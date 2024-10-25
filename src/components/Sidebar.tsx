@@ -12,9 +12,17 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
+import {useLazyGetSignoutQuery} from "../feature/authentication/api/signinApi";
 const Sidebar = () => {
   const [active, setActive] = useState("dashboard");
   const router = useNavigate();
+
+  const [logoutTrigger] = useLazyGetSignoutQuery({});
+
+  const logout = () => {
+    logoutTrigger({});
+    router("/sign-in");
+  }
   return (
     <div className="w-[280px] h-full min-h-svh  p-5 pt-2 border-r-2">
       <div className="flex ms-2 mt-5">
@@ -107,6 +115,9 @@ const Sidebar = () => {
               size={"lg"}
               variant={"ghost"}
               className="flex text-md p-3 justify-start w-full"
+              onClick={
+                logout
+              }
             >
               <LogOut
                 style={{ width: "25px", height: "25px" }}

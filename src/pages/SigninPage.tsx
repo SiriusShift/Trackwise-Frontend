@@ -36,14 +36,9 @@ const SignInPage = () => {
   });
 
   const [postSignin] = usePostSigninMutation();
-  const { data, error } = useGetAuthStatusQuery({});
-
-  useEffect(() => {
-    if (data) {
-      setIsAuthenticated(true);
-    }
-  });
-
+  const { error, data } = useGetAuthStatusQuery({});
+  console.log(data,error);
+  
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (isValid) {
@@ -80,9 +75,6 @@ const SignInPage = () => {
 
   return (
     <>
-      {/* {!isAuthenticated ? (
-        router("/")
-      ) : ( */}
         <LayoutAuth
           title="Welcome back"
           desc="Let's get started to track your expenses"
@@ -137,7 +129,6 @@ const SignInPage = () => {
             </a>
           </p>
         </LayoutAuth>
-      {/* )} */}
       <Toaster visibleToasts={5} />
     </>
   );

@@ -54,8 +54,16 @@ const signInApi = api.injectEndpoints({
                 headers: { Accept: "application/json" },
                 credentials: 'include'
             }),
+        }),
+        getSignout: builder.query({
+            query: () => ({
+                url: "/sign-out",
+                method: "GET",
+                headers: { Accept: "application/json" },
+                credentials: 'include'
+            }),
         })
     }),
 });
 
-export const { usePostSigninMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery } = signInApi;
+export const { usePostSigninMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery, useLazyGetAuthStatusQuery, useLazyGetSignoutQuery } = signInApi;
