@@ -33,7 +33,7 @@ const iconMap: Record<IconName, React.ComponentType> = {
 };
 
 const Sidebar = () => {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState("Dashboard");
   const router = useNavigate();
 
   const [logoutTrigger] = useLazyGetSignoutQuery({});
@@ -44,12 +44,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="xl:w-[280px] fixed top-0 left-0 h-full min-h-svh sm:p-3 xl:p-5 pt-2 border-r-2">
-      <div className="flex xl:ms-2 mt-5 justify-center xl:justify-start">
+    <div className="lg:w-[280px] hidden lg:inline fixed top-0 left-0 h-full min-h-svh sm:p-3 lg:p-5 pt-2 border-r-2">
+      <div className="flex lg:ms-3 mt-5 justify-center lg:justify-start">
         <img src={Logo} width={"27px"} alt="trackwise logo" />
-        <h1 className="text-xl ml-4 hidden xl:inline">Trackwise</h1>
+        <h1 className="text-lg ml-4 hidden lg:inline">Trackwise</h1>
       </div>
-      <div className="xl:flex mt-12 xl:flex-col justify-between h-[580px]">
+      <div className="lg:flex mt-12 lg:flex-col justify-between h-[580px]">
         <div className="gap-3 flex flex-col overflow-scroll">
           {navigationData.map((item) => {
             const IconComponent = iconMap[item.icon as IconName];
@@ -62,29 +62,29 @@ const Sidebar = () => {
                   setActive(item.name);
                   router(item.path);
                 }}
-                className="xl:flex text-md px-3 xl:p-3 xl:justify-start xl:w-full"
+                className="lg:flex text-md px-3 lg:p-3 lg:justify-start lg:w-full"
               >
                 {IconComponent && (
                   <IconComponent
                     style={{ width: "25px", height: "25px" }}
-                    className="xl:mr-3"
+                    className="lg:mr-3"
                   />
                 )}
-                <span className="hidden xl:inline">{item.name}</span>
+                <span className="hidden lg:inline">{item.name}</span>
               </Button>
             );
           })}
           <Button
             size={"lg"}
             variant={"ghost"}
-            className="xl:flex text-md px-3 xl:p-3 xl:justify-start xl:w-full"
+            className="lg:flex text-md px-3 lg:p-3 lg:justify-start lg:w-full"
             onClick={logout}
           >
             <LogOut
               style={{ width: "25px", height: "25px" }}
-              className="xl:mr-3"
+              className="lg:mr-3"
             />{" "}
-            <span className="hidden xl:inline">Logout</span>
+            <span className="hidden lg:inline">Logout</span>
           </Button>
         </div>
       </div>

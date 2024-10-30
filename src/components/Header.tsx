@@ -1,12 +1,13 @@
 import React from 'react'
 import moment from 'moment'
 import DefaultProfile from '../assets/images/default.png'
-import { Bell } from 'lucide-react'
+import { Bell, Menu } from 'lucide-react'
 const Header = () => {
     
   return (
-    <div className='h-20 flex items-center justify-between'>
+    <div className='min-h-16 flex items-center justify-between'>
         <div className='flex items-center gap-5'>
+            <Menu className='inline lg:hidden'/>
             <div className='border-2 h-10 w-64 flex px-3 items-center rounded-lg border-gray-200 shadow-md'>
                 <div className='h-6 w-6 me-3 rounded-full bg-gradient-to-tr from-gray-500 to-70% to-gray-300'></div>
                 <p>Jerome Perona</p>
