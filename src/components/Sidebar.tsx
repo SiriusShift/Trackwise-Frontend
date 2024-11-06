@@ -13,12 +13,6 @@ import {
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { useLazyGetSignoutQuery } from "../feature/authentication/api/signinApi";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { navigationData } from "@/navigation/navigationData";
 
 type IconName = "LayoutGrid" | "Wallet" | "HandCoins" | "Landmark" | "Settings" | "LogOut";
@@ -44,13 +38,15 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="lg:w-[280px] hidden lg:inline fixed top-0 left-0 h-full min-h-svh sm:p-3 lg:p-5 pt-2 border-r-2">
-      <div className="flex lg:ms-3 mt-5 justify-center lg:justify-start">
+    <div className="lg:w-[265px] hidden lg:inline fixed top-0 left-0 h-full min-h-svh sm:p-3 lg:p-5 pt-2 border-r-2 flex flex-col">
+      <div className="flex lg:ms-3 mt-2 justify-center lg:justify-start">
         <img src={Logo} width={"27px"} alt="trackwise logo" />
         <h1 className="text-lg ml-4 hidden lg:inline">Trackwise</h1>
       </div>
-      <div className="lg:flex mt-12 lg:flex-col justify-between h-[580px]">
-        <div className="gap-3 flex flex-col overflow-scroll">
+
+      {/* Main Content Wrapper with Scroll */}
+      <div className="flex-1 mt-12 overflow-y-auto max-h-[calc(100vh-5rem)] your-scrollable-class">
+        <div className="gap-3 flex flex-col">
           {navigationData.map((item) => {
             const IconComponent = iconMap[item.icon as IconName];
             return (
@@ -74,19 +70,23 @@ const Sidebar = () => {
               </Button>
             );
           })}
-          <Button
-            size={"lg"}
-            variant={"ghost"}
-            className="lg:flex text-md px-3 lg:p-3 lg:justify-start lg:w-full"
-            onClick={logout}
-          >
-            <LogOut
-              style={{ width: "25px", height: "25px" }}
-              className="lg:mr-3"
-            />{" "}
-            <span className="hidden lg:inline">Logout</span>
-          </Button>
         </div>
+      </div>
+
+      {/* Settings Button Stuck to the Bottom */}
+      <div className="mt-auto">
+        <Button
+          size={"lg"}
+          variant={"ghost"}
+          className="lg:flex text-md px-3 lg:p-3 lg:justify-start lg:w-full"
+          onClick={logout}
+        >
+          <LogOut
+            style={{ width: "25px", height: "25px" }}
+            className="lg:mr-3"
+          />
+          <span className="hidden lg:inline">Logout</span>
+        </Button>
       </div>
     </div>
   );

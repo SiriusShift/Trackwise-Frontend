@@ -5,7 +5,7 @@ import { Bell, Menu } from 'lucide-react'
 const Header = () => {
     
   return (
-    <div className='min-h-16 flex items-center justify-between'>
+    <div className='min-h-20 flex items-center justify-between'>
         <div className='flex items-center gap-5'>
             <Menu className='inline lg:hidden'/>
             <div className='border-2 h-10 w-64 flex px-3 items-center rounded-lg border-gray-200 shadow-md'>

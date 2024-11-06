@@ -6,6 +6,15 @@ body {
   font-family: 'Quicksand', sans-serif;
 }
 
+.your-scrollable-class::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.your-scrollable-class {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
 @layer base {
   :root {
