@@ -1,9 +1,8 @@
 import { useState } from "react";
 import Logo from "../assets/images/Logo.svg";
-import Dashboard from "../assets/images/Dashboard.svg";
-import Loan from "../assets/images/Loan Icon.svg";
 import {
   Wallet,
+  WalletMinimal,
   HandCoins,
   LayoutGrid,
   Landmark,
@@ -38,14 +37,14 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="lg:w-[265px] hidden lg:inline fixed top-0 left-0 h-full min-h-svh sm:p-3 lg:p-5 pt-2 border-r-2 flex flex-col">
-      <div className="flex lg:ms-3 mt-2 justify-center lg:justify-start">
-        <img src={Logo} width={"27px"} alt="trackwise logo" />
-        <h1 className="text-lg ml-4 hidden lg:inline">Trackwise</h1>
+    <div className="lg:w-[265px] hidden lg:flex fixed top-0 left-0 h-full min-h-svh sm:p-3 lg:p-5 border-r-2 pt-2 flex-col">
+      <div className="flex lg:ms-3 mt-3 justify-center lg:justify-start">
+        <WalletMinimal />
+        <h1 className="text-lg ml-4 hidden font-bold lg:inline">Trackwise</h1>
       </div>
 
       {/* Main Content Wrapper with Scroll */}
-      <div className="flex-1 mt-12 overflow-y-auto max-h-[calc(100vh-5rem)] your-scrollable-class">
+      <div className="flex-1 mt-10 overflow-y-auto max-h-[calc(100vh-5rem)] your-scrollable-class">
         <div className="gap-3 flex flex-col">
           {navigationData.map((item) => {
             const IconComponent = iconMap[item.icon as IconName];
@@ -63,7 +62,6 @@ const Sidebar = () => {
                 {IconComponent && (
                   <IconComponent
                     style={{ width: "25px", height: "25px" }}
-                    className="lg:mr-3"
                   />
                 )}
                 <span className="hidden lg:inline">{item.name}</span>

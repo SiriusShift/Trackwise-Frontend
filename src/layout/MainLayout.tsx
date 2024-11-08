@@ -7,9 +7,9 @@ function MainLayout() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex flex-col lg:ms-80 mx-10 w-full">
+      <div className="flex flex-col w-full">
         <Header />
-        <div className="h-full py-5">
+        <div className="h-full lg:ms-72 me-5 py-5">
           <Outlet />
         </div>
       </div>

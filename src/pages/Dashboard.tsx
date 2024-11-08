@@ -152,11 +152,11 @@ const Dashboard = () => {
           </PopoverContent>
         </Popover>
       </div> */}
-      <div className="gap-5 flex flex-col 2xl:flex-row">
+      <div className="gap-5 grid  2xl:flex-row">
         <div className="flex w-full flex-col gap-5">
           <div className="grid grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5">
-            <div className="border p-5 flex flex-col justify-between rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 border-gray-100 shadow-md">
-              <div className="flex justify-between">
+            <Card className="border p-5 flex flex-col justify-between rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 shadow-md">
+              {/* <div className="flex justify-between">
                 <div>
                   <h1 className="text-xl">Balance</h1>
                   <p className="text-sm text-gray-400">September 2024</p>
@@ -169,14 +169,14 @@ const Dashboard = () => {
                 <h2 className="text-2xl text-gray-600 font-semibold">
                   ₱ 100,000
                 </h2>
-              </div>
-            </div>
-            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 border-gray-100 shadow-md"></div>
-            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 border-gray-100 shadow-md"></div>
-            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 border-gray-100 shadow-md"></div>
+              </div> */}
+            </Card>
+            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 shadow-md"></div>
+            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 shadow-md"></div>
+            <div className="border rounded-lg col-span-2 md:col-span-2 xl:col-span-1 h-36 shadow-md"></div>
           </div>
           <div className="gap-5 grid-rows-1 grid grid-cols-3">
-            <Card className="col-span-4  lg:col-span-3 border rounded-lg border-gray-100 shadow-md">
+            <Card className="col-span-4  lg:col-span-3 border rounded-lg shadow-md">
               <div className="mx-6 mt-6">
                 <h1 className="text-xl font-bold">Active Loans</h1>
                 <CardDescription className="text-base">
@@ -230,7 +230,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="flex flex-row 2xl:flex-col gap-5">
-          <div className="w-1/2 xl:min-w-[350px] rounded lg p-5 border border-gray-100 shadow-md ">
+          <div className="w-1/2 xl:min-w-[350px] rounded lg p-5 border shadow-md ">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">
                 Recent Transactions
@@ -239,7 +239,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -264,7 +264,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -289,7 +289,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -314,7 +314,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -338,7 +338,7 @@ const Dashboard = () => {
               </div> */}
             </div>
           </div>
-          <div className="w-1/2 xl:min-w-[350px] rounded lg p-5 border border-gray-100 shadow-md ">
+          <div className="w-1/2 xl:min-w-[350px] rounded lg p-5 border shadow-md ">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">
                 Recent Transactions
@@ -347,7 +347,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -372,7 +372,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -397,7 +397,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white max-h-12 max-w-12 flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
@@ -422,7 +422,7 @@ const Dashboard = () => {
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white border-gray-100 max-h-12 max-w-12 flex justify-center shadow-md">
+                <div className="p-2 border rounded-md bg-white flex justify-center shadow-md">
                   <UtensilsCrossed
                     className="text-black"
                     width={25}
