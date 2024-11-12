@@ -9,7 +9,7 @@ function MainLayout() {
       <Sidebar />
       <div className="flex flex-col w-full">
         <Header />
-        <div className="h-full lg:ms-72 me-5 py-5">
+        <div className="h-full lg:ms-72 mx-5 py-5">
           <Outlet />
         </div>
       </div>
