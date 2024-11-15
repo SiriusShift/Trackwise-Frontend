@@ -12,11 +12,12 @@ import React from "react";
 import {
   Calendar as CalendarIcon,
   UtensilsCrossed,
-  Info,
   Banknote,
   Plane,
   Bus,
   Smartphone,
+  ArrowUpFromLine,
+  ArrowDownFromLine,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -27,6 +28,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import CalendarWidget from "@/components/CalendarWidget";
 
 import {
   Card,
@@ -43,6 +46,7 @@ import {
 } from "@/components/ui/chart";
 import { useTheme } from "@/components/theme-provider";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -63,7 +67,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 const Dashboard = () => {
-  // const [date, setDate] = React.useState<Date>();
+  const [activeDay, setActiveDay] = React.useState();
   const { theme } = useTheme();
 
   return (
@@ -84,25 +88,64 @@ const Dashboard = () => {
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
-            <div className="grid grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
-              <Card className="border p-5 flex flex-col justify-between rounded-lg col-span-full md:col-span-1 h-60 ">
-                {/* <div className="flex justify-between">
-                <div>
-                  <h1 className="text-xl">Balance</h1>
-                  <p className="text-sm text-gray-400">September 2024</p>
+            <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
+              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
+                <CardHeader className="flex p-0 flex-row justify-between">
+                  <CardTitle className="text-xl">Overview</CardTitle>
+                  <CardDescription className="text-sm text-gray-400">
+                    September 2024
+                  </CardDescription>
+                </CardHeader>
+                <hr className="my-2 mb-4" />
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-gray-400">Balance</p>
+                    <h1 className="text-3xl">₱10,732.52</h1>
+                  </div>
+                  <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-gray-100 ">
+                    <Banknote />
+                  </div>
                 </div>
-                <div className="w-10 h-10 rounded-md flex justify-center items-center bg-gray-100">
-                  <Banknote className="text-gray-500" />
+                <div className="flex gap-1 mt-5">
+                  <p>Compare to last month</p>
+                  <p className="text-green-500">+6.52%</p>
                 </div>
-              </div>
-              <div>
-                <h2 className="text-2xl text-gray-600 font-semibold">
-                  ₱ 100,000
-                </h2>
-              </div> */}
+                <p className="text-gray-400">September 01 - September 30</p>
               </Card>
-              <Card className="border rounded-lg col-span-full  md:col-span-2 xl:col-span-1 h-60 "></Card>
-              <Card className="border rounded-lg col-span-full md:col-span-3 xl:col-span-1 h-60 "></Card>
+              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
+                <CardHeader className="flex p-0 flex-row justify-between">
+                  <CardTitle className="text-xl">Calendar</CardTitle>
+                  <CardDescription className="text-sm text-gray-400">
+                    September 2024
+                  </CardDescription>
+                </CardHeader>
+                <hr className="my-2 mb-4"/>
+                <div className="space-y-3">
+                <div className="flex gap-2 justify-around">
+                  <div className="flex gap-2">
+                    <div className="w-12 h-12 rounded-md flex  justify-center items-center bg-gray-100">
+                      <ArrowUpFromLine className="text-black"/>
+                    </div>
+                    <div>
+                      <p>Income</p>
+                      <p className="text-green-500">+6.52%</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-12 h-12 rounded-md flex  justify-center items-center bg-gray-100">
+                      <ArrowDownFromLine className="text-black"/>
+                    </div>
+                    <div>
+                      <p>Expense</p>
+                      <p className="text-red-500">+6.52%</p>
+                    </div>
+                  </div>
+                </div>
+                <CalendarWidget colorTheme={theme} handleClick={setActiveDay}/>
+                </div>
+
+              </Card>
+              <Card className="border rounded-lg col-span-full md:col-span-4 xl:col-span-1 h-60 "></Card>
             </div>
             <div className="gap-5 grid-rows-2 md:grid-rows-1 grid grid-cols-4">
               <div className="col-span-full md:col-span-2">
@@ -110,11 +153,7 @@ const Dashboard = () => {
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
                       <CardTitle className="text-xl">Loan Balance</CardTitle>
-                      <p className="hidden md:inline">See All</p>
-                      <Info
-                        width={25}
-                        className="inline text-gray-500 md:hidden"
-                      />{" "}
+                      <Link to="/loans">See All</Link>
                     </div>
                     <CardDescription className="text-lg mb-5">
                       ₱10,732,012.52 / ₱50,023,012.20
@@ -177,11 +216,7 @@ const Dashboard = () => {
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
                       <CardTitle className="text-xl">Savings Plan</CardTitle>
-                      <p className="hidden md:inline">See All</p>
-                      <Info
-                        width={25}
-                        className="inline text-gray-500 md:hidden"
-                      />
+                      <Link to="/savings">See All</Link>
                     </div>
                     <CardDescription className="text-lg mb-5">
                       Three active savings plans
@@ -201,7 +236,7 @@ const Dashboard = () => {
                         <div className="border-l-2 border-dashed">
                           <div className="p-3 space-y-3">
                             <div className="w-12 flex justify-center items-center h-12 rounded-md bg-gray-100">
-                              <Plane className="text-black"/>
+                              <Plane className="text-black" />
                             </div>
                             <div>
                               <h1 className="text-lg font-bold">Travel</h1>
@@ -214,7 +249,7 @@ const Dashboard = () => {
                         <div className="border-l-2 border-dashed">
                           <div className="p-3 space-y-3">
                             <div className="w-12 flex justify-center items-center h-12 rounded-md bg-gray-100">
-                              <Smartphone className="text-black"/>
+                              <Smartphone className="text-black" />
                             </div>
                             <div>
                               <h1 className="text-lg font-bold">Smartphone</h1>
@@ -234,8 +269,7 @@ const Dashboard = () => {
           <div className="rounded col-span-full md:col-span-1 lg p-7 border  ">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">Upcoming payments</h1>
-              <p className="hidden md:inline">See All</p>
-              <Info width={25} className="inline text-gray-500 md:hidden" />
+              <Link to={"/wallet"}>See All</Link>
             </div>
             {/* <hr className="w-full mt-3"/> */}
             <div className="flex mt-5 rounded-md flex-col gap-5 justify-between">
@@ -280,8 +314,7 @@ const Dashboard = () => {
               <h1 className="gap-3 text-xl font-semibold">
                 Recent Transactions
               </h1>
-              <p className="hidden md:inline">See All</p>
-              <Info width={25} className="inline text-gray-500 md:hidden" />
+              <Link to={"/wallet"}>See All</Link>
             </div>
             <div className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">

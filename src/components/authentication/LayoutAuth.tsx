@@ -1,5 +1,6 @@
 // app/components/SignUpForm.tsx
 "use client";
+import { WalletMinimal } from "lucide-react";
 import Logo from "../../assets/images/Logo.svg";
 import { ReactNode } from "react";
 import { SubmitHandler } from "react-hook-form";
@@ -32,7 +33,7 @@ const LayoutAuth = ({ children, title, desc, submit }: LayoutAuthProps) => {
     <>
       <div className="content-center sm:flex h-dvh sm:w-screen sm:items-center sm:justify-center">
         <div className="flex flex-col items-center sm:w-96 gap-2">
-          <img src={Logo} alt="brand-logo" className="h-10 w-10" />
+          <WalletMinimal width={35} height={35}/>
           <h1 className="text-2xl font-bold">{title}</h1>
           <p className="text-center">{desc}</p>
           <form
