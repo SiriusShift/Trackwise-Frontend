@@ -97,12 +97,15 @@ const SignInPage = () => {
               {...register("password")}
               required
             />
-            <p
+            <div className="flex justify-end">
+            <a
+              href="/forgot-password" 
               className="text-sm text-right -mt-4"
               onClick={() => router("/forgot-password")}
             >
               Forgot Password?
-            </p>
+            </a>
+            </div>
             <Button
               className="w-full sm:w-96 text-right"
               disabled={!isValid}

@@ -3,13 +3,12 @@ import '@/assets/styles/Calendar.css'
 import { Button } from "./ui/button";
 interface Day {
   day: string;
+  activeDay: number;
   date: number;
 }
 
-const HorizontalCalendar: React.FC = ({ handleClick, colorTheme }) => {
+const HorizontalCalendar: React.FC = ({ handleClick, activeDay, colorTheme }) => {
   const today = new Date();
-  const currentDate = today.getDate();
-
 
   const days: Day[] = Array.from({ length: 31 }, (_, i) => {
     const date = new Date(today.getFullYear(), today.getMonth(), i + 1);
@@ -24,7 +23,7 @@ const HorizontalCalendar: React.FC = ({ handleClick, colorTheme }) => {
   {days.map((day, index) => (
     <button
       key={index}
-      className={`day-tile ${day.date === currentDate ? colorTheme === "light" ? "bg-black text-white" : "bg-white text-black" : ""}`}
+      className={`day-tile ${day.date === activeDay ? colorTheme === "light" ? "bg-black text-white" : "bg-white text-black" : ""}`}
       onClick={() => handleClick(day.date)} // Optional: Define a function for handling day clicks
     >
       <div className="day">{day.day}</div>

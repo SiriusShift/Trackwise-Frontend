@@ -1,32 +1,15 @@
+import {
+  LayoutGrid,
+  Activity,
+  HandCoins,
+  Landmark,
+  Settings,
+} from "lucide-react";
+
 export const navigationData = [
-    {
-        id: 1,
-        name: 'Dashboard',
-        path: '/',
-        icon: 'LayoutGrid'
-    },
-    {
-        id: 2,
-        name: 'Wallet',
-        path: '/wallet',
-        icon: 'Wallet'
-    },
-    {
-        id: 3,
-        name: 'Loan',
-        path: '/loan',
-        icon: 'Landmark'
-    },
-    {
-        id: 4,
-        name: 'Savings',
-        path: '/savings',
-        icon: 'HandCoins'
-    },
-    {
-        id: 5,
-        name: 'Settings',
-        path: '/settings',
-        icon: 'Settings'
-    },
-]
+  { name: "Dashboard", path: "/", icon: LayoutGrid },
+  { name: "Cash Flow", path: "/funds", icon: Activity },
+  { name: "Loan", path: "/loan", icon: HandCoins },
+  { name: "Savings", path: "/savings", icon: Landmark },
+  { name: "Settings", path: "/settings", icon: Settings },
+];

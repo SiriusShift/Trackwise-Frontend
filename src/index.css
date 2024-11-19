@@ -7,7 +7,6 @@ body {
   /* background-color: #f5f5f9
   ; */
 }
-
 .your-scrollable-class::-webkit-scrollbar {
   display: none;
 }
@@ -18,7 +17,15 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+.sidebar {
+  transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  overflow: hidden;
+}
 
+.sidebar-header,
+.sidebar-footer {
+  transition: opacity 0.3s ease-in-out;
+}
 
 
 @layer base {
@@ -47,7 +54,7 @@ body {
     --chart-2: 0 0% 85%;   /* Light Gray */
     --chart-3: 0 0% 70%;   /* Medium Light Gray */
     --chart-4: 0 0% 55%;   /* Medium Gray */
-    --chart-5: 0 0% 40%;   /* Darker Gray */
+    --chart-5: 0 0% 40%;   /* Darker Gray */   --sidebar-background: 0 0% 98%;   --sidebar-foreground: 240 5.3% 26.1%;   --sidebar-primary: 240 5.9% 10%;   --sidebar-primary-foreground: 0 0% 98%;   --sidebar-accent: 240 4.8% 95.9%;   --sidebar-accent-foreground: 240 5.9% 10%;   --sidebar-border: 220 13% 91%;   --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -74,7 +81,15 @@ body {
     --chart-2: 0 0% 20%;   /* Dark Gray */
     --chart-3: 0 0% 30%;   /* Medium Dark Gray */
     --chart-4: 0 0% 40%;   /* Medium Gray */
-    --chart-5: 0 0% 50%;   /* Lighter Dark Gray */
+    --chart-5: 0 0% 50%;   /* Lighter Dark Gray */   
+    --sidebar-background: 240 5.9% 10%;   
+    --sidebar-foreground: 240 4.8% 95.9%;   
+    --sidebar-primary: 224.3 76.3% 48%;   
+    --sidebar-primary-foreground: 0 0% 100%;   
+    --sidebar-accent: 240 3.7% 15.9%;   
+    --sidebar-accent-foreground: 240 4.8% 95.9%;   
+    --sidebar-border: 240 3.7% 15.9%;   
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
