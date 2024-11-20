@@ -17,6 +17,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { navigationData } from "@/navigation/navigationData";
+import { useLocation } from "react-router-dom";
+import MonthPicker from "@/components/datePicker";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -38,153 +41,25 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const WalletPage = () => {
+  const location = useLocation();
+  const currentPageName = navigationData.find(
+    (item) => item.path === location.pathname
+  );
   return (
-    <div className="flex">
-      <div className="w-full border-y py-5">
-        <div className="w-full flex">
-          <div className="border-r h-full flex justify-between px-3 w-full">
-            <div>
-              <p className="text-sm text-gray-400">Avg. Monthly Expense</p>
-              <h1 className="text-3xl">₱4,500.00</h1>
-            </div>
-            <ChartContainer className="w-[350px] h-[150px]" config={chartConfig}>
-              <AreaChart
-                accessibilityLayer
-                data={chartData}
-                margin={{
-                  left: 12,
-                  right: 12,
-                }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <defs>
-                  <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                  <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                </defs>
-                <Area
-                  dataKey="mobile"
-                  type="natural"
-                  fill="url(#fillMobile)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-mobile)"
-                  stackId="a"
-                />
-                <Area
-                  dataKey="desktop"
-                  type="natural"
-                  fill="url(#fillDesktop)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-desktop)"
-                  stackId="a"
-                />
-              </AreaChart>
-            </ChartContainer>
-          </div>
-          <div className=" h-full flex justify-between px-3 w-full">
-            <div>
-              <p className="text-sm text-gray-400">Avg. Monthly Expense</p>
-              <h1 className="text-3xl">₱4,500.00</h1>
-            </div>
-            <ChartContainer className="w-[250px]" config={chartConfig}>
-              <AreaChart
-                accessibilityLayer
-                data={chartData}
-                margin={{
-                  left: 12,
-                  right: 12,
-                }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <defs>
-                  <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                  <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                </defs>
-                <Area
-                  dataKey="mobile"
-                  type="natural"
-                  fill="url(#fillMobile)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-mobile)"
-                  stackId="a"
-                />
-                <Area
-                  dataKey="desktop"
-                  type="natural"
-                  fill="url(#fillDesktop)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-desktop)"
-                  stackId="a"
-                />
-              </AreaChart>
-            </ChartContainer>
-          </div>
+    <div className="flex flex-col">
+      <div className="flex justify-between">
+        <div>
+          <p className="text-xl">{currentPageName?.name}</p>
+          <p className="text-gray-400">
+            This is your overview of expenses and incomes for this month
+          </p>
         </div>
+        <div>
+          <MonthPicker />
+        </div>
+      </div>
+      <div>
+        
       </div>
     </div>
   );

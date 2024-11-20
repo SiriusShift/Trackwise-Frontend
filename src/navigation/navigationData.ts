@@ -9,7 +9,7 @@ import {
 export const navigationData = [
   { name: "Dashboard", path: "/", icon: LayoutGrid },
   { name: "Cash Flow", path: "/funds", icon: Activity },
-  { name: "Loan", path: "/loan", icon: HandCoins },
+  { name: "Loan", path: "/loans", icon: HandCoins },
   { name: "Savings", path: "/savings", icon: Landmark },
   { name: "Settings", path: "/settings", icon: Settings },
 ];

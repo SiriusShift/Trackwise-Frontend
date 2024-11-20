@@ -9,14 +9,25 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { WalletMinimal } from "lucide-react";
+import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../navigation/navigationData";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { useLazyGetSignoutQuery } from "../feature/authentication/api/signinApi";
+
 
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const router = useNavigate();
+
+  const [logoutTrigger] = useLazyGetSignoutQuery({});
+
+
+  const handleLogout = () => {
+    logoutTrigger({});
+    router("/sign-in");
+  };
 
   return (
     <Sidebar
@@ -46,7 +57,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <button
-                      className="flex items-center h-[42px] space-x-2"
+                      className="flex items-center h-[42px] space-x-2 "
                       onClick={() => router(item.path)}
                     >
                       {item.icon && (
@@ -64,13 +75,20 @@ export function AppSidebar() {
 
       {/* Sidebar Footer */}
       <SidebarFooter>
-        <div
-          className={`p-4 text-sm text-center text-muted transition-opacity duration-300 ${
-            isExpanded ? "opacity-100" : "opacity-0"
-          }`}
+        <div className="mx-3">
+        <Button
+          size={"lg"}
+          variant={"ghost"}
+          className="lg:flex text-md lg:pl-3 h-[42px] lg:justify-start lg:w-full"
+          onClick={handleLogout}
         >
-          <span>© 2024 Trackwise</span>
-        </div>
+          <LogOut
+            style={{ width: "24px", height: "24px" }}
+            className="lg:mr-3"
+          />
+          <span>Logout</span>
+        </Button>
+          </div>
       </SidebarFooter>
     </Sidebar>
   );

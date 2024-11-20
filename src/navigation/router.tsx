@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
                 element: <WalletPage />
             },
             {
-                path: "/loan",
+                path: "/loans",
                 element: <LoanPage />
             },
             {

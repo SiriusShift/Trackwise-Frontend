@@ -1,21 +1,24 @@
 import DefaultProfile from "../assets/images/default.png";
-import {navigationData} from "../navigation/navigationData";
+import { navigationData } from "../navigation/navigationData";
 import { Bell, Menu, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import ModeToggle from "./mode-toggle";
 import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "./ui/sidebar";
+
 const Header = () => {
-  const location = useLocation();
-  const currentPageName = navigationData.find(
-    (item) => item.path === location.pathname
-  )
+  // const location = useLocation();
+  // const currentPageName = navigationData.find(
+  //   (item) => item.path === location.pathname
+  // );
+
   return (
-    <div className="flex border-b-2  items-center justify-between">
+    <div className="flex bg-background sticky right-0 top-0 w-full border-b-2 items-center justify-between">
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
           <SidebarTrigger className="inline md:hidden" />
-          <p className="text-xl">{currentPageName?.name}</p>
+          <p>Good morning, John</p>
+          {/* <p className="text-xl">{currentPageName?.name}</p> */}
         </div>
         <div className="flex items-center gap-2 sm:gap-5 justify-between">
           <ModeToggle />
