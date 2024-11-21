@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 function MainLayout() {
   return (
     <SidebarProvider>
-      <div className="flex w-full h-screen">
+      <div className="flex w-full h-screen overflow-hidden">
         <AppSidebar />
         <div className="flex flex-col w-full">
           <Header />

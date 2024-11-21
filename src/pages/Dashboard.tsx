@@ -102,21 +102,21 @@ const Dashboard = () => {
   const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   return (
-    <>
+    <div className="space-y-5">
+      <div className="flex justify-between">
+        <div>
+          <p className="text-xl">{currentPageName?.name}</p>
+          <p className="text-gray-400">
+            This is your overview dashboard for this month
+          </p>
+        </div>
+        <div>
+          <MonthPicker />
+        </div>
+      </div>
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xl">{currentPageName?.name}</p>
-                <p className="text-gray-400">
-                  This is your overview dashboard for this month
-                </p>
-              </div>
-              <div>
-                <MonthPicker />
-              </div>
-            </div>
             <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
               <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-4 lg:col-span-2 xl:col-span-1 h-60 ">
                 <CardHeader className="flex p-0 flex-row justify-between">
@@ -326,7 +326,9 @@ const Dashboard = () => {
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
                       <CardTitle className="text-xl">Savings Plan</CardTitle>
-                      <Link to="/savings" className="z-1">See All</Link>
+                      <Link to="/savings" className="z-1">
+                        See All
+                      </Link>
                     </div>
                     <CardDescription className="text-lg mb-5">
                       Three active savings plans
@@ -523,7 +525,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
