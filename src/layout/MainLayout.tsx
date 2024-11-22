@@ -10,7 +10,7 @@ function MainLayout() {
         <AppSidebar />
         <div className="flex flex-col w-full">
           <Header />
-          <div className="px-5 py-5 overflow-auto flex-grow">
+          <div className="px-5 py-5 overflow-auto ">
             <Outlet />
           </div>
         </div>

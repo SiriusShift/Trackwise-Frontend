@@ -103,7 +103,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-5">
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-5 sm:flex-row justify-between">
         <div>
           <p className="text-xl">{currentPageName?.name}</p>
           <p className="text-gray-400">
@@ -118,7 +118,7 @@ const Dashboard = () => {
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
             <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
-              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-4 lg:col-span-2 xl:col-span-1 h-60 ">
+              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
                 <CardHeader className="flex p-0 flex-row justify-between">
                   <CardTitle className="text-xl">Overview</CardTitle>
                   <CardDescription className="text-sm text-gray-400">
@@ -141,7 +141,7 @@ const Dashboard = () => {
                 </div>
                 <p className="text-gray-400">September 01 - September 30</p>
               </Card>
-              <Card className="border p-5 z-0 flex flex-col rounded-lg col-span-full md:col-span-4 lg:col-span-2 xl:col-span-1 h-60 ">
+              <Card className="border p-5 z-0 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
                 <CardHeader className="flex p-0 flex-row justify-between">
                   <CardTitle className="text-xl">Expense limit</CardTitle>
                   <CardDescription className="text-sm text-gray-400">
@@ -255,7 +255,7 @@ const Dashboard = () => {
               </Card>
             </div>
             <div className="gap-5 space-y-5 z-30 sm:space-y-0 sm:grid-rows-2 md:grid-rows-1 sm:grid grid-cols-4">
-              <div className="col-span-full md:col-span-4 lg:col-span-2">
+              <div className="col-span-full md:col-span-2 lg:col-span-2">
                 <Card className="p-0 gap-5 h-full flex flex-col justify-between">
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
@@ -321,7 +321,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-              <div className="col-span-full md:col-span-4 lg:col-span-2">
+              <div className="col-span-full md:col-span-2 lg:col-span-2">
                 <Card className="p-0 gap-5 h-full flex flex-col">
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">

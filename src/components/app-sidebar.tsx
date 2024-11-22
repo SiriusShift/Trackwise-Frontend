@@ -13,19 +13,13 @@ import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../navigation/navigationData";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./ui/button";
-import { useLazyGetSignoutQuery } from "../feature/authentication/api/signinApi";
-
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const router = useNavigate();
 
-  const [logoutTrigger] = useLazyGetSignoutQuery({});
-
-
   const handleLogout = () => {
-    logoutTrigger({});
     router("/sign-in");
   };
 
@@ -44,7 +38,11 @@ export function AppSidebar() {
           } lg:ms-3 mt-3 justify-start`}
         >
           <WalletMinimal className="text-primary" />
-          {isExpanded && <h1 className="text-lg ml-4 font-bold">Trackwise</h1>}
+          {isExpanded && (
+            <h1 className="text-lg ml-4 inline md:hidden lg:inline font-bold">
+              Trackwise
+            </h1>
+          )}
         </div>
       </SidebarHeader>
 
@@ -56,15 +54,31 @@ export function AppSidebar() {
               {navigationData.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <button
-                      className="flex items-center h-[42px] space-x-2 "
-                      onClick={() => router(item.path)}
-                    >
-                      {item.icon && (
-                        <item.icon style={{ width: "24px", height: "24px" }} />
+                    <div className="flex items-center h-[42px] space-x-2">
+                      <item.icon style={{ width: "24px", height: "24px" }} />
+                      <span className="inline md:hidden lg:inline">
+                        {item.name}
+                      </span>
+                      {!isExpanded && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                className="hidden md:block"
+                                onClick={() => router(item.path)}
+                              >
+                                <item.icon
+                                  style={{ width: "20px", height: "20px" }}
+                                />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{item.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
-                      {isExpanded && <span>{item.name}</span>}
-                    </button>
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -75,20 +89,20 @@ export function AppSidebar() {
 
       {/* Sidebar Footer */}
       <SidebarFooter>
-        <div className="mx-3">
-        <Button
-          size={"lg"}
-          variant={"ghost"}
-          className="lg:flex text-md lg:pl-3 h-[42px] lg:justify-start lg:w-full"
-          onClick={handleLogout}
-        >
-          <LogOut
-            style={{ width: "24px", height: "24px" }}
-            className="lg:mr-3"
-          />
-          <span>Logout</span>
-        </Button>
-          </div>
+        <div className="mx-3 py-3">
+          <SidebarMenuButton asChild>
+            <button
+              className="flex items-center h-[42px] rounded w-[100%] px-2 space-x-2"
+              onClick={handleLogout}
+            >
+              <LogOut
+                style={{ width: "24px", height: "24px" }}
+                className="lg:mr-3"
+              />
+              <span className="inline md:hidden lg:inline">Logout</span>
+            </button>
+          </SidebarMenuButton>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

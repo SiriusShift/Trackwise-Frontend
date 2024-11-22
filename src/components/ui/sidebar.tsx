@@ -219,10 +219,9 @@ const Sidebar = React.forwardRef<
         data-variant={variant}
         data-side={side}
       >
-        {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            "duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
+            "duration-200 relative h-svh w-[--sidebar-width] md:w-20 lg:w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
@@ -240,6 +239,7 @@ const Sidebar = React.forwardRef<
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
+            "md:w-20 lg:w-[--sidebar-width]", // Set width to w-20 on medium screens
             className
           )}
           {...props}
@@ -255,6 +255,7 @@ const Sidebar = React.forwardRef<
     )
   }
 )
+
 Sidebar.displayName = "Sidebar"
 
 const SidebarTrigger = React.forwardRef<

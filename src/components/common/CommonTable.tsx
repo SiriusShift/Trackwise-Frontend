@@ -79,18 +79,18 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full">
       {/* Filter input */}
-      <div className="flex items-center h-12 pb-4">
+      <div className="flex items-center pb-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter description..."
+          value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("description")?.setFilterValue(event.target.value)
           }
           className="w-52 h-full"
         />
       </div>
 
-      <div className="rounded-md border overflow-y-scroll h-[375px]">
+      <div className="rounded-md border overflow-auto h-[375px]">
         <Table>
           <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -108,7 +108,34 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-
+          <TableBody className="font-semibold">
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
         </Table>
       </div>
 

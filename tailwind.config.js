@@ -20,7 +20,24 @@ module.exports = {
     			md: 'calc(var(--radius) - 2px)',
     			sm: 'calc(var(--radius) - 4px)'
     		},
+			animation:{
+				blink: 'blink 5s ease-in-out infinite'
+			},
+			keyframes: {
+				blink: {
+					"0%, 100%": { opacity: "1" },
+					"50%": { opacity: "0" },
+				  },
+			},
     		colors: {
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning:{
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
     			background: 'hsl(var(--background))',
     			foreground: 'hsl(var(--foreground))',
     			card: {

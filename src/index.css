@@ -4,9 +4,8 @@
 
 body {
   font-family: 'Quicksand', sans-serif;
-  /* background-color: #f5f5f9
-  ; */
 }
+
 .your-scrollable-class::-webkit-scrollbar {
   display: none;
 }
@@ -27,7 +26,6 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -46,6 +44,10 @@ body {
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --success: 144 60% 50%; /* Green for success */
+    --success-foreground: 0 0% 98%;
+    --warning: 39 100% 50%; /* Yellow for warning */
+    --warning-foreground: 0 0% 10%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
@@ -54,7 +56,15 @@ body {
     --chart-2: 0 0% 85%;   /* Light Gray */
     --chart-3: 0 0% 70%;   /* Medium Light Gray */
     --chart-4: 0 0% 55%;   /* Medium Gray */
-    --chart-5: 0 0% 40%;   /* Darker Gray */   --sidebar-background: 0 0% 98%;   --sidebar-foreground: 240 5.3% 26.1%;   --sidebar-primary: 240 5.9% 10%;   --sidebar-primary-foreground: 0 0% 98%;   --sidebar-accent: 240 4.8% 95.9%;   --sidebar-accent-foreground: 240 5.9% 10%;   --sidebar-border: 220 13% 91%;   --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-5: 0 0% 40%;   /* Darker Gray */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -74,6 +84,10 @@ body {
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --success: 144 60% 40%; /* Darker green for dark mode */
+    --success-foreground: 0 0% 98%;
+    --warning: 39 100% 45%; /* Darker yellow for dark mode */
+    --warning-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
@@ -81,14 +95,14 @@ body {
     --chart-2: 0 0% 20%;   /* Dark Gray */
     --chart-3: 0 0% 30%;   /* Medium Dark Gray */
     --chart-4: 0 0% 40%;   /* Medium Gray */
-    --chart-5: 0 0% 50%;   /* Lighter Dark Gray */   
-    --sidebar-background: 240 5.9% 10%;   
-    --sidebar-foreground: 240 4.8% 95.9%;   
-    --sidebar-primary: 224.3 76.3% 48%;   
-    --sidebar-primary-foreground: 0 0% 100%;   
-    --sidebar-accent: 240 3.7% 15.9%;   
-    --sidebar-accent-foreground: 240 4.8% 95.9%;   
-    --sidebar-border: 240 3.7% 15.9%;   
+    --chart-5: 0 0% 50%;   /* Lighter Dark Gray */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }

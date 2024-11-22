@@ -10,42 +10,73 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+import moment from "moment";
+import { Badge } from "@/components/ui/badge";
+
+export type Expense = {
+  id: number; // Unique identifier
+  date: string; // ISO format date string
+  category: string; // Expense category
+  description: string; // Description of the expense
+  amount: number; // Amount in dollars
+  paymentMethod: string; // Payment method used
+  status: "paid" | "unpaid" | "overdue"; // Specific status
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Expense>[] = [
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ getValue }) => {
+      const dateValue = getValue();
+      return <span>{dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}</span>;
+    },
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="text-xs"
-          size={"sm"}
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2" />
-        </Button>
-      );
-    },
+    accessorKey: "category",
+    header: "Category",
+    cell: ({ getValue }) => (
+      <div className="flex space-x-2">
+        <Badge variant="outline">{getValue()}</Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ getValue }) => {
+      const amount = getValue() as number | undefined;
+      return <span>${amount?.toFixed(2) || "0.00"}</span>;
+    },
+  },
+  {
+    accessorKey: "paymentMethod",
+    header: "Payment Method",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue }) => {
+      const status = getValue() as Expense["status"];
+      const statusColor =
+        status === "Paid"
+          ? "success"
+          : status === "Unpaid"
+          ? "warning"
+          : "destructive";
+
+      return <Badge variant={"outline"} ><div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`}/>{status || "unknown"}</Badge>;
+    },
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const payment = row.original;
 
@@ -60,7 +91,11 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() =>
+                payment?.id
+                  ? navigator.clipboard.writeText(String(payment.id))
+                  : console.warn("No payment ID available.")
+              }
             >
               Copy payment ID
             </DropdownMenuItem>
