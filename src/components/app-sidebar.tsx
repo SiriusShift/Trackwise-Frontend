@@ -54,7 +54,7 @@ export function AppSidebar() {
               {navigationData.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <div className="flex items-center h-[42px] space-x-2">
+                    <div onClick={() => router(item.path)} className="flex items-center hover:cursor-pointer h-[42px] space-x-2">
                       <item.icon style={{ width: "24px", height: "24px" }} />
                       <span className="inline md:hidden lg:inline">
                         {item.name}

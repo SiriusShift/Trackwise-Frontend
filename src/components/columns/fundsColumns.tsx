@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-
+import { Expense } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,16 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
-
-export type Expense = {
-  id: number; // Unique identifier
-  date: string; // ISO format date string
-  category: string; // Expense category
-  description: string; // Description of the expense
-  amount: number; // Amount in dollars
-  paymentMethod: string; // Payment method used
-  status: "paid" | "unpaid" | "overdue"; // Specific status
-};
 
 export const columns: ColumnDef<Expense>[] = [
   {

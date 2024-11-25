@@ -77,12 +77,14 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full">
+    <div className="min-w-full">
       {/* Filter input */}
       <div className="flex items-center pb-4">
         <Input
           placeholder="Filter description..."
-          value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("description")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn("description")?.setFilterValue(event.target.value)
           }
@@ -90,13 +92,15 @@ export function DataTable<TData, TValue>({
         />
       </div>
 
-      <div className="rounded-md border overflow-auto h-[375px]">
+      {/* Table container with responsive and overflow behavior */}
+
+      <div className="border relative w-full rounded-md z-1 overflow-auto">
         <Table>
           <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="whitespace-nowrap">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -108,7 +112,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="font-semibold">
+          <TableBody className="font-semibold ">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -116,7 +120,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -136,6 +140,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+
         </Table>
       </div>
 
