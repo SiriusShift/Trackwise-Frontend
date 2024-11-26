@@ -1,12 +1,24 @@
-export type Expense = {
+export interface Expense {
   id: number; // Unique identifier
-  date: string; // ISO format date string
-  category: string; // Expense category
-  description: string; // Description of the expense
-  amount: number; // Amount in dollars
-  paymentMethod: string; // Payment method used
-  status: "Paid" | "Unpaid" | "Overdue"; // Specific status
-};
+  date: Date; // Date of the expense
+  category: string; // Category of the expense (e.g., "Food & Dining", "Transport")
+  description?: string; // Optional description
+  amount: number; // Expense amount
+  source: Object;
+  status: "Paid" | "Unpaid" | "Pending"; // Status of the expense
+}
+
+export interface Income {
+  id: number;
+  date: Date;
+  category: string;
+  description?: string;
+  amount: number;
+  source?: { id: number; name: string };
+  user: { id: number; name: string };
+  status: "Received" | "Pending" | string;
+}
+
 
 export interface Option {
   label: string;
@@ -31,3 +43,10 @@ export interface DataTableFilterOption<TData> {
   filterOperator?: string;
   isMulti?: boolean;
 }
+
+
+export interface expenseForm = {
+  name: string;
+  email: string;
+  password: string;
+};

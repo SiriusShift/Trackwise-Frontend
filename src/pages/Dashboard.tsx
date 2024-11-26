@@ -103,7 +103,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-5 sm:flex-row justify-between">
+      <div className="flex gap-5 justify-between">
         <div>
           <p className="text-xl">{currentPageName?.name}</p>
           <p className="text-gray-400">

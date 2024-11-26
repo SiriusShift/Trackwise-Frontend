@@ -44,3 +44,12 @@ export const resetPasswordSchema = {
       .oneOf([yup.ref("password")], "Passwords must match"),
   }),
 };
+
+export const addExpenseSchema = yup.object().shape({
+  category: yup.string().required("Category is required"),
+  description: yup.string().required("Description is required"),
+  amount: yup
+    .number()
+    .required("Amount is required")
+    .positive("Amount must be greater than 0"),
+});

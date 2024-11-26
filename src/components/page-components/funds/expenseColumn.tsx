@@ -13,7 +13,7 @@ import {
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
 
-export const columns: ColumnDef<Expense>[] = [
+export const expenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "date",
     header: "Date",

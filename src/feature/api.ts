@@ -7,10 +7,6 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_PUBLIC_BASEURL,
     prepareHeaders: (headers) => {
       headers.set("Accept", "application/json");
-      headers.set(
-        "Authorization",
-        `Bearer ${decryptString(localStorage.getItem("token") || "")}`
-      );
     },
     fetchFn: async (url, options) => {
       console.log("Making request to:", url);

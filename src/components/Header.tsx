@@ -17,7 +17,7 @@ const Header = () => {
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
           <SidebarTrigger className="inline md:hidden" />
-          <p>Good morning, John</p>
+          <p className="hidden sm:inline">Good morning, John</p>
           {/* <p className="text-xl">{currentPageName?.name}</p> */}
         </div>
         <div className="flex items-center gap-2 sm:gap-5 justify-between">

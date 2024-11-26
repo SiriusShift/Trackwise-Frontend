@@ -7,10 +7,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  ArrowDownFromLine,
+  ArrowDownToLine,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Plus,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,15 +37,19 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
+import MonthPicker from "@/components/datePicker";
+import { AddDialog } from "../dialog/addDialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  children?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  children,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -77,9 +85,9 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="min-w-full">
-      {/* Filter input */}
-      <div className="flex items-center pb-4">
+    <div className="min-w-full space-y-5">
+      {/* Filter */}
+      <div className="flex items-center flex-row gap-2 sm:gap-5 min-w-full justify-between">
         <Input
           placeholder="Filter description..."
           value={
@@ -88,13 +96,25 @@ export function DataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn("description")?.setFilterValue(event.target.value)
           }
-          className="w-52 h-full"
+          className="w-1/2 sm:w-52 h-9"
         />
+        <div className="flex gap-2">
+          <AddDialog />
+          <Button size={"sm"} variant={"outline"}>
+            <ArrowDownToLine />
+            <span className="hidden sm:inline">Export</span>
+          </Button>
+          <Button size={"sm"} variant={"outline"}>
+            <SlidersHorizontal />
+            <span className="hidden sm:inline">Filter</span>
+          </Button>
+          {/* <MonthPicker /> */}
+        </div>
       </div>
 
       {/* Table container with responsive and overflow behavior */}
 
-      <div className="border relative w-full rounded-md z-1 overflow-auto">
+      <div className="border relative w-full h-[375px] rounded-md z-1 overflow-auto">
         <Table>
           <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -140,15 +160,14 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-
         </Table>
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex items-center justify-end gap-5 px-2 py-4">
+      <div className="flex items-center justify-end gap-5">
         {/* Rows per page */}
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="text-sm font-medium hidden sm:inline">Rows per page</p>
           <Select
             value={`${pageSize}`}
             onValueChange={(value) => {

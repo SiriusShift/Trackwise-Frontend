@@ -2,10 +2,11 @@ import { navigationData } from "@/navigation/navigationData";
 import { useLocation } from "react-router-dom";
 import MonthPicker from "@/components/datePicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DataTable } from "@/components/data-table/data-table";
+import { DataTable } from "@/components/common/CommonTable";
 import { Expense } from "@/types";
-import { columns } from "@/components/columns/fundsColumns";
+import { expenseColumns } from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
+import useDisclosure from "@/hooks/useDisclosure";
 
 async function getData(): Promise<Expense[]> {
   return [
@@ -153,7 +154,7 @@ const WalletPage = () => {
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
-
+  
   useEffect(() => {
     const fetchData = async () => {
       const result = await getData();
@@ -171,11 +172,8 @@ const WalletPage = () => {
             This is your overview of expenses and incomes for this month
           </p>
         </div>
-        <div>
-          <MonthPicker />
-        </div>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={expenseColumns} data={data} />
       <div>
         <h1 className="text-xl">Expenses limit for this month</h1>
         <div className="w-full grid grid-cols-4">
@@ -185,6 +183,7 @@ const WalletPage = () => {
           <div className="h-28 w-full">hello</div>
         </div>
       </div>
+
     </div>
   );
 };

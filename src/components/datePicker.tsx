@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "./ui/button";
+import { CalendarRange } from "lucide-react";
 
 const MonthPicker = () => {
   const [selectedMonth, setSelectedMonth] = useState<Date>(
@@ -52,10 +53,12 @@ const MonthPicker = () => {
     <div className="flex flex-col items-start">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant={"outline"}>
-            {selectedMonth
+          <Button size={"sm"} variant={"outline"} className="font-normal">
+            <CalendarRange />
+            <span className="hidden sm:inline">{selectedMonth
               ? format(selectedMonth, "MMMM yyyy")
-              : "Select Month"}
+              : "Select Month"}</span>
+
           </Button>
         </PopoverTrigger>
         <PopoverContent side="bottom" align="end" className="w-auto p-4">
