@@ -8,7 +8,7 @@ function MainLayout() {
     <SidebarProvider>
       <div className="flex w-full h-full">
         <AppSidebar />
-        <div className="flex flex-col w-full overflow-scroll">
+        <div className="flex flex-col w-full overflow-auto">
           <Header />
           <div className="px-5 py-5  ">
             <Outlet />

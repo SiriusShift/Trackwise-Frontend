@@ -14,14 +14,16 @@ const categoryApi = api.injectEndpoints({
             }),
         }),
         getCategory: builder.query({
-            query: () => ({
+            query: (params) => ({
                 url: "/category/get",
                 method: "GET",
                 headers: { 
                     Accept: "application/json" 
                 },
+                params,
                 credentials: 'include',  // This ensures the cookie is included in the request
             }),
+            transformResponse: (response) => response.data
         }),
     }),
 });

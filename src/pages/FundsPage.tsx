@@ -6,7 +6,11 @@ import { DataTable } from "@/components/common/CommonTable";
 import { Expense } from "@/types";
 import { expenseColumns } from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
-import useDisclosure from "@/hooks/useDisclosure";
+import Toolbar from "@/components/common/CommonToolbar";
+// import useDisclosure from "@/hooks/useDisclosure";
+// import { AddDialog } from "@/components/dialog/addDialog";
+// import { Button } from "@/components/ui/button";
+// import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
 
 async function getData(): Promise<Expense[]> {
   return [
@@ -150,11 +154,12 @@ async function getData(): Promise<Expense[]> {
 
 const WalletPage = () => {
   const location = useLocation();
+  const [type, setType] = useState<string>("Expense");
   const [data, setData] = useState([]);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const result = await getData();
@@ -173,7 +178,14 @@ const WalletPage = () => {
           </p>
         </div>
       </div>
-      <DataTable columns={expenseColumns} data={data} />
+      <div>
+        <Toolbar type={type}>
+          <div>
+            
+          </div>
+        </Toolbar>
+        <DataTable columns={expenseColumns} data={data} />
+      </div>
       <div>
         <h1 className="text-xl">Expenses limit for this month</h1>
         <div className="w-full grid grid-cols-4">
@@ -183,7 +195,6 @@ const WalletPage = () => {
           <div className="h-28 w-full">hello</div>
         </div>
       </div>
-
     </div>
   );
 };

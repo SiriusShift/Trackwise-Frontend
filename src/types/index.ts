@@ -1,6 +1,6 @@
 export interface Expense {
   id: number; // Unique identifier
-  date: Date; // Date of the expense
+  date: string; // Date of the expense
   category: string; // Category of the expense (e.g., "Food & Dining", "Transport")
   description?: string; // Optional description
   amount: number; // Expense amount
@@ -17,6 +17,12 @@ export interface Income {
   source?: { id: number; name: string };
   user: { id: number; name: string };
   status: "Received" | "Pending" | string;
+}
+
+
+export interface CommonToolbarProps  {
+  type: string;
+  children: React.ReactNode;
 }
 
 
@@ -43,7 +49,6 @@ export interface DataTableFilterOption<TData> {
   filterOperator?: string;
   isMulti?: boolean;
 }
-
 
 export interface expenseForm = {
   name: string;

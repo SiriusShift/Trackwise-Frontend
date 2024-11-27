@@ -38,7 +38,7 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import MonthPicker from "@/components/datePicker";
-import { AddDialog } from "../dialog/addDialog";
+import { AddDialog } from "../dialog/fundsDialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -88,7 +88,7 @@ export function DataTable<TData, TValue>({
     <div className="min-w-full space-y-5">
       {/* Filter */}
       <div className="flex items-center flex-row gap-2 sm:gap-5 min-w-full justify-between">
-        <Input
+        {/* <Input
           placeholder="Filter description..."
           value={
             (table.getColumn("description")?.getFilterValue() as string) ?? ""
@@ -97,24 +97,12 @@ export function DataTable<TData, TValue>({
             table.getColumn("description")?.setFilterValue(event.target.value)
           }
           className="w-1/2 sm:w-52 h-9"
-        />
-        <div className="flex gap-2">
-          <AddDialog />
-          <Button size={"sm"} variant={"outline"}>
-            <ArrowDownToLine />
-            <span className="hidden sm:inline">Export</span>
-          </Button>
-          <Button size={"sm"} variant={"outline"}>
-            <SlidersHorizontal />
-            <span className="hidden sm:inline">Filter</span>
-          </Button>
-          {/* <MonthPicker /> */}
-        </div>
+        /> */}
       </div>
 
       {/* Table container with responsive and overflow behavior */}
 
-      <div className="border relative w-full h-[375px] rounded-md z-1 overflow-auto">
+      <div className="border relative w-full h-[375px] rounded-md z-0 overflow-auto">
         <Table>
           <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
             {table.getHeaderGroups().map((headerGroup) => (
