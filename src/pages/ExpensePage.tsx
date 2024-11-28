@@ -155,6 +155,7 @@ async function getData(): Promise<Expense[]> {
 const WalletPage = () => {
   const location = useLocation();
   const [type, setType] = useState<string>("Expense");
+  const [activeTab, setActiveTab] = useState<string>("Expense");
   const [data, setData] = useState([]);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
@@ -170,21 +171,59 @@ const WalletPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-5">
         <div>
           <p className="text-xl">{currentPageName?.name}</p>
           <p className="text-gray-400">
-            This is your overview of expenses and incomes for this month
+            This is your overview of expenses for this month
           </p>
         </div>
+        <MonthPicker />
       </div>
       <div>
         <Toolbar type={type}>
-          <div>
-            
+          <div className="relative h-9 w-48 bg-secondary p-1 rounded-sm">
+            {/* Inner Tab Container */}
+            <div className="relative flex gap-1 h-full bg-secondary rounded-sm text-center items-center overflow-hidden">
+              {/* Animated Active Tab Indicator */}
+              <div
+                className={`absolute top-0 left-0 h-full w-1/2 bg-background rounded-sm transition-all duration-300`}
+                style={{
+                  transform:
+                    activeTab === "Expense"
+                      ? "translateX(0)"
+                      : "translateX(100%)",
+                }}
+              ></div>
+
+              {/* Tab 1 */}
+              <div
+                onClick={() => setActiveTab("Expense")}
+                className={`relative z-10 h-full flex items-center justify-center text-sm w-1/2 cursor-pointer ${
+                  activeTab === "Expense" ? "text-primary" : "text-gray-500"
+                }`}
+              >
+                Regular
+              </div>
+
+              {/* Tab 2 */}
+              <div
+                onClick={() => setActiveTab("Income")}
+                className={`relative z-10 h-full flex items-center justify-center text-sm w-1/2 cursor-pointer ${
+                  activeTab === "Income" ? "text-primary" : "text-gray-500"
+                }`}
+              >
+                Recurring
+              </div>
+            </div>
           </div>
         </Toolbar>
-        <DataTable columns={expenseColumns} data={data} />
+        {activeTab === "Expense" ? (
+          <DataTable columns={expenseColumns} data={data} />
+        ) : (
+          ""
+          // <DataTable columns={expenseColumns} data={data} />
+        )}
       </div>
       <div>
         <h1 className="text-xl">Expenses limit for this month</h1>

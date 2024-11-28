@@ -23,12 +23,14 @@ import {
 import { useLazyGetSignoutQuery } from "@/feature/authentication/api/signinApi";
 import { Button } from "./ui/button";
 import useScreenWidth from "@/hooks/useScreenWidth";
+import useLocationHook from "@/hooks/useLocation";
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [active, setActive] = useState("Dashboard");
+  const location = useLocationHook();
+  const [active, setActive] = useState(location?.location?.pathname);
+  console.log(active);
   const router = useNavigate();
   const screenWidth = useScreenWidth();
-  console.log(screenWidth);
 
   const [logoutTrigger] = useLazyGetSignoutQuery({});
 
@@ -75,8 +77,8 @@ export function AppSidebar() {
                             <TooltipTrigger>
                               <Button
                                 className="hidden md:block lg:hidden"
-                                variant={active === item.name ? "default" : "ghost"}
-                                onClick={() => router.push(item.path)} // Ensure you're using `router.push` for navigation
+                                variant={active === item.path ? "default" : "ghost"}
+                                onClick={() => router(item.path)} // Ensure you're using `router.push` for navigation
                               >
                                 <item.icon
                                   style={{ width: "20px", height: "20px" }}
@@ -97,10 +99,10 @@ export function AppSidebar() {
                       ) : (
                         <Button
                           onClick={() => {
-                            setActive(item.name);
+                            setActive(item.path);
                             router(item.path);
                           }}
-                          variant={active === item.name ? "default" : "ghost"}
+                          variant={active === item.path ? "default" : "ghost"}
                           className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
                         >
                           <item.icon

@@ -7,15 +7,12 @@ import MonthPicker from "../datePicker";
 import { Input } from "../ui/input";
 function CommonToolbar({ type, children }: CommonToolbarProps) {
   return (
-    <div className="flex flex-col space-y-2">
-      <div>
-        {children}
-        <div>
-          <MonthPicker />
-        </div>
+    <div className="flex flex-col space-y-3">
+      <div className="flex justify-end">
+      <Input placeholder="Search.." className="w-1/2 sm:w-52 h-9" />
       </div>
       <div className="flex justify-between ">
-        <Input placeholder="Search.." className="w-52 h-9"/>
+        {children}
         <div className="space-x-2">
           {" "}
           <AddDialog type={type} />

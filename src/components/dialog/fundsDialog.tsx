@@ -68,7 +68,7 @@ export function AddDialog({ type }: { type: string }) {
     <Dialog>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <Plus className="mr-2" /> Add
+          <Plus className="sm:mr-2" /> <span className="hidden sm:inline">Add</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:min-w-md">
