@@ -1,4 +1,4 @@
-import { Copy, Plus } from "lucide-react";
+import { Copy, Plus, CalendarDays, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "../ui/input";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import { Popover, PopoverContent } from "../ui/popover";
+import moment from "moment";
 
 type AddExpenseFormData = {
   category: string;
@@ -54,6 +57,7 @@ export function AddDialog({ type }: { type: string }) {
       category: "",
       description: "",
       amount: 0,
+      date: moment
     },
   });
 
@@ -68,7 +72,8 @@ export function AddDialog({ type }: { type: string }) {
     <Dialog>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <Plus className="sm:mr-2" /> <span className="hidden sm:inline">Add</span>
+          <Plus className="sm:mr-2" />{" "}
+          <span className="hidden sm:inline">Add</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:min-w-md">
@@ -83,6 +88,34 @@ export function AddDialog({ type }: { type: string }) {
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Category Field */}
+            <FormField
+              name="date"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date</FormLabel>
+                  <FormControl>
+                    <div className="flex relative space-x-2">
+                      <Input placeholder="" type="date" />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            className="absolute right-0"
+                            variant={"ghost"}
+                          >
+                            <CalendarDays />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <Calendar mode={"single"} onSelect={form.setValue("amount")} />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               name="category"
               control={form.control}
@@ -99,10 +132,7 @@ export function AddDialog({ type }: { type: string }) {
                       </SelectTrigger>
                       <SelectContent>
                         {categoryData?.map((category) => (
-                          <SelectItem
-                            key={category.id}
-                            value={category.name}
-                          >
+                          <SelectItem key={category.id} value={category.name}>
                             {category.name}
                           </SelectItem>
                         ))}

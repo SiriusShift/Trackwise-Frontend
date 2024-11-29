@@ -52,6 +52,7 @@ export const expenseSchema = yup.object().shape({
     .number()
     .required("Amount is required")
     .positive("Amount must be greater than 0"),
+  date: yup.date().required("Date is required"),
 });
 
 export const reccuringExpenseSchema = yup.object().shape({

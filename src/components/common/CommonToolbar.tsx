@@ -5,14 +5,17 @@ import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
 import { CommonToolbarProps } from "../../types/index";
 import MonthPicker from "../datePicker";
 import { Input } from "../ui/input";
+import useScreenWidth from "@/hooks/useScreenWidth";
 function CommonToolbar({ type, children }: CommonToolbarProps) {
+  const screenWidth = useScreenWidth();
+
   return (
-    <div className="flex flex-col space-y-3">
-      <div className="flex justify-end">
-      <Input placeholder="Search.." className="w-1/2 sm:w-52 h-9" />
+    <div className="flex sm:grid sm:grid-cols-1 overflow-x-auto sm:grid-rows-2 gap-2">
+      <div className="flex w-2/6 justify-end">
+        <Input placeholder="Search.." className="sm:w-52 h-9" />
       </div>
-      <div className="flex justify-between ">
-        {children}
+      <div className="flex overflow-x-auto justify-between">
+        {screenWidth > 640 ? children : null}
         <div className="space-x-2">
           {" "}
           <AddDialog type={type} />

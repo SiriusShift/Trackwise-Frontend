@@ -72,7 +72,7 @@ const MonthPicker = () => {
               >
                 Prev
               </Button>
-              <span className="text-lg font-semibold">{currentYear}</span>
+              <span className="sm:text-lg font-semibold">{currentYear}</span>
               <Button variant={"ghost"} onClick={handleNextYear}>
                 Next
               </Button>
@@ -91,7 +91,7 @@ const MonthPicker = () => {
                   <Button
                     key={month}
                     onClick={() => handleMonthChange(index)}
-                    className={`px-3 py-2 text-sm rounded-md ${
+                    className={`px-3 py-2 text-xs sm:text-sm rounded-md ${
                       selectedMonth &&
                       selectedMonth.getFullYear() === currentYear &&
                       selectedMonth.getMonth() === index

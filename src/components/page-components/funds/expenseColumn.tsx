@@ -46,7 +46,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   },
   {
     accessorKey: "paymentMethod",
-    header: "Payment Method",
+    header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },
   {
