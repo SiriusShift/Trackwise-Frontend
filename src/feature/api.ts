@@ -7,7 +7,9 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_PUBLIC_BASEURL,
     prepareHeaders: (headers) => {
       headers.set("Accept", "application/json");
+      return headers; // Ensure headers are returned
     },
+    credentials: "include", // Include credentials such as cookies
     fetchFn: async (url, options) => {
       console.log("Making request to:", url);
       console.log("Request options:", options);

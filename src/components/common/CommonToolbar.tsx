@@ -11,7 +11,7 @@ function CommonToolbar({ type, children }: CommonToolbarProps) {
 
   return (
     <div className="flex sm:grid sm:grid-cols-1 overflow-x-auto sm:grid-rows-2 gap-2">
-      <div className="flex w-2/6 justify-end">
+      <div className="flex w-2/6 ">
         <Input placeholder="Search.." className="sm:w-52 h-9" />
       </div>
       <div className="flex overflow-x-auto justify-between">

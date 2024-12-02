@@ -10,7 +10,6 @@ const categoryApi = api.injectEndpoints({
                     Accept: "application/json" 
                 },
                 body: payload,
-                credentials: 'include',  // This ensures the cookie is included in the request
             }),
         }),
         getCategory: builder.query({
@@ -21,7 +20,6 @@ const categoryApi = api.injectEndpoints({
                     Accept: "application/json" 
                 },
                 params,
-                credentials: 'include',  // This ensures the cookie is included in the request
             }),
             transformResponse: (response) => response.data
         }),

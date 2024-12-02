@@ -4,7 +4,7 @@ import MonthPicker from "@/components/datePicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/common/CommonTable";
 import { Expense } from "@/types";
-import { expenseColumns } from "@/components/page-components/funds/expenseColumn";
+import { expenseColumns, recurringExpenseColumns } from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
 import Toolbar from "@/components/common/CommonToolbar";
 // import useDisclosure from "@/hooks/useDisclosure";
@@ -221,8 +221,7 @@ const WalletPage = () => {
         {activeTab === "Expense" ? (
           <DataTable columns={expenseColumns} data={data} />
         ) : (
-          ""
-          // <DataTable columns={expenseColumns} data={data} />
+          <DataTable columns={recurringExpenseColumns} data={data} />
         )}
       </div>
       <div>

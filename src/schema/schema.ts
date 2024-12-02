@@ -46,20 +46,25 @@ export const resetPasswordSchema = {
 };
 
 export const expenseSchema = yup.object().shape({
-  category: yup.string().required("Category is required"),
+  category: yup.object().required("Category is required"),
   description: yup.string().required("Description is required"),
   amount: yup
     .number()
     .required("Amount is required")
     .positive("Amount must be greater than 0"),
   date: yup.date().required("Date is required"),
+  source: yup.object().required("Source is required"),
 });
 
-export const reccuringExpenseSchema = yup.object().shape({
-  category: yup.string().required("Category is required"),
+
+export const expenseSchema = yup.object().shape({
+  category: yup.object().required("Category is required"),
   description: yup.string().required("Description is required"),
   amount: yup
     .number()
     .required("Amount is required")
     .positive("Amount must be greater than 0"),
+  date: yup.date().required("Date is required"),
+  source: yup.object().required("Source is required"),
+  status: yup.string().required("Status is required"),
 });
