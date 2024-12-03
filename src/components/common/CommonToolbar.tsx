@@ -6,19 +6,17 @@ import { CommonToolbarProps } from "../../types/index";
 import MonthPicker from "../datePicker";
 import { Input } from "../ui/input";
 import useScreenWidth from "@/hooks/useScreenWidth";
-function CommonToolbar({ type, children }: CommonToolbarProps) {
+
+function CommonToolbar({ type, children, active }: CommonToolbarProps) {
   const screenWidth = useScreenWidth();
 
   return (
-    <div className="flex sm:grid sm:grid-cols-1 overflow-x-auto sm:grid-rows-2 gap-2">
-      <div className="flex w-2/6 ">
-        <Input placeholder="Search.." className="sm:w-52 h-9" />
-      </div>
-      <div className="flex overflow-x-auto justify-between">
+    <div className="flex overflow-x-auto sm:flex-col gap-2 p-1">
+      <Input placeholder="Search.." className="w-auto sm:w-52 h-9" />
+      <div className="flex gap-2 justify-between whitespace-nowrap">
         {screenWidth > 640 ? children : null}
-        <div className="space-x-2">
-          {" "}
-          <AddDialog type={type} />
+        <div className="flex space-x-2">
+          <AddDialog type={type} active={active} />
           <Button size={"sm"} variant={"outline"}>
             <ArrowDownToLine />
             <span className="hidden sm:inline">Export</span>

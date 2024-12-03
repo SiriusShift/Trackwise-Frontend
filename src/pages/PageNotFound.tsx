@@ -1,9 +1,9 @@
-// import PageNotFoundImage from "../assets/images/PageNotFound.svg";
+import PageNotFoundImage from "../assets/images/PageNotFound.svg";
 
 function PageNotFound() {
   return (
-    <div>
-
+    <div className="h-screen flex flex-col items-center justify-center">
+      <img src={PageNotFoundImage} width={500} />
     </div>
   );
 }

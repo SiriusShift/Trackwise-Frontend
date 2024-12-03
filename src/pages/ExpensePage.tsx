@@ -154,12 +154,13 @@ async function getData(): Promise<Expense[]> {
 
 const WalletPage = () => {
   const location = useLocation();
-  const [type, setType] = useState<string>("Expense");
-  const [activeTab, setActiveTab] = useState<string>("Expense");
+  const [activeTab, setActiveTab] = useState<string>("Regular");
   const [data, setData] = useState([]);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
+
+  console.log(activeTab);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,7 +182,7 @@ const WalletPage = () => {
         <MonthPicker />
       </div>
       <div>
-        <Toolbar type={type}>
+        <Toolbar type={"Expense"} active={activeTab}>
           <div className="relative h-9 w-48 bg-secondary p-1 rounded-sm">
             {/* Inner Tab Container */}
             <div className="relative flex gap-1 h-full bg-secondary rounded-sm text-center items-center overflow-hidden">
@@ -190,7 +191,7 @@ const WalletPage = () => {
                 className={`absolute top-0 left-0 h-full w-1/2 bg-background rounded-sm transition-all duration-300`}
                 style={{
                   transform:
-                    activeTab === "Expense"
+                    activeTab === "Regular"
                       ? "translateX(0)"
                       : "translateX(100%)",
                 }}
@@ -198,9 +199,9 @@ const WalletPage = () => {
 
               {/* Tab 1 */}
               <div
-                onClick={() => setActiveTab("Expense")}
+                onClick={() => setActiveTab("Regular")}
                 className={`relative z-10 h-full flex items-center justify-center text-sm w-1/2 cursor-pointer ${
-                  activeTab === "Expense" ? "text-primary" : "text-gray-500"
+                  activeTab === "Regular" ? "text-primary" : "text-gray-500"
                 }`}
               >
                 Regular
@@ -208,9 +209,9 @@ const WalletPage = () => {
 
               {/* Tab 2 */}
               <div
-                onClick={() => setActiveTab("Income")}
+                onClick={() => setActiveTab("Recurring")}
                 className={`relative z-10 h-full flex items-center justify-center text-sm w-1/2 cursor-pointer ${
-                  activeTab === "Income" ? "text-primary" : "text-gray-500"
+                  activeTab === "Recurring" ? "text-primary" : "text-gray-500"
                 }`}
               >
                 Recurring
@@ -218,7 +219,7 @@ const WalletPage = () => {
             </div>
           </div>
         </Toolbar>
-        {activeTab === "Expense" ? (
+        {activeTab === "Regular" ? (
           <DataTable columns={expenseColumns} data={data} />
         ) : (
           <DataTable columns={recurringExpenseColumns} data={data} />

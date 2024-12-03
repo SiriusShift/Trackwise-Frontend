@@ -23,6 +23,7 @@ export interface Income {
 export interface CommonToolbarProps  {
   type: string;
   children: React.ReactNode;
+  active: string;
 }
 
 

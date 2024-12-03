@@ -42,7 +42,7 @@ export const numberInput = (e: React.ChangeEvent<HTMLInputElement>, field: any) 
 }
 
 
-export const decryptString = (data: string) => {
+export const decryptString = (data: any) => {
   if (!data) return null;
 
   const bytes = CryptoJS.AES.decrypt(data, saltkey);
@@ -50,7 +50,7 @@ export const decryptString = (data: string) => {
   return decryptedData;
 };
 
-export const encryptString = (data: string) => {
+export const encryptString = (data: any) => {
   if (!data) return null;
   const ciphertext = CryptoJS.AES.encrypt(
     JSON.stringify(data),

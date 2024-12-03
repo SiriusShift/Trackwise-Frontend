@@ -17,11 +17,15 @@ import {
 import { userInfo } from "@/feature/authentication/reducers/userDetail";
 import LayoutAuth from "@/components/authentication/LayoutAuth";
 import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { decryptString } from "@/utils/CustomFunctions";
 
 const SignInPage = () => {
   const router = useNavigate();
   const dispatch = useDispatch();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [cookies] = useCookies(["user"]);
+  console.log(cookies);
+
   const {
     handleSubmit,
     register,
@@ -36,9 +40,16 @@ const SignInPage = () => {
   });
 
   const [postSignin] = usePostSigninMutation();
-  const { error, data } = useGetAuthStatusQuery({});
-  console.log(data,error);
-  
+  const { error, data, isLoading } = useGetAuthStatusQuery({});
+  console.log("test",data, error, isLoading);
+
+  // useEffect(() => {
+  //   if (data?.authenticated && !error && cookies?.user) {
+  //     console.log("test1")
+  //     router("/"); // Redirect to home if already authenticated
+  //   }
+  // }, [data, router]);
+
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (isValid) {
@@ -75,64 +86,66 @@ const SignInPage = () => {
 
   return (
     <>
-        <LayoutAuth
-          title="Welcome back"
-          desc="Let's get started to track your expenses"
-          submit={onSubmit}
-        >
-          <div
-            className="mt-5 w-full gap-5 sm:w-96 flex-col flex"
-            // onSubmit={}
+      {(!isLoading || !data?.authenticated) && (
+        <>
+          {" "}
+          <LayoutAuth
+            title="Welcome back"
+            desc="Let's get started to track your expenses"
+            submit={onSubmit}
           >
-            <Input
-              placeholder="Email"
-              className="w-full sm:w-96"
-              {...register("email")}
-              required
-            />
-            <Input
-              placeholder="Password"
-              type="password"
-              className="w-full sm:w-96"
-              {...register("password")}
-              required
-            />
-            <div className="flex justify-end">
-            <a
-              href="/forgot-password" 
-              className="text-sm text-right -mt-4"
-              onClick={() => router("/forgot-password")}
-            >
-              Forgot Password?
-            </a>
+            <div className="mt-5 w-full gap-5 sm:w-96 flex-col flex">
+              <Input
+                placeholder="Email"
+                className="w-full sm:w-96"
+                {...register("email")}
+                required
+              />
+              <Input
+                placeholder="Password"
+                type="password"
+                className="w-full sm:w-96"
+                {...register("password")}
+                required
+              />
+              <div className="flex justify-end">
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-right -mt-4"
+                  onClick={() => router("/forgot-password")}
+                >
+                  Forgot Password?
+                </a>
+              </div>
+              <Button
+                className="w-full sm:w-96 text-right"
+                disabled={!isValid}
+                type="submit"
+              >
+                Login
+              </Button>
             </div>
-            <Button
-              className="w-full sm:w-96 text-right"
-              disabled={!isValid}
-              type="submit"
-            >
-              Login
+            <div className="relative flex py-3 w-full sm:w-full items-center">
+              <div className="flex-grow border-t border-gray-400"></div>
+              <span className="flex-shrink text-xs mx-4 text-gray-400">
+                OR CONTINUE WITH
+              </span>
+              <div className="flex-grow border-t border-gray-400"></div>
+            </div>
+            <Button variant={"outline"} className="w-full sm:w-96 shadow-md">
+              <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
+              Continue with Google
             </Button>
-          </div>
-          <div className="relative flex py-3 w-full sm:w-full items-center">
-            <div className="flex-grow border-t border-gray-400"></div>
-            <span className="flex-shrink text-xs mx-4 text-gray-400">
-              OR CONTINUE WITH
-            </span>
-            <div className="flex-grow border-t border-gray-400"></div>
-          </div>
-          <Button variant={"outline"} className="w-full sm:w-96 shadow-md">
-            <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
-            Continue with Google
-          </Button>
-          <p className="mt-2 text-sm text-center">
-            Don't have an account?{" "}
-            <a className="font-bold " onClick={() => router("/sign-up")}>
-              Sign Up
-            </a>
-          </p>
-        </LayoutAuth>
-      <Toaster visibleToasts={5} />
+            <p className="mt-2 text-sm text-center">
+              Don't have an account?{" "}
+              <a className="font-bold " onClick={() => router("/sign-up")}>
+                Sign Up
+              </a>
+            </p>
+          </LayoutAuth>
+          <Toaster visibleToasts={5} />
+        </>
+      )}
     </>
   );
 };

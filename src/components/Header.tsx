@@ -5,8 +5,13 @@ import { Button } from "./ui/button";
 import ModeToggle from "./mode-toggle";
 import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "./ui/sidebar";
+import { useCookies } from "react-cookie";
+import { decryptString } from "@/utils/CustomFunctions";
 
 const Header = () => {
+  const [cookies] = useCookies();
+  const userInfo = decryptString(cookies?.user);
+  console.log(userInfo);
   // const location = useLocation();
   // const currentPageName = navigationData.find(
   //   (item) => item.path === location.pathname
@@ -17,7 +22,7 @@ const Header = () => {
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
           <SidebarTrigger className="inline md:hidden" />
-          <p className="hidden sm:inline">Good morning, John</p>
+          <p className="hidden sm:inline">Good morning, {userInfo?.firstName}</p>
           {/* <p className="text-xl">{currentPageName?.name}</p> */}
         </div>
         <div className="flex items-center gap-2 sm:gap-5 justify-between">

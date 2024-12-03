@@ -18,7 +18,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { expenseSchema, reccuringExpenseSchema } from "@/schema/schema";
+import {
+  expenseSchema,
+  reccuringExpenseSchema,
+  recurringExpense,
+} from "@/schema/schema";
 import { FormProvider, useForm } from "react-hook-form";
 import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
 import {
@@ -64,6 +68,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type AddExpenseFormData = {
+  userId: string;
   category: Object;
   description: string;
   amount: number;
@@ -80,9 +85,11 @@ type AddExpenseFormData = {
    */
   /******  6b4ca4a7-dace-472e-9f44-c8ea54efafed  *******/ date: Date;
   source: Object;
+  status: string;
 };
 
-export function AddDialog({ type }: { type: string }) {
+export function AddDialog({ type, active }: { type: string; active: string }) {
+  console.log(active);
   const width = useScreenWidth();
   // RTK QUERY
   const { data: categoryData, isLoading: isLoadingCategory } =
@@ -94,14 +101,18 @@ export function AddDialog({ type }: { type: string }) {
 
   // React Hook Form
   const form = useForm<AddExpenseFormData>({
-    resolver: yupResolver(expenseSchema),
+    resolver: yupResolver(
+      active === "Recurring" ? recurringExpense : expenseSchema
+    ),
     mode: "onChange",
     defaultValues: {
+      userId: "",
       category: null,
       description: "",
       amount: 0,
       date: moment(),
       source: null,
+      status: null,
     },
   });
 
@@ -263,47 +274,46 @@ export function AddDialog({ type }: { type: string }) {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Notify me about...</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="all" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          All new messages
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="mentions" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          Direct messages and mentions
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="none" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Nothing</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {active === "Recurring" ? (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex \ space-y-1"
+                      >
+                        <FormItem className="flex items-center border px-3 border-warning  py-2 rounded-md space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="Unpaid" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Unpaid</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center border px-3 border-success py-2 rounded-md space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="Paid" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Pending</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center border px-3 border-destructive py-2 rounded-md space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="Overdue" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Overdue</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              ""
+            )}
 
             {/* Description Field */}
             <FormField
@@ -374,7 +384,7 @@ export function AddDialog({ type }: { type: string }) {
           <span className="hidden sm:inline">Add</span>
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="sm:min-w-md px-4">
+      <DrawerContent className="sm:min-w-md px-2">
         <DrawerHeader>
           <DrawerTitle>Add Expense</DrawerTitle>
           <DrawerDescription>
@@ -383,8 +393,8 @@ export function AddDialog({ type }: { type: string }) {
         </DrawerHeader>
 
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="px-4">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="px-4 space-y-3">
               {/* Category and Date Fields */}
               <div className="grid grid-cols-2 gap-5">
                 <FormField
@@ -477,7 +487,7 @@ export function AddDialog({ type }: { type: string }) {
                 name="source"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Source</FormLabel>
                     <FormControl>
                       <Select
@@ -511,12 +521,59 @@ export function AddDialog({ type }: { type: string }) {
                 )}
               />
 
+              {active === "Recurring" ? (
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Status</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex \ space-y-1"
+                        >
+                          <FormItem className="flex items-center border px-3 border-warning  py-2 rounded-md space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="Unpaid" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Unpaid
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center border px-3 border-success py-2 rounded-md space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="Paid" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Pending
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center border px-3 border-destructive py-2 rounded-md space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="Overdue" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Overdue
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                ""
+              )}
+
               {/* Description Field */}
               <FormField
                 name="description"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Input
@@ -535,7 +592,7 @@ export function AddDialog({ type }: { type: string }) {
                 name="amount"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input

@@ -24,9 +24,11 @@ import { useLazyGetSignoutQuery } from "@/feature/authentication/api/signinApi";
 import { Button } from "./ui/button";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import useLocationHook from "@/hooks/useLocation";
+import { useCookies } from "react-cookie";
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocationHook();
+  const [, , removeCookie] = useCookies(["user"]);
   const [active, setActive] = useState(location?.location?.pathname);
   console.log(active);
   const router = useNavigate();
@@ -36,6 +38,7 @@ export function AppSidebar() {
 
   const handleLogout = () => {
     logoutTrigger({});
+    removeCookie("user", { path: "/" });
     router("/sign-in");
   };
 
@@ -78,7 +81,7 @@ export function AppSidebar() {
                               <Button
                                 className="hidden md:block lg:hidden"
                                 variant={active === item.path ? "default" : "ghost"}
-                                onClick={() => router(item.path)} // Ensure you're using `router.push` for navigation
+                                onClick={() => {setActive(item.path); router(item.path)}} // Ensure you're using `router.push` for navigation
                               >
                                 <item.icon
                                   style={{ width: "20px", height: "20px" }}
