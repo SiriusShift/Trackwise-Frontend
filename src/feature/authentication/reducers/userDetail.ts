@@ -15,7 +15,7 @@ export const signFormSlice = createSlice({
   name: "userDetail",
   initialState: initialState,
   reducers: {
-    userInfo: (state, action) => {
+    setUserInfo: (state, action) => {
       state.id = action.payload.id;
       state.firstName = action.payload.firstName;
       state.lastName = action.payload.lastName;
@@ -28,5 +28,5 @@ export const signFormSlice = createSlice({
   },
 });
 
-export const { userInfo } =
+export const { setUserInfo } =
   signFormSlice.actions;

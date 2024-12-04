@@ -91,10 +91,10 @@ export function AppSidebar() {
                             <TooltipContent
                               side="right"
                               sideOffset={5}
-                              className="p-2 px-4 rounded-lg shadow-md bg-primary text-black"
+                              className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
                             >
                               <p className="tracking-wide">{item.name}</p>
-                              <TooltipArrow className="fill-white"/>{" "}
+                              <TooltipArrow className="bg-background"/>{" "}
                               {/* Add styles to customize the arrow */}
                             </TooltipContent>
                           </Tooltip>

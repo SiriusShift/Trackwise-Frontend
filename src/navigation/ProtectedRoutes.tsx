@@ -4,26 +4,43 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import { useCookies } from "react-cookie";
 import { encryptString } from "@/utils/CustomFunctions";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserInfo } from "@/feature/authentication/reducers/userDetail";
 
 function ProtectedRoutes() {
   const navigate = useNavigate();
   const [authTrigger, { data, error }] = useLazyGetAuthStatusQuery();
+  const dispatch = useDispatch();
+  console.log(data);
   const [cookies, setCookie] = useCookies(["user"]);
-
-  console.log(cookies);
+  const userInfo = useSelector((state) => state?.userDetails?.id)
+  console.log(userInfo);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       console.log("hello")
       try {
         const response = await authTrigger({}).unwrap();
-        if(!response){
+        if(!response && error){
           navigate("/sign-in");
-        }else if(!cookies?.user){
+        }else if(!userInfo || !cookies.user){
           console.log("NO COOKIE");
-          const userInfo = encryptString(response?.user) 
-          console.log(response);
-          setCookie("user", userInfo, {path: "/", maxAge: 7 * 24 * 60 * 60})
+          dispatch(
+            setUserInfo({
+              id: response?.user?.id,
+              email: response?.user?.email,
+              username: response?.user?.username,
+              firstName: response?.user?.firstName,
+              lastName: response?.user?.lastName,
+              role: response?.user?.role,
+              phoneNumber: response?.user?.phoneNumber,
+              profileImage: response?.user?.profileImage,
+            })
+          );
+        }
+        if(!cookies.user){
+          const encryptedInfo = encryptString(response?.user);
+          setCookie("user", encryptedInfo, {path: "/", maxAge: 7 * 24 * 60 * 60});
         }
       } catch (err) {
         console.error("Error fetching auth status:", err);

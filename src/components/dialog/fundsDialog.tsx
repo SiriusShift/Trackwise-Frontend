@@ -66,6 +66,10 @@ import {
 } from "../ui/drawer";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { usePostExpenseMutation } from "@/feature/expenses/api/expensesApi";
+import { toast, Toaster } from "sonner";
 
 type AddExpenseFormData = {
   userId: string;
@@ -89,8 +93,12 @@ type AddExpenseFormData = {
 };
 
 export function AddDialog({ type, active }: { type: string; active: string }) {
-  console.log(active);
+  const [open, setOpen] = useState(false);
   const width = useScreenWidth();
+  const userId = useSelector((state) => state?.userDetails?.id);
+
+  console.log("is open?", open);
+
   // RTK QUERY
   const { data: categoryData, isLoading: isLoadingCategory } =
     useGetCategoryQuery({
@@ -98,37 +106,52 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
     });
 
   const { data: assetData, isLoading: isLoadingAsset } = useGetAssetQuery();
+  const [postExpense, { isLoading }] = usePostExpenseMutation();
 
   // React Hook Form
   const form = useForm<AddExpenseFormData>({
     resolver: yupResolver(
-      active === "Recurring" ? recurringExpense : expenseSchema
+      active === "Recurring" ? recurringExpense.schema : expenseSchema.schema
     ),
     mode: "onChange",
-    defaultValues: {
-      userId: "",
-      category: null,
-      description: "",
-      amount: 0,
-      date: moment(),
-      source: null,
-      status: null,
-    },
+    defaultValues:
+      active === "Recurring"
+        ? recurringExpense.defaultValues
+        : expenseSchema.defaultValues,
   });
 
   console.log(form.watch());
 
-  const { handleSubmit, reset, formState } = form;
+  const { handleSubmit, setValue, reset, formState } = form;
 
-  const onSubmit = (data: AddExpenseFormData) => {
+  useEffect(() => {
+    setValue("userId",userId);
+  }, [userId]);
+
+  const onSubmit = async (data: AddExpenseFormData) => {
     console.log("Submitted data:", data);
-    reset(); // Reset the form after successful submission
+    try{
+      await postExpense({
+        ...data,
+        recurring: active === "Recurring" ? true : false, 
+        source: data?.source?.id || "",
+        category: data?.category?.id || "",
+        userId: parseInt(data?.userId)
+      });
+      reset({
+        userId: userId,
+      }); // Reset the form after successful submission
+      setOpen(false);
+    }catch(err){
+      console.log(err);
+      toast.error("error");
+    }
   };
 
   return width > 768 ? (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
+        <Button size="sm" onClick={() => setOpen(true)} variant="outline">
           <Plus className="sm:mr-2" />{" "}
           <span className="hidden sm:inline">Add</span>
         </Button>
@@ -377,9 +400,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       </DialogContent>
     </Dialog>
   ) : (
-    <Drawer>
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button size="sm" variant="outline">
+        <Button size="sm" onClick={() => setOpen(true)} variant="outline">
           <Plus className="sm:mr-2" />
           <span className="hidden sm:inline">Add</span>
         </Button>

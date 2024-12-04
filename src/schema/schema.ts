@@ -45,27 +45,49 @@ export const resetPasswordSchema = {
   }),
 };
 
-export const expenseSchema = yup.object().shape({
-  userId: yup.string().required("User Id is required"),
-  category: yup.object().required("Category is required"),
-  description: yup.string().required("Description is required"),
-  amount: yup
-    .number()
-    .required("Amount is required")
-    .positive("Amount must be greater than 0"),
-  date: yup.date().required("Date is required"),
-  source: yup.object().required("Source is required"),
-});
+export const expenseSchema = {
+  schema: yup.object().shape({
+    userId: yup.string().required("User Id is required"),
+    category: yup.object().required("Category is required"),
+    description: yup.string().required("Description is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+    date: yup.date().required("Date is required"),
+    source: yup.object().required("Source is required"),
+  }),
+  defaultValues : {
+    userId: null,
+    category: "",
+    description: "",
+    amount: "",
+    date: "",
+    source: "",
+  }
+}
 
 
-export const recurringExpense = yup.object().shape({
-  category: yup.object().required("Category is required"),
-  description: yup.string().required("Description is required"),
-  amount: yup
-    .number()
-    .required("Amount is required")
-    .positive("Amount must be greater than 0"),
-  date: yup.date().required("Date is required"),
-  source: yup.object().required("Source is required"),
-  status: yup.string().required("Status is required"),
-});
+export const recurringExpense = {
+  schema:  yup.object().shape({
+    userId: yup.number().required("User Id is required"),
+    category: yup.object().required("Category is required"),
+    description: yup.string().required("Description is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+    date: yup.date().required("Date is required"),
+    source: yup.object().required("Source is required"),
+    status: yup.string().required("Status is required"),
+  }),
+  defaultValues : {
+    category: "",
+    description: "",
+    amount: "",
+    date: "",
+    source: "",
+    status: "",
+    userId: null,
+  }  
+}

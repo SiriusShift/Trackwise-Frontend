@@ -8,13 +8,13 @@ import Google from "../assets/images/Google.svg";
 import Logo from "../assets/images/Logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
 import {
   useGetAuthStatusQuery,
   usePostSigninMutation,
 } from "@/feature/authentication/api/signinApi";
-import { userInfo } from "@/feature/authentication/reducers/userDetail";
+import { setUserInfo } from "@/feature/authentication/reducers/userDetail";
 import LayoutAuth from "@/components/authentication/LayoutAuth";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -22,10 +22,11 @@ import { decryptString } from "@/utils/CustomFunctions";
 
 const SignInPage = () => {
   const router = useNavigate();
-  const dispatch = useDispatch();
   const [cookies] = useCookies(["user"]);
-  console.log(cookies);
-
+  const [postSignin] = usePostSigninMutation();
+  const { error, data, isLoading } = useGetAuthStatusQuery({});
+  console.log("test",data, error, isLoading);
+  
   const {
     handleSubmit,
     register,
@@ -39,16 +40,12 @@ const SignInPage = () => {
     defaultValues: loginSchema.defaultValues,
   });
 
-  const [postSignin] = usePostSigninMutation();
-  const { error, data, isLoading } = useGetAuthStatusQuery({});
-  console.log("test",data, error, isLoading);
-
-  // useEffect(() => {
-  //   if (data?.authenticated && !error && cookies?.user) {
-  //     console.log("test1")
-  //     router("/"); // Redirect to home if already authenticated
-  //   }
-  // }, [data, router]);
+  useEffect(() => {
+    if (data?.authenticated && !error && cookies.user) {
+      console.log("test1")
+      router("/"); // Redirect to home if already authenticated
+    }
+  }, [data, router]);
 
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -58,18 +55,6 @@ const SignInPage = () => {
           email: watch("email"),
           password: watch("password"),
         }).unwrap();
-        dispatch(
-          userInfo({
-            id: response?.user?.id,
-            email: response?.user?.email,
-            username: response?.user?.username,
-            firstName: response?.user?.firstName,
-            lastName: response?.user?.lastName,
-            role: response?.user?.role,
-            phoneNumber: response?.user?.phoneNumber,
-            profileImage: response?.user?.profileImage,
-          })
-        );
         router("/");
       } catch (err) {
         let errorMessage = "An error occurred"; // Default message
@@ -86,7 +71,7 @@ const SignInPage = () => {
 
   return (
     <>
-      {(!isLoading || !data?.authenticated) && (
+      {(!isLoading && (!data?.authenticated || !cookies.user)) && (
         <>
           {" "}
           <LayoutAuth
