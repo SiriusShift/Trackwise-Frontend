@@ -23,7 +23,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
@@ -45,7 +45,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "paymentMethod",
+    accessorKey: "asset.name",
     header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },
@@ -111,7 +111,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
@@ -133,7 +133,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "paymentMethod",
+    accessorKey: "asset.name",
     header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },

@@ -7,6 +7,9 @@ import { Expense } from "@/types";
 import { expenseColumns, recurringExpenseColumns } from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
 import Toolbar from "@/components/common/CommonToolbar";
+import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
+import { decryptString } from "@/utils/CustomFunctions";
+import { useSelector } from "react-redux";
 // import useDisclosure from "@/hooks/useDisclosure";
 // import { AddDialog } from "@/components/dialog/addDialog";
 // import { Button } from "@/components/ui/button";
@@ -156,6 +159,7 @@ const WalletPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("Regular");
   const [data, setData] = useState([]);
+  const userId = useSelector((state) => state?.userDetails?.id);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
@@ -169,6 +173,12 @@ const WalletPage = () => {
     };
     fetchData();
   }, []);
+  const {data: expensesData} = useGetExpensesQuery({
+    userId: userId,
+    active: activeTab
+  });
+  console.log("data", expensesData);
+
 
   return (
     <div className="flex flex-col gap-5">
@@ -220,9 +230,9 @@ const WalletPage = () => {
           </div>
         </Toolbar>
         {activeTab === "Regular" ? (
-          <DataTable columns={expenseColumns} data={data} />
+          <DataTable columns={expenseColumns} data={expensesData || []} />
         ) : (
-          <DataTable columns={recurringExpenseColumns} data={data} />
+          <DataTable columns={recurringExpenseColumns} data={expensesData || []} />
         )}
       </div>
       <div>
