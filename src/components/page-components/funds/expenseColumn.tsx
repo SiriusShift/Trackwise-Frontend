@@ -1,5 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  CreditCard,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+} from "lucide-react";
 import { Expense } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@radix-ui/react-separator";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
   {
@@ -19,7 +26,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Date",
     cell: ({ getValue }) => {
       const dateValue = getValue();
-      return <span>{dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}</span>;
+      return (
+        <span>
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
+        </span>
+      );
     },
   },
   {
@@ -87,11 +98,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   : console.warn("No payment ID available.")
               }
             >
-              Copy payment ID
+              <Pencil /> Edit
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            {/* <DropdownMenuSeparator /> */}
+            <DropdownMenuItem><Eye /> View details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -99,15 +109,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   },
 ];
 
-
-
 export const recurringExpenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "date",
     header: "Date",
     cell: ({ getValue }) => {
       const dateValue = getValue();
-      return <span>{dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}</span>;
+      return (
+        <span>
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
+        </span>
+      );
     },
   },
   {
@@ -149,7 +161,12 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
           ? "warning"
           : "destructive";
 
-      return <Badge variant={"outline"} ><div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`}/>{status || "unknown"}</Badge>;
+      return (
+        <Badge variant={"outline"}>
+          <div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`} />
+          {status || "unknown"}
+        </Badge>
+      );
     },
   },
   {
@@ -168,18 +185,19 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() =>
-                payment?.id
-                  ? navigator.clipboard.writeText(String(payment.id))
-                  : console.warn("No payment ID available.")
-              }
-            >
-              Copy payment ID
+            <DropdownMenuItem>
+              <CreditCard />
+              Pay Now
             </DropdownMenuItem>
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Pencil /> Edit Expense
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Eye />
+              View details
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

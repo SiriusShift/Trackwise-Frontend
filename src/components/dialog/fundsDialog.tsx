@@ -125,24 +125,24 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
   const { handleSubmit, setValue, reset, formState } = form;
 
   useEffect(() => {
-    setValue("userId",userId);
+    setValue("userId", userId);
   }, [userId]);
 
   const onSubmit = async (data: AddExpenseFormData) => {
     console.log("Submitted data:", data);
-    try{
+    try {
       await postExpense({
         ...data,
-        recurring: active === "Recurring" ? true : false, 
+        recurring: active === "Recurring" ? true : false,
         source: data?.source?.id || "",
         category: data?.category?.id || "",
-        userId: parseInt(data?.userId)
+        userId: parseInt(data?.userId),
       });
       reset({
         userId: userId,
       }); // Reset the form after successful submission
       setOpen(false);
-    }catch(err){
+    } catch (err) {
       console.log(err);
       toast.error("error");
     }
@@ -158,7 +158,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       </DialogTrigger>
       <DialogContent className="sm:min-w-md">
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
+          <DialogTitle>
+            Add {active === "Recurring" ? "recurring " : ""} expense
+          </DialogTitle>
           <DialogDescription>
             Fill in the details to create a new expense
           </DialogDescription>
@@ -174,7 +176,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                 name="date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>
+                      {active === "Regular" ? "" : "Due"} Date
+                    </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -207,8 +211,11 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                           initialFocus
                           disabled={(date) => {
                             const minDate = new Date("2000-01-01"); // Minimum date
-                            const maxDate = active === "Recurring" ? null : new Date(); // Maximum date only for "Recurring"
-                            return date < minDate || (maxDate && date > maxDate); // Only check maxDate if it exists
+                            const maxDate =
+                              active === "Recurring" ? null : new Date(); // Maximum date only for "Recurring"
+                            return (
+                              date < minDate || (maxDate && date > maxDate)
+                            ); // Only check maxDate if it exists
                           }}
                         />
                       </PopoverContent>
@@ -339,12 +346,12 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
               )}
             />
 
-{active === "Recurring" ? (
+            {active === "Recurring" ? (
               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
-                  <FormItem className="space-y-3">
+                  <FormItem className="space-y-2">
                     <FormLabel>Status</FormLabel>
                     <FormControl>
                       <RadioGroup
@@ -409,7 +416,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       </DrawerTrigger>
       <DrawerContent className="sm:min-w-md px-2">
         <DrawerHeader>
-          <DrawerTitle>Add Expense</DrawerTitle>
+          <DrawerTitle>
+            Add {active === "Recurring" ? "recurring " : ""} expense
+          </DrawerTitle>
           <DrawerDescription>
             Fill in the details to create a new expense
           </DrawerDescription>
@@ -583,7 +592,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                   </FormItem>
                 )}
               />
-                            {active === "Recurring" ? (
+              {active === "Recurring" ? (
                 <FormField
                   control={form.control}
                   name="status"
@@ -629,7 +638,6 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
               ) : (
                 ""
               )}
-
             </div>
             {/* Footer Buttons */}
             <DrawerFooter className="sm:justify-start">
