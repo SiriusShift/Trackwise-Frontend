@@ -29,8 +29,12 @@ export const numberInput = (e: React.ChangeEvent<HTMLInputElement>, field: any) 
   // Log for debugging
   console.log(field, value);
 
+  if (value === '') {
+    value = "0";
+  }
+  
   // Remove leading zeros, except if it's a "0." for decimal values
-  if (/^0+/.test(value) && value.length > 1 && value[1] !== '.') {
+  else if (/^0+/.test(value) && value.length > 1 && value[1] !== '.') {
     value = value.replace(/^0+/, '');  // Remove leading zeros
   }
 

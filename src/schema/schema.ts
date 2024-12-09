@@ -69,25 +69,27 @@ export const expenseSchema = {
 
 
 export const recurringExpense = {
-  schema:  yup.object().shape({
-    userId: yup.number().required("User Id is required"),
+  schema: yup.object().shape({
+    userId: yup.string().required("User Id is required"),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
+    frequency: yup.string().required("Frequency is required"),
+    status : yup.string().required("Status is required"),
     amount: yup
       .number()
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
-    date: yup.date().required("Date is required"),
-    source: yup.object().required("Source is required"),
-    status: yup.string().required("Status is required"),
+    startDate: yup.date().required("Start date is required"),
+    endDate: yup.date(),
   }),
   defaultValues : {
+    userId: null,
     category: "",
     description: "",
-    amount: "",
-    date: "",
-    source: "",
-    status: "",
-    userId: null,
-  }  
+    frequency: "",
+    status : "",
+    amount: 0,
+    startDate: "",
+    endDate: ""
+  }
 }
