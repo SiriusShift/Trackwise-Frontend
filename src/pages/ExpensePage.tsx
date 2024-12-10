@@ -19,8 +19,10 @@ import { useSelector } from "react-redux";
 
 const WalletPage = () => {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<string>("Regular");
+  const [activeTab, setActiveTab] = useState<string>("All");
   const [data, setData] = useState([]);
+  const [pageSize, setPageSize] = useState(5); // Track page size
+  const [pageIndex, setPageIndex] = useState(0); // Track page index
   const userId = useSelector((state) => state?.userDetails?.id);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
@@ -30,7 +32,9 @@ const WalletPage = () => {
 
   const {data: expensesData} = useGetExpensesQuery({
     userId: userId,
-    active: activeTab
+    active: activeTab,
+    pageSize: pageSize,
+    pageIndex: pageIndex
   });
   
   console.log("data", expensesData);
@@ -57,7 +61,7 @@ const WalletPage = () => {
                 className={`absolute top-0 left-0 h-full w-1/2 bg-background rounded-sm transition-all duration-300`}
                 style={{
                   transform:
-                    activeTab === "Regular"
+                    activeTab === "All"
                       ? "translateX(0)"
                       : "translateX(100%)",
                 }}
@@ -65,12 +69,12 @@ const WalletPage = () => {
 
               {/* Tab 1 */}
               <div
-                onClick={() => setActiveTab("Regular")}
+                onClick={() => setActiveTab("All")}
                 className={`relative z-10 h-full flex items-center justify-center text-sm w-1/2 cursor-pointer ${
-                  activeTab === "Regular" ? "text-primary" : "text-gray-500"
+                  activeTab === "All" ? "text-primary" : "text-gray-500"
                 }`}
               >
-                Regular
+                All
               </div>
 
               {/* Tab 2 */}
@@ -85,10 +89,10 @@ const WalletPage = () => {
             </div>
           </div>
         </Toolbar>
-        {activeTab === "Regular" ? (
-          <DataTable columns={expenseColumns} data={expensesData || []} />
+        {activeTab === "All" ? (
+          <DataTable columns={expenseColumns} setPageIndex={setPageIndex} setPageSize={setPageSize} pageIndex={pageIndex} pageSize={pageSize} data={expensesData || []} />
         ) : (
-          <DataTable columns={recurringExpenseColumns} data={expensesData || []} />
+          <DataTable columns={recurringExpenseColumns} setPageIndex={setPageIndex} setPageSize={setPageSize} pageIndex={pageIndex} pageSize={pageSize} data={expensesData || []} />
         )}
       </div>
       <div>
