@@ -44,19 +44,24 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   children?: React.ReactNode;
+  pageSize: number;
+  pageIndex: number;
+  setPageIndex: React.Dispatch<React.SetStateAction<number>>;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  children,
+  pageSize,
+  pageIndex,
+  setPageIndex,
+  setPageSize,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [pageSize, setPageSize] = React.useState(5); // Track page size
-  const [pageIndex, setPageIndex] = React.useState(0); // Track page index
 
   const table = useReactTable({
     data,

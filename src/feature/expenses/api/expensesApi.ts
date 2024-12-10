@@ -1,6 +1,6 @@
 import { api } from "@/feature/api";
 
-const expensesApi = api.injectEndpoints({
+const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses"] }).injectEndpoints({
   endpoints: (builder) => ({
     getExpenses: builder.query({
       query: (params) => ({
@@ -12,6 +12,7 @@ const expensesApi = api.injectEndpoints({
         },
       }),
       transformResponse: (response) => response.data,
+      providesTags: ["Expenses"],
     }),
     postExpense: builder.mutation({
       query: (payload) => ({
@@ -22,6 +23,7 @@ const expensesApi = api.injectEndpoints({
         },
         body: payload,
       }),
+      invalidatesTags: ["Expenses"],
     }),
   }),
 });

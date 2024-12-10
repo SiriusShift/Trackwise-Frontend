@@ -34,6 +34,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
   },
   {
+    accessorKey: "recipient",
+    header: "Recipient",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  },
+  {
     accessorKey: "category.name",
     header: "Category",
     cell: ({ getValue }) => (
@@ -52,13 +57,33 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Amount",
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>${amount?.toFixed(2) || "0.00"}</span>;
+      return <span>₱{amount?.toFixed(2) || "0.00"}</span>;
     },
   },
   {
     accessorKey: "asset.name",
     header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue }) => {
+      const status = getValue() as Expense["status"];
+      const statusColor =
+        status === "Paid"
+          ? "success"
+          : status === "Unpaid"
+          ? "warning"
+          : "destructive";
+
+      return (
+        <Badge variant={"outline"}>
+          <div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`} />
+          {status || "unknown"}
+        </Badge>
+      );
+    },
   },
   // {
   //   accessorKey: "status",

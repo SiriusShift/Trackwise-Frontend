@@ -56,6 +56,7 @@ export const expenseSchema = {
       .positive("Amount must be greater than 0"),
     date: yup.date().required("Date is required"),
     source: yup.object().required("Source is required"),
+    recipient: yup.string().required("Receipient is required"),
   }),
   defaultValues : {
     userId: null,
@@ -73,7 +74,7 @@ export const recurringExpense = {
     userId: yup.string().required("User Id is required"),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
-    frequency: yup.string().required("Frequency is required"),
+    frequency: yup.object().required("Frequency is required"),
     status : yup.string().required("Status is required"),
     amount: yup
       .number()

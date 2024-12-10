@@ -1,6 +1,6 @@
 import {api} from "../../api";
 
-const assetsApi = api.injectEndpoints({
+const assetsApi = api.enhanceEndpoints({ addTagTypes: ["Assets"] }).injectEndpoints({
     endpoints: (builder) => ({
         getAsset: builder.query({
             query: () => ({
@@ -10,6 +10,7 @@ const assetsApi = api.injectEndpoints({
                     Accept: "application/json" 
                 },
             }),
+            providesTags: ["Assets"],
             transformResponse: (response: any) => response.data
         }),
     }),

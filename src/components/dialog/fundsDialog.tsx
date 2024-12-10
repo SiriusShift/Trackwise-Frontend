@@ -66,6 +66,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { usePostExpenseMutation } from "@/feature/expenses/api/expensesApi";
 import { toast, Toaster } from "sonner";
+import { frequencies } from "@/utils/Constants";
 
 type AddExpenseFormData = {
   userId: string;
@@ -105,6 +106,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
     });
 
   const { data: assetData, isLoading: isLoadingAsset } = useGetAssetQuery();
+  console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
 
   // React Hook Form
@@ -173,9 +175,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="flex gap-4 flex-col">
                   <div
-                    className={`${
-                      active === "Recurring" ? "order-1" : ""
-                    } space-y-4`}
+                    className={`${active === "All" ? "order-1" : ""} space-y-4`}
                   >
                     <div className="grid grid-cols-2 gap-5">
                       <FormField
@@ -201,7 +201,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                     {field.value?.name || "Select a category"}
                                   </SelectValue>
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="max-h-[200px]">
                                   {categoryData?.map((category) => (
                                     <SelectItem
                                       key={category.id}
@@ -232,14 +232,14 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                 placeholder="Enter amount"
                                 className="input-class text-sm"
                                 disabled={
-                                  active === "Regular" && !form.watch("source")
+                                  active === "All" && !form.watch("source")
                                 }
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   const balance = form.watch("source")?.balance;
 
                                   if (
-                                    active === "Regular" &&
+                                    active === "All" &&
                                     balance &&
                                     value > balance
                                   ) {
@@ -276,8 +276,8 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                     />
                   </div>
 
-                  {active === "Regular" ? (
-                    <div>
+                  {active === "All" ? (
+                    <>
                       <FormField
                         control={form.control}
                         name="date"
@@ -340,52 +340,68 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                         )}
                       />
 
-                      <FormField
-                        name="source"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Source</FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={(value) => {
-                                  // Find the selected category object based on the value (category name)
-                                  console.log(value);
-                                  const selectedSource = assetData?.find(
-                                    (source) => source.name === value
-                                  );
-                                  field.onChange(selectedSource); // Set the entire object in the form state
-                                }}
-                                defaultValue={field.value?.name}
-                              >
-                                <SelectTrigger className="capitalize">
-                                  <SelectValue placeholder="Select source" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {assetData?.map((source) => (
-                                    <SelectItem
-                                      key={source.id}
-                                      value={source.name}
-                                    >
-                                      <div className="flex justify-between items-center">
-                                        <span>{source.name}</span>
-                                        <span className="text-sm ml-2 text-gray-500">
-                                          ₱{source?.balance}
-                                        </span>
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {/* Description Field */}
-
-                      {/* Amount Field */}
-                    </div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <FormField
+                          name="source"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>Source</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={(value) => {
+                                    // Find the selected category object based on the value (category name)
+                                    console.log(value);
+                                    const selectedSource = assetData?.find(
+                                      (source) => source.name === value
+                                    );
+                                    field.onChange(selectedSource); // Set the entire object in the form state
+                                  }}
+                                  defaultValue={field.value?.name}
+                                >
+                                  <SelectTrigger className="capitalize">
+                                    <SelectValue placeholder="Select source" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-[200px]">
+                                    {assetData?.map((source) => (
+                                      <SelectItem
+                                        key={source.id}
+                                        value={source.name}
+                                      >
+                                        <div className="flex justify-between items-center">
+                                          <span>{source.name}</span>
+                                          <span className="text-sm ml-2 text-gray-500">
+                                            ₱{source?.remainingBalance}
+                                          </span>
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name="recipient"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>Recipient</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="text"
+                                  placeholder="Enter Recipient"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </>
                   ) : (
                     <>
                       <div className="grid grid-cols-2 gap-5">
@@ -561,8 +577,8 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                               <FormControl>
                                 <Select
                                   onValueChange={(value) => {
-                                    const selectedCategory = categoryData?.find(
-                                      (category) => category.name === value
+                                    const selectedCategory = frequencies?.find(
+                                      (frequency) => frequency.name === value
                                     );
                                     field.onChange(selectedCategory);
                                   }}
@@ -572,12 +588,12 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                     <SelectValue placeholder="Select frequency" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {categoryData?.map((category) => (
+                                    {frequencies?.map((frequency) => (
                                       <SelectItem
-                                        key={category.id}
-                                        value={category.name}
+                                        key={frequency.id}
+                                        value={frequency.name}
                                       >
-                                        {category.name}
+                                        {frequency.name}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
