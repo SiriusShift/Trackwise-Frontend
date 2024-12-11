@@ -34,20 +34,20 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import MonthPicker from "@/components/datePicker";
 import { AddDialog } from "../dialog/fundsDialog";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  children?: React.ReactNode;
-  pageSize: number;
-  pageIndex: number;
-  setPageIndex: React.Dispatch<React.SetStateAction<number>>;
-  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  columns: ColumnDef<TData, TValue>[]; // Columns definition
+  data: TData[]; // Data to display
+  pageSize: number; // Number of rows per page
+  pageIndex: number; // Current page index
+  totalPages: number; // Total number of pages
+  totalCount: number; // Total number of items
+  setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
+  setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
 }
 
 export function DataTable<TData, TValue>({
@@ -55,6 +55,8 @@ export function DataTable<TData, TValue>({
   data,
   pageSize,
   pageIndex,
+  totalPages,
+  totalCount,
   setPageIndex,
   setPageSize,
 }: DataTableProps<TData, TValue>) {
@@ -67,7 +69,6 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
@@ -80,33 +81,18 @@ export function DataTable<TData, TValue>({
         pageIndex,
       },
     },
-    onPaginationChange: (updater) => {
-      if (typeof updater === "function") {
-        const newState = updater(table.getState().pagination);
-        setPageSize(newState.pageSize); // Update page size
-        setPageIndex(newState.pageIndex); // Update page index
-      }
-    },
+    // Remove pagination handling from here
   });
 
   return (
     <div className="min-w-full space-y-5">
       {/* Filter */}
       <div className="flex items-center flex-row gap-2 sm:gap-5 min-w-full justify-between">
-        {/* <Input
-          placeholder="Filter description..."
-          value={
-            (table.getColumn("description")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("description")?.setFilterValue(event.target.value)
-          }
-          className="w-1/2 sm:w-52 h-9"
-        /> */}
+        {/* Filter Input */}
+        {/* <Input placeholder="Filter description..." value={...} /> */}
       </div>
 
       {/* Table container with responsive and overflow behavior */}
-
       <div className="border relative w-full h-[375px] rounded-md z-0 overflow-auto">
         <Table>
           <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
@@ -165,7 +151,7 @@ export function DataTable<TData, TValue>({
             value={`${pageSize}`}
             onValueChange={(value) => {
               setPageSize(Number(value)); // Update page size
-              setPageIndex(0); // Reset to first page
+              setPageIndex(0); // Reset to first page when page size changes
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -183,7 +169,7 @@ export function DataTable<TData, TValue>({
 
         {/* Page Information */}
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {pageIndex + 1} of {table.getPageCount()}
+          Page {pageIndex + 1} of {totalPages}
         </div>
 
         {/* Pagination Buttons */}
@@ -192,7 +178,7 @@ export function DataTable<TData, TValue>({
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => setPageIndex(0)} // Go to first page
-            disabled={!table.getCanPreviousPage()}
+            disabled={pageIndex === 0}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft />
@@ -201,29 +187,24 @@ export function DataTable<TData, TValue>({
             variant="outline"
             className="h-8 w-8 p-0"
             onClick={() => setPageIndex((prev) => Math.max(prev - 1, 0))} // Go to previous page
-            disabled={!table.getCanPreviousPage()}
+            disabled={pageIndex === 0}
           >
-            <span className="sr-only">Go to previous page</span>
             <ChevronLeft />
           </Button>
+
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() =>
-              setPageIndex((prev) =>
-                Math.min(prev + 1, table.getPageCount() - 1)
-              )
-            } // Go to next page
-            disabled={!table.getCanNextPage()}
+            onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages - 1))} // Go to next page
+            disabled={pageIndex >= totalPages - 1}
           >
-            <span className="sr-only">Go to next page</span>
             <ChevronRight />
           </Button>
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => setPageIndex(table.getPageCount() - 1)} // Go to last page
-            disabled={!table.getCanNextPage()}
+            onClick={() => setPageIndex(totalPages - 1)} // Go to last page
+            disabled={pageIndex >= totalPages - 1}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight />

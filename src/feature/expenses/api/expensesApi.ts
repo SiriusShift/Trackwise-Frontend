@@ -11,7 +11,7 @@ const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses"] }).injectEn
           Accept: "application/json",
         },
       }),
-      transformResponse: (response) => response.data,
+      // transformResponse: (response) => response.data,
       providesTags: ["Expenses"],
     }),
     postExpense: builder.mutation({

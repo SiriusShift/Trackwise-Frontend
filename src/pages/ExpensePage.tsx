@@ -4,7 +4,10 @@ import MonthPicker from "@/components/datePicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/common/CommonTable";
 import { Expense } from "@/types";
-import { expenseColumns, recurringExpenseColumns } from "@/components/page-components/funds/expenseColumn";
+import {
+  expenseColumns,
+  recurringExpenseColumns,
+} from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
 import Toolbar from "@/components/common/CommonToolbar";
 import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
@@ -14,8 +17,6 @@ import { useSelector } from "react-redux";
 // import { AddDialog } from "@/components/dialog/addDialog";
 // import { Button } from "@/components/ui/button";
 // import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
-
-
 
 const WalletPage = () => {
   const location = useLocation();
@@ -30,15 +31,14 @@ const WalletPage = () => {
 
   console.log(activeTab);
 
-  const {data: expensesData} = useGetExpensesQuery({
+  const { data: expensesData } = useGetExpensesQuery({
     userId: userId,
     active: activeTab,
     pageSize: pageSize,
-    pageIndex: pageIndex
+    pageIndex: pageIndex,
   });
-  
-  console.log("data", expensesData);
 
+  console.log("data", expensesData);
 
   return (
     <div className="flex flex-col gap-5">
@@ -61,9 +61,7 @@ const WalletPage = () => {
                 className={`absolute top-0 left-0 h-full w-1/2 bg-background rounded-sm transition-all duration-300`}
                 style={{
                   transform:
-                    activeTab === "All"
-                      ? "translateX(0)"
-                      : "translateX(100%)",
+                    activeTab === "All" ? "translateX(0)" : "translateX(100%)",
                 }}
               ></div>
 
@@ -90,9 +88,27 @@ const WalletPage = () => {
           </div>
         </Toolbar>
         {activeTab === "All" ? (
-          <DataTable columns={expenseColumns} setPageIndex={setPageIndex} setPageSize={setPageSize} pageIndex={pageIndex} pageSize={pageSize} data={expensesData || []} />
+          <DataTable
+            columns={expenseColumns}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            totalCount={expensesData?.totalCount}
+            totalPages={expensesData?.totalPages}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            data={expensesData?.data || []}
+          />
         ) : (
-          <DataTable columns={recurringExpenseColumns} setPageIndex={setPageIndex} setPageSize={setPageSize} pageIndex={pageIndex} pageSize={pageSize} data={expensesData || []} />
+          <DataTable
+            columns={recurringExpenseColumns}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            totalCount={expensesData?.totalCount}
+            totalPages={expensesData?.totalPages}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            data={expensesData?.data || []}
+          />
         )}
       </div>
       <div>

@@ -134,6 +134,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
     try {
       await postExpense({
         ...data,
+        status: active === "All" && "Paid",
         recurring: active === "Recurring" ? true : false,
         source: data?.source?.id || "",
         category: data?.category?.id || "",
