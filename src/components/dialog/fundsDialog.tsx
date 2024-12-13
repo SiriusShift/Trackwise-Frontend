@@ -279,85 +279,111 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
 
                   {active === "All" ? (
                     <>
-<FormField
-  control={form.control}
-  name="date"
-  render={({ field }) => (
-    <FormItem className="flex flex-col">
-      <FormLabel>Date & Time</FormLabel>
-      <Popover>
-        <PopoverTrigger asChild>
-          <FormControl>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "text-left font-normal",
-                !field.value && "text-muted-foreground"
-              )}
-            >
-              {field.value ? (
-                `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
-              ) : (
-                <span>Pick a date & time</span>
-              )}
-              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-            </Button>
-          </FormControl>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-4" align="start">
-          <div className="flex flex-col space-y-4">
-            {/* Calendar for Date Selection */}
-            <Calendar
-              mode="single"
-              selected={
-                field.value ? new Date(field.value) : undefined
-              }
-              onSelect={(date) => {
-                const newDate = new Date(
-                  date.setHours(
-                    field.value ? new Date(field.value).getHours() : 0,
-                    field.value ? new Date(field.value).getMinutes() : 0
-                  )
-                );
-                console.log("Selected Date:", newDate);
-                field.onChange(newDate); // Update date with time preserved
-              }}
-              initialFocus
-              disabled={(date) => {
-                const minDate = new Date("2000-01-01"); // Minimum date
-                const maxDate =
-                  active === "Recurring" ? null : new Date(); // Maximum date only for "Recurring"
-                return (
-                  date < minDate || (maxDate && date > maxDate)
-                ); // Only check maxDate if it exists
-              }}
-            />
-            {/* Time Picker for Time Selection */}
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Time:</label>
-              <input
-                type="time"
-                className="border rounded-md px-2 py-1 text-sm"
-                value={field.value ? moment(field.value).format("HH:mm") : ""}
-                onChange={(e) => {
-                  const [hours, minutes] = e.target.value.split(":").map(Number);
-                  const updatedDate = new Date(field.value || new Date());
-                  updatedDate.setHours(hours, minutes);
-                  console.log("Selected Time:", updatedDate);
-                  field.onChange(updatedDate); // Update time with date preserved
-                }}
-              />
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-      <FormMessage>
-        {form.formState.errors.date?.message}
-      </FormMessage>
-    </FormItem>
-  )}
-/>
-
+                      <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Date & Time</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      `${moment(field.value).format(
+                                        "MMM DD, YYYY hh:mm A"
+                                      )}` // Format date & time
+                                    ) : (
+                                      <span>Pick a date & time</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-4"
+                                align="start"
+                              >
+                                <div className="flex flex-col space-y-4">
+                                  {/* Calendar for Date Selection */}
+                                  <Calendar
+                                    mode="single"
+                                    selected={
+                                      field.value
+                                        ? new Date(field.value)
+                                        : undefined
+                                    }
+                                    onSelect={(date) => {
+                                      const newDate = new Date(
+                                        date.setHours(
+                                          field.value
+                                            ? new Date(field.value).getHours()
+                                            : 0,
+                                          field.value
+                                            ? new Date(field.value).getMinutes()
+                                            : 0
+                                        )
+                                      );
+                                      console.log("Selected Date:", newDate);
+                                      field.onChange(newDate); // Update date with time preserved
+                                    }}
+                                    initialFocus
+                                    disabled={(date) => {
+                                      const minDate = new Date("2000-01-01"); // Minimum date
+                                      const maxDate =
+                                        active === "Recurring"
+                                          ? null
+                                          : new Date(); // Maximum date only for "Recurring"
+                                      return (
+                                        date < minDate ||
+                                        (maxDate && date > maxDate)
+                                      ); // Only check maxDate if it exists
+                                    }}
+                                  />
+                                  {/* Time Picker for Time Selection */}
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">
+                                      Time:
+                                    </label>
+                                    <input
+                                      type="time"
+                                      className="border rounded-md px-2 py-1 text-sm"
+                                      value={
+                                        field.value
+                                          ? moment(field.value).format("HH:mm")
+                                          : ""
+                                      }
+                                      onChange={(e) => {
+                                        const [hours, minutes] = e.target.value
+                                          .split(":")
+                                          .map(Number);
+                                        const updatedDate = new Date(
+                                          field.value || new Date()
+                                        );
+                                        updatedDate.setHours(hours, minutes);
+                                        console.log(
+                                          "Selected Time:",
+                                          updatedDate
+                                        );
+                                        field.onChange(updatedDate); // Update time with date preserved
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage>
+                              {form.formState.errors.date?.message}
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
 
                       <div className="grid grid-cols-2 gap-5">
                         <FormField
@@ -423,71 +449,69 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                     </>
                   ) : (
                     <>
-                      <div className="grid grid-cols-2 gap-5">
-                        <FormField
-                          control={form.control}
-                          name="startDate"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel>Start Date</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        moment(field.value).format(
-                                          "MMM DD, YYYY"
-                                        ) // Ensure value is parsed
-                                      ) : (
-                                        <span>Pick a date</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  align="start"
-                                >
-                                  <Calendar
-                                    mode="single"
-                                    selected={
-                                      field.value
-                                        ? new Date(field.value)
-                                        : undefined
-                                    }
-                                    onSelect={(date) => {
-                                      console.log("Selected Date:", date); // Debugging log
-                                      field.onChange(date);
-                                    }}
-                                    initialFocus
-                                    disabled={(date) => {
-                                      const minDate = new Date("2000-01-01"); // Minimum date
-                                      const maxDate =
-                                        active === "Recurring"
-                                          ? null
-                                          : new Date(); // Maximum date only for "Recurring"
-                                      return (
-                                        date < minDate ||
-                                        (maxDate && date > maxDate)
-                                      ); // Only check maxDate if it exists
-                                    }}
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage>
-                                {form.formState.errors.date?.message}
-                              </FormMessage>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
+                      {/* <div className="grid grid-cols-2 gap-5"> */}
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Start Date</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      moment(field.value).format("MMM DD, YYYY") // Ensure value is parsed
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={
+                                    field.value
+                                      ? new Date(field.value)
+                                      : undefined
+                                  }
+                                  onSelect={(date) => {
+                                    console.log("Selected Date:", date); // Debugging log
+                                    field.onChange(date);
+                                  }}
+                                  initialFocus
+                                  disabled={(date) => {
+                                    const minDate = new Date("2000-01-01"); // Minimum date
+                                    const maxDate =
+                                      active === "Recurring"
+                                        ? null
+                                        : new Date(); // Maximum date only for "Recurring"
+                                    return (
+                                      date < minDate ||
+                                      (maxDate && date > maxDate)
+                                    ); // Only check maxDate if it exists
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage>
+                              {form.formState.errors.date?.message}
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                      {/* <FormField
                           control={form.control}
                           name="endDate"
                           render={({ field }) => (
@@ -543,8 +567,8 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                               </Popover>
                             </FormItem>
                           )}
-                        />
-                      </div>
+                        /> */}
+                      {/* </div> */}
 
                       <div className="grid grid-cols-2 gap-5">
                         <FormField

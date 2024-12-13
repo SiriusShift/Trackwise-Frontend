@@ -81,7 +81,7 @@ export const recurringExpense = {
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
     startDate: yup.date().required("Start date is required"),
-    endDate: yup.date(),
+    // endDate: yup.date(),
   }),
   defaultValues : {
     userId: null,
@@ -91,6 +91,6 @@ export const recurringExpense = {
     status : "",
     amount: 0,
     startDate: "",
-    endDate: ""
+    // endDate: ""
   }
 }
