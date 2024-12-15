@@ -90,5 +90,6 @@ export const recurringExpense = {
     // status : "",
     amount: 0,
     startDate: "",
+    endDate: ""
   }
 }

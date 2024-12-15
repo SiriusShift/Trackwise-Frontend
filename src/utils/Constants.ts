@@ -6,6 +6,6 @@ export const frequencies = [
   { id: 6, name: "Quarterly", interval: 3, unit: "month" },
   { id: 7, name: "Semi-annually", interval: 6, unit: "month" },
   { id: 8, name: "Annually", interval: 1, unit: "year" },
-  { id: 9, name: "Custom", interval: null, unit: null }, // For user-defined intervals
+  // { id: 9, name: "Custom", interval: null, unit: null }, // For user-defined intervals
 ];
 
