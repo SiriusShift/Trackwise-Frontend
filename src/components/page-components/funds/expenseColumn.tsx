@@ -137,7 +137,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 export const recurringExpenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "date",
-    header: "Date",
+    header: "Due date",
     cell: ({ getValue }) => {
       const dateValue = getValue();
       return (
@@ -168,11 +168,6 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       const amount = getValue() as number | undefined;
       return <span>${amount?.toFixed(2) || "0.00"}</span>;
     },
-  },
-  {
-    accessorKey: "asset.name",
-    header: "Source",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },
   {
     accessorKey: "status",

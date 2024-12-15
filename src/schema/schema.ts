@@ -75,22 +75,20 @@ export const recurringExpense = {
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
     frequency: yup.object().required("Frequency is required"),
-    status : yup.string().required("Status is required"),
+    // status : yup.string().required("Status is required"),
     amount: yup
       .number()
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
     startDate: yup.date().required("Start date is required"),
-    endDate: yup.date(),
   }),
   defaultValues : {
     userId: null,
     category: "",
     description: "",
     frequency: "",
-    status : "",
+    // status : "",
     amount: 0,
     startDate: "",
-    endDate: ""
   }
 }

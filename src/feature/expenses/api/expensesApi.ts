@@ -1,6 +1,7 @@
 import { api } from "@/feature/api";
+import { get } from "http";
 
-const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses"] }).injectEndpoints({
+const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense"] }).injectEndpoints({
   endpoints: (builder) => ({
     getExpenses: builder.query({
       query: (params) => ({
@@ -15,17 +16,40 @@ const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses"] }).injectEn
       providesTags: ["Expenses"],
     }),
     postExpense: builder.mutation({
-      query: (payload) => ({
+      query: (body) => ({
         url: "/expenses/create",
         method: "POST",
         headers: {
           Accept: "application/json",
         },
-        body: payload,
+        body,
       }),
       invalidatesTags: ["Expenses"],
+    }),
+
+    postRecurringExpense: builder.mutation({
+      query: (body) => ({
+        url: "/expenses/createRecurring",
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body,
+      }),
+      invalidatesTags: ["RecurringExpense"],
+    }),
+    getRecurringExpenses: builder.query({
+      query: (params) => ({
+        params,
+        url: "/expenses/getRecurring",
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }),
+      providesTags: ["RecurringExpense"],
     }),
   }),
 });
 
-export const { useGetExpensesQuery, usePostExpenseMutation } = expensesApi;
+export const { useGetExpensesQuery, usePostExpenseMutation, usePostRecurringExpenseMutation, useGetRecurringExpensesQuery } = expensesApi;

@@ -10,7 +10,7 @@ import {
 } from "@/components/page-components/funds/expenseColumn";
 import { useState, useEffect } from "react";
 import Toolbar from "@/components/common/CommonToolbar";
-import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
+import { useGetExpensesQuery, useGetRecurringExpensesQuery } from "@/feature/expenses/api/expensesApi";
 import { decryptString } from "@/utils/CustomFunctions";
 import { useSelector } from "react-redux";
 // import useDisclosure from "@/hooks/useDisclosure";
@@ -34,6 +34,12 @@ const WalletPage = () => {
   const { data: expensesData } = useGetExpensesQuery({
     userId: userId,
     active: activeTab,
+    pageSize: pageSize,
+    pageIndex: pageIndex,
+  });
+
+  const { data: recurringData } = useGetRecurringExpensesQuery({
+    userId: userId,
     pageSize: pageSize,
     pageIndex: pageIndex,
   });
@@ -107,7 +113,7 @@ const WalletPage = () => {
             totalPages={expensesData?.totalPages}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            data={expensesData?.data || []}
+            data={recurringData?.data || []}
           />
         )}
       </div>
