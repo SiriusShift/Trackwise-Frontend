@@ -70,6 +70,7 @@ import {
 } from "@/feature/expenses/api/expensesApi";
 import { toast, Toaster } from "sonner";
 import { frequencies } from "@/utils/Constants";
+import { date } from "yup";
 
 type AddExpenseFormData = {
   userId: string;
@@ -151,6 +152,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
           userId: parseInt(data?.userId),
           frequency: data?.frequency?.name,
           category: data?.category?.id,
+          startDate: moment(data?.startDate).utc().format()
         });
       } else {
         await postExpense({
@@ -160,6 +162,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
           source: data?.source?.id || "",
           category: data?.category?.id || "",
           userId: parseInt(data?.userId),
+          date: moment(data?.date).utc().format(),
         });
       }
       reset({
