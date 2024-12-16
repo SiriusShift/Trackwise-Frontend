@@ -5,6 +5,7 @@ import {
   Eye,
   MoreHorizontal,
   Pencil,
+  Trash2
 } from "lucide-react";
 import { Expense } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -65,26 +66,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
   },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ getValue }) => {
-      const status = getValue() as Expense["status"];
-      const statusColor =
-        status === "Paid"
-          ? "success"
-          : status === "Unpaid"
-          ? "warning"
-          : "destructive";
-
-      return (
-        <Badge variant={"outline"}>
-          <div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`} />
-          {status || "unknown"}
-        </Badge>
-      );
-    },
-  },
   // {
   //   accessorKey: "status",
   //   header: "Status",
@@ -126,7 +107,8 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               <Pencil /> Edit
             </DropdownMenuItem>
             {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem><Eye /> View details</DropdownMenuItem>
+            <DropdownMenuItem><Eye />View</DropdownMenuItem>
+            <DropdownMenuItem><Trash2 />Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -207,17 +189,15 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
               <CreditCard />
-              Pay Now
+              Pay
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator /> */}
             <DropdownMenuItem>
-              <Pencil /> Edit Expense
+              <Pencil /> Edit
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Eye />
-              View details
-            </DropdownMenuItem>
+            <DropdownMenuItem><Eye />View</DropdownMenuItem>
+            <DropdownMenuItem><Trash2 />Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
