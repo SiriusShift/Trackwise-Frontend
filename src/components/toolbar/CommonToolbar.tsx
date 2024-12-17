@@ -6,25 +6,23 @@ import { CommonToolbarProps } from "../../types/index";
 import MonthPicker from "../datePicker";
 import { Input } from "../ui/input";
 import useScreenWidth from "@/hooks/useScreenWidth";
+import { FilterSheet } from "../page-components/funds/FilterSheet";
 
-function CommonToolbar({ type, children, active }: CommonToolbarProps) {
+function CommonToolbar({ type, children, active, title }: CommonToolbarProps) {
   const screenWidth = useScreenWidth();
 
   return (
-    <div className="flex sm:flex-col gap-2 p-1">
-      <div className="flex w-full gap-2 overflow-x-auto justify-start sm:justify-between whitespace-nowrap">
+    <div className="flex sm:flex-col gap-2">
+      <div className="flex w-full gap-2 overflow-x-auto items-center justify-start sm:justify-between whitespace-nowrap">
         {screenWidth > 640 ? children : null}
-        <div className="flex space-x-2">
-          <Input placeholder="Search.." className="w-auto sm:w-52 h-9" />
+        <div className="flex gap-2 p-1">
+          <Input placeholder="Search.." className="w-auto hidden sm:inline sm:w-52 h-9" />
           <AddDialog type={type} active={active} />
           <Button size={"sm"} variant={"outline"}>
             <ArrowDownToLine />
-            <span className="hidden lg:inline">Export</span>
+            <span className="inline sm:hidden lg:inline">Export</span>
           </Button>
-          <Button size={"sm"} variant={"outline"}>
-            <SlidersHorizontal />
-            <span className="hidden lg:inline">Filter</span>
-          </Button>
+          <FilterSheet title={title}/>
         </div>
       </div>
     </div>

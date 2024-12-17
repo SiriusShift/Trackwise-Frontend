@@ -143,7 +143,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex items-center justify-end gap-5">
+      <div className="flex w-full py-1 gap-2 overflow-x-auto justify-between sm:justify-end whitespace-nowrap">
         {/* Rows per page */}
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium hidden sm:inline">Rows per page</p>
@@ -169,7 +169,8 @@ export function DataTable<TData, TValue>({
 
         {/* Page Information */}
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {pageIndex + 1} of {totalPages}
+          <span className="hidden sm:inline">Page</span> {pageIndex + 1} of{" "}
+          {totalPages}
         </div>
 
         {/* Pagination Buttons */}
@@ -195,7 +196,9 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages - 1))} // Go to next page
+            onClick={() =>
+              setPageIndex((prev) => Math.min(prev + 1, totalPages - 1))
+            } // Go to next page
             disabled={pageIndex >= totalPages - 1}
           >
             <ChevronRight />

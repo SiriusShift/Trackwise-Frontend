@@ -24,6 +24,7 @@ export interface CommonToolbarProps  {
   type: string;
   children: React.ReactNode;
   active: string;
+  title: string;
 }
 
 

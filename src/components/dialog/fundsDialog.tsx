@@ -613,8 +613,8 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerTrigger asChild>
             <Button size="sm" onClick={() => setOpen(true)} variant="outline">
-              <Plus className="sm:mr-2" />
-              <span className="hidden sm:inline">Add</span>
+              <Plus className="lg:mr-2" />
+              <span>Add</span>
             </Button>
           </DrawerTrigger>
           <DrawerContent className="sm:min-w-md px-8">
@@ -629,95 +629,98 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
 
             <FormProvider {...form}>
               <form onSubmit={handleSubmit(onSubmit)} className="pb-5">
-                <div className="flex flex-col pb-5">
-                  <div
-                    className={`${active === "All" ? "order-1" : ""}`}
-                  >
-                    <FormField
-                      name="category"
-                      control={control}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel className="hidden sm-inline">
-                            Category
-                          </FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={(value) => {
-                                // Find the selected category object based on the value (category name)
-                                const selectedCategory = categoryData?.find(
-                                  (category) => category.name === value
-                                );
-                                field.onChange(selectedCategory); // Set the entire object in the form state
-                              }}
-                              value={field.value?.name} // Set the category name as the value for display
-                            >
-                              <SelectTrigger className="capitalize">
-                                {/* Display the name of the selected category */}
-                                <SelectValue placeholder="Select a category">
-                                  {field.value?.name || "Select a category"}
-                                </SelectValue>
-                              </SelectTrigger>
-                              <SelectContent className="max-h-[200px]">
-                                {categoryData?.map((category) => (
-                                  <SelectItem
-                                    key={category.id}
-                                    value={category.name}
-                                  >
-                                    {category.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name="amount"
-                      control={control}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel className="hidden sm-inline">
-                            Amount
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              min={0}
-                              type="number"
-                              step="0.01"
-                              placeholder="Enter amount"
-                              className="input-class text-sm"
-                              disabled={active === "All" && !watch("source")}
-                              onChange={(e) => {
-                                const value = Number(e.target.value);
-                                const balance = watch("source")?.balance;
+                <div className="flex flex-col pb-5 pt-3">
+                  <div className={`${active === "All" ? "order-1" : ""}`}>
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField
+                        name="category"
+                        control={control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel className="hidden sm-inline">
+                              Category
+                            </FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={(value) => {
+                                  // Find the selected category object based on the value (category name)
+                                  const selectedCategory = categoryData?.find(
+                                    (category) => category.name === value
+                                  );
+                                  field.onChange(selectedCategory); // Set the entire object in the form state
+                                }}
+                                value={field.value?.name} // Set the category name as the value for display
+                              >
+                                <SelectTrigger className="capitalize">
+                                  {/* Display the name of the selected category */}
+                                  <SelectValue placeholder="Select category">
+                                    {field.value?.name}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[200px]">
+                                  {categoryData?.map((category) => (
+                                    <SelectItem
+                                      key={category.id}
+                                      value={category.name}
+                                    >
+                                      {category.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="amount"
+                        control={control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel className="hidden sm-inline">
+                              Amount
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                min={0}
+                                type="number"
+                                step="0.01"
+                                placeholder="Enter amount"
+                                className="input-class text-sm"
+                                disabled={active === "All" && !watch("source")}
+                                onChange={(e) => {
+                                  const value = Number(e.target.value);
+                                  const balance = watch("source")?.balance;
 
-                                if (
-                                  active === "All" &&
-                                  balance &&
-                                  value > balance
-                                ) {
-                                  toast.error("Insufficient balance");
-                                  e.target.value = balance; // Reset to the maximum allowed value
-                                } else {
-                                  numberInput(e, field); // Proceed with normal input handling
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                                  if (
+                                    active === "All" &&
+                                    balance &&
+                                    value > balance
+                                  ) {
+                                    toast.error("Insufficient balance");
+                                    e.target.value = balance; // Reset to the maximum allowed value
+                                  } else {
+                                    numberInput(e, field); // Proceed with normal input handling
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <FormField
                       name="description"
                       control={control}
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel className="hidden sm-inline">Description</FormLabel>
+                          <FormLabel className="hidden sm-inline">
+                            Description
+                          </FormLabel>
                           <FormControl>
                             <Input
                               {...field}
@@ -739,7 +742,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                         name="date"
                         render={({ field }) => (
                           <FormItem className="flex flex-col">
-                            <FormLabel className="hidden sm-inline">Date</FormLabel>
+                            <FormLabel className="hidden sm-inline">
+                              Date
+                            </FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -794,13 +799,15 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                         )}
                       />
 
-                      <div className="grid grid-cols-2 gap-5">
+                      <div className="grid grid-cols-2 gap-2">
                         <FormField
                           name="source"
                           control={control}
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
-                              <FormLabel className="hidden sm-inline">Source</FormLabel>
+                              <FormLabel className="hidden sm-inline">
+                                Source
+                              </FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={(value) => {
@@ -842,7 +849,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                           control={form.control}
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
-                              <FormLabel className="hidden sm-inline">Recipient</FormLabel>
+                              <FormLabel className="hidden sm-inline">
+                                Recipient
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   {...field}
