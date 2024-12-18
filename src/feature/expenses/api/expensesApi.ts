@@ -52,4 +52,4 @@ const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringE
   }),
 });
 
-export const { useGetExpensesQuery, usePostExpenseMutation, usePostRecurringExpenseMutation, useGetRecurringExpensesQuery } = expensesApi;
+export const { useGetExpensesQuery, useLazyGetExpensesQuery, usePostExpenseMutation, usePostRecurringExpenseMutation, useGetRecurringExpensesQuery } = expensesApi;

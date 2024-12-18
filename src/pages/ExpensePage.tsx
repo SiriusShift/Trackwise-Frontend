@@ -8,11 +8,12 @@ import {
   expenseColumns,
   recurringExpenseColumns,
 } from "@/components/page-components/funds/expenseColumn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Toolbar from "@/components/toolbar/CommonToolbar";
 import {
   useGetExpensesQuery,
   useGetRecurringExpensesQuery,
+  useLazyGetExpensesQuery,
 } from "@/feature/expenses/api/expensesApi";
 import { useSelector } from "react-redux";
 import useScreenWidth from "@/hooks/useScreenWidth";
@@ -58,13 +59,10 @@ const WalletPage = () => {
   );
 
   // Queries
-  const { data: expensesData } = useGetExpensesQuery({
-    userId,
-    active: activeTab,
-    Search: search,
-    pageSize,
-    pageIndex,
-  });
+  const [triggerExpense, { data: expensesData }] = useLazyGetExpensesQuery();
+  
+
+  console.log("data",expensesData);
 
   const { data: recurringData } = useGetRecurringExpensesQuery({
     userId,
@@ -73,6 +71,33 @@ const WalletPage = () => {
   });
 
   const { data: categoryData } = useGetCategoryQuery({});
+  
+  const handleFilter = () => {
+    const requestData = {
+      userId,
+      active: activeTab,
+      pageSize,
+      pageIndex,
+      ...(search && { Search: search }), // Add `Search` only if truthy
+      ...(selectedCategories.length > 0 && {
+        Categories: JSON.stringify(selectedCategories.map((category) => category.id)), // Add array of IDs
+      }),
+    };
+  
+    console.log(requestData);
+    triggerExpense(requestData);
+  };
+
+  const clearFilter = () => {
+    setSearch("");
+    setSelectedCategories([]);
+    triggerExpense({
+      userId,
+      active: activeTab,
+      pageSize,
+      pageIndex,
+    })
+  };
 
   const handleCheckboxChange = (category: any) => {
     setSelectedCategories((prevSelected) => {
@@ -84,6 +109,18 @@ const WalletPage = () => {
       return [...prevSelected, category];
     });
   };
+
+  //UseEffect
+  useEffect(() => {
+    triggerExpense(
+      {
+        userId,
+        active: activeTab,
+        pageSize,
+        pageIndex,
+      },
+    );
+  }, [activeTab, pageSize, pageIndex]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -149,7 +186,7 @@ const WalletPage = () => {
                 <ArrowDownToLine className="lg:mr-2" />
                 <span className="hidden lg:inline">Export</span>
               </Button>
-              <FilterSheet title="Filter" icon={<Filter width={17}/>}>
+              <FilterSheet setClear={clearFilter} onSubmit={handleFilter} title="Filter" icon={<Filter width={17}/>}>
                 <div className="flex flex-col py-3 gap-5">
                   <div className="flex flex-col gap-2">
                     <h1 className="text-sm font-semibold">
@@ -164,16 +201,14 @@ const WalletPage = () => {
                   </div>
                   <hr />
                   <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
                       <h1 className="text-sm font-semibold">Category</h1>
-                      <a
+                      {/* <a
                         href="#"
                         className="text-gray-400 hover:text-primary text-sm"
                         onClick={() => setSelectedCategories([])}
                       >
                         Reset
-                      </a>
-                    </div>
+                      </a> */}
                     {/* Collapsible Filter */}
                     <Collapsible>
                       {/* Trigger */}
