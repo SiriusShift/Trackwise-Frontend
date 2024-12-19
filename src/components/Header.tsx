@@ -12,17 +12,15 @@ const Header = () => {
   const [cookies] = useCookies();
   const userInfo = decryptString(cookies?.user);
   console.log(userInfo);
-  // const location = useLocation();
-  // const currentPageName = navigationData.find(
-  //   (item) => item.path === location.pathname
-  // );
-
+  
   return (
     <div className="flex bg-background sticky right-0 top-0 w-full border-b items-center justify-between">
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
           <SidebarTrigger className="inline md:hidden" />
-          <p className="hidden sm:inline">Good morning, {userInfo?.firstName}</p>
+          <p className="hidden sm:inline">
+            Good morning, {userInfo?.firstName}
+          </p>
           {/* <p className="text-xl">{currentPageName?.name}</p> */}
         </div>
         <div className="flex items-center gap-2 sm:gap-5 justify-between">
@@ -32,11 +30,11 @@ const Header = () => {
           </Button>
           <div className="relative w-10 h-10">
             {/* Profile Picture */}
-            <div className="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center">
+            <div className="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
               <img
-                src={DefaultProfile}
-                width={20} // Adjusted to a number for React consistency
+                src={userInfo?.profileImage || DefaultProfile}
                 alt="Profile Picture"
+                className="h-full w-full object-cover"
               />
             </div>
 

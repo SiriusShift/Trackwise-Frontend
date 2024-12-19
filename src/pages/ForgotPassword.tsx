@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePostForgotPasswordMutation } from "@/feature/authentication/api/signinApi";
 import { useState } from "react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 const ForgotPassword = () => {
   const router = useNavigate();
   const [email, setEmail] = useState("");
@@ -50,7 +50,6 @@ const ForgotPassword = () => {
           </div>
         </div>
       </LayoutAuth>
-      <Toaster />
     </>
   );
 };

@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../schema/schema";
 import Google from "../assets/images/Google.svg";
 import Logo from "../assets/images/Logo.svg";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
@@ -16,17 +16,22 @@ import {
 } from "@/feature/authentication/api/signinApi";
 import { setUserInfo } from "@/feature/authentication/reducers/userDetail";
 import LayoutAuth from "@/components/authentication/LayoutAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { decryptString } from "@/utils/CustomFunctions";
 
 const SignInPage = () => {
   const router = useNavigate();
+  const location = useLocation();
   const [cookies] = useCookies(["user"]);
   const [postSignin] = usePostSigninMutation();
-  const { error, data, isLoading } = useGetAuthStatusQuery({});
-  console.log("test",data, error, isLoading);
+
+  const searchParams = new URLSearchParams(location.search);
+  const errorStatus = searchParams.get("error");
+  const message = searchParams.get("message");
   
+  const { error, data, isLoading } = useGetAuthStatusQuery({});
+
   const {
     handleSubmit,
     register,
@@ -46,6 +51,14 @@ const SignInPage = () => {
       router("/"); // Redirect to home if already authenticated
     }
   }, [data, router]);
+
+  useEffect(() => {
+    if (errorStatus) {
+      setTimeout(() => {
+        toast.error(message);
+      }, 500)
+    }
+  }, [errorStatus, message]);
 
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -67,6 +80,10 @@ const SignInPage = () => {
     } else {
       console.log(errors);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/auth/google/sign-in'; // Redirect to backend OAuth route
   };
 
   return (
@@ -117,7 +134,7 @@ const SignInPage = () => {
               </span>
               <div className="flex-grow border-t border-gray-400"></div>
             </div>
-            <Button variant={"outline"} className="w-full sm:w-96 shadow-md">
+            <Button type="button" onClick={handleGoogleLogin} variant={"outline"} className="w-full sm:w-96 shadow-md">
               <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
               Continue with Google
             </Button>
@@ -128,7 +145,6 @@ const SignInPage = () => {
               </a>
             </p>
           </LayoutAuth>
-          <Toaster visibleToasts={5} />
         </>
       )}
     </>

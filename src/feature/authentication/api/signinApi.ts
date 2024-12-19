@@ -62,7 +62,16 @@ const signInApi = api.injectEndpoints({
                 headers: { Accept: "application/json" },
                 credentials: 'include'
             }),
+        }),
+        getUserGoogle: builder.query({
+            query: () => ({
+                url: "/auth/google",
+                method: "GET",
+                headers: { Accept: "application/json" },
+                credentials: 'include'
+            }),
         })
+
     }),
 });
 

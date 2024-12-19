@@ -68,7 +68,7 @@ import {
   usePostExpenseMutation,
   usePostRecurringExpenseMutation,
 } from "@/feature/expenses/api/expensesApi";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { frequencies } from "@/utils/Constants";
 import { date } from "yup";
 
@@ -987,7 +987,6 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
           </DrawerContent>
         </Drawer>
       )}{" "}
-      <Toaster />
     </>
   );
 }

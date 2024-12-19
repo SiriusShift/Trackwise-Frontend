@@ -92,7 +92,6 @@ const ResetPassword = () => {
           </div>
         </div>
       </LayoutAuth>
-      <Toaster />
     </>
   );
 };

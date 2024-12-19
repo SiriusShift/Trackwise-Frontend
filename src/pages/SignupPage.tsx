@@ -11,7 +11,7 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 // import Logo from "../assets/images/Logo.svg";
 import Google from "../assets/images/Google.svg";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { signupSchema } from "../schema/schema";
@@ -108,6 +108,10 @@ const signUp = () => {
     }
   };
 
+  const handleGoogleSignup = () => {
+    window.location.href = 'http://localhost:5000/auth/google/sign-up'; // Redirect to backend OAuth route
+  };
+
   const resendCode = () => {
     setCountdown(60); // 1 minute countdown
   };
@@ -189,7 +193,7 @@ const signUp = () => {
                 </span>
                 <div className="flex-grow border-t border-gray-400"></div>
               </div>
-              <Button variant={"outline"} className="w-full sm:w-96 shadow-md">
+              <Button variant={"outline"} type="button" onClick={handleGoogleSignup} className="w-full sm:w-96 shadow-md">
                 <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
                 Continue with Google
               </Button>
@@ -239,7 +243,6 @@ const signUp = () => {
           </div>
         )}
       </LayoutAuth>
-      <Toaster visibleToasts={5} />
     </>
   );
 };
