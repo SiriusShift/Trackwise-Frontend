@@ -8,14 +8,10 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "./ui/button";
 import { CalendarRange } from "lucide-react";
 
-const MonthPicker = () => {
+const MonthPicker = ({setStartDate, setEndDate} : any) => {
   const [selectedMonth, setSelectedMonth] = useState<Date>(
     startOfMonth(new Date())
   ); // Default to current month
-  const [monthRange, setMonthRange] = useState<{
-    start: string;
-    end: string;
-  } | null>(null);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const currentMonthIndex = new Date().getMonth(); // Current month (0-11)
@@ -43,7 +39,8 @@ const MonthPicker = () => {
     const start = format(startOfMonth(date), "yyyy-MMMM-dd");
     const end = format(endOfMonth(date), "yyyy-MMMM-dd");
 
-    setMonthRange({ start, end });
+    setStartDate(start);
+    setEndDate(end);
   };
 
   const handlePreviousYear = () => setCurrentYear((prevYear) => prevYear - 1);

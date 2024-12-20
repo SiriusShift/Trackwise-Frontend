@@ -58,7 +58,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Amount",
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>₱{amount?.toFixed(2) || "0.00"}</span>;
+      return <span>₱{amount?.toFixed(2) || "0"}</span>;
     },
   },
   {
@@ -148,7 +148,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     header: "Amount",
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>${amount?.toFixed(2) || "0.00"}</span>;
+      return <span>₱{amount?.toFixed(2) || "0"}</span>;
     },
   },
   {

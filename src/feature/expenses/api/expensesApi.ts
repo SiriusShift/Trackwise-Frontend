@@ -1,7 +1,7 @@
 import { api } from "@/feature/api";
 import { get } from "http";
 
-const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense"] }).injectEndpoints({
+const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense", "Assets"] }).injectEndpoints({
   endpoints: (builder) => ({
     getExpenses: builder.query({
       query: (params) => ({
@@ -24,7 +24,7 @@ const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringE
         },
         body,
       }),
-      invalidatesTags: ["Expenses"],
+      invalidatesTags: ["Expenses", "Assets"],
     }),
 
     postRecurringExpense: builder.mutation({
@@ -49,7 +49,20 @@ const expensesApi = api.enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringE
       }),
       providesTags: ["RecurringExpense"],
     }),
+
+    //ASSETS
+    getAsset: builder.query({
+      query: () => ({
+          url: "/asset/get",
+          method: "GET",
+          headers: { 
+              Accept: "application/json" 
+          },
+      }),
+      providesTags: ["Assets"],
+      transformResponse: (response: any) => response.data
+  }),
   }),
 });
 
-export const { useGetExpensesQuery, useLazyGetExpensesQuery, usePostExpenseMutation, usePostRecurringExpenseMutation, useGetRecurringExpensesQuery } = expensesApi;
+export const { useGetExpensesQuery, useLazyGetExpensesQuery, usePostExpenseMutation, usePostRecurringExpenseMutation, useGetRecurringExpensesQuery, useGetAssetQuery } = expensesApi;

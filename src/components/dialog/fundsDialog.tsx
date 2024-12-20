@@ -47,7 +47,7 @@ import moment from "moment";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { useGetAssetQuery } from "@/feature/assets/api/assetsApi";
+import { useGetAssetQuery } from "@/feature/expenses/api/expensesApi";
 import { numberInput } from "@/utils/CustomFunctions";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import {
@@ -109,7 +109,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       type: type,
     });
 
-  const { data: assetData, isLoading: isLoadingAsset } = useGetAssetQuery();
+  const { data: assetData } = useGetAssetQuery({}, { refetchOnMountOrArgChange: true });
   console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
   const [postRecurring] = usePostRecurringExpenseMutation();
@@ -162,7 +162,9 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
           source: data?.source?.id || "",
           category: data?.category?.id || "",
           userId: parseInt(data?.userId),
+          amount: parseFloat(data?.amount),
           date: moment(data?.date).utc().format(),
+          assetBalance: watch("source")?.balance,
         });
       }
       reset({

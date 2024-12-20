@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import moment from "moment";
 
 const WalletPage = () => {
   const location = useLocation();
@@ -44,11 +45,13 @@ const WalletPage = () => {
   // State Management
   const [activeTab, setActiveTab] = useState<string>("All");
   const [search, setSearch] = useState<string>("");
+  const [startDate, setStartDate] = useState<Date | null>(moment().startOf("month").toDate());
+  const [endDate, setEndDate] = useState<Date | null>(moment().startOf("month").toDate());
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
 
-  console.log(selectedCategories);
+  console.log(startDate, endDate);
 
   // Get User ID
   const userId = useSelector((state: any) => state?.userDetails?.id);
@@ -66,6 +69,8 @@ const WalletPage = () => {
 
   const { data: recurringData } = useGetRecurringExpensesQuery({
     userId,
+    startDate,
+    endDate,
     pageSize,
     pageIndex,
   });
@@ -75,9 +80,11 @@ const WalletPage = () => {
   const handleFilter = () => {
     const requestData = {
       userId,
-      active: activeTab,
+      // active: activeTab,
       pageSize,
       pageIndex,
+      startDate,
+      endDate,
       ...(search && { Search: search }), // Add `Search` only if truthy
       ...(selectedCategories.length > 0 && {
         Categories: JSON.stringify(selectedCategories.map((category) => category.id)), // Add array of IDs
@@ -93,7 +100,9 @@ const WalletPage = () => {
     setSelectedCategories([]);
     triggerExpense({
       userId,
-      active: activeTab,
+      startDate,
+      endDate,
+      // active: activeTab,
       pageSize,
       pageIndex,
     })
@@ -115,12 +124,14 @@ const WalletPage = () => {
     triggerExpense(
       {
         userId,
-        active: activeTab,
+        startDate,
+        endDate,
+        // active: activeTab,
         pageSize,
         pageIndex,
       },
     );
-  }, [activeTab, pageSize, pageIndex]);
+  }, [pageSize, pageIndex]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -128,7 +139,7 @@ const WalletPage = () => {
       <div>
         <div className="flex justify-between">
           <p className="text-xl font-semibold">{currentPageName?.name}</p>
-          <MonthPicker />
+          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate}/>
         </div>
         <p className="text-gray-400">
           This is your overview of expenses for this month
@@ -299,16 +310,16 @@ const WalletPage = () => {
           Expenses limit for this month
         </h1>
         <div className="w-full grid grid-cols-4 gap-2">
-          <div className="h-28 bg-gray-100 flex items-center justify-center rounded-md">
+          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
             Content 1
           </div>
-          <div className="h-28 bg-gray-100 flex items-center justify-center rounded-md">
+          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
             Content 2
           </div>
-          <div className="h-28 bg-gray-100 flex items-center justify-center rounded-md">
+          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
             Content 3
           </div>
-          <div className="h-28 bg-gray-100 flex items-center justify-center rounded-md">
+          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
             Content 4
           </div>
         </div>
