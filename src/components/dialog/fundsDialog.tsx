@@ -384,20 +384,26 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                           ? moment(field.value).format("HH:mm")
                                           : ""
                                       }
-                                      onChange={(e) => {
-                                        const [hours, minutes] = e.target.value
-                                          .split(":")
-                                          .map(Number);
-                                        const updatedDate = new Date(
-                                          field.value || new Date()
+                                      onSelect={(date) => {
+                                        const newDate = new Date(
+                                          date.setHours(
+                                            field.value ? new Date(field.value).getHours() : 0,
+                                            field.value ? new Date(field.value).getMinutes() : 0
+                                          )
                                         );
-                                        updatedDate.setHours(hours, minutes);
-                                        console.log(
-                                          "Selected Time:",
-                                          updatedDate
-                                        );
-                                        field.onChange(updatedDate); // Update time with date preserved
+                                        console.log("Selected Date:", newDate);
+                                        field.onChange(newDate); // Update date with time preserved
                                       }}
+                                      onChange={(e) => {
+                                        const [hours, minutes] = e.target.value.split(":").map(Number);
+                                        const updatedDate = field.value
+                                          ? new Date(field.value)
+                                          : new Date(); // Use the selected date or default to now
+                                        updatedDate.setHours(hours, minutes);
+                                        console.log("Updated Time:", updatedDate);
+                                        field.onChange(updatedDate); // Update time with the correct date preserved
+                                      }}
+                                      
                                     />
                                   </div>
                                 </div>

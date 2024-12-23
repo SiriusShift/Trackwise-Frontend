@@ -3,7 +3,7 @@ import LayoutAuth from "@/components/authentication/LayoutAuth";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { usePostResetPasswordMutation } from "@/feature/authentication/api/signinApi";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPasswordSchema } from "@/schema/schema";

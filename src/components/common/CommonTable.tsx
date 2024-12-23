@@ -35,9 +35,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import { Input } from "@/components/ui/input";
-import MonthPicker from "@/components/datePicker";
-import { AddDialog } from "../dialog/fundsDialog";
+import NoData from "@/assets/images/noData.svg";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -46,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   pageIndex: number; // Current page index
   totalPages: number; // Total number of pages
   totalCount: number; // Total number of items
+  children: React.ReactNode;
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
 }
@@ -59,6 +58,7 @@ export function DataTable<TData, TValue>({
   totalCount,
   setPageIndex,
   setPageSize,
+  children,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -93,53 +93,62 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table container with responsive and overflow behavior */}
-      <div className="border relative w-full h-[375px] rounded-md z-0 overflow-auto">
-        <Table>
-          <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="whitespace-nowrap">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="font-semibold ">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="whitespace-nowrap">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+      <div className="flex gap-5 ">
+        <div className="border relative w-full h-[375px] rounded-md z-0 overflow-auto">
+          <Table>
+            <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="whitespace-nowrap">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns?.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody className="font-semibold ">
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="whitespace-nowrap">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns?.length}
+                    className="h-24 text-center"
+                  >
+                    <img
+                      src={NoData}
+                      className="mx-auto"
+                      width={350}
+                      alt="No Data"
+                    />
+                    <p>No data found</p>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {children}
       </div>
 
       {/* Pagination Footer */}

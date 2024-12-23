@@ -35,12 +35,12 @@ const MonthPicker = ({setStartDate, setEndDate} : any) => {
     const date = new Date(currentYear, monthIndex, 1);
     setSelectedMonth(date);
 
-    // Calculate start and end of the month
-    const start = format(startOfMonth(date), "yyyy-MMMM-dd");
-    const end = format(endOfMonth(date), "yyyy-MMMM-dd");
+    // // Calculate start and end of the month
+    // const start = format(startOfMonth(date), "yyyy-MMMM-dd");
+    // const end = format(endOfMonth(date), "yyyy-MMMM-dd");
 
-    setStartDate(start);
-    setEndDate(end);
+    setStartDate(startOfMonth(date));
+    setEndDate(endOfMonth(date));
   };
 
   const handlePreviousYear = () => setCurrentYear((prevYear) => prevYear - 1);

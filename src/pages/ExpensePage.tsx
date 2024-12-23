@@ -2,31 +2,20 @@ import { navigationData } from "@/navigation/navigationData";
 import { useLocation } from "react-router-dom";
 import MonthPicker from "@/components/datePicker";
 import { DataTable } from "@/components/common/CommonTable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Expense } from "@/types";
 import {
   expenseColumns,
   recurringExpenseColumns,
 } from "@/components/page-components/funds/expenseColumn";
-import { useEffect, useState } from "react";
-import Toolbar from "@/components/toolbar/CommonToolbar";
+import { useEffect, useMemo, useState } from "react";
 import {
-  useGetExpensesQuery,
-  useGetRecurringExpensesQuery,
   useLazyGetExpensesQuery,
+  useLazyGetRecurringExpensesQuery,
 } from "@/feature/expenses/api/expensesApi";
 import { useSelector } from "react-redux";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import { Button } from "@/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/funds/FilterSheet";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
 import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
 import { AddDialog } from "@/components/dialog/fundsDialog";
 import {
@@ -37,16 +26,76 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import moment from "moment";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label, Pie, PieChart } from "recharts";
+import { TrendingUp } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+const chartData = [
+  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
+  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
+  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
+  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
+  { browser: "other", visitors: 190, fill: "var(--color-other)" },
+];
+const chartConfig = {
+  visitors: {
+    label: "Visitors",
+  },
+  chrome: {
+    label: "Chrome",
+    color: "hsl(var(--chart-1))",
+  },
+  safari: {
+    label: "Safari",
+    color: "hsl(var(--chart-2))",
+  },
+  firefox: {
+    label: "Firefox",
+    color: "hsl(var(--chart-3))",
+  },
+  edge: {
+    label: "Edge",
+    color: "hsl(var(--chart-4))",
+  },
+  other: {
+    label: "Other",
+    color: "hsl(var(--chart-5))",
+  },
+} satisfies ChartConfig;
 
 const WalletPage = () => {
+  const totalVisitors = useMemo(() => {
+    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
+  }, []);
+
   const location = useLocation();
   const screenWidth = useScreenWidth();
 
   // State Management
   const [activeTab, setActiveTab] = useState<string>("All");
   const [search, setSearch] = useState<string>("");
-  const [startDate, setStartDate] = useState<Date | null>(moment().startOf("month").toDate());
-  const [endDate, setEndDate] = useState<Date | null>(moment().startOf("month").toDate());
+  const [status, setStatus] = useState<string>("All");
+  const [startDate, setStartDate] = useState<Date | null>(
+    moment().startOf("month").toDate()
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    moment().endOf("month").toDate()
+  );
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
@@ -63,20 +112,16 @@ const WalletPage = () => {
 
   // Queries
   const [triggerExpense, { data: expensesData }] = useLazyGetExpensesQuery();
-  
 
-  console.log("data",expensesData);
+  console.log("data", expensesData);
 
-  const { data: recurringData } = useGetRecurringExpensesQuery({
-    userId,
-    startDate,
-    endDate,
-    pageSize,
-    pageIndex,
-  });
+  const [triggerRecurring, { data: recurringData }] =
+    useLazyGetRecurringExpensesQuery();
+
+  console.log("recurring", recurringData);
 
   const { data: categoryData } = useGetCategoryQuery({});
-  
+
   const handleFilter = () => {
     const requestData = {
       userId,
@@ -85,27 +130,44 @@ const WalletPage = () => {
       pageIndex,
       startDate,
       endDate,
+      ...(status && { Status: status }),
       ...(search && { Search: search }), // Add `Search` only if truthy
       ...(selectedCategories.length > 0 && {
-        Categories: JSON.stringify(selectedCategories.map((category) => category.id)), // Add array of IDs
+        Categories: JSON.stringify(
+          selectedCategories.map((category) => category.id)
+        ), // Add array of IDs
       }),
     };
-  
-    console.log(requestData);
-    triggerExpense(requestData);
+
+    if (activeTab === "Recurring") {
+      triggerRecurring(requestData);
+    } else {
+      triggerExpense(requestData);
+    }
   };
 
   const clearFilter = () => {
     setSearch("");
     setSelectedCategories([]);
-    triggerExpense({
-      userId,
-      startDate,
-      endDate,
-      // active: activeTab,
-      pageSize,
-      pageIndex,
-    })
+    if (activeTab === "Recurring") {
+      setStatus("");
+      triggerRecurring({
+        userId,
+        startDate,
+        endDate,
+        pageSize,
+        pageIndex,
+      });
+    } else {
+      triggerExpense({
+        userId,
+        startDate,
+        endDate,
+        // active: activeTab,
+        pageSize,
+        pageIndex,
+      });
+    }
   };
 
   const handleCheckboxChange = (category: any) => {
@@ -121,17 +183,25 @@ const WalletPage = () => {
 
   //UseEffect
   useEffect(() => {
-    triggerExpense(
-      {
+    if (activeTab === "Recurring") {
+      triggerRecurring({
+        userId,
+        startDate,
+        endDate,
+        pageSize,
+        pageIndex,
+      });
+    } else {
+      triggerExpense({
         userId,
         startDate,
         endDate,
         // active: activeTab,
         pageSize,
         pageIndex,
-      },
-    );
-  }, [pageSize, pageIndex]);
+      });
+    }
+  }, [pageSize, pageIndex, startDate, endDate, activeTab]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -139,7 +209,7 @@ const WalletPage = () => {
       <div>
         <div className="flex justify-between">
           <p className="text-xl font-semibold">{currentPageName?.name}</p>
-          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate}/>
+          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate} />
         </div>
         <p className="text-gray-400">
           This is your overview of expenses for this month
@@ -197,7 +267,12 @@ const WalletPage = () => {
                 <ArrowDownToLine className="lg:mr-2" />
                 <span className="hidden lg:inline">Export</span>
               </Button>
-              <FilterSheet setClear={clearFilter} onSubmit={handleFilter} title="Filter" icon={<Filter width={17}/>}>
+              <FilterSheet
+                setClear={clearFilter}
+                onSubmit={handleFilter}
+                title="Filter"
+                icon={<Filter width={17} />}
+              >
                 <div className="flex flex-col py-3 gap-5">
                   <div className="flex flex-col gap-2">
                     <h1 className="text-sm font-semibold">
@@ -212,8 +287,8 @@ const WalletPage = () => {
                   </div>
                   <hr />
                   <div className="flex flex-col gap-2">
-                      <h1 className="text-sm font-semibold">Category</h1>
-                      {/* <a
+                    <h1 className="text-sm font-semibold">Category</h1>
+                    {/* <a
                         href="#"
                         className="text-gray-400 hover:text-primary text-sm"
                         onClick={() => setSelectedCategories([])}
@@ -272,13 +347,56 @@ const WalletPage = () => {
                     </Collapsible>
                   </div>
                   <hr />
+                  {activeTab === "Recurring" && (
+                    <>
+                      <div className="flex flex-col gap-2">
+                        <h1 className="text-sm font-semibold">Category</h1>
+                        <RadioGroup
+                          value={status}
+                          onValueChange={(value) => setStatus(value)} // Ensure value is updated
+                          className="space-y-2"
+                        >
+                          {/* Option 1 */}
+                          <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-warning">
+                            <RadioGroupItem id="Unpaid" value="Unpaid" />
+                            <label
+                              htmlFor="Unpaid"
+                              className="text-sm font-medium"
+                            >
+                              Unpaid
+                            </label>
+                          </div>
+                          {/* Option 2 */}
+                          <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
+                            <RadioGroupItem id="Paid" value="Paid" />
+                            <label
+                              htmlFor="Paid"
+                              className="text-sm font-medium"
+                            >
+                              Paid
+                            </label>
+                          </div>
+                          {/* Option 3 */}
+                          <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-destructive">
+                            <RadioGroupItem id="Overdue" value="Overdue" />
+                            <label
+                              htmlFor="Overdue"
+                              className="text-sm font-medium"
+                            >
+                              Overdue
+                            </label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      <hr />
+                    </>
+                  )}
                 </div>
               </FilterSheet>
             </div>
           </div>
         </div>
 
-        {/* Data Table */}
         {activeTab === "All" ? (
           <DataTable
             columns={expenseColumns}
@@ -289,7 +407,74 @@ const WalletPage = () => {
             pageIndex={pageIndex}
             pageSize={pageSize}
             data={expensesData?.data || []}
-          />
+          >
+            <Card className="flex flex-col w-[500px]">
+              <CardHeader className="items-center pb-0">
+                <CardTitle className="text-lg xl:text-xl">Pie Chart - Donut with Text</CardTitle>
+                <CardDescription>January - June 2024</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 content-center pb-0">
+                <ChartContainer
+                  config={chartConfig}
+                  className="mx-auto aspect-square max-h-[200px]"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey="visitors"
+                      nameKey="browser"
+                      innerRadius={60}
+                      outerRadius={80}
+                      strokeWidth={5}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                              >
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="fill-foreground text-3xl font-bold"
+                                >
+                                  {totalVisitors.toLocaleString()}
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground"
+                                >
+                                  Visitors
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+              <CardFooter className="flex-col text-center gap-2 text-sm">
+                <div className="flex items-center gap-2 font-medium leading-none">
+                  Trending up by 5.2% this month{" "}
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="leading-none text-muted-foreground">
+                  Showing total visitors for the last 6 months
+                </div>
+              </CardFooter>
+            </Card>
+          </DataTable>
         ) : (
           <DataTable
             columns={recurringExpenseColumns}
@@ -300,8 +485,76 @@ const WalletPage = () => {
             pageIndex={pageIndex}
             pageSize={pageSize}
             data={recurringData?.data || []}
-          />
+          >
+            <Card className="flex flex-col">
+              <CardHeader className="items-center pb-0">
+                <CardTitle>Pie Chart - Donut with Text</CardTitle>
+                <CardDescription>January - June 2024</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-0">
+                <ChartContainer
+                  config={chartConfig}
+                  className="mx-auto aspect-square max-h-[150px]"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey="visitors"
+                      nameKey="browser"
+                      innerRadius={50}
+                      outerRadius={70}
+                      strokeWidth={5}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                              >
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="fill-foreground text-3xl font-bold"
+                                >
+                                  {totalVisitors.toLocaleString()}
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground"
+                                >
+                                  Visitors
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+              <CardFooter className="flex-col gap-2 text-sm">
+                <div className="flex items-center gap-2 font-medium leading-none">
+                  Trending up by 5.2% this month{" "}
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="leading-none text-muted-foreground">
+                  Showing total visitors for the last 6 months
+                </div>
+              </CardFooter>
+            </Card>
+          </DataTable>
         )}
+        {/* Data Table */}
       </div>
 
       {/* Expense Limits Section */}
@@ -309,19 +562,22 @@ const WalletPage = () => {
         <h1 className="text-xl font-semibold mb-3">
           Expenses limit for this month
         </h1>
-        <div className="w-full grid grid-cols-4 gap-2">
-          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
-            Content 1
+        <div>
+          <div className="w-1/2 2xl:w-full grid xl:grid-rows-2 xl:grid-cols-2 2xl:grid-rows-1 2xl:grid-cols-4 gap-5">
+            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
+              Content 1
+            </div>
+            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
+              Content 2
+            </div>
+            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
+              Content 3
+            </div>
+            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
+              Content 4
+            </div>
           </div>
-          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
-            Content 2
-          </div>
-          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
-            Content 3
-          </div>
-          <div className="h-28 bg-secondary flex items-center justify-center rounded-md">
-            Content 4
-          </div>
+          <div className="hidden 2xl:inline 2xl:w-[400px]"></div>
         </div>
       </div>
     </div>

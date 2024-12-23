@@ -9,7 +9,7 @@ import Logo from "../assets/images/Logo.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import {
   useGetAuthStatusQuery,
   usePostSigninMutation,
@@ -29,7 +29,7 @@ const SignInPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
   const message = searchParams.get("message");
-  
+
   const { error, data, isLoading } = useGetAuthStatusQuery({});
 
   const {
@@ -47,7 +47,7 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (data?.authenticated && !error && cookies.user) {
-      console.log("test1")
+      console.log("test1");
       router("/"); // Redirect to home if already authenticated
     }
   }, [data, router]);
@@ -56,7 +56,7 @@ const SignInPage = () => {
     if (errorStatus) {
       setTimeout(() => {
         toast.error(message);
-      }, 500)
+      }, 500);
     }
   }, [errorStatus, message]);
 
@@ -83,12 +83,12 @@ const SignInPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google/sign-in'; // Redirect to backend OAuth route
+    window.location.href = "http://localhost:5000/auth/google/sign-in"; // Redirect to backend OAuth route
   };
 
   return (
     <>
-      {(!isLoading && (!data?.authenticated || !cookies.user)) && (
+      {!isLoading && (!data?.authenticated || !cookies.user) && (
         <>
           {" "}
           <LayoutAuth
@@ -134,7 +134,12 @@ const SignInPage = () => {
               </span>
               <div className="flex-grow border-t border-gray-400"></div>
             </div>
-            <Button type="button" onClick={handleGoogleLogin} variant={"outline"} className="w-full sm:w-96 shadow-md">
+            <Button
+              type="button"
+              onClick={handleGoogleLogin}
+              variant={"outline"}
+              className="w-full sm:w-96 shadow-md"
+            >
               <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
               Continue with Google
             </Button>
