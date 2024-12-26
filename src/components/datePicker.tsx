@@ -11,7 +11,7 @@ import { CalendarRange } from "lucide-react";
 const MonthPicker = ({setStartDate, setEndDate} : any) => {
   const [selectedMonth, setSelectedMonth] = useState<Date>(
     startOfMonth(new Date())
-  ); // Default to current month
+  );
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const currentMonthIndex = new Date().getMonth(); // Current month (0-11)

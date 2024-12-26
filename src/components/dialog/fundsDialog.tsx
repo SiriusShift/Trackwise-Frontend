@@ -164,10 +164,11 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
           userId: parseInt(data?.userId),
           amount: parseFloat(data?.amount),
           date: moment(data?.date).utc().format(),
-          assetBalance: watch("source")?.balance,
+          assetBalance: watch("source")?.remainingBalance,
         });
       }
       reset({
+        ...recurringExpense.defaultValues,
         userId: userId,
       }); // Reset the form after successful submission
       setOpen(false);
@@ -599,7 +600,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="sm:justify-start space-x-2">
+                <div className="sm:justify-end w-full space-x-2">
                   <Button type="submit" disabled={!isValid}>
                     Add
                   </Button>
@@ -976,7 +977,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="sm:justify-start space-x-2">
+                <div className="sm:justify-end w-full space-x-2">
                   <Button type="submit" disabled={!isValid}>
                     Add
                   </Button>

@@ -6,7 +6,7 @@ import { CommonToolbarProps } from "../../types/index";
 import MonthPicker from "../datePicker";
 import { Input } from "../ui/input";
 import useScreenWidth from "@/hooks/useScreenWidth";
-import { FilterSheet } from "../page-components/funds/FilterSheet";
+import { FilterSheet } from "../page-components/expense/FilterSheet";
 
 function CommonToolbar({ type, children, active, title }: CommonToolbarProps) {
   const screenWidth = useScreenWidth();

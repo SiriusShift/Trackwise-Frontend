@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
-                path: "/expense",
+                path: "/expenses",
                 element: <Expense />
             },
             {
