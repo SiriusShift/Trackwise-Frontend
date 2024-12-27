@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .sidebar {
@@ -42,11 +42,16 @@ body {
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
-    --chart-1: 0 0% 0%;   /* Very Light Gray (almost white) */
-    --chart-2: 0 0% 85%;   /* Light Gray */
-    --chart-3: 0 0% 70%;   /* Medium Light Gray */
-    --chart-4: 0 0% 55%;   /* Medium Gray */
-    --chart-5: 0 0% 40%;   /* Darker Gray */
+    --chart-1: 0 0% 15%; /* Darker than White */
+    --chart-2: 0 0% 25%; /* Very Light Gray */
+    --chart-3: 0 0% 40%; /* Light Gray */
+    --chart-4: 0 0% 45%; /* Medium Light Gray */
+    --chart-5: 0 0% 55%; /* Medium Gray */
+    --chart-6: 0 0% 45%; /* Neutral Gray */
+    --chart-7: 0 0% 35%; /* Medium Dark Gray */
+    --chart-8: 0 0% 25%; /* Dark Gray */
+    --chart-9: 0 0% 15%; /* Very Dark Gray */
+    --chart-10: 0 0% 10%; /* Near Black */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -81,11 +86,16 @@ body {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-    --chart-1: 0 0% 100%;   /* Very Dark Gray (almost black) */
-    --chart-2: 0 0% 20%;   /* Dark Gray */
-    --chart-3: 0 0% 30%;   /* Medium Dark Gray */
-    --chart-4: 0 0% 40%;   /* Medium Gray */
-    --chart-5: 0 0% 50%;   /* Lighter Dark Gray */
+    --chart-1: 0 0% 94%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 70%;
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 50%;
+    --chart-6: 0 0% 40%;
+    --chart-7: 0 0% 32%;
+    --chart-8: 0 0% 24%;
+    --chart-9: 0 0% 16%;
+    --chart-10: 0 0% 10%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

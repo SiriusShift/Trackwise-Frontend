@@ -46,7 +46,7 @@ const WalletPage = () => {
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
 
-  console.log(startDate, endDate);
+  console.log(moment(startDate).format("MMMM YYYY"), endDate);
 
   // Get User ID
   const userId = useSelector((state: any) => state?.userDetails?.id);
@@ -351,8 +351,9 @@ const WalletPage = () => {
             setPageSize={setPageSize}
             totalPages={expensesData?.totalPages}
             pageIndex={pageIndex}
+            date={endDate}
             pageSize={pageSize}
-            totalExpense={expensesData?.totalExpense}
+            total={expensesData?.totalExpense}
             categoryExpenses={expensesData?.categoryExpenses}
             data={expensesData?.data || []}
           />
@@ -365,7 +366,7 @@ const WalletPage = () => {
             totalPages={recurringData?.totalPages}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            totalExpense={expensesData?.totalExpense}
+            total={expensesData?.totalExpense}
             categoryExpenses={expensesData?.categoryExpenses}
             data={recurringData?.data || []}
           />

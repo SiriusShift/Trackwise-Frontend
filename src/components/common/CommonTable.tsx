@@ -37,7 +37,14 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import NoData from "@/assets/images/noData.svg";
-import { Label, Pie, PieChart } from "recharts";
+import {
+  Cell,
+  Label,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -46,15 +53,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { useLocation } from "react-router-dom";
 import { navigationData } from "@/navigation/navigationData";
-
+import moment from "moment";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -63,57 +64,40 @@ interface DataTableProps<TData, TValue> {
   pageIndex: number; // Current page index
   totalPages: number; // Total number of pages
   totalCount: number; // Total number of items
+  date: Date; // Date filter
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   categoryExpenses: any;
-  totalExpense: number;
+  total: number;
 }
 
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-];
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
+const getColor = (index) => {
+  const colors = [
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-6))",
+    "hsl(var(--chart-7))",
+    "hsl(var(--chart-8))",
+    "hsl(var(--chart-9))",
+    "hsl(var(--chart-10))",
+  ];
+  return colors[index % colors.length];
+};
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   pageSize,
+  date,
   pageIndex,
   totalPages,
-  totalExpense,
+  total,
   setPageIndex,
   setPageSize,
-  categoryExpenses
+  categoryExpenses,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -121,12 +105,9 @@ export function DataTable<TData, TValue>({
   );
 
   const location = useLocation();
-    const currentPageName = navigationData.find(
-      (item) => item.path === location.pathname
-    );
-  
-
-  console.log("categoryExpenses", categoryExpenses);
+  const currentPageName = navigationData.find(
+    (item) => item.path === location.pathname
+  );
   const table = useReactTable({
     data,
     columns,
@@ -210,70 +191,85 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        <Card className="flex flex-col w-[400px]">
+        <Card className="flex flex-col max-w-[400px]">
+          {/* Card Header */}
           <CardHeader className="items-center pb-0">
-            <CardTitle className="text-lg xl:text-xl">
-              Expenses - Pie Chart{" "}
+            <CardTitle className="text-lg xl:text-xl text-center">
+              Expenses - Pie Chart
             </CardTitle>
-            <CardDescription>December 2024</CardDescription>
+            <CardDescription className="text-center">
+              {moment(date).format("MMMM YYYY")}
+            </CardDescription>
           </CardHeader>
+
+          {/* Card Content */}
           <CardContent className="flex-1 content-center pb-0">
-            <ChartContainer
-              config={chartConfig}
-              className="mx-auto aspect-square max-h-[200px]"
-            >
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
+                {/* Pie Chart */}
                 <Pie
-                  data={chartData}
-                  dataKey="visitors"
-                  nameKey="browser"
+                  data={categoryExpenses}
+                  dataKey="total" // Using 'total' for the value
+                  nameKey="categoryName" // Using 'categoryName' for the label
                   innerRadius={60}
                   outerRadius={80}
                   strokeWidth={5}
+                  stroke="hsl(var(--background))" // Apply primary color for the border
                 >
+                  {categoryExpenses?.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={getColor(index)} />
+                  ))}
                   <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-foreground text-xl font-bold"
-                            >
-                              ₱{totalExpense?.toLocaleString()}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="text-sm fill-muted-foreground"
-                            >
-                              {currentPageName?.name}
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
+                    position="center"
+                    fontSize={16}
+                    fontWeight="bold"
+                    className="text-destructive"
+                    value={`₱${total?.toLocaleString()}`}
+                    // content={({ viewBox }) => {
+                    //   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    //     return (
+                    //       <text
+                    //         x={viewBox.cx}
+                    //         y={viewBox.cy}
+                    //         textAnchor="middle"
+                    //         dominantBaseline="middle"
+                    //       >
+                    //         <tspan
+                    //           x={viewBox.cx}
+                    //           y={viewBox.cy}
+                    //           className="fill-foreground text-3xl font-bold"
+                    //         >
+                    //           {total.toLocaleString()}
+                    //         </tspan>
+                    //         <tspan
+                    //           x={viewBox.cx}
+                    //           y={(viewBox.cy || 0) + 24}
+                    //           className="fill-muted-foreground"
+                    //         >
+                    //           Visitors
+                    //         </tspan>
+                    //       </text>
+                    //     );
+                    //   }
+                    // }}
                   />
                 </Pie>
+                <Tooltip />
               </PieChart>
-            </ChartContainer>
+            </ResponsiveContainer>
           </CardContent>
-          <CardFooter className="flex-col text-center gap-2 text-sm">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+
+          {/* Card Footer */}
+          <CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
+            {/* Trending Section */}
+            <div className="flex items-center justify-center gap-2 font-medium leading-none">
+              <span className="truncate">Trending up this month by 5.2%</span>
+              <TrendingUp className="h-4 w-4 flex-shrink-0" />
             </div>
+            {/* Description Section */}
             <div className="leading-none text-muted-foreground">
-              Showing total {currentPageName?.name.toLocaleLowerCase()} for the month of December
+              Showing total {currentPageName?.name.toLocaleLowerCase()} for the
+              month of {moment(date).format("MMMM")}
             </div>
           </CardFooter>
         </Card>
