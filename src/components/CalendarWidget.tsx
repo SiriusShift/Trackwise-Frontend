@@ -23,7 +23,7 @@ const HorizontalCalendar: React.FC = ({ handleClick, activeDay, colorTheme }) =>
   {days.map((day, index) => (
     <button
       key={index}
-      className={`day-tile ${day.date === activeDay ? colorTheme === "light" ? "bg-black text-white" : "bg-white text-black" : ""}`}
+      className={`day-tile ${day.date === activeDay ? colorTheme === "light" ? "bg-background text-white" : "bg-white text-black" : ""}`}
       onClick={() => handleClick(day.date)} // Optional: Define a function for handling day clicks
     >
       <div className="day">{day.day}</div>

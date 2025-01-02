@@ -25,6 +25,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "date",
     header: "Date",
+    meta: {
+      cellClassName: "border-b",
+    },
     cell: ({ getValue }) => {
       const dateValue = getValue();
       return (
@@ -38,6 +41,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     accessorKey: "recipient",
     header: "Recipient",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "category.name",
@@ -47,11 +53,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         <Badge variant="outline">{getValue()}</Badge>
       </div>
     ),
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "amount",
@@ -60,11 +72,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const amount = getValue() as number | undefined;
       return <span>₱{amount?.toFixed(2) || "0"}</span>;
     },
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "asset.name",
     header: "Source",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   // {
   //   accessorKey: "status",
@@ -83,13 +101,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   // },
   {
     id: "actions",
-    header: "Actions",
+    meta: {
+      headerClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
+      cellClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
+    },
+    // header: "Actions",
     cell: ({ row }) => {
       const payment = row.original;
 
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild >
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
@@ -128,6 +150,9 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
         </span>
       );
     },
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "category.name",
@@ -137,11 +162,17 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
         <Badge variant="outline">{getValue()}</Badge>
       </div>
     ),
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     accessorKey: "amount",
@@ -149,6 +180,9 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
       return <span>₱{amount?.toFixed(2) || "0"}</span>;
+    },
+    meta: {
+      cellClassName: "border-b",
     },
   },
   {
@@ -170,10 +204,12 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
         </Badge>
       );
     },
+    meta: {
+      cellClassName: "border-b",
+    },
   },
   {
     id: "actions",
-    header: "Actions",
     cell: ({ row }) => {
       const payment = row.original;
 
@@ -201,6 +237,10 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
           </DropdownMenuContent>
         </DropdownMenu>
       );
+    },
+    meta: {
+      headerClassName: "sticky right-0 bg-background z-10 border-l border-b",
+      cellClassName: "sticky right-0 bg-background z-10 border-l border-b",
     },
   },
 ];

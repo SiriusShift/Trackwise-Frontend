@@ -7,14 +7,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowDownFromLine,
-  ArrowDownToLine,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Plus,
-  SlidersHorizontal,
+  TrendingDown,
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +34,7 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import NoData from "@/assets/images/noData.svg";
+import noPie from "@/assets/images/noDataPie.svg";
 import {
   Cell,
   Label,
@@ -56,6 +54,11 @@ import {
 import { useLocation } from "react-router-dom";
 import { navigationData } from "@/navigation/navigationData";
 import moment from "moment";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -69,7 +72,35 @@ interface DataTableProps<TData, TValue> {
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   categoryExpenses: any;
   total: number;
+  trend: any;
 }
+
+const chartConfig = {
+  width: "100%", // Full width of the container
+  height: 210, // Fixed height for the chart
+  innerRadius: 55, // Inner radius for the pie chart
+  outerRadius: 80, // Outer radius for the pie chart
+  strokeWidth: 5, // Stroke width for the pie chart
+  strokeColor: "hsl(var(--background))", // Stroke color (primary background color)
+  dataKey: "total", // The key in the data for the value
+  nameKey: "categoryName", // The key in the data for the label
+  colors: [
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-6))",
+    "hsl(var(--chart-7))",
+    "hsl(var(--chart-8))",
+    "hsl(var(--chart-9))",
+    "hsl(var(--chart-10))",
+  ],
+  labelValueFontSize: 16, // Font size for the label value in the center
+  labelValueFontWeight: "bold", // Font weight for the label value
+  labelValueClassName: "text-destructive", // CSS class for the label value (color)
+  showTooltip: true, // Whether or not to display the tooltip
+};
 
 const getColor = (index) => {
   const colors = [
@@ -95,10 +126,12 @@ export function DataTable<TData, TValue>({
   pageIndex,
   totalPages,
   total,
+  trend,
   setPageIndex,
   setPageSize,
   categoryExpenses,
 }: DataTableProps<TData, TValue>) {
+  console.log(data.length);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -136,14 +169,19 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table container with responsive and overflow behavior */}
-      <div className="flex gap-5 ">
-        <div className="border relative w-full h-[375px] rounded-md z-0 overflow-auto">
+      <div className="flex gap-5">
+        <div className="border relative w-full min-[400px] max-h-[400px] rounded-md z-0 overflow-auto">
           <Table>
             <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="whitespace-nowrap">
+                    <TableHead
+                      key={header.id}
+                      className={
+                        header.column.columnDef.meta?.headerClassName || "" // Use headerClassName
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -163,7 +201,12 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="whitespace-nowrap">
+                      <TableCell
+                        key={cell.id}
+                        className={`whitespace-nowrap ${
+                          cell.column.columnDef.meta?.cellClassName || ""
+                        }`}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -191,11 +234,11 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        <Card className="flex flex-col max-w-[400px]">
+        <Card className="flex flex-col min-w-[300px]">
           {/* Card Header */}
           <CardHeader className="items-center pb-0">
             <CardTitle className="text-lg xl:text-xl text-center">
-              Expenses - Pie Chart
+              {currentPageName?.name} - Pie Chart
             </CardTitle>
             <CardDescription className="text-center">
               {moment(date).format("MMMM YYYY")}
@@ -203,68 +246,84 @@ export function DataTable<TData, TValue>({
           </CardHeader>
 
           {/* Card Content */}
-          <CardContent className="flex-1 content-center pb-0">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                {/* Pie Chart */}
-                <Pie
-                  data={categoryExpenses}
-                  dataKey="total" // Using 'total' for the value
-                  nameKey="categoryName" // Using 'categoryName' for the label
-                  innerRadius={60}
-                  outerRadius={80}
-                  strokeWidth={5}
-                  stroke="hsl(var(--background))" // Apply primary color for the border
-                >
-                  {categoryExpenses?.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={getColor(index)} />
-                  ))}
-                  <Label
-                    position="center"
-                    fontSize={16}
-                    fontWeight="bold"
-                    className="text-destructive"
-                    value={`₱${total?.toLocaleString()}`}
-                    // content={({ viewBox }) => {
-                    //   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    //     return (
-                    //       <text
-                    //         x={viewBox.cx}
-                    //         y={viewBox.cy}
-                    //         textAnchor="middle"
-                    //         dominantBaseline="middle"
-                    //       >
-                    //         <tspan
-                    //           x={viewBox.cx}
-                    //           y={viewBox.cy}
-                    //           className="fill-foreground text-3xl font-bold"
-                    //         >
-                    //           {total.toLocaleString()}
-                    //         </tspan>
-                    //         <tspan
-                    //           x={viewBox.cx}
-                    //           y={(viewBox.cy || 0) + 24}
-                    //           className="fill-muted-foreground"
-                    //         >
-                    //           Visitors
-                    //         </tspan>
-                    //       </text>
-                    //     );
-                    //   }
-                    // }}
-                  />
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
+          <ChartContainer config={chartConfig}>
+            <CardContent className="flex-1 content-center pb-0">
+              <ResponsiveContainer
+                width={chartConfig.width}
+                height={chartConfig.height}
+              >
+                {categoryExpenses?.length > 0 ? (
+                  <PieChart>
+                    {chartConfig.showTooltip && (
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    )}
+                    <Pie
+                      data={categoryExpenses}
+                      dataKey={chartConfig.dataKey} // Using 'total' for the value
+                      nameKey={chartConfig.nameKey} // Using 'categoryName' for the label
+                      innerRadius={chartConfig.innerRadius}
+                      outerRadius={chartConfig.outerRadius}
+                      strokeWidth={chartConfig.strokeWidth}
+                      stroke={chartConfig.strokeColor} // Apply primary color for the border
+                    >
+                      {categoryExpenses.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            chartConfig.colors[
+                              index % chartConfig.colors.length
+                            ]
+                          }
+                        />
+                      ))}
+                      <Label
+                        position="center"
+                        fontSize={16}
+                        fontWeight="bold"
+                        // className="text-destructive"
+                        value={`₱${total?.toLocaleString()}`}
+                      />
+                    </Pie>
+                  </PieChart>
+                ) : (
+                  <div className="flex justify-center h-full items-center">
+                    <img src={noPie} width={150} alt="No Data" />
+                  </div>
+                )}
+              </ResponsiveContainer>
+            </CardContent>
+          </ChartContainer>
 
           {/* Card Footer */}
           <CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
             {/* Trending Section */}
             <div className="flex items-center justify-center gap-2 font-medium leading-none">
-              <span className="truncate">Trending up this month by 5.2%</span>
-              <TrendingUp className="h-4 w-4 flex-shrink-0" />
+              {trend === "NaN" ? (
+                <span>No data for trend calculation</span>
+              ) : (
+                <>
+                  <span className="truncate">
+                    Trending {trend > 0 ? "up" : "down"} this month by {trend}%
+                  </span>
+                  {trend > 0 ? (
+                    <TrendingUp
+                      className={`h-4 w-4 ${
+                        currentPageName?.name === "Expenses"
+                          ? "text-destructive"
+                          : "text-success"
+                      }`}
+                    />
+                  ) : (
+                    <TrendingDown
+                      className={`h-4 w-4 ${
+                        currentPageName?.name === "Expenses"
+                          ? "text-success"
+                          : "text-destructive"
+                      }`}
+                    />
+                  )}
+                </>
+              )}
             </div>
             {/* Description Section */}
             <div className="leading-none text-muted-foreground">

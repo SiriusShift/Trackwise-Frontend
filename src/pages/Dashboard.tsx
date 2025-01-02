@@ -14,7 +14,7 @@ import {
 } from "recharts";
 
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar as CalendarIcon,
   UtensilsCrossed,
@@ -46,6 +46,7 @@ import { Link, useLocation } from "react-router-dom";
 import { log } from "console";
 import { navigationData } from "@/navigation/navigationData";
 import MonthPicker from "@/components/datePicker";
+import moment from "moment";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -92,8 +93,18 @@ const chartConfig = {
  */
 const Dashboard = () => {
   const currentDay = new Date().getDate();
-  const [activeDay, setActiveDay] = React.useState(currentDay);
+  let activeMonth = localStorage.getItem("activeMonth");
+  activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
+
+  const [startDate, setStartDate] = useState<Date | null>(
+    moment(activeMonth).startOf("month").toDate()
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    moment(activeMonth).endOf("month").toDate()
+  );
+  const [activeDay, setActiveDay] = useState(currentDay);
   console.log(activeDay);
+
   const { theme } = useTheme();
   const location = useLocation();
   const currentPageName = navigationData.find(
@@ -111,7 +122,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div>
-          <MonthPicker />
+          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate} />
         </div>
       </div>
       <div className="flex flex-col 2xl:flex-row gap-5">
@@ -122,7 +133,7 @@ const Dashboard = () => {
                 <CardHeader className="flex p-0 flex-row justify-between">
                   <CardTitle className="text-xl">Overview</CardTitle>
                   <CardDescription className="text-sm text-gray-400">
-                    September 2024
+                    {moment(activeMonth).format("MMMM YYYY")}
                   </CardDescription>
                 </CardHeader>
                 <hr className="my-2 mb-4" />
@@ -139,13 +150,16 @@ const Dashboard = () => {
                   <p>Compare to last month</p>
                   <p className="text-green-500">+6.52%</p>
                 </div>
-                <p className="text-gray-400">September 01 - September 30</p>
+                <p className="text-gray-400">
+                  {moment(startDate).startOf("month").format("MMMM DD")} -{" "}
+                  {moment(endDate).endOf("month").format("MMMM DD")}{" "}
+                </p>
               </Card>
               <Card className="border p-5 z-0 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
                 <CardHeader className="flex p-0 flex-row justify-between">
                   <CardTitle className="text-xl">Expense limit</CardTitle>
                   <CardDescription className="text-sm text-gray-400">
-                    September 2024
+                    {moment(activeMonth).format("MMMM YYYY")}
                   </CardDescription>
                 </CardHeader>
                 <hr className="my-2 mb-4" />
@@ -221,7 +235,7 @@ const Dashboard = () => {
                 <CardHeader className="flex p-0 flex-row justify-between">
                   <CardTitle className="text-xl">Calendar</CardTitle>
                   <CardDescription className="text-sm text-gray-400">
-                    September 2024
+                  {moment(activeMonth).format("MMMM YYYY")}
                   </CardDescription>
                 </CardHeader>
                 <hr className="my-2 mb-4" />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -7,14 +7,24 @@ import {
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "./ui/button";
 import { CalendarRange } from "lucide-react";
+import moment from "moment";
 
-const MonthPicker = ({setStartDate, setEndDate} : any) => {
-  const [selectedMonth, setSelectedMonth] = useState<Date>(
-    startOfMonth(new Date())
-  );
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+const MonthPicker = ({ setStartDate, setEndDate }: any) => {
+  const [storedActiveMonth, setStoredActiveMonth] = useState(localStorage.getItem("activeMonth"));
 
-  const currentMonthIndex = new Date().getMonth(); // Current month (0-11)
+  // Parse the stored month or default to the current date
+  const activeMonth = storedActiveMonth
+    ? new Date(JSON.parse(storedActiveMonth))
+    : moment().endOf("month").toDate();
+  
+
+    console.log(activeMonth);
+
+  if (!storedActiveMonth) {
+    localStorage.setItem("activeMonth", JSON.stringify(new Date()));
+  }
+
+  const [currentYear, setCurrentYear] = useState(activeMonth.getFullYear());
 
   const months = [
     "January",
@@ -32,12 +42,9 @@ const MonthPicker = ({setStartDate, setEndDate} : any) => {
   ];
 
   const handleMonthChange = (monthIndex: number) => {
-    const date = new Date(currentYear, monthIndex, 1);
-    setSelectedMonth(date);
-
-    // // Calculate start and end of the month
-    // const start = format(startOfMonth(date), "yyyy-MMMM-dd");
-    // const end = format(endOfMonth(date), "yyyy-MMMM-dd");
+    const date = new Date(currentYear, monthIndex, 2);
+    localStorage.setItem("activeMonth", JSON.stringify(date));
+    setStoredActiveMonth(JSON.stringify(date));
 
     setStartDate(startOfMonth(date));
     setEndDate(endOfMonth(date));
@@ -52,10 +59,9 @@ const MonthPicker = ({setStartDate, setEndDate} : any) => {
         <PopoverTrigger asChild>
           <Button size={"sm"} variant={"outline"} className="font-normal">
             <CalendarRange />
-            <span className="hidden sm:inline">{selectedMonth
-              ? format(selectedMonth, "MMMM yyyy")
-              : "Select Month"}</span>
-
+            <span className="hidden sm:inline">
+              {activeMonth ? format(activeMonth, "MMMM yyyy") : "Select Month"}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent side="bottom" align="end" className="w-auto p-4">
@@ -78,20 +84,13 @@ const MonthPicker = ({setStartDate, setEndDate} : any) => {
             {/* Month Grid */}
             <div className="grid grid-cols-3 gap-3">
               {months.map((month, index) => {
-                const isCurrentMonth =
-                  currentYear === new Date().getFullYear() &&
-                  index === currentMonthIndex;
-
-                console.log(isCurrentMonth);
-
                 return (
                   <Button
                     key={month}
                     onClick={() => handleMonthChange(index)}
                     className={`px-3 py-2 text-xs sm:text-sm rounded-md ${
-                      selectedMonth &&
-                      selectedMonth.getFullYear() === currentYear &&
-                      selectedMonth.getMonth() === index
+                      activeMonth.getFullYear() === currentYear &&
+                      activeMonth.getMonth() === index
                         ? "bg-primary text-primary-foreground" // Highlight selected month
                         : "bg-secondary hover:bg-accent-foreground text-accent-foreground hover:text-accent"
                     }`}
@@ -107,5 +106,6 @@ const MonthPicker = ({setStartDate, setEndDate} : any) => {
     </div>
   );
 };
+
 
 export default MonthPicker;

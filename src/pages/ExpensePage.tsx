@@ -14,7 +14,14 @@ import {
 import { useSelector } from "react-redux";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import { Button } from "@/components/ui/button";
-import { ArrowDownToLine, ChevronDown, Filter } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ChevronDown,
+  CirclePlus,
+  CirclePlusIcon,
+  Filter,
+  Plus,
+} from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
 import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
 import { AddDialog } from "@/components/dialog/fundsDialog";
@@ -31,16 +38,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 const WalletPage = () => {
   const location = useLocation();
   const screenWidth = useScreenWidth();
+  let activeMonth = localStorage.getItem("activeMonth");
+  activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
+  console.log(moment(activeMonth));
 
   // State Management
   const [activeTab, setActiveTab] = useState<string>("All");
   const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<string>("All");
   const [startDate, setStartDate] = useState<Date | null>(
-    moment().startOf("month").toDate()
+    moment(activeMonth).startOf("month").toDate()
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    moment().endOf("month").toDate()
+    moment(activeMonth).endOf("month").toDate()
   );
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
   const [pageSize, setPageSize] = useState<number>(5);
@@ -354,6 +364,7 @@ const WalletPage = () => {
             date={endDate}
             pageSize={pageSize}
             total={expensesData?.totalExpense}
+            trend={expensesData?.trend}
             categoryExpenses={expensesData?.categoryExpenses}
             data={expensesData?.data || []}
           />
@@ -364,9 +375,11 @@ const WalletPage = () => {
             setPageSize={setPageSize}
             totalCount={recurringData?.totalCount}
             totalPages={recurringData?.totalPages}
+            date={endDate}
             pageIndex={pageIndex}
             pageSize={pageSize}
             total={expensesData?.totalExpense}
+            trend={expensesData?.trend}
             categoryExpenses={expensesData?.categoryExpenses}
             data={recurringData?.data || []}
           />
@@ -376,25 +389,34 @@ const WalletPage = () => {
 
       {/* Expense Limits Section */}
       <div>
-        <h1 className="text-xl font-semibold mb-3">
+        <h1 className="text-xl font-semibold mb-5">
           Expenses limit for this month
         </h1>
-        <div>
-          <div className="w-1/2 2xl:w-full grid xl:grid-rows-2 xl:grid-cols-2 2xl:grid-rows-1 2xl:grid-cols-4 gap-5">
-            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
-              Content 1
-            </div>
-            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
-              Content 2
-            </div>
-            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
-              Content 3
-            </div>
-            <div className="h-24 2xl:h-36 bg-secondary flex items-center justify-center rounded-md">
-              Content 4
-            </div>
+        <div className="flex w-full h-[120px] overflow-x-auto gap-5">
+          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
+            <button className="rounded-full border-primary border p-1">
+              <Plus size={30} />
+            </button>{" "}
+            <span className="ml-5">Set New Limit</span>
           </div>
-          <div className="hidden 2xl:inline 2xl:w-[400px]"></div>
+          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
+            <button className="rounded-full border-primary border p-1">
+              <Plus size={30} />
+            </button>{" "}
+            <span className="ml-5">Set New Limit</span>
+          </div>
+          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
+            <button className="rounded-full border-primary border p-1">
+              <Plus size={30} />
+            </button>{" "}
+            <span className="ml-5">Set New Limit</span>
+          </div>
+          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
+            <button className="rounded-full border-primary border p-1">
+              <Plus size={30} />
+            </button>{" "}
+            <span className="ml-5">Set New Limit</span>
+          </div>
         </div>
       </div>
     </div>
