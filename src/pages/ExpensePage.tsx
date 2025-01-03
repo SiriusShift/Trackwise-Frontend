@@ -67,11 +67,11 @@ const WalletPage = () => {
   );
 
   // Queries
-  const [triggerExpense, { data: expensesData }] = useLazyGetExpensesQuery();
+  const [triggerExpense, { data: expensesData, isLoading: expensesLoading }] = useLazyGetExpensesQuery();
 
   console.log("data", expensesData);
 
-  const [triggerRecurring, { data: recurringData }] =
+  const [triggerRecurring, { data: recurringData, isLoading: recurringLoading }] =
     useLazyGetRecurringExpensesQuery();
 
   console.log("recurring", recurringData);
@@ -365,6 +365,7 @@ const WalletPage = () => {
             pageSize={pageSize}
             total={expensesData?.totalExpense}
             trend={expensesData?.trend}
+            isLoading={expensesLoading || recurringLoading}
             categoryExpenses={expensesData?.categoryExpenses}
             data={expensesData?.data || []}
           />
@@ -380,6 +381,7 @@ const WalletPage = () => {
             pageSize={pageSize}
             total={expensesData?.totalExpense}
             trend={expensesData?.trend}
+            isLoading={expensesLoading || recurringLoading}
             categoryExpenses={expensesData?.categoryExpenses}
             data={recurringData?.data || []}
           />

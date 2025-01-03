@@ -59,6 +59,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import CommonPieGraph from "./CommonPieGraph";
+import { Skeleton } from "../ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -71,6 +73,7 @@ interface DataTableProps<TData, TValue> {
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   categoryExpenses: any;
+  isLoading: boolean;
   total: number;
   trend: any;
 }
@@ -102,22 +105,6 @@ const chartConfig = {
   showTooltip: true, // Whether or not to display the tooltip
 };
 
-const getColor = (index) => {
-  const colors = [
-    "hsl(var(--chart-1))",
-    "hsl(var(--chart-2))",
-    "hsl(var(--chart-3))",
-    "hsl(var(--chart-4))",
-    "hsl(var(--chart-5))",
-    "hsl(var(--chart-6))",
-    "hsl(var(--chart-7))",
-    "hsl(var(--chart-8))",
-    "hsl(var(--chart-9))",
-    "hsl(var(--chart-10))",
-  ];
-  return colors[index % colors.length];
-};
-
 export function DataTable<TData, TValue>({
   columns,
   data,
@@ -127,6 +114,7 @@ export function DataTable<TData, TValue>({
   totalPages,
   total,
   trend,
+  isLoading,
   setPageIndex,
   setPageSize,
   categoryExpenses,
@@ -170,7 +158,7 @@ export function DataTable<TData, TValue>({
 
       {/* Table container with responsive and overflow behavior */}
       <div className="flex gap-5">
-        <div className="border relative w-full min-[400px] max-h-[400px] rounded-md z-0 overflow-auto">
+        <div className="border relative w-full min-h-[375px] max-h-[400px] rounded-md z-0 overflow-auto">
           <Table>
             <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -193,8 +181,22 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="font-semibold ">
-              {table.getRowModel().rows?.length ? (
+            <TableBody className="font-semibold">
+              {isLoading ? (
+                // Skeleton rows when data is loading
+                Array.from({ length: 5 }).map((_, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {Array.from({ length: columns?.length -1 || 5 }).map(
+                      (_, colIndex) => (
+                        <TableCell key={colIndex}>
+                          <Skeleton className="h-6 w-full rounded" />
+                        </TableCell>
+                      )
+                    )}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
+                // Render actual rows when data is available
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -216,6 +218,7 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 ))
               ) : (
+                // Fallback for no data
                 <TableRow>
                   <TableCell
                     colSpan={columns?.length}
@@ -234,104 +237,12 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        <Card className="flex flex-col min-w-[300px]">
-          {/* Card Header */}
-          <CardHeader className="items-center pb-0">
-            <CardTitle className="text-lg xl:text-xl text-center">
-              {currentPageName?.name} - Pie Chart
-            </CardTitle>
-            <CardDescription className="text-center">
-              {moment(date).format("MMMM YYYY")}
-            </CardDescription>
-          </CardHeader>
-
-          {/* Card Content */}
-          <ChartContainer config={chartConfig}>
-            <CardContent className="flex-1 content-center pb-0">
-              <ResponsiveContainer
-                width={chartConfig.width}
-                height={chartConfig.height}
-              >
-                {categoryExpenses?.length > 0 ? (
-                  <PieChart>
-                    {chartConfig.showTooltip && (
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    )}
-                    <Pie
-                      data={categoryExpenses}
-                      dataKey={chartConfig.dataKey} // Using 'total' for the value
-                      nameKey={chartConfig.nameKey} // Using 'categoryName' for the label
-                      innerRadius={chartConfig.innerRadius}
-                      outerRadius={chartConfig.outerRadius}
-                      strokeWidth={chartConfig.strokeWidth}
-                      stroke={chartConfig.strokeColor} // Apply primary color for the border
-                    >
-                      {categoryExpenses.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            chartConfig.colors[
-                              index % chartConfig.colors.length
-                            ]
-                          }
-                        />
-                      ))}
-                      <Label
-                        position="center"
-                        fontSize={16}
-                        fontWeight="bold"
-                        // className="text-destructive"
-                        value={`₱${total?.toLocaleString()}`}
-                      />
-                    </Pie>
-                  </PieChart>
-                ) : (
-                  <div className="flex justify-center h-full items-center">
-                    <img src={noPie} width={150} alt="No Data" />
-                  </div>
-                )}
-              </ResponsiveContainer>
-            </CardContent>
-          </ChartContainer>
-
-          {/* Card Footer */}
-          <CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
-            {/* Trending Section */}
-            <div className="flex items-center justify-center gap-2 font-medium leading-none">
-              {trend === "NaN" ? (
-                <span>No data for trend calculation</span>
-              ) : (
-                <>
-                  <span className="truncate">
-                    Trending {trend > 0 ? "up" : "down"} this month by {trend}%
-                  </span>
-                  {trend > 0 ? (
-                    <TrendingUp
-                      className={`h-4 w-4 ${
-                        currentPageName?.name === "Expenses"
-                          ? "text-destructive"
-                          : "text-success"
-                      }`}
-                    />
-                  ) : (
-                    <TrendingDown
-                      className={`h-4 w-4 ${
-                        currentPageName?.name === "Expenses"
-                          ? "text-success"
-                          : "text-destructive"
-                      }`}
-                    />
-                  )}
-                </>
-              )}
-            </div>
-            {/* Description Section */}
-            <div className="leading-none text-muted-foreground">
-              Showing total {currentPageName?.name.toLocaleLowerCase()} for the
-              month of {moment(date).format("MMMM")}
-            </div>
-          </CardFooter>
-        </Card>
+        <CommonPieGraph
+          total={total}
+          trend={trend}
+          categoryExpenses={categoryExpenses}
+          date={date}
+        />
       </div>
 
       {/* Pagination Footer */}
