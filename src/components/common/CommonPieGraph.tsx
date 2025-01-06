@@ -3,13 +3,7 @@ import moment from "moment";
 import { useLocation } from "react-router-dom";
 import { navigationData } from "@/navigation/navigationData";
 import { PuffLoader } from "react-spinners"; // Example spinner component
-import {
-  Cell,
-  Label,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-} from "recharts";
+import { Cell, Label, Pie, PieChart, ResponsiveContainer } from "recharts";
 import {
   Card,
   CardContent,
@@ -18,11 +12,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import useScreenWidth from "@/hooks/useScreenWidth";
 
 const chartConfig = {
-  width: "100%",
+  width: 200,
   height: 210,
   innerRadius: 55,
   outerRadius: 80,
@@ -47,6 +46,7 @@ const chartConfig = {
 function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
   const [showChart, setShowChart] = React.useState(false);
   const location = useLocation();
+  const width = useScreenWidth();
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
@@ -60,7 +60,8 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
   }, [categoryExpenses]);
 
   return (
-    <Card className="flex flex-col min-w-[300px]">
+  // return width > 1024 ? (
+    <Card className="flex flex-col h-full min-w-[250px]">
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-lg xl:text-xl text-center">
@@ -72,18 +73,18 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
       </CardHeader>
 
       {/* Card Content */}
-      <ChartContainer config={chartConfig}>
-        <CardContent className="flex-1 content-center pb-0">
+      <ChartContainer className="h-[225px] lg:h-auto" config={chartConfig}>
+        <CardContent className="flex-1 justify-center flex content-center pb-0">
           {showChart ? (
             <ResponsiveContainer
               width={chartConfig.width}
               height={chartConfig.height}
             >
               <PieChart>
-              <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />  
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
                 <Pie
                   data={categoryExpenses}
                   dataKey={chartConfig.dataKey}
@@ -156,6 +157,103 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
         </div>
       </CardFooter>
     </Card>
+  // ) : (
+  //   <Card className="flex min-w-[300px] h-60">
+  //     {/* Card Header */}
+  //     <CardHeader className="items-start">
+  //       <div>
+  //         <CardTitle className="text-lg text-center">
+  //           {currentPageName?.name} - Pie Chart
+  //         </CardTitle>
+  //         <CardDescription className="text-left">
+  //           {moment(date).format("MMMM YYYY")}
+  //         </CardDescription>
+  //       </div>
+  //       <div className="pt-5">
+  //         <div className="flex items-center gap-2 font-medium leading-none">
+  //           {trend === "NaN" ? (
+  //             <span>No data for trend calculation</span>
+  //           ) : (
+  //             <>
+  //               <span className="truncate">
+  //                 Trending {trend > 0 ? "up" : "down"} this month by {trend}%
+  //               </span>
+  //               {trend > 0 ? (
+  //                 <TrendingUp
+  //                   className={`h-4 w-4 ${
+  //                     currentPageName?.name === "Expenses"
+  //                       ? "text-destructive"
+  //                       : "text-success"
+  //                   }`}
+  //                 />
+  //               ) : (
+  //                 <TrendingDown
+  //                   className={`h-4 w-4 ${
+  //                     currentPageName?.name === "Expenses"
+  //                       ? "text-success"
+  //                       : "text-destructive"
+  //                   }`}
+  //                 />
+  //               )}
+  //             </>
+  //           )}
+  //         </div>
+  //         <div className="leading-none text-muted-foreground">
+  //           Showing total {currentPageName?.name.toLocaleLowerCase()} for the
+  //           month of {moment(date).format("MMMM")}
+  //         </div>
+  //       </div>
+  //     </CardHeader>
+
+  //     {/* Card Content */}
+  //     <ChartContainer config={chartConfig}>
+  //       <CardContent className="flex-1 content-center flex justify-center items-center h-full pb-0">
+  //         {showChart ? (
+  //           <ResponsiveContainer
+  //             width={chartConfig.width}
+  //             height={chartConfig.height}
+  //           >
+  //             <PieChart>
+  //               <ChartTooltip
+  //                 cursor={false}
+  //                 content={<ChartTooltipContent hideLabel />}
+  //               />
+  //               <Pie
+  //                 data={categoryExpenses}
+  //                 dataKey={chartConfig.dataKey}
+  //                 nameKey={chartConfig.nameKey}
+  //                 innerRadius={chartConfig.innerRadius}
+  //                 outerRadius={chartConfig.outerRadius}
+  //                 strokeWidth={chartConfig.strokeWidth}
+  //                 stroke={chartConfig.strokeColor}
+  //                 isAnimationActive={true}
+  //               >
+  //                 {categoryExpenses.map((entry, index) => (
+  //                   <Cell
+  //                     key={`cell-${index}`}
+  //                     fill={
+  //                       chartConfig.colors[index % chartConfig.colors.length]
+  //                     }
+  //                   />
+  //                 ))}
+  //                 <Label
+  //                   position="center"
+  //                   fontSize={16}
+  //                   fontWeight="bold"
+  //                   value={`₱${total?.toLocaleString()}`}
+  //                 />
+  //               </Pie>
+  //             </PieChart>
+  //           </ResponsiveContainer>
+  //         ) : (
+  //           <div className="flex justify-center min-h-52 items-center">
+  //             {/* Spinner */}
+  //             <PuffLoader size={80} color="hsl(var(--primary))" />
+  //           </div>
+  //         )}
+  //       </CardContent>
+  //     </ChartContainer>
+  //   </Card>
   );
 }
 

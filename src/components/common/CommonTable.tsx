@@ -149,13 +149,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="min-w-full space-y-5">
+    <div className="min-w-full flex flex-col gap-5">
       {/* Filter */}
-      <div className="flex items-center flex-row gap-2 sm:gap-5 min-w-full justify-between">
-        {/* Filter Input */}
-        {/* <Input placeholder="Filter description..." value={...} /> */}
-      </div>
-
       {/* Table container with responsive and overflow behavior */}
       <div className="flex gap-5">
         <div className="border relative w-full min-h-[375px] max-h-[400px] rounded-md z-0 overflow-auto">
@@ -186,7 +181,7 @@ export function DataTable<TData, TValue>({
                 // Skeleton rows when data is loading
                 Array.from({ length: 5 }).map((_, rowIndex) => (
                   <TableRow key={rowIndex}>
-                    {Array.from({ length: columns?.length -1 || 5 }).map(
+                    {Array.from({ length: columns?.length - 1 || 5 }).map(
                       (_, colIndex) => (
                         <TableCell key={colIndex}>
                           <Skeleton className="h-6 w-full rounded" />
@@ -237,12 +232,14 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        <CommonPieGraph
-          total={total}
-          trend={trend}
-          categoryExpenses={categoryExpenses}
-          date={date}
-        />
+        <div className="hidden lg:inline">
+          <CommonPieGraph
+            total={total}
+            trend={trend}
+            categoryExpenses={categoryExpenses}
+            date={date}
+          />
+        </div>
       </div>
 
       {/* Pagination Footer */}
@@ -316,6 +313,15 @@ export function DataTable<TData, TValue>({
             <ChevronsRight />
           </Button>
         </div>
+      </div>
+
+      <div className="inline lg:hidden">
+        <CommonPieGraph
+          total={total}
+          trend={trend}
+          categoryExpenses={categoryExpenses}
+          date={date}
+        />
       </div>
     </div>
   );

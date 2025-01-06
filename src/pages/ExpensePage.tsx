@@ -173,7 +173,7 @@ const WalletPage = () => {
       </div>
 
       {/* Toolbar */}
-      <div>
+      <div className="flex flex-col gap-5">
         <div className="flex sm:flex-col gap-2">
           <div className="flex w-full gap-2 overflow-x-auto items-center justify-between whitespace-nowrap">
             {/* Tabs */}
@@ -221,7 +221,7 @@ const WalletPage = () => {
               <AddDialog type="Expense" active={activeTab} />
               <Button size="sm" variant="outline">
                 <ArrowDownToLine className="lg:mr-2" />
-                <span className="hidden lg:inline">Export</span>
+                <span>Export</span>
               </Button>
               <FilterSheet
                 setClear={clearFilter}
@@ -353,7 +353,6 @@ const WalletPage = () => {
           </div>
         </div>
 
-        <div></div>
         {activeTab === "All" ? (
           <DataTable
             columns={expenseColumns}

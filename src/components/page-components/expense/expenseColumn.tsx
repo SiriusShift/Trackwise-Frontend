@@ -239,8 +239,8 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       );
     },
     meta: {
-      headerClassName: "sticky right-0 bg-background z-10 border-l border-b",
-      cellClassName: "sticky right-0 bg-background z-10 border-l border-b",
+      headerClassName: "sticky right-0 bg-background z-10 border-l w-12 border-b",
+      cellClassName: "sticky right-0 bg-background z-10 border-l w-12 border-b",
     },
   },
 ];
