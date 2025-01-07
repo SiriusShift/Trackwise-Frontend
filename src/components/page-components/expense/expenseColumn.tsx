@@ -5,7 +5,7 @@ import {
   Eye,
   MoreHorizontal,
   Pencil,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { Expense } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@radix-ui/react-separator";
+import { useState } from "react";
+import { Dialog, DialogDescription, DialogContent, DialogTrigger, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DeleteDialog } from "@/components/dialog/DeleteDialog";
+import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
+// import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
+  {
+    accessorKey: "id",
+    header: "ID",
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
   {
     accessorKey: "date",
     header: "Date",
@@ -102,37 +113,51 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   {
     id: "actions",
     meta: {
-      headerClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
+      headerClassName:
+        "sticky right-0 bg-background z-10 border-l border-b w-12",
       cellClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
     },
     // header: "Actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const expense = row.original;
+      console.log(expense);
+
+      const [deleteExpense, { isLoading }]= useDeleteExpenseMutation();
+
+      const onDelete = async () => {
+        await deleteExpense(expense.id);
+      };
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild >
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() =>
-                payment?.id
-                  ? navigator.clipboard.writeText(String(payment.id))
-                  : console.warn("No payment ID available.")
-              }
-            >
-              <Pencil /> Edit
-            </DropdownMenuItem>
-            {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem><Eye />View</DropdownMenuItem>
-            <DropdownMenuItem><Trash2 />Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                   expense?.id
+                    ? navigator.clipboard.writeText(String(expense.id))
+                    : console.warn("No payment ID available.")
+                }
+              >
+                <Pencil /> Edit
+              </DropdownMenuItem>
+              {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuItem>
+                <Eye />
+                View
+              </DropdownMenuItem>
+              <DeleteDialog onDelete={onDelete} isLoading={isLoading}/>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* <DeleteDialog open={isExpenseOpen} onOpenChange={(open) => setIsExpenseOpen(open)} /> */}
+        </>
       );
     },
   },
@@ -232,14 +257,21 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             <DropdownMenuItem>
               <Pencil /> Edit
             </DropdownMenuItem>
-            <DropdownMenuItem><Eye />View</DropdownMenuItem>
-            <DropdownMenuItem><Trash2 />Delete</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Eye />
+              View
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Trash2 />
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
     meta: {
-      headerClassName: "sticky right-0 bg-background z-10 border-l w-12 border-b",
+      headerClassName:
+        "sticky right-0 bg-background z-10 border-l w-12 border-b",
       cellClassName: "sticky right-0 bg-background z-10 border-l w-12 border-b",
     },
   },

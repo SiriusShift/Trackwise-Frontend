@@ -29,6 +29,17 @@ const expensesApi = api
         invalidatesTags: ["Expenses", "Assets"],
       }),
 
+      deleteExpense: builder.mutation({
+        query: (id) => ({
+          url: `/expenses/deleteExpense/${id}`,
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+          },
+        }),
+        invalidatesTags: ["Expenses", "Assets"],
+      }),
+
       postRecurringExpense: builder.mutation({
         query: (body) => ({
           url: "/expenses/createRecurring",
@@ -89,4 +100,5 @@ export const {
   useGetRecurringExpensesQuery,
   useGetAssetQuery,
   useLazyGetDetailedExpenseQuery,
+  useDeleteExpenseMutation,
 } = expensesApi;

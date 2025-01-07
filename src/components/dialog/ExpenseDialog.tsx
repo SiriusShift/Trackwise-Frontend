@@ -109,7 +109,10 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       type: type,
     });
 
-  const { data: assetData } = useGetAssetQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: assetData } = useGetAssetQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  );
   console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
   const [postRecurring] = usePostRecurringExpenseMutation();
@@ -388,23 +391,33 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                       onSelect={(date) => {
                                         const newDate = new Date(
                                           date.setHours(
-                                            field.value ? new Date(field.value).getHours() : 0,
-                                            field.value ? new Date(field.value).getMinutes() : 0
+                                            field.value
+                                              ? new Date(field.value).getHours()
+                                              : 0,
+                                            field.value
+                                              ? new Date(
+                                                  field.value
+                                                ).getMinutes()
+                                              : 0
                                           )
                                         );
                                         console.log("Selected Date:", newDate);
                                         field.onChange(newDate); // Update date with time preserved
                                       }}
                                       onChange={(e) => {
-                                        const [hours, minutes] = e.target.value.split(":").map(Number);
+                                        const [hours, minutes] = e.target.value
+                                          .split(":")
+                                          .map(Number);
                                         const updatedDate = field.value
                                           ? new Date(field.value)
                                           : new Date(); // Use the selected date or default to now
                                         updatedDate.setHours(hours, minutes);
-                                        console.log("Updated Time:", updatedDate);
+                                        console.log(
+                                          "Updated Time:",
+                                          updatedDate
+                                        );
                                         field.onChange(updatedDate); // Update time with the correct date preserved
                                       }}
-                                      
                                     />
                                   </div>
                                 </div>

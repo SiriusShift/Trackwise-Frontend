@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
 import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
-import { AddDialog } from "@/components/dialog/fundsDialog";
+import { AddDialog } from "@/components/dialog/ExpenseDialog";
 import {
   Collapsible,
   CollapsibleContent,
