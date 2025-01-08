@@ -4,6 +4,7 @@ import {
   CalendarDays,
   Calendar as CalendarIcon,
   Wallet,
+  Pencil,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,7 @@ import {
 import { toast } from "sonner";
 import { frequencies } from "@/utils/Constants";
 import { date } from "yup";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 
 type AddExpenseFormData = {
   userId: string;
@@ -96,12 +98,21 @@ type AddExpenseFormData = {
   status: string;
 };
 
-export function AddDialog({ type, active }: { type: string; active: string }) {
+export function AddDialog({
+  type,
+  active,
+  mode,
+  rowData,
+}: {
+  type: string;
+  rowData: Object;
+  active: string;
+  mode: string;
+}) {
   const [open, setOpen] = useState(false);
   const width = useScreenWidth();
   const userId = useSelector((state) => state?.userDetails?.id);
-
-  console.log("is open?", open);
+  console.log(mode);
 
   // RTK QUERY
   const { data: categoryData, isLoading: isLoadingCategory } =
@@ -146,6 +157,15 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
     setValue("userId", userId);
   }, [userId]);
 
+  useEffect(() => {
+    setValue("date", rowData?.date);
+    setValue("description", rowData?.description);
+    setValue("amount", rowData?.amount);
+    setValue("category", rowData?.category);
+    setValue("source", rowData?.asset);
+    setValue("recipient", rowData?.recipient);
+  }, [rowData]);
+
   const onSubmit = async (data: AddExpenseFormData) => {
     console.log("Submitted data:", data);
     try {
@@ -186,15 +206,22 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       {width > 640 ? (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" onClick={() => setOpen(true)} variant="outline">
-              <Plus className="lg:mr-2" />{" "}
-              <span className="hidden lg:inline">Add</span>
-            </Button>
+            {mode === "add" ? (
+              <Button size="sm" onClick={() => setOpen(true)} variant="outline">
+                <Plus className="lg:mr-2" />{" "}
+                <span className="hidden lg:inline">Add</span>
+              </Button>
+            ) : (
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Pencil /> Edit
+              </DropdownMenuItem>
+            )}
           </DialogTrigger>
           <DialogContent className="sm:min-w-md">
             <DialogHeader>
               <DialogTitle>
-                Add {active === "Recurring" ? "recurring " : ""} expense
+                {mode === "add" ? "Add" : "Edit"}{" "}
+                {active === "Recurring" ? "recurring " : ""} expense
               </DialogTitle>
               <DialogDescription>
                 Fill in the details to create a new{" "}
@@ -615,7 +642,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                 {/* Footer Buttons */}
                 <div className="sm:justify-end w-full space-x-2">
                   <Button type="submit" disabled={!isValid}>
-                    Add
+                    {mode === "edit" ? "Update" : "Add"}
                   </Button>
                   <DialogClose asChild>
                     <Button
@@ -634,15 +661,22 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
       ) : (
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerTrigger asChild>
-            <Button size="sm" onClick={() => setOpen(true)} variant="outline">
-              <Plus className="lg:mr-2" />
-              <span>Add</span>
-            </Button>
+            {mode === "add" ? (
+              <Button size="sm" onClick={() => setOpen(true)} variant="outline">
+                <Plus className="lg:mr-2" />{" "}
+                <span className="hidden lg:inline">Add</span>
+              </Button>
+            ) : (
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Pencil /> Edit
+              </DropdownMenuItem>
+            )}
           </DrawerTrigger>
           <DrawerContent className="sm:min-w-md px-8">
             <DrawerHeader className="p-0 pt-3">
               <DrawerTitle>
-                Add {active === "Recurring" ? "recurring " : ""} expense
+                {mode === "add" ? "Add" : "Edit"}{" "}
+                {active === "Recurring" ? "recurring " : ""} expense
               </DrawerTitle>
               <DrawerDescription>
                 Fill in the details to create a new expense
@@ -764,9 +798,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                         name="date"
                         render={({ field }) => (
                           <FormItem className="flex flex-col">
-                            <FormLabel className="hidden sm-inline">
-                              Date
-                            </FormLabel>
+                            <FormLabel>Date & Time</FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -778,42 +810,102 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                                     )}
                                   >
                                     {field.value ? (
-                                      moment(field.value).format("MMM DD, YYYY") // Ensure value is parsed
+                                      `${moment(field.value).format(
+                                        "MMM DD, YYYY hh:mm A"
+                                      )}` // Format date & time
                                     ) : (
-                                      <span>Pick a date</span>
+                                      <span>Pick a date & time</span>
                                     )}
                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>
                               <PopoverContent
-                                className="w-auto p-0"
+                                className="w-auto p-4"
                                 align="start"
                               >
-                                <Calendar
-                                  mode="single"
-                                  selected={
-                                    field.value
-                                      ? new Date(field.value)
-                                      : undefined
-                                  }
-                                  onSelect={(date) => {
-                                    console.log("Selected Date:", date); // Debugging log
-                                    field.onChange(date);
-                                  }}
-                                  initialFocus
-                                  disabled={(date) => {
-                                    const minDate = new Date("2000-01-01"); // Minimum date
-                                    const maxDate =
-                                      active === "Recurring"
-                                        ? null
-                                        : new Date(); // Maximum date only for "Recurring"
-                                    return (
-                                      date < minDate ||
-                                      (maxDate && date > maxDate)
-                                    ); // Only check maxDate if it exists
-                                  }}
-                                />
+                                <div className="flex flex-col space-y-4">
+                                  {/* Calendar for Date Selection */}
+                                  <Calendar
+                                    mode="single"
+                                    selected={
+                                      field.value
+                                        ? new Date(field.value)
+                                        : undefined
+                                    }
+                                    onSelect={(date) => {
+                                      const newDate = new Date(
+                                        date.setHours(
+                                          field.value
+                                            ? new Date(field.value).getHours()
+                                            : 0,
+                                          field.value
+                                            ? new Date(field.value).getMinutes()
+                                            : 0
+                                        )
+                                      );
+                                      console.log("Selected Date:", newDate);
+                                      field.onChange(newDate); // Update date with time preserved
+                                    }}
+                                    initialFocus
+                                    disabled={(date) => {
+                                      const minDate = new Date("2000-01-01"); // Minimum date
+                                      const maxDate =
+                                        active === "Recurring"
+                                          ? null
+                                          : new Date(); // Maximum date only for "Recurring"
+                                      return (
+                                        date < minDate ||
+                                        (maxDate && date > maxDate)
+                                      ); // Only check maxDate if it exists
+                                    }}
+                                  />
+                                  {/* Time Picker for Time Selection */}
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">
+                                      Time:
+                                    </label>
+                                    <input
+                                      type="time"
+                                      className="border rounded-md px-2 py-1 text-sm"
+                                      value={
+                                        field.value
+                                          ? moment(field.value).format("HH:mm")
+                                          : ""
+                                      }
+                                      onSelect={(date) => {
+                                        const newDate = new Date(
+                                          date.setHours(
+                                            field.value
+                                              ? new Date(field.value).getHours()
+                                              : 0,
+                                            field.value
+                                              ? new Date(
+                                                  field.value
+                                                ).getMinutes()
+                                              : 0
+                                          )
+                                        );
+                                        console.log("Selected Date:", newDate);
+                                        field.onChange(newDate); // Update date with time preserved
+                                      }}
+                                      onChange={(e) => {
+                                        const [hours, minutes] = e.target.value
+                                          .split(":")
+                                          .map(Number);
+                                        const updatedDate = field.value
+                                          ? new Date(field.value)
+                                          : new Date(); // Use the selected date or default to now
+                                        updatedDate.setHours(hours, minutes);
+                                        console.log(
+                                          "Updated Time:",
+                                          updatedDate
+                                        );
+                                        field.onChange(updatedDate); // Update time with the correct date preserved
+                                      }}
+                                    />
+                                  </div>
+                                </div>
                               </PopoverContent>
                             </Popover>
                             <FormMessage>{errors.date?.message}</FormMessage>
@@ -992,7 +1084,7 @@ export function AddDialog({ type, active }: { type: string; active: string }) {
                 {/* Footer Buttons */}
                 <div className="sm:justify-end w-full space-x-2">
                   <Button type="submit" disabled={!isValid}>
-                    Add
+                    {mode === "edit" ? "Update" : "Add"}
                   </Button>
                   <DialogClose asChild>
                     <Button

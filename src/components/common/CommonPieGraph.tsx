@@ -95,7 +95,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
                   stroke={chartConfig.strokeColor}
                   isAnimationActive={true}
                 >
-                  {categoryExpenses.map((entry, index) => (
+                  {categoryExpenses?.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={

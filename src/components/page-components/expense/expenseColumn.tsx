@@ -20,9 +20,19 @@ import {
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { Dialog, DialogDescription, DialogContent, DialogTrigger, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogDescription,
+  DialogContent,
+  DialogTrigger,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
+import { AddDialog } from "@/components/dialog/ExpenseDialog";
+import { useSelector } from "react-redux";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -120,9 +130,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     // header: "Actions",
     cell: ({ row }) => {
       const expense = row.original;
-      console.log(expense);
+      // console.log(expense);
+      const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
 
-      const [deleteExpense, { isLoading }]= useDeleteExpenseMutation();
+      const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
       const onDelete = async () => {
         await deleteExpense(expense.id);
@@ -139,21 +150,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                   expense?.id
-                    ? navigator.clipboard.writeText(String(expense.id))
-                    : console.warn("No payment ID available.")
-                }
-              >
-                <Pencil /> Edit
-              </DropdownMenuItem>
+              <AddDialog rowData={expense} active={activeTab} mode="edit" type="Expense" />
               {/* <DropdownMenuSeparator /> */}
               <DropdownMenuItem>
                 <Eye />
                 View
               </DropdownMenuItem>
-              <DeleteDialog onDelete={onDelete} isLoading={isLoading}/>
+              <DeleteDialog
+                type="All"
+                onDelete={onDelete}
+                isLoading={isLoading}
+              />
             </DropdownMenuContent>
           </DropdownMenu>
           {/* <DeleteDialog open={isExpenseOpen} onOpenChange={(open) => setIsExpenseOpen(open)} /> */}
@@ -235,44 +242,55 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <CreditCard />
-              Pay
-            </DropdownMenuItem>
-
-            {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem>
-              <Pencil /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Eye />
-              View
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash2 />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
     meta: {
       headerClassName:
-        "sticky right-0 bg-background z-10 border-l w-12 border-b",
-      cellClassName: "sticky right-0 bg-background z-10 border-l w-12 border-b",
+        "sticky right-0 bg-background z-10 border-l border-b w-12",
+      cellClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
+    },
+    // header: "Actions",
+    cell: ({ row }) => {
+      const expense = row.original;
+      const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
+
+      console.log(expense);
+
+      const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
+
+      const onDelete = async () => {
+        await deleteExpense(expense.id);
+      };
+
+      return (
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <CreditCard />
+                Pay
+              </DropdownMenuItem>
+              <AddDialog rowData={expense} active={activeTab} mode="edit" type="Recurring" />
+              {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuItem>
+                <Eye />
+                View
+              </DropdownMenuItem>
+              <DeleteDialog
+                type="Recurring"
+                onDelete={onDelete}
+                isLoading={isLoading}
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* <DeleteDialog open={isExpenseOpen} onOpenChange={(open) => setIsExpenseOpen(open)} /> */}
+        </>
+      );
     },
   },
 ];
