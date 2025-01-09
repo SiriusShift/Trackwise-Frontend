@@ -73,7 +73,6 @@ const expensesApi = api
             Accept: "application/json",
           },
         }),
-        providesTags: ["RecurringExpense"],
       }),
 
       //ASSETS
@@ -85,7 +84,6 @@ const expensesApi = api
             Accept: "application/json",
           },
         }),
-        providesTags: ["Assets"],
         transformResponse: (response: any) => response.data,
       }),
     }),

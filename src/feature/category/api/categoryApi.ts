@@ -1,6 +1,6 @@
 import { api } from "../../api";
 
-const categoryApi = api.injectEndpoints({
+const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category"] }).injectEndpoints({
     endpoints: (builder) => ({
         postCategory: builder.mutation({
             query: (payload) => ({
@@ -11,6 +11,7 @@ const categoryApi = api.injectEndpoints({
                 },
                 body: payload,
             }),
+            invalidatesTags: ["Category"],
         }),
         getCategory: builder.query({
             query: (params) => ({
