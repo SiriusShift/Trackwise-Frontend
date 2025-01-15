@@ -86,6 +86,17 @@ const expensesApi = api
         }),
         transformResponse: (response: any) => response.data,
       }),
+
+      getFrequency: builder.query({
+        query: () => ({
+          url: "/frequency/get",
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }),
+        transformResponse: (response: any) => response.data,
+      }),
     }),
   });
 
@@ -99,4 +110,5 @@ export const {
   useGetAssetQuery,
   useLazyGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
+  useGetFrequencyQuery
 } = expensesApi;

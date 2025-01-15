@@ -8,7 +8,6 @@ import Google from "../assets/images/Google.svg";
 import Logo from "../assets/images/Logo.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import {
   useGetAuthStatusQuery,

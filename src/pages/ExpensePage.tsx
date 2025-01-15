@@ -215,7 +215,7 @@ const WalletPage = () => {
           </div>
 
           <div className="flex gap-2">
-            <AlertDialogDemo />
+            {/* <AlertDialogDemo /> */}
             <AddDialog mode="add" type="Expense" active={activeTab} />
             <Button size="sm" variant="outline">
               <ArrowDownToLine className="lg:mr-2" />

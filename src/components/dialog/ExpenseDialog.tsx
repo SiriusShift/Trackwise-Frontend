@@ -45,10 +45,9 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import moment from "moment";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { useGetAssetQuery } from "@/feature/expenses/api/expensesApi";
+import { useGetAssetQuery, useGetFrequencyQuery } from "@/feature/expenses/api/expensesApi";
 import { numberInput } from "@/utils/CustomFunctions";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import {
@@ -61,8 +60,8 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from "../ui/drawer";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// import { Label } from "@/components/ui/label";
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
@@ -127,9 +126,8 @@ export function AddDialog({
   console.log(mode);
 
   // RTK QUERY
-  const { data: categoryData } =
-    useGetCategoryQuery();
-
+  const { data: categoryData } = useGetCategoryQuery();
+  const { data: frequencyData } = useGetFrequencyQuery();
   const { data: assetData } = useGetAssetQuery();
   console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
@@ -188,7 +186,7 @@ export function AddDialog({
         await postRecurring({
           ...data,
           userId: parseInt(data?.userId),
-          frequency: data?.frequency?.name,
+          freqId: data?.frequency?.id,
           category: data?.category?.id,
           startDate: moment(data?.startDate).utc().format(),
         });
@@ -480,13 +478,12 @@ export function AddDialog({
                                 <Select
                                   onValueChange={(value) => {
                                     // Find the selected category object based on the value (category name)
-                                    console.log(value);
                                     const selectedSource = assetData?.find(
                                       (source) => source.name === value
                                     );
                                     field.onChange(selectedSource); // Set the entire object in the form state
                                   }}
-                                  defaultValue={field.value?.name}
+                                  value={field.value?.name}
                                 >
                                   <SelectTrigger className="capitalize">
                                     <SelectValue placeholder="Select source" />
@@ -605,7 +602,7 @@ export function AddDialog({
                               <FormControl>
                                 <Select
                                   onValueChange={(value) => {
-                                    const selectedCategory = frequencies?.find(
+                                    const selectedCategory = frequencyData?.find(
                                       (frequency) => frequency.name === value
                                     );
                                     field.onChange(selectedCategory);
@@ -616,7 +613,7 @@ export function AddDialog({
                                     <SelectValue placeholder="Select frequency" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {frequencies?.map((frequency) => (
+                                    {frequencyData?.map((frequency) => (
                                       <SelectItem
                                         key={frequency.id}
                                         value={frequency.name}
@@ -702,21 +699,20 @@ export function AddDialog({
 
             <FormProvider {...form}>
               <form onSubmit={handleSubmit(onSubmit)} className="pb-5">
-                <div className="flex flex-col pb-5 pt-3 gap-2">
+                <div className="flex flex-col py-3 gap-2">
                   <div className={`${active === "All" ? "order-1" : ""}`}>
                     <div className="grid grid-cols-2 gap-2">
                       <FormField
                         name="category"
                         control={control}
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
+                          <FormItem className="space-y-0">
                             <FormLabel className="hidden sm-inline">
                               Category
                             </FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={(value) => {
-                                  console.log("hello");
                                   const selectedCategory = categoryData?.find(
                                     (category) => category.name === value
                                   );
@@ -748,7 +744,7 @@ export function AddDialog({
                         name="amount"
                         control={control}
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
+                          <FormItem className="space-y-0">
                             <FormLabel className="hidden sm-inline">
                               Amount
                             </FormLabel>
@@ -813,7 +809,7 @@ export function AddDialog({
                         name="date"
                         render={({ field }) => (
                           <FormItem className="flex flex-col">
-                            <FormLabel>Date & Time</FormLabel>
+                            {/* <FormLabel>Date & Time</FormLabel> */}
                             <Popover modal={true}>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -839,14 +835,53 @@ export function AddDialog({
                                 className="w-auto p-4"
                                 align="start"
                               >
-                                <div className="flex flex-col space-y-4">
-                                  {/* Calendar for Date Selection */}
-                                  <Calendar
-                                    mode="single"
-                                    selected={
+                                {/* Calendar for Date Selection */}
+                                <Calendar
+                                  mode="single"
+                                  selected={
+                                    field.value
+                                      ? new Date(field.value)
+                                      : undefined
+                                  }
+                                  onSelect={(date) => {
+                                    const newDate = new Date(
+                                      date.setHours(
+                                        field.value
+                                          ? new Date(field.value).getHours()
+                                          : 0,
+                                        field.value
+                                          ? new Date(field.value).getMinutes()
+                                          : 0
+                                      )
+                                    );
+                                    console.log("Selected Date:", newDate);
+                                    field.onChange(newDate); // Update date with time preserved
+                                  }}
+                                  initialFocus
+                                  disabled={(date) => {
+                                    const minDate = new Date("2000-01-01"); // Minimum date
+                                    const maxDate =
+                                      active === "Recurring"
+                                        ? null
+                                        : new Date(); // Maximum date only for "Recurring"
+                                    return (
+                                      date < minDate ||
+                                      (maxDate && date > maxDate)
+                                    ); // Only check maxDate if it exists
+                                  }}
+                                />
+                                {/* Time Picker for Time Selection */}
+                                <div className="flex items-center justify-between">
+                                  <label className="text-sm font-medium">
+                                    Time:
+                                  </label>
+                                  <input
+                                    type="time"
+                                    className="border rounded-md px-2 py-1 text-sm"
+                                    value={
                                       field.value
-                                        ? new Date(field.value)
-                                        : undefined
+                                        ? moment(field.value).format("HH:mm")
+                                        : ""
                                     }
                                     onSelect={(date) => {
                                       const newDate = new Date(
@@ -862,64 +897,18 @@ export function AddDialog({
                                       console.log("Selected Date:", newDate);
                                       field.onChange(newDate); // Update date with time preserved
                                     }}
-                                    initialFocus
-                                    disabled={(date) => {
-                                      const minDate = new Date("2000-01-01"); // Minimum date
-                                      const maxDate =
-                                        active === "Recurring"
-                                          ? null
-                                          : new Date(); // Maximum date only for "Recurring"
-                                      return (
-                                        date < minDate ||
-                                        (maxDate && date > maxDate)
-                                      ); // Only check maxDate if it exists
+                                    onChange={(e) => {
+                                      const [hours, minutes] = e.target.value
+                                        .split(":")
+                                        .map(Number);
+                                      const updatedDate = field.value
+                                        ? new Date(field.value)
+                                        : new Date(); // Use the selected date or default to now
+                                      updatedDate.setHours(hours, minutes);
+                                      console.log("Updated Time:", updatedDate);
+                                      field.onChange(updatedDate); // Update time with the correct date preserved
                                     }}
                                   />
-                                  {/* Time Picker for Time Selection */}
-                                  <div className="flex items-center justify-between">
-                                    <label className="text-sm font-medium">
-                                      Time:
-                                    </label>
-                                    <input
-                                      type="time"
-                                      className="border rounded-md px-2 py-1 text-sm"
-                                      value={
-                                        field.value
-                                          ? moment(field.value).format("HH:mm")
-                                          : ""
-                                      }
-                                      onSelect={(date) => {
-                                        const newDate = new Date(
-                                          date.setHours(
-                                            field.value
-                                              ? new Date(field.value).getHours()
-                                              : 0,
-                                            field.value
-                                              ? new Date(
-                                                  field.value
-                                                ).getMinutes()
-                                              : 0
-                                          )
-                                        );
-                                        console.log("Selected Date:", newDate);
-                                        field.onChange(newDate); // Update date with time preserved
-                                      }}
-                                      onChange={(e) => {
-                                        const [hours, minutes] = e.target.value
-                                          .split(":")
-                                          .map(Number);
-                                        const updatedDate = field.value
-                                          ? new Date(field.value)
-                                          : new Date(); // Use the selected date or default to now
-                                        updatedDate.setHours(hours, minutes);
-                                        console.log(
-                                          "Updated Time:",
-                                          updatedDate
-                                        );
-                                        field.onChange(updatedDate); // Update time with the correct date preserved
-                                      }}
-                                    />
-                                  </div>
                                 </div>
                               </PopoverContent>
                             </Popover>
@@ -933,7 +922,7 @@ export function AddDialog({
                           name="source"
                           control={control}
                           render={({ field }) => (
-                            <FormItem className="flex flex-col">
+                            <FormItem className="space-y-0">
                               <FormLabel className="hidden sm-inline">
                                 Source
                               </FormLabel>
@@ -977,7 +966,7 @@ export function AddDialog({
                           name="recipient"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="flex flex-col">
+                            <FormItem className="space-y-0">
                               <FormLabel className="hidden sm-inline">
                                 Recipient
                               </FormLabel>
@@ -1118,7 +1107,7 @@ export function AddDialog({
                 </div>
 
                 {/* Footer Buttons */}
-                <DrawerFooter>
+                <DrawerFooter className="px-0">
                   <Button type="submit" disabled={!isValid}>
                     {mode === "edit" ? "Update" : "Add"}
                   </Button>

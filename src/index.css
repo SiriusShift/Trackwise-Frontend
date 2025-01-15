@@ -6,17 +6,23 @@ body {
   font-family: "Quicksand", sans-serif;
 }
 
-.sidebar {
+/* .sidebar {
   transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
   overflow: hidden;
-}
+} */
 
 .sidebar-header,
 .sidebar-footer {
   transition: opacity 0.3s ease-in-out;
 }
 
+
+
 @layer base {
+  * {
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
+  }
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
