@@ -8,16 +8,16 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+// import {
+//   Dialog,
+//   DialogClose,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expenseSchema, recurringExpense } from "@/schema/schema";
 import { FormProvider, useForm } from "react-hook-form";
@@ -48,9 +48,10 @@ import moment from "moment";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  useGetAssetQuery,
   useGetFrequencyQuery,
+  usePatchExpenseMutation,
 } from "@/feature/expenses/api/expensesApi";
+import { assetsApi, useGetAssetQuery } from "@/feature/assets/api/assetsApi";
 import { numberInput } from "@/utils/CustomFunctions";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import {
@@ -65,7 +66,7 @@ import {
 } from "../ui/drawer";
 // import { Label } from "@/components/ui/label";
 // import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
   usePostExpenseMutation,
@@ -73,7 +74,7 @@ import {
 } from "@/feature/expenses/api/expensesApi";
 import { toast } from "sonner";
 import { frequencies } from "@/utils/Constants";
-import { date } from "yup";
+// import { date } from "yup";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import {
   AlertDialogTrigger,
@@ -92,6 +93,8 @@ type AddExpenseFormData = {
   category: Object;
   description: string;
   amount: number;
+  recipient: string;
+  expenseId: string;
   endDate: Date;
   startDate: Date;
   frequency: string;
@@ -105,16 +108,17 @@ export function AddDialog({
   mode,
   rowData,
 }: {
-  type: string;
+  // type: string;
   rowData: Object;
   active: string;
   mode: string;
 }) {
-  // const [open, setOpen] = useState(false);
+  const [initialData, setInitialData] = useState<Object>({});
   const width = useScreenWidth();
+  const dispatch = useDispatch();
   const userId = useSelector((state) => state?.userDetails?.id);
 
-  console.log(mode);
+  console.log(rowData);
 
   // RTK QUERY
   const { data: categoryData } = useGetCategoryQuery();
@@ -123,6 +127,8 @@ export function AddDialog({
   console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
   const [postRecurring] = usePostRecurringExpenseMutation();
+  const [triggerPatchExpense, { isLoading: patchLoading }] =
+    usePatchExpenseMutation();
 
   // React Hook Form
   const form = useForm<AddExpenseFormData>({
@@ -147,16 +153,13 @@ export function AddDialog({
     formState: { errors, isValid },
   } = form;
 
-  console.log(errors);
-
   useEffect(() => {
     console.log("Dialog rendered");
     setValue("userId", userId);
   }, [userId]);
 
   useEffect(() => {
-    if (rowData && mode === "edit") {
-      reset({ ...rowData });
+    if (rowData) {
       if (active === "Recurring") {
         setValue("startDate", rowData?.date);
         setValue("frequency", rowData?.frequency);
@@ -164,44 +167,61 @@ export function AddDialog({
         setValue("date", rowData?.date);
         setValue("source", rowData?.asset);
       }
+      setValue("expenseId", rowData?.id);
       setValue("description", rowData?.description);
       setValue("amount", rowData?.amount);
       setValue("category", rowData?.category);
       setValue("recipient", rowData?.recipient);
+      setInitialData(watch());
     }
   }, [rowData]);
 
   const onSubmit = async (data: AddExpenseFormData) => {
     console.log("Submitted data:", data);
     try {
-      if (active === "Recurring") {
-        await postRecurring({
-          ...data,
-          userId: parseInt(data?.userId),
-          freqId: data?.frequency?.id,
-          category: data?.category?.id,
-          startDate: moment(data?.startDate).utc().format(),
+      if (mode === "edit") {
+        await triggerPatchExpense({
+          data,
+          id: data?.expenseId,
+        }).then(() => {
+          dispatch(assetsApi.util.invalidateTags(["Assets"]));
         });
         reset({
           ...expenseSchema.defaultValues,
           userId: userId,
         }); // Reset the form after successful submission
       } else {
-        await postExpense({
-          ...data,
-          status: active === "All" && "Paid",
-          recurring: active === "Recurring" ? true : false,
-          source: data?.source?.id || "",
-          category: data?.category?.id || "",
-          userId: parseInt(data?.userId),
-          amount: parseFloat(data?.amount),
-          date: moment(data?.date).utc().format(),
-          assetBalance: watch("source")?.remainingBalance,
-        });
-        reset({
-          ...recurringExpense.defaultValues,
-          userId: userId,
-        }); // Reset the form after successful submission
+        if (active === "Recurring") {
+          await postRecurring({
+            ...data,
+            userId: parseInt(data?.userId),
+            freqId: data?.frequency?.id,
+            category: data?.category?.id,
+            startDate: moment(data?.startDate).utc().format(),
+          });
+          reset({
+            ...expenseSchema.defaultValues,
+            userId: userId,
+          }); // Reset the form after successful submission
+        } else {
+          await postExpense({
+            ...data,
+            status: active === "All" && "Paid",
+            recurring: active === "Recurring" ? true : false,
+            source: data?.source?.id || "",
+            category: data?.category?.id || "",
+            userId: parseInt(data?.userId),
+            amount: parseFloat(data?.amount),
+            date: moment(data?.date).utc().format(),
+            assetBalance: watch("source")?.remainingBalance,
+          }).then(() => {
+            dispatch(assetsApi.util.invalidateTags(["Assets"]));
+          });
+          reset({
+            ...recurringExpense.defaultValues,
+            userId: userId,
+          }); // Reset the form after successful submission
+        }
       }
     } catch (err) {
       console.log(err);
@@ -216,15 +236,21 @@ export function AddDialog({
           <AlertDialogTrigger asChild>
             {mode === "add" ? (
               <Button size="sm" variant="outline">
-                <Plus className="lg:mr-2" />{" "}
+                <Plus className="lg:mr-2" />
                 <span className="inline sm:hidden lg:inline">Add</span>
               </Button>
             ) : (
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  // setDropdownOpen(false); // Close the dropdown
+                }}
+              >
                 <Pencil /> Edit
               </DropdownMenuItem>
             )}
           </AlertDialogTrigger>
+
           <AlertDialogContent className="sm:min-w-md">
             <AlertDialogHeader>
               <AlertDialogTitle>
@@ -650,7 +676,13 @@ export function AddDialog({
                 {/* Footer Buttons */}
                 <AlertDialogFooter>
                   <AlertDialogAction asChild>
-                    <Button type="submit" disabled={!isValid}>
+                    <Button
+                      type="submit"
+                      disabled={
+                        !isValid ||
+                        JSON.stringify(initialData) === JSON.stringify(watch())
+                      }
+                    >
                       {mode === "edit" ? "Update" : "Add"}
                     </Button>
                   </AlertDialogAction>

@@ -71,6 +71,7 @@ const WalletPage = () => {
     startDate: startDate,
     endDate: endDate,
   });
+  
   console.log(detailedExpense);
 
   const [

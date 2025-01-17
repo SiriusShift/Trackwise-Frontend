@@ -1,7 +1,8 @@
 import { api } from "@/feature/api";
+import { useGetAssetQuery } from "@/feature/assets/api/assetsApi";
 
 const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense", "Assets"] })
+  .enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getExpenses: builder.query({
@@ -25,7 +26,7 @@ const expensesApi = api
           },
           body,
         }),
-        invalidatesTags: ["Expenses", "Assets"],
+        invalidatesTags: ["Expenses"],
       }),
 
       deleteExpense: builder.mutation({
@@ -36,7 +37,19 @@ const expensesApi = api
             Accept: "application/json",
           },
         }),
-        invalidatesTags: ["Expenses", "Assets"],
+        invalidatesTags: ["Expenses"],
+      }),
+
+      patchExpense: builder.mutation({
+        query: ({data, id}) => ({
+          url: `/expenses/updateExpense/${id}`,
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+          },
+          body: data,
+        }),
+        invalidatesTags: ["Expenses", "RecurringExpense"],
       }),
 
       postRecurringExpense: builder.mutation({
@@ -76,18 +89,6 @@ const expensesApi = api
         providesTags: ["RecurringExpense"],
       }),
 
-      //ASSETS
-      getAsset: builder.query({
-        query: () => ({
-          url: "/asset/get",
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }),
-        transformResponse: (response: any) => response.data,
-      }),
-
       getFrequency: builder.query({
         query: () => ({
           url: "/frequency/get",
@@ -108,8 +109,8 @@ export const {
   usePostExpenseMutation,
   usePostRecurringExpenseMutation,
   useGetRecurringExpensesQuery,
-  useGetAssetQuery,
   useGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
+  usePatchExpenseMutation,
   useGetFrequencyQuery
 } = expensesApi;

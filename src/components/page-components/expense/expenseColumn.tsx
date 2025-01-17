@@ -131,6 +131,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     cell: ({ row }) => {
       const expense = row.original;
       // console.log(expense);
+
       const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
@@ -141,7 +142,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu>
+          <DropdownMenu
+            modal={false}
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -150,8 +153,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <AddDialog rowData={expense} active={activeTab} mode="edit"/>
-              {/* <DropdownMenuSeparator /> */}
+              <AddDialog
+                rowData={expense}
+                active={activeTab}
+                mode="edit"
+              />
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -250,9 +256,10 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     // header: "Actions",
     cell: ({ row }) => {
       const expense = row.original;
+      const [isDropdownOpen, setDropdownOpen] = useState(false);
       const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
 
-      console.log(expense);
+      console.log("", isDropdownOpen);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
@@ -262,7 +269,9 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu>
+          <DropdownMenu
+            modal={false}
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -275,8 +284,11 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
                 <CreditCard />
                 Pay
               </DropdownMenuItem>
-              <AddDialog rowData={expense} active={activeTab} mode="edit"/>
-              {/* <DropdownMenuSeparator /> */}
+              <AddDialog
+                rowData={expense}
+                active={activeTab}
+                mode="edit"
+              />
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -288,6 +300,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
               />
             </DropdownMenuContent>
           </DropdownMenu>
+
           {/* <DeleteDialog open={isExpenseOpen} onOpenChange={(open) => setIsExpenseOpen(open)} /> */}
         </>
       );
