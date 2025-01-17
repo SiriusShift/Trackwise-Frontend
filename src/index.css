@@ -16,8 +16,6 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
-
-
 @layer base {
   * {
     animation-fill-mode: forwards;

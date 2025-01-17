@@ -47,7 +47,10 @@ import {
 import moment from "moment";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { useGetAssetQuery, useGetFrequencyQuery } from "@/feature/expenses/api/expensesApi";
+import {
+  useGetAssetQuery,
+  useGetFrequencyQuery,
+} from "@/feature/expenses/api/expensesApi";
 import { numberInput } from "@/utils/CustomFunctions";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import {
@@ -92,24 +95,12 @@ type AddExpenseFormData = {
   endDate: Date;
   startDate: Date;
   frequency: string;
-  /*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * A dialog component for adding a new expense.
-   * It accepts a type prop which can be either "income" or "expense".
-   * The dialog component renders a form with fields for date, category, source, description, and amount.
-   * The form is validated using the `expenseSchema` schema.
-   * The onSubmit handler is called when the form is submitted with valid data.
-   * The component renders a different UI based on the screen width.
-   * If the screen width is greater than 768px, it renders a Dialog component.
-   * Otherwise, it renders a Drawer component.
-   */
-  /******  6b4ca4a7-dace-472e-9f44-c8ea54efafed  *******/ date: Date;
+  date: Date;
   source: Object;
   status: string;
 };
 
 export function AddDialog({
-  type,
   active,
   mode,
   rowData,
@@ -164,7 +155,8 @@ export function AddDialog({
   }, [userId]);
 
   useEffect(() => {
-    if (rowData) {
+    if (rowData && mode === "edit") {
+      reset({ ...rowData });
       if (active === "Recurring") {
         setValue("startDate", rowData?.date);
         setValue("frequency", rowData?.frequency);
@@ -190,6 +182,10 @@ export function AddDialog({
           category: data?.category?.id,
           startDate: moment(data?.startDate).utc().format(),
         });
+        reset({
+          ...expenseSchema.defaultValues,
+          userId: userId,
+        }); // Reset the form after successful submission
       } else {
         await postExpense({
           ...data,
@@ -202,11 +198,11 @@ export function AddDialog({
           date: moment(data?.date).utc().format(),
           assetBalance: watch("source")?.remainingBalance,
         });
+        reset({
+          ...recurringExpense.defaultValues,
+          userId: userId,
+        }); // Reset the form after successful submission
       }
-      reset({
-        ...recurringExpense.defaultValues,
-        userId: userId,
-      }); // Reset the form after successful submission
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -602,9 +598,10 @@ export function AddDialog({
                               <FormControl>
                                 <Select
                                   onValueChange={(value) => {
-                                    const selectedCategory = frequencyData?.find(
-                                      (frequency) => frequency.name === value
-                                    );
+                                    const selectedCategory =
+                                      frequencyData?.find(
+                                        (frequency) => frequency.name === value
+                                      );
                                     field.onChange(selectedCategory);
                                   }}
                                   value={field.value?.name}

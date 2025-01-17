@@ -1,5 +1,4 @@
 import { api } from "@/feature/api";
-import { get } from "http";
 
 const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense", "Assets"] })
@@ -61,6 +60,7 @@ const expensesApi = api
             Accept: "application/json",
           },
         }),
+        transformResponse: (response: any) => response.data,
         providesTags: ["Expenses"],
       }),
 
@@ -73,6 +73,7 @@ const expensesApi = api
             Accept: "application/json",
           },
         }),
+        providesTags: ["RecurringExpense"],
       }),
 
       //ASSETS
@@ -108,7 +109,7 @@ export const {
   usePostRecurringExpenseMutation,
   useGetRecurringExpensesQuery,
   useGetAssetQuery,
-  useLazyGetDetailedExpenseQuery,
+  useGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
   useGetFrequencyQuery
 } = expensesApi;

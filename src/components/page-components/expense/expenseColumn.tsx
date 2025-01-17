@@ -150,7 +150,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <AddDialog rowData={expense} active={activeTab} mode="edit" type="Expense" />
+              <AddDialog rowData={expense} active={activeTab} mode="edit"/>
               {/* <DropdownMenuSeparator /> */}
               <DropdownMenuItem>
                 <Eye />
@@ -275,7 +275,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
                 <CreditCard />
                 Pay
               </DropdownMenuItem>
-              <AddDialog rowData={expense} active={activeTab} mode="edit" type="Recurring" />
+              <AddDialog rowData={expense} active={activeTab} mode="edit"/>
               {/* <DropdownMenuSeparator /> */}
               <DropdownMenuItem>
                 <Eye />

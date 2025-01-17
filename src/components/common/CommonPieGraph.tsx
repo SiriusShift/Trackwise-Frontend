@@ -46,7 +46,7 @@ const chartConfig = {
 function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
   const [showChart, setShowChart] = React.useState(false);
   const location = useLocation();
-  const width = useScreenWidth();
+  console.log(categoryExpenses);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
@@ -54,7 +54,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
   // Delay chart rendering for smooth animation
   React.useEffect(() => {
     if (categoryExpenses) {
-      const timer = setTimeout(() => setShowChart(true), 500); // Delay by 500ms
+      const timer = setTimeout(() => setShowChart(true), 200); // Delay by 500ms
       return () => clearTimeout(timer);
     }
   }, [categoryExpenses]);

@@ -119,15 +119,10 @@ export function DataTable<TData, TValue>({
   setPageSize,
   categoryExpenses,
 }: DataTableProps<TData, TValue>) {
-  console.log(data.length);
+  console.log(categoryExpenses);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  );
-
-  const location = useLocation();
-  const currentPageName = navigationData.find(
-    (item) => item.path === location.pathname
   );
   const table = useReactTable({
     data,
@@ -234,9 +229,9 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="hidden lg:inline">
           <CommonPieGraph
-            total={total}
-            trend={trend}
-            categoryExpenses={categoryExpenses}
+            total={categoryExpenses?.totalExpense}
+            trend={categoryExpenses?.trend}
+            categoryExpenses={categoryExpenses?.categoryExpenses}
             date={date}
           />
         </div>
@@ -317,9 +312,9 @@ export function DataTable<TData, TValue>({
 
       <div className="inline lg:hidden">
         <CommonPieGraph
-          total={total}
-          trend={trend}
-          categoryExpenses={categoryExpenses}
+          total={categoryExpenses?.totalExpense}
+          trend={categoryExpenses?.trend}
+          categoryExpenses={categoryExpenses?.categoryExpenses}
           date={date}
         />
       </div>

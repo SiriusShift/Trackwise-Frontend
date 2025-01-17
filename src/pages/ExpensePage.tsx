@@ -8,6 +8,7 @@ import {
 } from "@/components/page-components/expense/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
+  useGetDetailedExpenseQuery,
   useLazyGetExpensesQuery,
   useLazyGetRecurringExpensesQuery,
 } from "@/feature/expenses/api/expensesApi";
@@ -33,7 +34,6 @@ const WalletPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
-
 
   let activeMonth = localStorage.getItem("activeMonth");
   activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
@@ -66,7 +66,12 @@ const WalletPage = () => {
   const [triggerExpense, { data: expensesData, isLoading: expensesLoading }] =
     useLazyGetExpensesQuery();
 
-  console.log("data", expensesData);
+  const { data: detailedExpense } = useGetDetailedExpenseQuery({
+    userId: userId,
+    startDate: startDate,
+    endDate: endDate,
+  });
+  console.log(detailedExpense);
 
   const [
     triggerRecurring,
@@ -145,16 +150,21 @@ const WalletPage = () => {
         endDate,
         pageSize,
         pageIndex,
-      });
+      }, 
+      { preferCacheValue: true }
+    );
     } else {
-      triggerExpense({
-        userId,
-        startDate,
-        endDate,
-        // active: activeTab,
-        pageSize,
-        pageIndex,
-      });
+      triggerExpense(
+        {
+          userId,
+          startDate,
+          endDate,
+          // active: activeTab,
+          pageSize,
+          pageIndex,
+        },
+        { preferCacheValue: true }
+      );
     }
   }, [pageSize, pageIndex, startDate, endDate, activeTab]);
 
@@ -356,10 +366,9 @@ const WalletPage = () => {
             pageIndex={pageIndex}
             date={endDate}
             pageSize={pageSize}
-            total={expensesData?.totalExpense}
             trend={expensesData?.trend}
             isLoading={expensesLoading || recurringLoading}
-            categoryExpenses={expensesData?.categoryExpenses}
+            categoryExpenses={detailedExpense}
             data={expensesData?.data || []}
           />
         ) : (
@@ -372,10 +381,9 @@ const WalletPage = () => {
             date={endDate}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            total={expensesData?.totalExpense}
             trend={expensesData?.trend}
             isLoading={expensesLoading || recurringLoading}
-            categoryExpenses={expensesData?.categoryExpenses}
+            categoryExpenses={detailedExpense}
             data={recurringData?.data || []}
           />
         )}
