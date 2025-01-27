@@ -153,6 +153,8 @@ export function AddDialog({
     formState: { errors, isValid },
   } = form;
 
+  console.log(errors, isValid);
+
   useEffect(() => {
     console.log("Dialog rendered");
     setValue("userId", userId);
@@ -190,6 +192,7 @@ export function AddDialog({
           ...expenseSchema.defaultValues,
           userId: userId,
         }); // Reset the form after successful submission
+        toast.success("Expense updated successfully");
       } else {
         if (active === "Recurring") {
           await postRecurring({
@@ -327,7 +330,8 @@ export function AddDialog({
                                 disabled={active === "All" && !watch("source")}
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
-                                  const balance = watch("source")?.balance;
+                                  const balance = watch("source")?.remainingBalance;
+                                  console.log(balance);
 
                                   if (
                                     active === "All" &&
@@ -680,7 +684,7 @@ export function AddDialog({
                       type="submit"
                       disabled={
                         !isValid ||
-                        JSON.stringify(initialData) === JSON.stringify(watch())
+                        (JSON.stringify(initialData) === JSON.stringify(watch()) && mode === "edit")
                       }
                     >
                       {mode === "edit" ? "Update" : "Add"}

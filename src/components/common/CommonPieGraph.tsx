@@ -60,7 +60,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
   }, [categoryExpenses]);
 
   return (
-  // return width > 1024 ? (
+    // return width > 1024 ? (
     <Card className="flex flex-col h-full min-w-[250px]">
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
@@ -83,7 +83,12 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
               <PieChart>
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
+                  content={
+                    <ChartTooltipContent
+                      className="w-auto max-w-[150px] p-2 rounded-md shadow-md"
+                      hideLabel
+                    />
+                  }
                 />
                 <Pie
                   data={categoryExpenses}
@@ -157,103 +162,103 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
         </div>
       </CardFooter>
     </Card>
-  // ) : (
-  //   <Card className="flex min-w-[300px] h-60">
-  //     {/* Card Header */}
-  //     <CardHeader className="items-start">
-  //       <div>
-  //         <CardTitle className="text-lg text-center">
-  //           {currentPageName?.name} - Pie Chart
-  //         </CardTitle>
-  //         <CardDescription className="text-left">
-  //           {moment(date).format("MMMM YYYY")}
-  //         </CardDescription>
-  //       </div>
-  //       <div className="pt-5">
-  //         <div className="flex items-center gap-2 font-medium leading-none">
-  //           {trend === "NaN" ? (
-  //             <span>No data for trend calculation</span>
-  //           ) : (
-  //             <>
-  //               <span className="truncate">
-  //                 Trending {trend > 0 ? "up" : "down"} this month by {trend}%
-  //               </span>
-  //               {trend > 0 ? (
-  //                 <TrendingUp
-  //                   className={`h-4 w-4 ${
-  //                     currentPageName?.name === "Expenses"
-  //                       ? "text-destructive"
-  //                       : "text-success"
-  //                   }`}
-  //                 />
-  //               ) : (
-  //                 <TrendingDown
-  //                   className={`h-4 w-4 ${
-  //                     currentPageName?.name === "Expenses"
-  //                       ? "text-success"
-  //                       : "text-destructive"
-  //                   }`}
-  //                 />
-  //               )}
-  //             </>
-  //           )}
-  //         </div>
-  //         <div className="leading-none text-muted-foreground">
-  //           Showing total {currentPageName?.name.toLocaleLowerCase()} for the
-  //           month of {moment(date).format("MMMM")}
-  //         </div>
-  //       </div>
-  //     </CardHeader>
+    // ) : (
+    //   <Card className="flex min-w-[300px] h-60">
+    //     {/* Card Header */}
+    //     <CardHeader className="items-start">
+    //       <div>
+    //         <CardTitle className="text-lg text-center">
+    //           {currentPageName?.name} - Pie Chart
+    //         </CardTitle>
+    //         <CardDescription className="text-left">
+    //           {moment(date).format("MMMM YYYY")}
+    //         </CardDescription>
+    //       </div>
+    //       <div className="pt-5">
+    //         <div className="flex items-center gap-2 font-medium leading-none">
+    //           {trend === "NaN" ? (
+    //             <span>No data for trend calculation</span>
+    //           ) : (
+    //             <>
+    //               <span className="truncate">
+    //                 Trending {trend > 0 ? "up" : "down"} this month by {trend}%
+    //               </span>
+    //               {trend > 0 ? (
+    //                 <TrendingUp
+    //                   className={`h-4 w-4 ${
+    //                     currentPageName?.name === "Expenses"
+    //                       ? "text-destructive"
+    //                       : "text-success"
+    //                   }`}
+    //                 />
+    //               ) : (
+    //                 <TrendingDown
+    //                   className={`h-4 w-4 ${
+    //                     currentPageName?.name === "Expenses"
+    //                       ? "text-success"
+    //                       : "text-destructive"
+    //                   }`}
+    //                 />
+    //               )}
+    //             </>
+    //           )}
+    //         </div>
+    //         <div className="leading-none text-muted-foreground">
+    //           Showing total {currentPageName?.name.toLocaleLowerCase()} for the
+    //           month of {moment(date).format("MMMM")}
+    //         </div>
+    //       </div>
+    //     </CardHeader>
 
-  //     {/* Card Content */}
-  //     <ChartContainer config={chartConfig}>
-  //       <CardContent className="flex-1 content-center flex justify-center items-center h-full pb-0">
-  //         {showChart ? (
-  //           <ResponsiveContainer
-  //             width={chartConfig.width}
-  //             height={chartConfig.height}
-  //           >
-  //             <PieChart>
-  //               <ChartTooltip
-  //                 cursor={false}
-  //                 content={<ChartTooltipContent hideLabel />}
-  //               />
-  //               <Pie
-  //                 data={categoryExpenses}
-  //                 dataKey={chartConfig.dataKey}
-  //                 nameKey={chartConfig.nameKey}
-  //                 innerRadius={chartConfig.innerRadius}
-  //                 outerRadius={chartConfig.outerRadius}
-  //                 strokeWidth={chartConfig.strokeWidth}
-  //                 stroke={chartConfig.strokeColor}
-  //                 isAnimationActive={true}
-  //               >
-  //                 {categoryExpenses.map((entry, index) => (
-  //                   <Cell
-  //                     key={`cell-${index}`}
-  //                     fill={
-  //                       chartConfig.colors[index % chartConfig.colors.length]
-  //                     }
-  //                   />
-  //                 ))}
-  //                 <Label
-  //                   position="center"
-  //                   fontSize={16}
-  //                   fontWeight="bold"
-  //                   value={`₱${total?.toLocaleString()}`}
-  //                 />
-  //               </Pie>
-  //             </PieChart>
-  //           </ResponsiveContainer>
-  //         ) : (
-  //           <div className="flex justify-center min-h-52 items-center">
-  //             {/* Spinner */}
-  //             <PuffLoader size={80} color="hsl(var(--primary))" />
-  //           </div>
-  //         )}
-  //       </CardContent>
-  //     </ChartContainer>
-  //   </Card>
+    //     {/* Card Content */}
+    //     <ChartContainer config={chartConfig}>
+    //       <CardContent className="flex-1 content-center flex justify-center items-center h-full pb-0">
+    //         {showChart ? (
+    //           <ResponsiveContainer
+    //             width={chartConfig.width}
+    //             height={chartConfig.height}
+    //           >
+    //             <PieChart>
+    //               <ChartTooltip
+    //                 cursor={false}
+    //                 content={<ChartTooltipContent hideLabel />}
+    //               />
+    //               <Pie
+    //                 data={categoryExpenses}
+    //                 dataKey={chartConfig.dataKey}
+    //                 nameKey={chartConfig.nameKey}
+    //                 innerRadius={chartConfig.innerRadius}
+    //                 outerRadius={chartConfig.outerRadius}
+    //                 strokeWidth={chartConfig.strokeWidth}
+    //                 stroke={chartConfig.strokeColor}
+    //                 isAnimationActive={true}
+    //               >
+    //                 {categoryExpenses.map((entry, index) => (
+    //                   <Cell
+    //                     key={`cell-${index}`}
+    //                     fill={
+    //                       chartConfig.colors[index % chartConfig.colors.length]
+    //                     }
+    //                   />
+    //                 ))}
+    //                 <Label
+    //                   position="center"
+    //                   fontSize={16}
+    //                   fontWeight="bold"
+    //                   value={`₱${total?.toLocaleString()}`}
+    //                 />
+    //               </Pie>
+    //             </PieChart>
+    //           </ResponsiveContainer>
+    //         ) : (
+    //           <div className="flex justify-center min-h-52 items-center">
+    //             {/* Spinner */}
+    //             <PuffLoader size={80} color="hsl(var(--primary))" />
+    //           </div>
+    //         )}
+    //       </CardContent>
+    //     </ChartContainer>
+    //   </Card>
   );
 }
 

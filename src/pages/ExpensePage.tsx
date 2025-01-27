@@ -28,11 +28,11 @@ import {
 } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AlertDialogDemo } from "@/components/calendar";
+import CommonTab from "@/components/common/CommonTab";
+import CommonTracker from "@/components/common/CommonTracker";
 
 const WalletPage = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
   const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
 
   let activeMonth = localStorage.getItem("activeMonth");
@@ -71,7 +71,7 @@ const WalletPage = () => {
     startDate: startDate,
     endDate: endDate,
   });
-  
+
   console.log(detailedExpense);
 
   const [
@@ -145,15 +145,16 @@ const WalletPage = () => {
   //UseEffect
   useEffect(() => {
     if (activeTab === "Recurring") {
-      triggerRecurring({
-        userId,
-        startDate,
-        endDate,
-        pageSize,
-        pageIndex,
-      }, 
-      { preferCacheValue: true }
-    );
+      triggerRecurring(
+        {
+          userId,
+          startDate,
+          endDate,
+          pageSize,
+          pageIndex,
+        },
+        { preferCacheValue: true }
+      );
     } else {
       triggerExpense(
         {
@@ -185,46 +186,7 @@ const WalletPage = () => {
       {/* Toolbar */}
       <div className="flex flex-col gap-5">
         <div className="flex gap-2 items-center justify-between">
-          <div className="relative hidden sm:inline h-9 w-48 bg-secondary p-1 rounded-sm">
-            <div className="relative flex gap-1 h-full bg-secondary rounded-sm items-center overflow-hidden">
-              <div
-                className={`absolute top-0 left-0 h-full w-1/2 bg-background rounded-sm transition-all duration-300`}
-                style={{
-                  transform:
-                    activeTab === "All" ? "translateX(0)" : "translateX(100%)",
-                }}
-              ></div>
-              <div
-                onClick={() =>
-                  dispatch(
-                    setExpenseTab({
-                      expenseTab: "All",
-                    })
-                  )
-                }
-                className={`relative z-10 flex items-center justify-center text-sm w-1/2 cursor-pointer ${
-                  activeTab === "All" ? "text-primary" : "text-gray-500"
-                }`}
-              >
-                All
-              </div>
-              <div
-                onClick={() =>
-                  dispatch(
-                    setExpenseTab({
-                      expenseTab: "Recurring",
-                    })
-                  )
-                }
-                className={`relative z-10 flex items-center justify-center text-sm w-1/2 cursor-pointer ${
-                  activeTab === "Recurring" ? "text-primary" : "text-gray-500"
-                }`}
-              >
-                Recurring
-              </div>
-            </div>
-          </div>
-
+          <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
             <AddDialog mode="add" type="Expense" active={activeTab} />
@@ -389,40 +351,9 @@ const WalletPage = () => {
           />
         )}
         {/* Data Table */}
+        <CommonTracker title="Expense Limit"/>
       </div>
 
-      {/* Expense Limits Section */}
-      <div>
-        <h1 className="text-xl font-semibold mb-5">
-          Expenses limit for this month
-        </h1>
-        <div className="flex w-full h-[120px] overflow-x-auto gap-5">
-          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
-            <button className="rounded-full border-primary border p-1">
-              <Plus size={30} />
-            </button>{" "}
-            <span className="ml-5">Set New Limit</span>
-          </div>
-          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
-            <button className="rounded-full border-primary border p-1">
-              <Plus size={30} />
-            </button>{" "}
-            <span className="ml-5">Set New Limit</span>
-          </div>
-          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
-            <button className="rounded-full border-primary border p-1">
-              <Plus size={30} />
-            </button>{" "}
-            <span className="ml-5">Set New Limit</span>
-          </div>
-          <div className="h-24 min-w-64 xl:w-1/4  border-secondary border flex items-center p-5 rounded-md">
-            <button className="rounded-full border-primary border p-1">
-              <Plus size={30} />
-            </button>{" "}
-            <span className="ml-5">Set New Limit</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

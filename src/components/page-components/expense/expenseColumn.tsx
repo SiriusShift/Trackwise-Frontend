@@ -33,6 +33,7 @@ import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
 import { AddDialog } from "@/components/dialog/ExpenseDialog";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -265,6 +266,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
 
       const onDelete = async () => {
         await deleteExpense(expense.id);
+        toast.success("Expense deleted successfully");
       };
 
       return (

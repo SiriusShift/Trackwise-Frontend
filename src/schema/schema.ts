@@ -48,7 +48,7 @@ export const resetPasswordSchema = {
 export const expenseSchema = {
   schema: yup.object().shape({
     userId: yup.string().required("User Id is required"),
-    expenseId: yup.string(),
+    expenseId: yup.string().nullable(),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
     amount: yup
@@ -75,7 +75,7 @@ export const expenseSchema = {
 export const recurringExpense = {
   schema: yup.object().shape({
     userId: yup.string().required("User Id is required"),
-    expenseId: yup.string(),
+    expenseId: yup.string().nullable(),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
     frequency: yup.object().required("Frequency is required"),
