@@ -13,7 +13,7 @@ import {
   CardTitle,
   CardDescription,
 } from "../ui/card";
-import { Plus } from "lucide-react";
+import { BusFront, CookingPot, Plus } from "lucide-react";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import { ChartContainer } from "../ui/chart";
 import {
@@ -23,6 +23,7 @@ import {
   RadialBar,
   RadialBarChart,
 } from "recharts";
+import { Button } from "../ui/button";
 
 const chartData = [
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
@@ -57,9 +58,13 @@ function CommonTracker({ title }: { title: string }) {
           <CarouselItem className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
             <Card className="h-full">
               <CardContent className="flex h-[100px] items-center p-9">
-                <button className="rounded-full border-primary border-2 p-1">
+                <Button
+                  variant={"outline"}
+                  size={"icon"}
+                  className="h-11 w-11 rounded-full border-primary border-2"
+                >
                   <Plus size={30} />
-                </button>
+                </Button>
                 <span className="ml-5">Set New Limit</span>
               </CardContent>
             </Card>
@@ -72,24 +77,24 @@ function CommonTracker({ title }: { title: string }) {
               className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
             >
               <Card className="h-full">
-                <CardContent className="flex-1 pb-0">
+                <CardContent className="flex h-[100px] items-center p-3">
                   <ChartContainer
                     config={chartConfig}
-                    className="mx-auto w-[80px] h-[80px]" // Adjusted width and height to match `w-11`
+                    className="h-[100px] w-[100px]" // Adjusted width and height to match `w-11`
                   >
                     <RadialBarChart
                       data={chartData}
                       startAngle={0}
                       endAngle={250}
-                      innerRadius={20} // Smaller inner radius
-                      outerRadius={15} // Smaller outer radius
+                      innerRadius={27} // Smaller inner radius
+                      outerRadius={20} // Smaller outer radius
                     >
                       <PolarGrid
                         gridType="circle"
                         radialLines={false}
                         stroke="none"
                         className="first:fill-muted last:fill-background"
-                        polarRadius={[20, 15]} // Adjusted polar radius
+                        polarRadius={[25, 22]} // Adjusted polar radius
                       />
                       <RadialBar
                         dataKey="visitors"
@@ -100,7 +105,28 @@ function CommonTracker({ title }: { title: string }) {
                         tick={false}
                         tickLine={false}
                         axisLine={false}
-                      />
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox?.cx && viewBox?.cy) {
+                              return (
+                                <svg
+                                  x={viewBox.cx - 12} // Adjust for icon's size
+                                  y={viewBox.cy - 12} // Adjust for icon's size
+                                  width={24}
+                                  height={24}
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="text-primary"
+                                >
+                                  <BusFront />
+                                </svg>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                      </PolarRadiusAxis>
                     </RadialBarChart>
                   </ChartContainer>
                 </CardContent>
@@ -110,8 +136,8 @@ function CommonTracker({ title }: { title: string }) {
         </CarouselContent>
 
         {/* Navigation Buttons */}
-        <CarouselPrevious className="absolute -left-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center bg-white shadow-lg w-10 h-10" />
-        <CarouselNext className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center bg-white shadow-lg w-10 h-10" />
+        <CarouselPrevious className="absolute -left-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center shadow-md w-10 h-10" />
+        <CarouselNext className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center shadow-md w-10 h-10" />
       </Carousel>
     </div>
   );
