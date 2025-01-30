@@ -19,14 +19,12 @@ export interface Income {
   status: "Received" | "Pending" | string;
 }
 
-
-export interface CommonToolbarProps  {
+export interface CommonToolbarProps {
   type: string;
   children: React.ReactNode;
   active: string;
   title: string;
 }
-
 
 export interface Option {
   label: string;
@@ -52,8 +50,13 @@ export interface DataTableFilterOption<TData> {
   isMulti?: boolean;
 }
 
-export interface expenseForm = {
+export interface expenseForm {
   name: string;
   email: string;
   password: string;
-};
+}
+
+export interface trackerFormType {
+  category: Object;
+  amount: number;
+}

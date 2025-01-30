@@ -24,6 +24,7 @@ import {
   RadialBarChart,
 } from "recharts";
 import { Button } from "../ui/button";
+import TrackerDialog from "../dialog/TrackerDialog";
 
 const chartData = [
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
@@ -58,20 +59,16 @@ function CommonTracker({ title }: { title: string }) {
           <CarouselItem className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
             <Card className="h-full">
               <CardContent className="flex h-[100px] items-center p-9">
-                <Button
-                  variant={"outline"}
-                  size={"icon"}
-                  className="h-11 w-11 rounded-full border-primary border-2"
-                >
-                  <Plus size={30} />
-                </Button>
+                <TrackerDialog title="Add budget limit" description="
+                Set a monthly spending limit for your budget category. You'll be
+                notified when you're approaching your limit." mode="add"/>
                 <span className="ml-5">Set New Limit</span>
               </CardContent>
             </Card>
           </CarouselItem>
 
           {/* Dynamic Cards with Radial Chart */}
-          {Array.from({ length: 5 }).map((_, index) => (
+          {/* {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem
               key={index}
               className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
@@ -132,7 +129,7 @@ function CommonTracker({ title }: { title: string }) {
                 </CardContent>
               </Card>
             </CarouselItem>
-          ))}
+          ))} */}
         </CarouselContent>
 
         {/* Navigation Buttons */}

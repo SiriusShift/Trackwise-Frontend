@@ -98,3 +98,17 @@ export const recurringExpense = {
     recipient: ""
   }
 }
+
+export const trackerSchema = {
+  schema: yup.object().shape({
+    category: yup.object().required("Category is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"), 
+  }),
+  defaultValues : {
+    category: "",
+    amount: 0
+  }
+}
