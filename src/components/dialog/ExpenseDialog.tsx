@@ -121,7 +121,9 @@ export function AddDialog({
   console.log(rowData);
 
   // RTK QUERY
-  const { data: categoryData } = useGetCategoryQuery();
+  const { data: categoryData } = useGetCategoryQuery({
+    type: "Expense"
+  });
   const { data: frequencyData } = useGetFrequencyQuery();
   const { data: assetData } = useGetAssetQuery();
   console.log(assetData);
@@ -297,7 +299,10 @@ export function AddDialog({
                                     {field.value?.name || "Select a category"}
                                   </SelectValue>
                                 </SelectTrigger>
-                                <SelectContent className="max-h-[200px]">
+                                <SelectContent
+                                  portal={false}
+                                  className="max-h-[200px]"
+                                >
                                   {categoryData?.map((category) => (
                                     <SelectItem
                                       key={category.id}
@@ -320,31 +325,39 @@ export function AddDialog({
                           <FormItem className="flex flex-col">
                             <FormLabel>Amount</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
-                                min={0}
-                                type="number"
-                                step="0.01"
-                                placeholder="Enter amount"
-                                className="input-class text-sm"
-                                disabled={active === "All" && !watch("source")}
-                                onChange={(e) => {
-                                  const value = Number(e.target.value);
-                                  const balance = watch("source")?.remainingBalance;
-                                  console.log(balance);
-
-                                  if (
-                                    active === "All" &&
-                                    balance &&
-                                    value > balance
-                                  ) {
-                                    toast.error("Insufficient balance");
-                                    e.target.value = balance; // Reset to the maximum allowed value
-                                  } else {
-                                    numberInput(e, field); // Proceed with normal input handling
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                  ₱
+                                </span>
+                                <Input
+                                  {...field}
+                                  min={0}
+                                  type="number"
+                                  step="0.01"
+                                  placeholder="Enter amount"
+                                  className="input-class text-sm pl-7"
+                                  disabled={
+                                    active === "All" && !watch("source")
                                   }
-                                }}
-                              />
+                                  onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    const balance =
+                                      watch("source")?.remainingBalance;
+                                    console.log(balance);
+
+                                    if (
+                                      active === "All" &&
+                                      balance &&
+                                      value > balance
+                                    ) {
+                                      toast.error("Insufficient balance");
+                                      e.target.value = balance; // Reset to the maximum allowed value
+                                    } else {
+                                      numberInput(e, field); // Proceed with normal input handling
+                                    }
+                                  }}
+                                />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -514,7 +527,10 @@ export function AddDialog({
                                   <SelectTrigger className="capitalize">
                                     <SelectValue placeholder="Select source" />
                                   </SelectTrigger>
-                                  <SelectContent className="max-h-[200px]">
+                                  <SelectContent
+                                    portal={false}
+                                    className="max-h-[200px]"
+                                  >
                                     {assetData?.map((source) => (
                                       <SelectItem
                                         key={source.id}
@@ -639,7 +655,10 @@ export function AddDialog({
                                   <SelectTrigger className="capitalize">
                                     <SelectValue placeholder="Select frequency" />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent
+                                    portal={false}
+                                    className="max-h-[200px]"
+                                  >
                                     {frequencyData?.map((frequency) => (
                                       <SelectItem
                                         key={frequency.id}
@@ -684,7 +703,9 @@ export function AddDialog({
                       type="submit"
                       disabled={
                         !isValid ||
-                        (JSON.stringify(initialData) === JSON.stringify(watch()) && mode === "edit")
+                        (JSON.stringify(initialData) ===
+                          JSON.stringify(watch()) &&
+                          mode === "edit")
                       }
                     >
                       {mode === "edit" ? "Update" : "Add"}
@@ -720,7 +741,7 @@ export function AddDialog({
             )}
           </DrawerTrigger>
           <DrawerContent className="sm:min-w-md px-8">
-            <DrawerHeader className="p-0 pt-3">
+            <DrawerHeader>
               <DrawerTitle>
                 {mode === "add" ? "Add" : "Edit"}{" "}
                 {active === "Recurring" ? "recurring " : ""} expense
@@ -744,30 +765,36 @@ export function AddDialog({
                               Category
                             </FormLabel>
                             <FormControl>
-                              <Select
-                                onValueChange={(value) => {
-                                  const selectedCategory = categoryData?.find(
-                                    (category) => category.name === value
-                                  );
-                                  field.onChange(selectedCategory); // Update the field state
-                                }}
-                                value={field.value?.name} // Use defaultValue instead of value
-                              >
-                                <SelectTrigger className="capitalize">
-                                  {/* Display the name of the selected category */}
-                                  <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[200px]">
-                                  {categoryData?.map((category) => (
-                                    <SelectItem
-                                      key={category.id}
-                                      value={category.name}
-                                    >
-                                      {category.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <div className="relative">
+                                {" "}
+                                <Select
+                                  onValueChange={(value) => {
+                                    const selectedCategory = categoryData?.find(
+                                      (category) => category.name === value
+                                    );
+                                    field.onChange(selectedCategory); // Update the field state
+                                  }}
+                                  value={field.value?.name} // Use defaultValue instead of value
+                                >
+                                  <SelectTrigger className="capitalize">
+                                    {/* Display the name of the selected category */}
+                                    <SelectValue placeholder="Select category" />
+                                  </SelectTrigger>
+                                  <SelectContent
+                                    portal={false}
+                                    className="max-h-[200px]"
+                                  >
+                                    {categoryData?.map((category) => (
+                                      <SelectItem
+                                        key={category.id}
+                                        value={category.name}
+                                      >
+                                        {category.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -974,7 +1001,10 @@ export function AddDialog({
                                   <SelectTrigger className="capitalize">
                                     <SelectValue placeholder="Select source" />
                                   </SelectTrigger>
-                                  <SelectContent className="max-h-[200px]">
+                                  <SelectContent
+                                    portal={false}
+                                    className="max-h-[200px]"
+                                  >
                                     {assetData?.map((source) => (
                                       <SelectItem
                                         key={source.id}
@@ -1147,7 +1177,12 @@ export function AddDialog({
                   <DrawerClose asChild>
                     <Button
                       type="button"
-                      onClick={() => form.reset()}
+                      onClick={() =>
+                        reset({
+                          ...expenseSchema.defaultValues,
+                          userId: userId,
+                        })
+                      }
                       variant="secondary"
                     >
                       Close

@@ -55,7 +55,7 @@ const WalletPage = () => {
   console.log(moment(startDate).format("MMMM YYYY"), endDate);
 
   // Get User ID
-  const userId = useSelector((state: any) => state?.userDetails?.id);
+  // const userId = useSelector((state: any) => state?.userDetails?.id);
 
   // Current Page Name
   const currentPageName = navigationData.find(
@@ -67,7 +67,7 @@ const WalletPage = () => {
     useLazyGetExpensesQuery();
 
   const { data: detailedExpense } = useGetDetailedExpenseQuery({
-    userId: userId,
+    // userId: userId,
     startDate: startDate,
     endDate: endDate,
   });
@@ -85,7 +85,7 @@ const WalletPage = () => {
 
   const handleFilter = () => {
     const requestData = {
-      userId,
+      // userId,
       // active: activeTab,
       pageSize,
       pageIndex,
@@ -113,7 +113,7 @@ const WalletPage = () => {
     if (activeTab === "Recurring") {
       setStatus("");
       triggerRecurring({
-        userId,
+        // userId,
         startDate,
         endDate,
         pageSize,
@@ -121,7 +121,7 @@ const WalletPage = () => {
       });
     } else {
       triggerExpense({
-        userId,
+        // userId,
         startDate,
         endDate,
         // active: activeTab,
@@ -147,7 +147,7 @@ const WalletPage = () => {
     if (activeTab === "Recurring") {
       triggerRecurring(
         {
-          userId,
+          // userId,
           startDate,
           endDate,
           pageSize,
@@ -158,7 +158,7 @@ const WalletPage = () => {
     } else {
       triggerExpense(
         {
-          userId,
+          // userId,
           startDate,
           endDate,
           // active: activeTab,

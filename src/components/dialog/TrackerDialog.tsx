@@ -38,10 +38,14 @@ import {
   SelectValue,
   SelectContent,
 } from "../ui/select";
-import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
+import {
+  useGetCategoryQuery,
+  usePatchCategoryLimitMutation,
+} from "@/feature/category/api/categoryApi";
 import { Input } from "../ui/input";
 import { numberInput } from "@/utils/CustomFunctions";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
+import { toast } from "sonner";
 
 function TrackerDialog({
   title,
@@ -55,7 +59,11 @@ function TrackerDialog({
   const width = useScreenWidth();
 
   // RTK Query
-  const { data: categoryData } = useGetCategoryQuery();
+  const { data: categoryData } = useGetCategoryQuery({
+    type: "Expense",
+  });
+
+  const [trigger] = usePatchCategoryLimitMutation();
 
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
@@ -66,17 +74,36 @@ function TrackerDialog({
   const {
     handleSubmit,
     control,
+    reset,
+    watch,
     formState: { errors, isValid },
   } = form;
 
+  console.log(watch());
+
   const onSubmit = async (data: trackerFormType) => {
-    console.log(data);
+    try {
+      await trigger({
+        categoryId: data?.category?.id,
+        amount: {
+          amount: data?.amount,
+        },
+      });
+      reset();
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+      toast.error("error");
+    }
   };
 
   // Define the form UI
   const formContent = (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className={`space-y-4 ${width > 675 ? "px-0" : "px-4"}`}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={`space-y-4 ${width > 675 ? "px-0" : "px-4"}`}
+      >
         {/* Category Field */}
         <FormField
           control={control}
@@ -99,7 +126,7 @@ function TrackerDialog({
                       {field.value?.name || "Select a category"}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
+                  <SelectContent portal={false} className="max-h-[200px]">
                     {categoryData?.map((category) => (
                       <SelectItem key={category.id} value={category.name}>
                         {category.name}
@@ -153,19 +180,21 @@ function TrackerDialog({
                 Close
               </Button>
             </AlertDialogCancel>
-            <Button type="submit" disabled={!isValid}>
-              {mode === "edit" ? "Update" : "Set"} Budget Limit
-            </Button>
+            <AlertDialogAction>
+              <Button type="submit" disabled={!isValid}>
+                {mode === "edit" ? "Update" : "Set"} Budget Limit
+              </Button>
+            </AlertDialogAction>
           </AlertDialogFooter>
         ) : (
           <DrawerFooter className="flex justify-end gap-2 px-0">
-              <Button
-                type="button"
-                onClick={() => form.reset()}
-                variant="secondary"
-              >
-                Close
-              </Button>
+            <Button
+              type="button"
+              onClick={() => form.reset()}
+              variant="secondary"
+            >
+              Close
+            </Button>
             <Button type="submit" disabled={!isValid}>
               {mode === "edit" ? "Update" : "Set"} Budget Limit
             </Button>

@@ -1,6 +1,6 @@
 import { api } from "../../api";
 
-const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category"] }).injectEndpoints({
+const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category", "CategoryLimit"] }).injectEndpoints({
     endpoints: (builder) => ({
         postCategory: builder.mutation({
             query: (payload) => ({
@@ -24,7 +24,30 @@ const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category"] }).injectEn
             }),
             transformResponse: (response) => response.data
         }),
+        getCategoryLimit: builder.query({
+            query: (params) => ({
+                url: "/category/getAllExpenseCategoryLimit",
+                method: "GET",
+                headers: { 
+                    Accept: "application/json" 
+                },
+                params,
+            }),
+            providesTags: ["CategoryLimit"],
+            transformResponse: (response) => response.data
+        }),
+        patchCategoryLimit: builder.mutation({
+            query: ({amount, categoryId}) => ({
+                url: `/category/patchLimit/${categoryId}`,
+                method: "PATCH",
+                headers: { 
+                    Accept: "application/json" 
+                },
+                body: amount
+            }),
+            invalidatesTags: ["CategoryLimit"],
+        })
     }),
 });
 
-export const { usePostCategoryMutation, useGetCategoryQuery } = categoryApi;
+export const { usePostCategoryMutation, useGetCategoryQuery, usePatchCategoryLimitMutation, useGetCategoryLimitQuery } = categoryApi;
