@@ -41,7 +41,7 @@ export function FilterSheet({
           <hr />
         </SheetHeader>
         <div className="h-5/6">{children}</div>
-        <SheetFooter className="absolute bottom-4 right-7">
+        <SheetFooter className="absolute flex flex-row gap-2 bottom-4 right-7">
           <Button variant={"outline"} type="reset" onClick={setClear}>Clear</Button>
           <Button type="submit" onClick={onSubmit}>Apply</Button>
         </SheetFooter>

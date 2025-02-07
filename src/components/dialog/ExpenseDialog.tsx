@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expenseSchema, recurringExpense } from "@/schema/schema";
 import { FormProvider, useForm } from "react-hook-form";
-import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
+import { categoryApi, useGetCategoryQuery } from "@/feature/category/api/categoryApi";
 import {
   Form,
   FormControl,
@@ -189,6 +189,7 @@ export function AddDialog({
           id: data?.expenseId,
         }).then(() => {
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
+          dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
         });
         reset({
           ...expenseSchema.defaultValues,
@@ -221,6 +222,7 @@ export function AddDialog({
             assetBalance: watch("source")?.remainingBalance,
           }).then(() => {
             dispatch(assetsApi.util.invalidateTags(["Assets"]));
+            dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
           });
           reset({
             ...recurringExpense.defaultValues,

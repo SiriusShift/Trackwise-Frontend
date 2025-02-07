@@ -186,7 +186,9 @@ const WalletPage = () => {
       {/* Toolbar */}
       <div className="flex flex-col gap-5">
         <div className="flex gap-2 items-center justify-between">
-          <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
+          <div className="relative hidden sm:inline h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
+            <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
+          </div>
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
             <AddDialog mode="add" type="Expense" active={activeTab} />
@@ -201,6 +203,9 @@ const WalletPage = () => {
               icon={<Filter width={17} />}
             >
               <div className="flex flex-col py-3 gap-5">
+                <div className="relative inline sm:hidden h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
+                  <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
+                </div>
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">
                     Search by description
@@ -351,9 +356,8 @@ const WalletPage = () => {
           />
         )}
         {/* Data Table */}
-        <CommonTracker title="Expense Limit"/>
+        <CommonTracker title="Expense Limit" />
       </div>
-
     </div>
   );
 };

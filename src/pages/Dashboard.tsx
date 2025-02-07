@@ -16,15 +16,14 @@ import {
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
-  Calendar as CalendarIcon,
   UtensilsCrossed,
   Banknote,
   Plane,
-  Bus,
-  Smartphone,
   ArrowUpFromLine,
-  ArrowDownFromLine,
+  ArrowDownFromLine
 } from "lucide-react";
+import * as Icons from "lucide-react";
+
 import CalendarWidget from "@/components/CalendarWidget";
 
 import {
@@ -46,7 +45,8 @@ import { Link, useLocation } from "react-router-dom";
 import { log } from "console";
 import { navigationData } from "@/navigation/navigationData";
 import MonthPicker from "@/components/datePicker";
-import moment from "moment";
+import moment from "moment-timezone";
+import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -95,15 +95,15 @@ const Dashboard = () => {
   const currentDay = new Date().getDate();
   let activeMonth = localStorage.getItem("activeMonth");
   activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
-
   const [startDate, setStartDate] = useState<Date | null>(
     moment(activeMonth).startOf("month").toDate()
   );
+  var timeZones = moment.tz.names();
+  console.log(timeZones)
   const [endDate, setEndDate] = useState<Date | null>(
     moment(activeMonth).endOf("month").toDate()
   );
   const [activeDay, setActiveDay] = useState(currentDay);
-  console.log(activeDay);
 
   const { theme } = useTheme();
   const location = useLocation();
@@ -112,6 +112,8 @@ const Dashboard = () => {
   );
   const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
+  //RTK QUERY
+  const {data, isLoading} = useGetExpensesQuery()
   return (
     <div className="space-y-5">
       <div className="flex gap-5 justify-between">
@@ -429,113 +431,40 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="rounded h-full col-span-full md:col-span-2 lg:col-span-1 p-7 border">
+          <div className="rounded col-span-full  md:col-span-2 lg:col-span-1 p-7 border">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">
                 Recent Transactions
               </h1>
-              <Link to={"/wallet"}>See All</Link>
+              <Link to={"/expenses"}>See All</Link>
             </div>
-            <div className="flex mt-5 rounded-md justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                  <UtensilsCrossed
-                    className="text-black"
-                    width={25}
-                    height={25}
-                  />
-                </div>
-                <div className="ml-3 w-full">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Mcdonalds</h1>
+            {data?.data.map((item: Object) => {
+              const LucidIcon = Icons[item.category?.icon];
+              return (
+                <div className="flex mt-5 rounded-md justify-between">
+                  <div className="flex w-full">
+                    <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
+                      <LucidIcon
+                        className="text-black"
+                        width={25}
+                        height={25}
+                      />
                     </div>
-                    <div>
-                      <h1 className="font-medium">₱1,000,000</h1>
+                    <div className="ml-3 w-full">
+                      <div className="flex justify-between">
+                        <div>
+                          <h1 className="font-medium">{item?.description}</h1>
+                        </div>
+                        <div>
+                          <h1 className="font-medium">₱{item?.amount.toFixed(2)}</h1>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 text-sm">{moment.tz(item?.date, "Asia/Manila").format("MMM DD, YYYY h:mm A")}</p>
                     </div>
                   </div>
-                  <p className="text-gray-400">Sep 18, 2024 - 10:24 AM</p>
                 </div>
-              </div>
-              {/* <div>
-                <h1 className="font-medium">₱1,000,000</h1>
-              </div> */}
-            </div>
-            <div className="flex mt-5 rounded-md justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                  <UtensilsCrossed
-                    className="text-black"
-                    width={25}
-                    height={25}
-                  />
-                </div>
-                <div className="ml-3 w-full">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Mcdonalds</h1>
-                    </div>
-                    <div>
-                      <h1 className="font-medium">₱1,000,000</h1>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">Sep 18, 2024 - 10:24 AM</p>
-                </div>
-              </div>
-              {/* <div>
-                <h1 className="font-medium">₱1,000,000</h1>
-              </div> */}
-            </div>
-            <div className="flex mt-5 rounded-md justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                  <UtensilsCrossed
-                    className="text-black"
-                    width={25}
-                    height={25}
-                  />
-                </div>
-                <div className="ml-3 w-full">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Mcdonalds</h1>
-                    </div>
-                    <div>
-                      <h1 className="font-medium">₱1,000,000</h1>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">Sep 18, 2024 - 10:24 AM</p>
-                </div>
-              </div>
-              {/* <div>
-                <h1 className="font-medium">₱1,000,000</h1>
-              </div> */}
-            </div>
-            <div className="flex mt-5 rounded-md justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                  <UtensilsCrossed
-                    className="text-black"
-                    width={25}
-                    height={25}
-                  />
-                </div>
-                <div className="ml-3 w-full">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Mcdonalds</h1>
-                    </div>
-                    <div>
-                      <h1 className="font-medium">₱1,000,000</h1>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">Sep 18, 2024 - 10:24 AM</p>
-                </div>
-              </div>
-              {/* <div>
-                <h1 className="font-medium">₱1,000,000</h1>
-              </div> */}
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>

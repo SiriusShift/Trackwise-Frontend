@@ -46,7 +46,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   },
   {
     accessorKey: "date",
-    header: "Date",
+    header: "Date and Time",
     meta: {
       cellClassName: "border-b",
     },
@@ -54,7 +54,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY HH:mm a") : "-"}
         </span>
       );
     },

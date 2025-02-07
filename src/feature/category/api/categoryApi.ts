@@ -1,6 +1,6 @@
 import { api } from "../../api";
 
-const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category", "CategoryLimit"] }).injectEndpoints({
+export const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category", "CategoryLimit"] }).injectEndpoints({
     endpoints: (builder) => ({
         postCategory: builder.mutation({
             query: (payload) => ({

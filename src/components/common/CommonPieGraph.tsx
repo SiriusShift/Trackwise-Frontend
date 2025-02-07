@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import useScreenWidth from "@/hooks/useScreenWidth";
+import noChartData from "@/assets/images/noDataPie.png";
 
 const chartConfig = {
   width: 200,
@@ -61,7 +62,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
 
   return (
     // return width > 1024 ? (
-    <Card className="flex flex-col h-full min-w-[250px]">
+    <Card className="flex flex-col h-full min-w-[250px] 2xl:w-[310px]">
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-lg xl:text-xl text-center">
@@ -80,42 +81,48 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
               width={chartConfig.width}
               height={chartConfig.height}
             >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      className="w-auto max-w-[150px] p-2 rounded-md shadow-md"
-                      hideLabel
-                    />
-                  }
-                />
-                <Pie
-                  data={categoryExpenses}
-                  dataKey={chartConfig.dataKey}
-                  nameKey={chartConfig.nameKey}
-                  innerRadius={chartConfig.innerRadius}
-                  outerRadius={chartConfig.outerRadius}
-                  strokeWidth={chartConfig.strokeWidth}
-                  stroke={chartConfig.strokeColor}
-                  isAnimationActive={true}
-                >
-                  {categoryExpenses?.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={
-                        chartConfig.colors[index % chartConfig.colors.length]
-                      }
-                    />
-                  ))}
-                  <Label
-                    position="center"
-                    fontSize={16}
-                    fontWeight="bold"
-                    value={`₱${total?.toLocaleString()}`}
+              {categoryExpenses.length > 0 ? (
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={
+                      <ChartTooltipContent
+                        className="w-auto max-w-[150px] p-2 rounded-md shadow-md"
+                        hideLabel
+                      />
+                    }
                   />
-                </Pie>
-              </PieChart>
+                  <Pie
+                    data={categoryExpenses}
+                    dataKey={chartConfig.dataKey}
+                    nameKey={chartConfig.nameKey}
+                    innerRadius={chartConfig.innerRadius}
+                    outerRadius={chartConfig.outerRadius}
+                    strokeWidth={chartConfig.strokeWidth}
+                    stroke={chartConfig.strokeColor}
+                    isAnimationActive={true}
+                    startAngle={90} // Adjust this for your preferred starting position
+                    endAngle={-270} // Ensure full 360° rotation
+                  >
+                    {categoryExpenses?.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          chartConfig.colors[index % chartConfig.colors.length]
+                        }
+                      />
+                    ))}
+                    <Label
+                      position="center"
+                      fontSize={16}
+                      fontWeight="bold"
+                      value={`₱${total}`}
+                    />
+                  </Pie>
+                </PieChart>
+              ) : (
+                <img src={noChartData} />
+              )}
             </ResponsiveContainer>
           ) : (
             <div className="flex justify-center min-h-52 items-center">

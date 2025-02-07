@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../navigation/navigationData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TooltipProvider,
@@ -41,6 +41,10 @@ export function AppSidebar() {
     removeCookie("user", { path: "/" });
     router("/sign-in");
   };
+
+  useEffect(() => {
+    setActive(location?.location?.pathname);
+  }, [location]);
 
   return (
     <Sidebar

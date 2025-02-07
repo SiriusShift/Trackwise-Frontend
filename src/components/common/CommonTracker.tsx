@@ -25,17 +25,32 @@ import {
 } from "recharts";
 import TrackerDialog from "../dialog/TrackerDialog";
 import { useGetCategoryLimitQuery } from "@/feature/category/api/categoryApi";
+import moment from "moment";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 function CommonTracker({ title }: { title: string }) {
-  const screenWidth = useScreenWidth(); // Get the current screen width
-  const isMdOrAbove = screenWidth >= 768; // Tailwind's `md` breakpoint (768px)
+  const width = useScreenWidth(); // Get the current screen width
+  const isMdOrAbove = width >= 768; // Tailwind's `md` breakpoint (768px)
+  let getMonth = localStorage.getItem("activeMonth");
+  getMonth = getMonth ? JSON.parse(getMonth) : new Date();
+  console.log(moment(getMonth));
 
-  const { data, isLoading } = useGetCategoryLimitQuery(); // Fetch category data from API
+  const { data, isLoading } = useGetCategoryLimitQuery({
+    startDate: moment(getMonth).startOf("month").utc().format(),
+    endDate: moment(getMonth).endOf("month").utc().format(),
+  }); // Fetch category data from API
 
   const chartConfig = {
     innerRadius: 27,
     outerRadius: 20,
-  }
+  };
 
   return (
     <div className="relative w-full">
@@ -66,46 +81,71 @@ function CommonTracker({ title }: { title: string }) {
 
           {/* Dynamic Cards with Radial Chart */}
           {data?.map((item, index) => {
-            const percentage = (item?.totalExpense / item?.limit) * 100;
-            const endAngle = Math.round((percentage / 100) * 360); // Ensure it's a whole number
-            console.log(percentage, endAngle);
+            const percentage =
+              item?.limit > 0 ? (item?.totalExpense / item?.limit) * 100 : 0;
+            const endAngle = 90 - (percentage / 100) * 360; // Fix the angle calculation
+
             return (
               <CarouselItem
                 key={index}
                 className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
               >
-                <Card className="h-full">
-                  <CardContent className="flex h-[100px] items-center p-3">
-                    <ChartContainer config={chartConfig} className="h-[100px] w-[100px]">
-                      <RadialBarChart
-                        data={[{ value: percentage }]} // Pass percentage as value for chart
-                        startAngle={90} // Start at the top
-                        endAngle={endAngle - 90} // Set end angle dynamically
-                        innerRadius={chartConfig?.innerRadius} // Inner radius of the radial chart
-                        outerRadius={chartConfig?.outerRadius} // Outer radius of the radial chart
+                <Card className="h-full relative">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="absolute top-2 w-5 right-2"
+                        variant={"ghost"}
+                        type="button"
                       >
-                        <PolarGrid
-                          gridType="circle"
-                          radialLines={false}
-                          stroke="none"
-                          className="first:fill-muted last:fill-background"
-                          polarRadius={[25, 22]}
-                        />
+                        <Icons.EllipsisVertical />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          console.log("Edit");
+                        }}
+                      >
+                        <Icons.Pencil /> Edit
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <CardContent className="flex h-[100px] items-center p-3">
+                    <ChartContainer
+                      config={chartConfig}
+                      className="h-[100px] w-[100px]"
+                    >
+                      <RadialBarChart
+                        width={100} // Ensure proper width
+                        height={100} // Ensure proper height
+                        innerRadius={chartConfig?.innerRadius}
+                        outerRadius={chartConfig?.outerRadius}
+                        startAngle={90} // Always start from top
+                        endAngle={endAngle} // Dynamically computed
+                        data={[{ value: percentage }]} // Ensure data has the expected key
+                      >
+                        <PolarGrid radialLines={false} stroke="none" />
                         <RadialBar
                           dataKey="value"
                           background
                           cornerRadius={10}
+                          fill="hsl(var(--chart-1))"
                         />
-                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                        <PolarRadiusAxis
+                          tick={false}
+                          tickLine={false}
+                          axisLine={false}
+                        >
                           <Label
                             content={({ viewBox }) => {
                               if (viewBox?.cx && viewBox?.cy) {
-                                // Dynamically render icon based on item.icon
-                                const LucideIcon = Icons[item.icon] || Icons["busFront"]; // Default to "Music" if not found
+                                const LucideIcon =
+                                  Icons[item.icon] || Icons["busFront"];
                                 return (
                                   <svg
-                                    x={viewBox.cx - 12} // Adjust for icon's size
-                                    y={viewBox.cy - 12} // Adjust for icon's size
+                                    x={viewBox.cx - 12}
+                                    y={viewBox.cy - 12}
                                     width={24}
                                     height={24}
                                     viewBox="0 0 24 24"
@@ -124,7 +164,10 @@ function CommonTracker({ title }: { title: string }) {
                     </ChartContainer>
                     <div className="flex flex-col">
                       <h1>{item.name}</h1>
-                      <p>$ {item.totalExpense} / {item.limit}</p>
+                      <p>
+                        ₱ {item.totalExpense.toFixed(2)} /{" "}
+                        {item.limit.toFixed(2)}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -134,8 +177,15 @@ function CommonTracker({ title }: { title: string }) {
         </CarouselContent>
 
         {/* Navigation Buttons */}
-        <CarouselPrevious className="absolute -left-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center shadow-md w-10 h-10" />
-        <CarouselNext className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-10 hidden md:flex items-center justify-center shadow-md w-10 h-10" />
+        {((data?.length > 3 && width >= 1536) ||
+          (data?.length > 2 && width >= 1280 && width < 1536) ||
+          (data?.length > 1 && width >= 768 && width < 1280) ||
+          (data?.length > 0 && width < 768)) && (
+          <>
+            <CarouselPrevious className="absolute -left-3 top-1/2 transform -translate-y-1/2 z-10 hidden sm:flex items-center justify-center shadow-md w-10 h-10" />
+            <CarouselNext className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-10 hidden sm:flex items-center justify-center shadow-md w-10 h-10" />
+          </>
+        )}
       </Carousel>
     </div>
   );

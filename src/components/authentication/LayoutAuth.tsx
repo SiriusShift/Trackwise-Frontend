@@ -10,15 +10,22 @@ interface LayoutAuthProps {
   title: string;
   desc: string;
   submit: SubmitHandler<any>; // Use a more general type if necessary
+  icon: React.ComponentType;
 }
 
 // Updated the LayoutAuth component
-const LayoutAuth = ({ children, title, desc, submit }: LayoutAuthProps) => {
-
+const LayoutAuth = ({
+  children,
+  title,
+  desc,
+  submit,
+  icon: Icon,
+}: LayoutAuthProps) => {
+  console.log(Icon);
   // Create the form handler
   // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   //   event.preventDefault(); // Prevent the default form submission
-  //   const formData = new FormData(event.currentTarget); 
+  //   const formData = new FormData(event.currentTarget);
   //   const data: FormData = {
   //     email: formData.get("email") as string,
   //     password: formData.get("password") as string,
@@ -33,7 +40,12 @@ const LayoutAuth = ({ children, title, desc, submit }: LayoutAuthProps) => {
     <>
       <div className="content-center sm:flex h-dvh w-screen sm:items-center sm:justify-center">
         <div className="flex flex-col px-10 sm:px-0 items-center sm:w-96 gap-2">
-          <WalletMinimal width={35} height={35}/>
+          {Icon ? (
+            <Icon width={35} height={35} />
+          ) : (
+            <WalletMinimal width={35} height={35} />
+          )}
+
           <h1 className="text-2xl font-bold">{title}</h1>
           <p className="text-center">{desc}</p>
           <form

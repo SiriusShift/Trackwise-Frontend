@@ -16,9 +16,8 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
   const activeMonth = storedActiveMonth
     ? new Date(JSON.parse(storedActiveMonth))
     : moment().endOf("month").toDate();
-  
 
-    console.log(activeMonth);
+  console.log(activeMonth);
 
   if (!storedActiveMonth) {
     localStorage.setItem("activeMonth", JSON.stringify(new Date()));
@@ -53,6 +52,10 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
   const handlePreviousYear = () => setCurrentYear((prevYear) => prevYear - 1);
   const handleNextYear = () => setCurrentYear((prevYear) => prevYear + 1);
 
+  // Get the current month and year
+  const currentMonth = moment().month(); // Current month (0-11)
+  const currentYearMonth = moment().format("YYYY-MM"); // Current year and month (for comparison)
+
   return (
     <div className="flex flex-col items-start">
       <Popover>
@@ -84,19 +87,22 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
             {/* Month Grid */}
             <div className="grid grid-cols-3 gap-3">
               {months.map((month, index) => {
+                const isFutureMonth = currentYearMonth < `${currentYear}-${String(index + 1).padStart(2, '0')}`;
+
                 return (
                   <Button
                     key={month}
-                    onClick={() => handleMonthChange(index)}
+                    onClick={() => !isFutureMonth && handleMonthChange(index)}
                     className={`px-3 py-2 text-xs sm:text-sm rounded-md ${
                       activeMonth.getFullYear() === currentYear &&
                       activeMonth.getMonth() === index
                         ? "bg-primary text-primary-foreground" // Highlight selected month
                         : "bg-secondary hover:bg-accent-foreground text-accent-foreground hover:text-accent"
                     }`}
+                    disabled={isFutureMonth} // Disable future months
                   >
                     {month}
-                  </Button>
+                  </Button>                                                                                                                                                                                                    
                 );
               })}
             </div>
@@ -106,6 +112,5 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
     </div>
   );
 };
-
 
 export default MonthPicker;
