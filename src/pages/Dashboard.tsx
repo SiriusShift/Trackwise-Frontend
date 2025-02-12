@@ -459,7 +459,7 @@ const Dashboard = () => {
                           <h1 className="font-medium">₱{item?.amount.toFixed(2)}</h1>
                         </div>
                       </div>
-                      <p className="text-gray-400 text-sm">{moment.tz(item?.date, "Asia/Manila").format("MMM DD, YYYY h:mm A")}</p>
+                      <p className="text-gray-400 text-sm">{item?.category?.name} - {moment.tz(item?.date, "Asia/Manila").format("MMM DD, h:mm A")}</p>
                     </div>
                   </div>
                 </div>

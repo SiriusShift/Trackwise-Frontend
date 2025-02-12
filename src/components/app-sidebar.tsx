@@ -54,7 +54,7 @@ export function AppSidebar() {
       style={{ willChange: "width, opacity" }} // Optimize for smooth transitions
     >
       {/* Sidebar Header */}
-      <SidebarHeader className="px-4">
+      <SidebarHeader className="mx-2 py-3 ">
         <div
           className={`flex items-center ml-3 transition-opacity duration-300 ease-in-out ${
             isExpanded ? "opacity-100" : "opacity-0"
@@ -131,7 +131,7 @@ export function AppSidebar() {
 
       {/* Sidebar Footer */}
       <SidebarFooter>
-        <div className="mx-3 py-3">
+        <div className="mx-3 py-2">
           <SidebarMenuButton asChild>
             <Button
               variant={"ghost"}

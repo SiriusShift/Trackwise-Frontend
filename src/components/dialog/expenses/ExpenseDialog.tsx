@@ -21,7 +21,10 @@ import { Button } from "@/components/ui/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expenseSchema, recurringExpense } from "@/schema/schema";
 import { FormProvider, useForm } from "react-hook-form";
-import { categoryApi, useGetCategoryQuery } from "@/feature/category/api/categoryApi";
+import {
+  categoryApi,
+  useGetCategoryQuery,
+} from "@/feature/category/api/categoryApi";
 import {
   Form,
   FormControl,
@@ -38,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 import {
   Popover,
   PopoverTrigger,
@@ -55,15 +58,14 @@ import { assetsApi, useGetAssetQuery } from "@/feature/assets/api/assetsApi";
 import { numberInput } from "@/utils/CustomFunctions";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-  DrawerDescription,
-  DrawerFooter,
-} from "../ui/drawer";
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 // import { Label } from "@/components/ui/label";
 // import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDispatch, useSelector } from "react-redux";
@@ -75,7 +77,7 @@ import {
 import { toast } from "sonner";
 import { frequencies } from "@/utils/Constants";
 // import { date } from "yup";
-import { DropdownMenuItem } from "../ui/dropdown-menu";
+import { DropdownMenuItem } from "../../ui/dropdown-menu";
 import {
   AlertDialogTrigger,
   AlertDialogContent,
@@ -86,7 +88,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "../ui/alert-dialog";
+} from "../../ui/alert-dialog";
 
 type AddExpenseFormData = {
   userId: string;
@@ -122,7 +124,7 @@ export function AddDialog({
 
   // RTK QUERY
   const { data: categoryData } = useGetCategoryQuery({
-    type: "Expense"
+    type: "Expense",
   });
   const { data: frequencyData } = useGetFrequencyQuery();
   const { data: assetData } = useGetAssetQuery();
@@ -152,10 +154,8 @@ export function AddDialog({
     control,
     reset,
     watch,
-    formState: { errors, isValid },
+    formState: { errors, isDirty, isValid },
   } = form;
-
-  console.log(errors, isValid);
 
   useEffect(() => {
     console.log("Dialog rendered");
@@ -729,8 +729,8 @@ export function AddDialog({
           </AlertDialogContent>
         </AlertDialog>
       ) : (
-        <Drawer>
-          <DrawerTrigger asChild>
+        <Sheet>
+          <SheetTrigger asChild>
             {mode === "add" ? (
               <Button size="sm" variant="outline">
                 <Plus className="lg:mr-2" />{" "}
@@ -741,129 +741,33 @@ export function AddDialog({
                 <Pencil /> Edit
               </DropdownMenuItem>
             )}
-          </DrawerTrigger>
-          <DrawerContent className="sm:min-w-md px-8">
-            <DrawerHeader>
-              <DrawerTitle>
-                {mode === "add" ? "Add" : "Edit"}{" "}
-                {active === "Recurring" ? "recurring " : ""} expense
-              </DrawerTitle>
-              <DrawerDescription>
-                Fill in the details to create a new expense
-              </DrawerDescription>
-            </DrawerHeader>
+          </SheetTrigger>
 
+          <SheetContent
+            side="right"
+            className="w-full max-w-full sm:max-w-[18rem] p-5 h-screen flex flex-col"
+          >
+            {" "}
+            <SheetHeader>
+              <div className="flex items-center gap-2">
+                {mode === "add" ? (
+                  <Plus className="h-5 w-5" />
+                ) : (
+                  <Pencil className="h-5 w-5" />
+                )}
+                <SheetTitle>
+                  {mode === "add" ? "Add" : "Edit"}{" "}
+                  {active === "Recurring" ? "recurring " : ""} expense
+                </SheetTitle>
+              </div>
+              <hr />
+            </SheetHeader>
             <FormProvider {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="pb-5">
-                <div className="flex flex-col py-3 gap-2">
-                  <div className={`${active === "All" ? "order-1" : ""}`}>
-                    <div className="grid grid-cols-2 gap-2">
-                      <FormField
-                        name="category"
-                        control={control}
-                        render={({ field }) => (
-                          <FormItem className="space-y-0">
-                            <FormLabel className="hidden sm-inline">
-                              Category
-                            </FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                {" "}
-                                <Select
-                                  onValueChange={(value) => {
-                                    const selectedCategory = categoryData?.find(
-                                      (category) => category.name === value
-                                    );
-                                    field.onChange(selectedCategory); // Update the field state
-                                  }}
-                                  value={field.value?.name} // Use defaultValue instead of value
-                                >
-                                  <SelectTrigger className="capitalize">
-                                    {/* Display the name of the selected category */}
-                                    <SelectValue placeholder="Select category" />
-                                  </SelectTrigger>
-                                  <SelectContent
-                                    portal={false}
-                                    className="max-h-[200px]"
-                                  >
-                                    {categoryData?.map((category) => (
-                                      <SelectItem
-                                        key={category.id}
-                                        value={category.name}
-                                      >
-                                        {category.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="amount"
-                        control={control}
-                        render={({ field }) => (
-                          <FormItem className="space-y-0">
-                            <FormLabel className="hidden sm-inline">
-                              Amount
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                min={0}
-                                type="number"
-                                step="0.01"
-                                placeholder="Enter amount"
-                                className="input-class text-sm"
-                                disabled={active === "All" && !watch("source")}
-                                onChange={(e) => {
-                                  const value = Number(e.target.value);
-                                  const balance = watch("source")?.balance;
-
-                                  if (
-                                    active === "All" &&
-                                    balance &&
-                                    value > balance
-                                  ) {
-                                    toast.error("Insufficient balance");
-                                    e.target.value = balance; // Reset to the maximum allowed value
-                                  } else {
-                                    numberInput(e, field); // Proceed with normal input handling
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      name="description"
-                      control={control}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel className="hidden sm-inline">
-                            Description
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="text"
-                              placeholder="Enter description"
-                              className="input-class text-sm"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="flex flex-col justify-between h-[90%] gap-5"
+              >
+                <div className="flex overflow-auto flex-col gap-5">
                   {active === "All" ? (
                     <>
                       <FormField
@@ -871,7 +775,7 @@ export function AddDialog({
                         name="date"
                         render={({ field }) => (
                           <FormItem className="flex flex-col">
-                            {/* <FormLabel>Date & Time</FormLabel> */}
+                            <FormLabel>Date & Time</FormLabel>
                             <Popover modal={true}>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -879,7 +783,7 @@ export function AddDialog({
                                     variant={"outline"}
                                     className={cn(
                                       "text-left font-normal",
-                                      !field.value && "text-muted-foreground"
+                                      !field.value && "text-muted-foreground "
                                     )}
                                   >
                                     {field.value ? (
@@ -979,177 +883,254 @@ export function AddDialog({
                         )}
                       />
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <FormField
-                          name="source"
-                          control={control}
-                          render={({ field }) => (
-                            <FormItem className="space-y-0">
-                              <FormLabel className="hidden sm-inline">
-                                Source
-                              </FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={(value) => {
-                                    // Find the selected category object based on the value (category name)
-                                    console.log(value);
-                                    const selectedSource = assetData?.find(
-                                      (source) => source.name === value
-                                    );
-                                    field.onChange(selectedSource); // Set the entire object in the form state
-                                  }}
-                                  defaultValue={field.value?.name}
+                      <FormField
+                        name="source"
+                        control={control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Source</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={(value) => {
+                                  // Find the selected category object based on the value (category name)
+                                  console.log(value);
+                                  const selectedSource = assetData?.find(
+                                    (source) => source.name === value
+                                  );
+                                  field.onChange(selectedSource); // Set the entire object in the form state
+                                }}
+                                defaultValue={field.value?.name}
+                              >
+                                <SelectTrigger className="capitalize">
+                                  <SelectValue placeholder="Select source" />
+                                </SelectTrigger>
+                                <SelectContent
+                                  portal={false}
+                                  className="max-h-[200px]"
                                 >
-                                  <SelectTrigger className="capitalize">
-                                    <SelectValue placeholder="Select source" />
-                                  </SelectTrigger>
-                                  <SelectContent
-                                    portal={false}
-                                    className="max-h-[200px]"
-                                  >
-                                    {assetData?.map((source) => (
-                                      <SelectItem
-                                        key={source.id}
-                                        value={source.name}
-                                      >
-                                        <div className="flex justify-between items-center">
-                                          <span>{source.name}</span>
-                                          <span className="text-sm ml-2 text-gray-500">
-                                            ₱{source?.remainingBalance}
-                                          </span>
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          name="recipient"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="space-y-0">
-                              <FormLabel className="hidden sm-inline">
-                                Recipient
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  type="text"
-                                  placeholder="Enter Recipient"
-                                  className="input-class text-sm"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                                  {assetData?.map((source) => (
+                                    <SelectItem
+                                      key={source.id}
+                                      value={source.name}
+                                    >
+                                      <div className="flex justify-between items-center">
+                                        <span>{source.name}</span>
+                                        <span className="text-sm ml-2 text-gray-500">
+                                          ₱{source?.remainingBalance}
+                                        </span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="recipient"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Recipient</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="Enter Recipient"
+                                className="input-class text-sm"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </>
                   ) : (
                     <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <FormField
-                          control={form.control}
-                          name="startDate"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel>Start Date</FormLabel>
-                              <Popover modal={true}>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        moment(field.value).format(
-                                          "MMM DD, YYYY"
-                                        ) // Ensure value is parsed
-                                      ) : (
-                                        <span>Pick a date</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  align="start"
-                                >
-                                  <Calendar
-                                    mode="single"
-                                    selected={
-                                      field.value
-                                        ? new Date(field.value)
-                                        : undefined
-                                    }
-                                    onSelect={(date) => {
-                                      console.log("Selected Date:", date); // Debugging log
-                                      field.onChange(date);
-                                    }}
-                                    initialFocus
-                                    disabled={(date) => {
-                                      const minDate = new Date("2000-01-01"); // Minimum date
-                                      const maxDate =
-                                        active === "Recurring"
-                                          ? null
-                                          : new Date(); // Maximum date only for "Recurring"
-                                      return (
-                                        date < minDate ||
-                                        (maxDate && date > maxDate)
-                                      ); // Only check maxDate if it exists
-                                    }}
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage>{errors.date?.message}</FormMessage>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          name="frequency"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel>Frequency</FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={(value) => {
-                                    const selectedCategory = frequencies?.find(
-                                      (frequency) => frequency.name === value
-                                    );
-                                    field.onChange(selectedCategory);
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Start Date</FormLabel>
+                            <Popover modal={true}>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      moment(field.value).format("MMM DD, YYYY") // Ensure value is parsed
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={
+                                    field.value
+                                      ? new Date(field.value)
+                                      : undefined
+                                  }
+                                  onSelect={(date) => {
+                                    console.log("Selected Date:", date); // Debugging log
+                                    field.onChange(date);
                                   }}
-                                  value={field.value?.name}
-                                >
-                                  <SelectTrigger className="capitalize">
-                                    <SelectValue placeholder="Select frequency" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {frequencies?.map((frequency) => (
-                                      <SelectItem
-                                        key={frequency.id}
-                                        value={frequency.name}
-                                      >
-                                        {frequency.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                                  initialFocus
+                                  disabled={(date) => {
+                                    {
+                                      /* Category Field */
+                                    }
+                                    <FormField
+                                      control={control}
+                                      name="category"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel className="hidden sm:inline">
+                                            Category
+                                          </FormLabel>
+                                          <FormControl>
+                                            <Select
+                                              onValueChange={(value) => {
+                                                const selectedCategory =
+                                                  categoryData?.find(
+                                                    (category) =>
+                                                      category.name === value
+                                                  );
+                                                field.onChange(
+                                                  selectedCategory
+                                                );
+                                              }}
+                                              value={field.value?.name}
+                                            >
+                                              <SelectTrigger className="capitalize">
+                                                <SelectValue placeholder="Select a category">
+                                                  {field.value?.name ||
+                                                    "Select a category"}
+                                                </SelectValue>
+                                              </SelectTrigger>
+                                              <SelectContent
+                                                portal={false}
+                                                className="max-h-[200px]"
+                                              >
+                                                {categoryData?.map(
+                                                  (category) => (
+                                                    <SelectItem
+                                                      key={category.id}
+                                                      value={category.name}
+                                                    >
+                                                      {category.name}
+                                                    </SelectItem>
+                                                  )
+                                                )}
+                                              </SelectContent>
+                                            </Select>
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />;
+
+                                    {
+                                      /* Amount Field */
+                                    }
+                                    <FormField
+                                      name="amount"
+                                      control={control}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel className="hidden sm:inline">
+                                            Monthly limit
+                                          </FormLabel>
+                                          <FormControl>
+                                            <div className="relative">
+                                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                                ₱
+                                              </span>
+                                              <Input
+                                                {...field}
+                                                type="number"
+                                                min={0}
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                className="pl-7"
+                                                onChange={(e) =>
+                                                  numberInput(e, field)
+                                                }
+                                              />
+                                            </div>
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />;
+
+                                    const minDate = new Date("2000-01-01"); // Minimum date
+                                    const maxDate =
+                                      active === "Recurring"
+                                        ? null
+                                        : new Date(); // Maximum date only for "Recurring"
+                                    return (
+                                      date < minDate ||
+                                      (maxDate && date > maxDate)
+                                    ); // Only check maxDate if it exists
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage>{errors.date?.message}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        name="frequency"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="flex-col">
+                            <FormLabel>Frequency</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={(value) => {
+                                  const selectedCategory = frequencies?.find(
+                                    (frequency) => frequency.name === value
+                                  );
+                                  field.onChange(selectedCategory);
+                                }}
+                                value={field.value?.name}
+                              >
+                                <SelectTrigger className="capitalize">
+                                  <SelectValue placeholder="Select frequency" />
+                                </SelectTrigger>
+                                <SelectContent portal={false} className="max-h-[200px]">
+                                  {frequencies?.map((frequency) => (
+                                    <SelectItem
+                                      key={frequency.id}
+                                      value={frequency.name}
+                                    >
+                                      {frequency.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         name="recipient"
                         control={form.control}
@@ -1169,14 +1150,111 @@ export function AddDialog({
                       />
                     </>
                   )}
-                </div>
+                  <FormField
+                    name="category"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Category</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            {" "}
+                            <Select
+                              onValueChange={(value) => {
+                                const selectedCategory = categoryData?.find(
+                                  (category) => category.name === value
+                                );
+                                field.onChange(selectedCategory); // Update the field state
+                              }}
+                              value={field.value?.name} // Use defaultValue instead of value
+                            >
+                              <SelectTrigger className="capitalize">
+                                {/* Display the name of the selected category */}
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                              <SelectContent
+                                portal={false}
+                                className="max-h-[200px]"
+                              >
+                                {categoryData?.map((category) => (
+                                  <SelectItem
+                                    key={category.id}
+                                    value={category.name}
+                                  >
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="amount"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            min={0}
+                            type="number"
+                            step="0.01"
+                            placeholder="Enter amount"
+                            className="input-class text-sm"
+                            disabled={active === "All" && !watch("source")}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
+                              const balance = watch("source")?.balance;
 
-                {/* Footer Buttons */}
-                <DrawerFooter className="px-0">
-                  <Button type="submit" disabled={!isValid}>
-                    {mode === "edit" ? "Update" : "Add"}
-                  </Button>
-                  <DrawerClose asChild>
+                              if (
+                                active === "All" &&
+                                balance &&
+                                value > balance
+                              ) {
+                                toast.error("Insufficient balance");
+                                e.target.value = balance; // Reset to the maximum allowed value
+                              } else {
+                                numberInput(e, field); // Proceed with normal input handling
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Enter description"
+                            className="input-class text-sm"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <SheetFooter className="mt-auto flex gap-2 justify-between w-full">
+                  <SheetClose asChild>
+                    <Button type="submit" disabled={!isValid || !isDirty}>
+                      {mode === "edit" ? "Update" : "Add"}
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
                     <Button
                       type="button"
                       onClick={() =>
@@ -1189,13 +1267,13 @@ export function AddDialog({
                     >
                       Close
                     </Button>
-                  </DrawerClose>
-                </DrawerFooter>
+                  </SheetClose>
+                </SheetFooter>
               </form>
             </FormProvider>
-          </DrawerContent>
-        </Drawer>
-      )}{" "}
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
 import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
-import { AddDialog } from "@/components/dialog/ExpenseDialog";
+import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
 import moment from "moment";
 import { setExpenseTab } from "@/feature/reducers/activeTab";
 import { Input } from "@/components/ui/input";
@@ -356,7 +356,7 @@ const WalletPage = () => {
           />
         )}
         {/* Data Table */}
-        <CommonTracker title="Expense Limit" />
+        <CommonTracker title="Expense Limit" mode="add"/>
       </div>
     </div>
   );

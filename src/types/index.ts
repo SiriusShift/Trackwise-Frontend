@@ -60,3 +60,8 @@ export interface trackerFormType {
   category: Object;
   amount: number;
 }
+
+export interface payRecurringForm {
+  amount: number;
+  source: object;
+}

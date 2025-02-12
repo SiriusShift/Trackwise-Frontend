@@ -99,6 +99,18 @@ export const expensesApi = api
         }),
         transformResponse: (response: any) => response.data,
       }),
+
+      postRecurringPayment : builder.mutation({
+        query: ({body, id}) => ({
+          url: `/expenses/postRecurringPayment/${id}`,
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+          body,
+        }),
+        invalidatesTags: ["RecurringExpense", "Expenses"],
+      })
     }),
   });
 
@@ -111,6 +123,7 @@ export const {
   useGetRecurringExpensesQuery,
   useGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
+  usePostRecurringPaymentMutation,
   usePatchExpenseMutation,
   useGetFrequencyQuery
 } = expensesApi;

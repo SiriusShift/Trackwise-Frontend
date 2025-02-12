@@ -59,7 +59,7 @@ export const expenseSchema = {
     source: yup.object().required("Source is required"),
     recipient: yup.string().required("Receipient is required"),
   }),
-  defaultValues : {
+  defaultValues: {
     userId: null,
     expenseId: null,
     category: "",
@@ -67,10 +67,9 @@ export const expenseSchema = {
     amount: "",
     date: "",
     source: "",
-    recipient: ""
-  }
-}
-
+    recipient: "",
+  },
+};
 
 export const recurringExpense = {
   schema: yup.object().shape({
@@ -85,9 +84,8 @@ export const recurringExpense = {
       .positive("Amount must be greater than 0"),
     startDate: yup.date().required("Start date is required"),
     recipient: yup.string().required("Receipient is required"),
-
   }),
-  defaultValues : {
+  defaultValues: {
     userId: null,
     expenseId: "",
     category: "",
@@ -95,9 +93,9 @@ export const recurringExpense = {
     frequency: "",
     amount: 0,
     startDate: "",
-    recipient: ""
-  }
-}
+    recipient: "",
+  },
+};
 
 export const trackerSchema = {
   schema: yup.object().shape({
@@ -105,10 +103,24 @@ export const trackerSchema = {
     amount: yup
       .number()
       .required("Amount is required")
-      .positive("Amount must be greater than 0"), 
+      .positive("Amount must be greater than 0"),
   }),
-  defaultValues : {
+  defaultValues: {
     category: "",
-    amount: 0
-  }
-}
+    amount: 0,
+  },
+};
+
+export const payRecurringSchema = {
+  schema: yup.object().shape({
+    // amount: yup
+    //   .number()
+    //   .required("Amount is required")
+    //   .positive("Amount must be greater than 0"),
+    source: yup.object().required("Source is required"),
+  }),
+  defaultValues: {
+    amount: 0,
+    // source: "",
+  },
+};

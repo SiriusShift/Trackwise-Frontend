@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -27,23 +25,36 @@ export function FilterSheet({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button size={"sm"} variant={"outline"}>
+        <Button size="sm" variant="outline" className="flex items-center gap-2">
           <Filter />
           <span className="inline sm:hidden lg:inline">Filter</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-72 p-5 h-full">
+
+      {/* Mobile-friendly Sheet Content */}
+      <SheetContent
+        side="right"
+        className="w-full max-w-full sm:max-w-[18rem] p-5 h-screen flex flex-col"
+      >
         <SheetHeader>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             {icon}
             <SheetTitle>{title}</SheetTitle>
           </div>
           <hr />
         </SheetHeader>
-        <div className="h-5/6">{children}</div>
-        <SheetFooter className="absolute flex flex-row gap-2 bottom-4 right-7">
-          <Button variant={"outline"} type="reset" onClick={setClear}>Clear</Button>
-          <Button type="submit" onClick={onSubmit}>Apply</Button>
+
+        {/* Scrollable content area */}
+        <div className="flex-1 px-1 overflow-auto">{children}</div>
+
+        {/* Footer with fixed positioning */}
+        <SheetFooter className="mt-auto flex gap-2 justify-between w-full">
+          <Button type="submit" onClick={onSubmit}>
+            Apply
+          </Button>
+          <Button variant="outline" type="reset" onClick={setClear}>
+            Clear
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

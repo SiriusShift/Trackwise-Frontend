@@ -19,31 +19,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogDescription,
-  DialogContent,
-  DialogTrigger,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
-import { AddDialog } from "@/components/dialog/ExpenseDialog";
-import { useSelector } from "react-redux";
+import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
+import PayDialog from "@/components/dialog/expenses/PayDialog";
+import { assetsApi } from "@/feature/assets/api/assetsApi";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: "ID",
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "date",
     header: "Date and Time",
@@ -54,7 +46,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMMM DD, YYYY HH:mm a") : "-"}
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY h:mm a") : "-"}
         </span>
       );
     },
@@ -143,9 +135,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu
-            modal={false}
-          >
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -154,11 +144,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <AddDialog
-                rowData={expense}
-                active={activeTab}
-                mode="edit"
-              />
+              <AddDialog rowData={expense} active={activeTab} mode="edit" />
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -185,8 +171,8 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
-        </span>
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY h:mm a") : "-"}
+          </span>
       );
     },
     meta: {
@@ -224,6 +210,17 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
   },
+  // {
+  //   accessorKey: "balance",
+  //   header: "Balance",
+  //   cell: ({ getValue }) => {
+  //     const amount = getValue() as number | undefined;
+  //     return <span>₱{amount?.toFixed(2) || "0"}</span>;
+  //   },
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "status",
     header: "Status",
@@ -257,23 +254,22 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
     // header: "Actions",
     cell: ({ row }) => {
       const expense = row.original;
-      const [isDropdownOpen, setDropdownOpen] = useState(false);
+      const dispatch = useDispatch();
+      // const [isDropdownOpen, setDropdownOpen] = useState(false);
       const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
-
-      console.log("", isDropdownOpen);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
       const onDelete = async () => {
-        await deleteExpense(expense.id);
+        await deleteExpense(expense.id).then(() => {
+          dispatch(assetsApi.util.invalidateTags(["Assets"]));
+        });
         toast.success("Expense deleted successfully");
       };
 
       return (
         <>
-          <DropdownMenu
-            modal={false}
-          >
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -282,15 +278,8 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <CreditCard />
-                Pay
-              </DropdownMenuItem>
-              <AddDialog
-                rowData={expense}
-                active={activeTab}
-                mode="edit"
-              />
+              <PayDialog rowData={expense} />
+              <AddDialog rowData={expense} active={activeTab} mode="edit" />
               <DropdownMenuItem>
                 <Eye />
                 View
