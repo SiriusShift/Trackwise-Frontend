@@ -767,7 +767,7 @@ export function AddDialog({
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col justify-between h-[90%] gap-5"
               >
-                <div className="flex overflow-auto flex-col gap-5">
+                <div className="flex overflow-auto flex-col gap-5 px-1">
                   {active === "All" ? (
                     <>
                       <FormField
@@ -838,9 +838,6 @@ export function AddDialog({
                                 />
                                 {/* Time Picker for Time Selection */}
                                 <div className="flex items-center justify-between">
-                                  <label className="text-sm font-medium">
-                                    Time:
-                                  </label>
                                   <input
                                     type="time"
                                     className="border rounded-md px-2 py-1 text-sm"

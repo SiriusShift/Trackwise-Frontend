@@ -10,8 +10,8 @@ import {
 
 export const navigationData = [
   { name: "Dashboard", path: "/", icon: LayoutGrid },
-  { name: "Expenses", path: "/expenses", icon: ChartNoAxesCombined },
-  { name: "Loan", path: "/loans", icon: HandCoins },
+  { name: "Liabilities", path: "/liabilities", icon: ChartNoAxesCombined },
   { name: "Assets", path: "/savings", icon: Landmark },
+  { name: "Loan", path: "/loans", icon: HandCoins },
   { name: "Settings", path: "/settings", icon: Settings },
 ];

@@ -66,7 +66,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-lg xl:text-xl text-center">
-          {currentPageName?.name} - Pie Chart
+          {currentPageName?.name} breakdown
         </CardTitle>
         <CardDescription className="text-center">
           {moment(date).format("MMMM YYYY")}

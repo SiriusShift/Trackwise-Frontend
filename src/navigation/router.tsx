@@ -41,17 +41,18 @@ export const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
-                path: "/expenses",
+                path: "/liabilities",
                 element: <Expense />
+            },
+            {
+                path: "/savings",
+                element: <SavingsPage />
             },
             {
                 path: "/loans",
                 element: <LoanPage />
             },
             {
-                path: "/savings",
-                element: <SavingsPage />
-            },{
                 path: "/settings",
                 element: <Settings />
             }
