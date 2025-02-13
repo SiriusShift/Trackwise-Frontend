@@ -34,6 +34,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu";
 
 function CommonTracker({ title }: { title: string }) {
   const width = useScreenWidth(); // Get the current screen width
@@ -81,6 +82,7 @@ function CommonTracker({ title }: { title: string }) {
 
           {/* Dynamic Cards with Radial Chart */}
           {data?.map((item, index) => {
+            console.log(item);
             const percentage =
               item?.limit > 0 ? (item?.totalExpense / item?.limit) * 100 : 0;
             const endAngle = 90 - (percentage / 100) * 360; // Fix the angle calculation
@@ -91,7 +93,7 @@ function CommonTracker({ title }: { title: string }) {
                 className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
               >
                 <Card className="h-full relative">
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         className="absolute top-2 w-5 right-2"
@@ -102,13 +104,11 @@ function CommonTracker({ title }: { title: string }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          console.log("Edit");
-                        }}
+                      <TrackerDialog title="Update budget limit" description="Adjust and update your budget limit to match your needs." mode="edit" data={item}/>
+                      {/* <DropdownMenuItem
                       >
                         <Icons.Pencil /> Edit
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <CardContent className="flex h-[100px] items-center p-3">
@@ -141,7 +141,7 @@ function CommonTracker({ title }: { title: string }) {
                             content={({ viewBox }) => {
                               if (viewBox?.cx && viewBox?.cy) {
                                 const LucideIcon =
-                                  Icons[item.icon] || Icons["busFront"];
+                                  Icons[item.category.icon] || Icons["busFront"];
                                 return (
                                   <svg
                                     x={viewBox.cx - 12}
@@ -163,7 +163,7 @@ function CommonTracker({ title }: { title: string }) {
                       </RadialBarChart>
                     </ChartContainer>
                     <div className="flex flex-col">
-                      <h1>{item.name}</h1>
+                      <h1>{item.category.name}</h1>
                       <p>
                         ₱ {item.totalExpense.toFixed(2)} /{" "}
                         {item.limit.toFixed(2)}

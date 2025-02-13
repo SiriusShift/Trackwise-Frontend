@@ -37,7 +37,7 @@ export const expensesApi = api
             Accept: "application/json",
           },
         }),
-        invalidatesTags: ["Expenses"],
+        invalidatesTags: ["Expenses", "RecurringExpense"],
       }),
 
       patchExpense: builder.mutation({

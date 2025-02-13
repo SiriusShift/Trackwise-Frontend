@@ -356,7 +356,7 @@ const WalletPage = () => {
           />
         )}
         {/* Data Table */}
-        <CommonTracker title="Expense Limit" mode="add"/>
+        <CommonTracker title="Budget Limit" mode="add"/>
       </div>
     </div>
   );

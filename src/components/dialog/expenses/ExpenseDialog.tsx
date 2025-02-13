@@ -252,6 +252,7 @@ export function AddDialog({
                   e.preventDefault();
                   // setDropdownOpen(false); // Close the dropdown
                 }}
+                disabled={rowData?.status === "Paid"}
               >
                 <Pencil /> Edit
               </DropdownMenuItem>
@@ -737,7 +738,10 @@ export function AddDialog({
                 <span className="inline sm:hidden lg:inline">Add</span>
               </Button>
             ) : (
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                disabled={rowData?.status === "Paid"}
+                onSelect={(e) => e.preventDefault()}
+              >
                 <Pencil /> Edit
               </DropdownMenuItem>
             )}
@@ -1112,7 +1116,10 @@ export function AddDialog({
                                 <SelectTrigger className="capitalize">
                                   <SelectValue placeholder="Select frequency" />
                                 </SelectTrigger>
-                                <SelectContent portal={false} className="max-h-[200px]">
+                                <SelectContent
+                                  portal={false}
+                                  className="max-h-[200px]"
+                                >
                                   {frequencies?.map((frequency) => (
                                     <SelectItem
                                       key={frequency.id}

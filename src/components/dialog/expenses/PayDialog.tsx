@@ -253,7 +253,7 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
       ) : (
         <Sheet>
           <SheetTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem disabled={rowData?.status === "Paid"} onSelect={(e) => e.preventDefault()}>
               <CreditCard />
               Pay
             </DropdownMenuItem>

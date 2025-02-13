@@ -1,6 +1,6 @@
 import useScreenWidth from "@/hooks/useScreenWidth";
 import { Pencil, Plus } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import {
   AlertDialog,
@@ -47,18 +47,21 @@ import { Input } from "../../ui/input";
 import { numberInput } from "@/utils/CustomFunctions";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
 import { toast } from "sonner";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 function TrackerDialog({
   title,
   mode,
   description,
+  data,
 }: {
   title: string;
   mode: string;
   description: string;
+  data: Object;
 }) {
+  const [open, setOpen] = useState(false);
   const width = useScreenWidth();
-
   // RTK Query
   const { data: categoryData } = useGetCategoryQuery({
     type: "Expense",
@@ -77,7 +80,8 @@ function TrackerDialog({
     control,
     reset,
     watch,
-    formState: { errors, isValid },
+    setValue,
+    formState: { errors, isValid, isDirty },
   } = form;
 
   console.log(watch());
@@ -98,12 +102,24 @@ function TrackerDialog({
     }
   };
 
+  useEffect(() => {
+    if (open && data) {
+      setValue("category", data?.category);
+      setValue("amount", data?.limit);
+    }
+    return () => {
+      if (!open) {
+        reset(trackerSchema.defaultValues); // Reset when dialog closes
+      }
+    };
+  }, [open, data, setValue, reset]);
+
   // Define the form UI
   const formContent = (
     <FormProvider {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="h-full flex flex-col justify-between px-1 gap-2 overflow-auto"
+        className="h-full flex flex-col justify-between p-1 gap-2 overflow-auto"
       >
         <div className="flex flex-col gap-5">
           {/* Category Field */}
@@ -122,6 +138,7 @@ function TrackerDialog({
                       field.onChange(selectedCategory);
                     }}
                     value={field.value?.name}
+                    disabled={mode === "edit"}
                   >
                     <SelectTrigger className="capitalize">
                       <SelectValue placeholder="Select a category">
@@ -176,15 +193,17 @@ function TrackerDialog({
             <AlertDialogCancel asChild>
               <Button
                 type="button"
-                onClick={() => form.reset()}
+                onClick={() => {
+                  mode === "edit" ? setOpen(false) : form.reset();
+                }}
                 variant="secondary"
               >
                 Close
               </Button>
             </AlertDialogCancel>
-            <AlertDialogAction>
-              <Button type="submit" disabled={!isValid}>
-                {mode === "edit" ? "Update" : "Set"} Budget Limit
+            <AlertDialogAction asChild>
+              <Button type="submit" disabled={!isValid || !isDirty}>
+                {mode === "edit" ? "Update" : "Set"} budget
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -198,7 +217,9 @@ function TrackerDialog({
             <SheetClose asChild>
               <Button
                 type="button"
-                onClick={() => form.reset()}
+                onClick={() => {
+                  mode === "edit" ? setOpen(false) : form.reset();
+                }}
                 variant="secondary"
               >
                 Close
@@ -215,13 +236,26 @@ function TrackerDialog({
       {width > 640 ? (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button
-              variant={"outline"}
-              size={"icon"}
-              className="h-11 w-11 rounded-full border-primary border-2"
-            >
-              <Plus size={30} />
-            </Button>
+            {mode === "edit" ? (
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  setOpen(true);
+                  e.preventDefault();
+                  // setDropdownOpen(false); // Close the dropdown
+                }}
+              >
+                <Pencil size={30} />
+                Edit
+              </DropdownMenuItem>
+            ) : (
+              <Button
+                variant={"outline"}
+                size={"icon"}
+                className="h-11 w-11 rounded-full border-primary border-2"
+              >
+                <Plus size={30} />
+              </Button>
+            )}
           </AlertDialogTrigger>
           <AlertDialogContent className="sm:min-w-[550px]">
             <AlertDialogHeader>
