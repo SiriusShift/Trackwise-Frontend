@@ -42,6 +42,7 @@ import {
 import {
   useGetCategoryQuery,
   usePatchCategoryLimitMutation,
+  usePostCategoryLimitMutation,
 } from "@/feature/category/api/categoryApi";
 import { Input } from "../../ui/input";
 import { numberInput } from "@/utils/CustomFunctions";
@@ -67,7 +68,8 @@ function TrackerDialog({
     type: "Expense",
   });
 
-  const [trigger] = usePatchCategoryLimitMutation();
+  const [triggerUpdate] = usePatchCategoryLimitMutation();
+  const [triggerPost] = usePostCategoryLimitMutation();
 
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
@@ -87,13 +89,22 @@ function TrackerDialog({
   console.log(watch());
 
   const onSubmit = async (data: trackerFormType) => {
+    console.log(data);
     try {
-      await trigger({
-        categoryId: data?.category?.id,
-        amount: {
-          amount: data?.amount,
-        },
-      });
+      if(mode === "edit") {
+        await triggerUpdate({
+          id: data?.id,
+          amount: {
+            amount: data?.amount,
+          },
+        })
+      }else{
+        await triggerPost({
+          categoryId: data?.category?.id,
+          amount: data?.amount
+        });
+      }
+
       reset();
       console.log(data);
     } catch (err) {
@@ -106,6 +117,7 @@ function TrackerDialog({
     if (open && data) {
       setValue("category", data?.category);
       setValue("amount", data?.limit);
+      setValue("id", data?.id);
     }
     return () => {
       if (!open) {
