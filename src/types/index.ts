@@ -65,3 +65,19 @@ export interface payRecurringForm {
   amount: number;
   source: object;
 }
+
+export interface commonWidgetProps {
+  children: React.ReactNode;
+  title: string;
+}
+
+export interface overviewWidgetProps {
+  startDate: Date;
+  endDate: Date;
+}
+
+export interface commonTrackerProps {
+  title: string;
+  data: Object[];
+  isLoading: Boolean;
+}

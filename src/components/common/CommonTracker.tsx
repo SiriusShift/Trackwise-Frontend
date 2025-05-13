@@ -35,18 +35,13 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu";
+import { useSelector } from "react-redux";
+import { DeleteDialog } from "../dialog/DeleteDialog";
+import { commonTrackerProps } from "@/types";
 
-function CommonTracker({ title }: { title: string }) {
-  const width = useScreenWidth(); // Get the current screen width
-  const isMdOrAbove = width >= 768; // Tailwind's `md` breakpoint (768px)
-  let getMonth = localStorage.getItem("activeMonth");
-  getMonth = getMonth ? JSON.parse(getMonth) : new Date();
-  console.log(moment(getMonth));
-
-  const { data, isLoading } = useGetCategoryLimitQuery({
-    startDate: moment(getMonth).startOf("month").utc().format(),
-    endDate: moment(getMonth).endOf("month").utc().format(),
-  }); // Fetch category data from API
+function CommonTracker({ title, data, isLoading }: commonTrackerProps) {
+  const width = useScreenWidth();
+  const isMdOrAbove = width >= 768;
 
   const chartConfig = {
     innerRadius: 27,
@@ -69,7 +64,7 @@ function CommonTracker({ title }: { title: string }) {
             <Card className="h-full">
               <CardContent className="flex h-[100px] items-center p-9">
                 <TrackerDialog
-                  title="Add budget limit"
+                  title={`Add ${title}`}
                   description="
                 Set a monthly spending limit for your budget category. You'll be
                 notified when you're approaching your limit."
@@ -84,7 +79,7 @@ function CommonTracker({ title }: { title: string }) {
           {data?.map((item, index) => {
             console.log(item);
             const percentage =
-              item?.limit > 0 ? (item?.totalExpense / item?.limit) * 100 : 0;
+              item?.value > 0 ? (item?.total / item?.value) * 100 : 0;
             const endAngle = 90 - (percentage / 100) * 360; // Fix the angle calculation
 
             return (
@@ -104,7 +99,18 @@ function CommonTracker({ title }: { title: string }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <TrackerDialog title="Update budget limit" description="Adjust and update your budget limit to match your needs." mode="edit" data={item}/>
+                      <TrackerDialog
+                        title="Edit budget limit"
+                        description="Adjust and update your budget limit to match your needs."
+                        mode="edit"
+                        data={item}
+                      />
+                      <DeleteDialog
+                        // onDelete={onDelete}
+                        description="Are you sure you want to delete this limit? This action cannot be undone"
+                        title="Delete Recurring Expense"
+                        isLoading={isLoading}
+                      />
                       {/* <DropdownMenuItem
                       >
                         <Icons.Pencil /> Edit
@@ -141,7 +147,8 @@ function CommonTracker({ title }: { title: string }) {
                             content={({ viewBox }) => {
                               if (viewBox?.cx && viewBox?.cy) {
                                 const LucideIcon =
-                                  Icons[item.category.icon] || Icons["busFront"];
+                                  Icons[item.category.icon] ||
+                                  Icons["busFront"];
                                 return (
                                   <svg
                                     x={viewBox.cx - 12}
@@ -165,8 +172,7 @@ function CommonTracker({ title }: { title: string }) {
                     <div className="flex flex-col">
                       <h1>{item.category.name}</h1>
                       <p>
-                        ₱ {item.totalExpense.toFixed(2)} /{" "}
-                        {item.limit.toFixed(2)}
+                        ₱ {item.total.toFixed(2)} / {item.value.toFixed(2)}
                       </p>
                     </div>
                   </CardContent>

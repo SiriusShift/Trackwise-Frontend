@@ -20,11 +20,11 @@ import {
   Banknote,
   Plane,
   ArrowUpFromLine,
-  ArrowDownFromLine
+  ArrowDownFromLine,
 } from "lucide-react";
 import * as Icons from "lucide-react";
 
-import CalendarWidget from "@/components/CalendarWidget";
+import CalendarWidget from "@/components/page-components/dashboard/CalendarWidget";
 
 import {
   Card,
@@ -47,6 +47,9 @@ import { navigationData } from "@/navigation/navigationData";
 import MonthPicker from "@/components/datePicker";
 import moment from "moment-timezone";
 import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
+import OverviewWidget from "@/components/page-components/dashboard/OverviewWidget";
+import LimitWidget from "@/components/page-components/dashboard/LimitWidget";
+import { formatString } from "@/utils/CustomFunctions";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -99,7 +102,7 @@ const Dashboard = () => {
     moment(activeMonth).startOf("month").toDate()
   );
   var timeZones = moment.tz.names();
-  console.log(timeZones)
+  console.log(timeZones);
   const [endDate, setEndDate] = useState<Date | null>(
     moment(activeMonth).endOf("month").toDate()
   );
@@ -113,7 +116,7 @@ const Dashboard = () => {
   const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   //RTK QUERY
-  const {data, isLoading} = useGetExpensesQuery()
+  const { data, isLoading } = useGetExpensesQuery();
   return (
     <div className="space-y-5">
       <div className="flex gap-5 justify-between">
@@ -131,146 +134,15 @@ const Dashboard = () => {
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
             <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
-              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
-                <CardHeader className="flex p-0 flex-row justify-between">
-                  <CardTitle className="text-xl">Overview</CardTitle>
-                  <CardDescription className="text-sm text-gray-400">
-                    {moment(activeMonth).format("MMMM YYYY")}
-                  </CardDescription>
-                </CardHeader>
-                <hr className="my-2 mb-4" />
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-gray-400">Balance</p>
-                    <h1 className="text-3xl">₱10,732.52</h1>
-                  </div>
-                  <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-gray-100 ">
-                    <Banknote />
-                  </div>
-                </div>
-                <div className="flex gap-1 mt-5">
-                  <p>Compare to last month</p>
-                  <p className="text-green-500">+6.52%</p>
-                </div>
-                <p className="text-gray-400">
-                  {moment(startDate).startOf("month").format("MMMM DD")} -{" "}
-                  {moment(endDate).endOf("month").format("MMMM DD")}{" "}
-                </p>
-              </Card>
-              <Card className="border p-5 z-0 flex flex-col rounded-lg col-span-full md:col-span-2 xl:col-span-1 h-60 ">
-                <CardHeader className="flex p-0 flex-row justify-between">
-                  <CardTitle className="text-xl">Expense limit</CardTitle>
-                  <CardDescription className="text-sm text-gray-400">
-                    {moment(activeMonth).format("MMMM YYYY")}
-                  </CardDescription>
-                </CardHeader>
-                <hr className="my-2 mb-4" />
-                <CardContent className="flex flex-1 items-center p-0">
-                  <ChartContainer
-                    config={chartConfig1}
-                    className="mx-auto aspect-square z-0 w-full max-w-[250px]"
-                  >
-                    <RadialBarChart
-                      data={chartData1}
-                      endAngle={180}
-                      innerRadius={90}
-                      outerRadius={140}
-                    >
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <PolarRadiusAxis
-                        tick={false}
-                        tickLine={false}
-                        axisLine={false}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) - 16}
-                                    className="fill-foreground text-2xl font-bold"
-                                  >
-                                    {totalVisitors.toLocaleString()}%
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 4}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Food
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </PolarRadiusAxis>
-                      {/* <RadialBar
-                        dataKey="food"
-                        stackId="a"
-                        cornerRadius={5}
-                        fill="var(--color-food)"
-                        className="stroke-transparent stroke-2"
-                      /> */}
-                      <RadialBar
-                        dataKey="food"
-                        fill="var(--color-bills)"
-                        stackId="a"
-                        // background={{ fill: "var(--color-secondary)" }}
-                        cornerRadius={5}
-                        className="stroke-transparent stroke-2"
-                      />
-                    </RadialBarChart>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-              <Card className="border p-5 flex flex-col rounded-lg col-span-full md:col-span-4 xl:col-span-1 h-60 ">
-                <CardHeader className="flex p-0 flex-row justify-between">
-                  <CardTitle className="text-xl">Calendar</CardTitle>
-                  <CardDescription className="text-sm text-gray-400">
-                  {moment(activeMonth).format("MMMM YYYY")}
-                  </CardDescription>
-                </CardHeader>
-                <hr className="my-2 mb-4" />
-                <div className="space-y-3">
-                  <div className="flex gap-2 justify-around">
-                    <div className="flex gap-2">
-                      <div className="w-12 h-12 rounded-md flex  justify-center items-center bg-gray-100">
-                        <ArrowUpFromLine className="text-black" />
-                      </div>
-                      <div>
-                        <p>Income</p>
-                        <p className="text-green-500">+6.52%</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="w-12 h-12 rounded-md flex  justify-center items-center bg-gray-100">
-                        <ArrowDownFromLine className="text-black" />
-                      </div>
-                      <div>
-                        <p>Expense</p>
-                        <p className="text-red-500">+6.52%</p>
-                      </div>
-                    </div>
-                  </div>
-                  <CalendarWidget
-                    activeDay={activeDay}
-                    colorTheme={theme}
-                    handleClick={setActiveDay}
-                  />
-                </div>
-              </Card>
+              <OverviewWidget startDate={startDate} endDate={endDate} />
+              <LimitWidget />
+              <CalendarWidget
+                activeDay={activeDay}
+                colorTheme={theme}
+                handleClick={setActiveDay}
+              />
             </div>
-            <div className="gap-5 space-y-5 z-30 sm:space-y-0 sm:grid-rows-2 md:grid-rows-1 sm:grid grid-cols-4">
+            <div className="gap-5 space-y-5 z-30 2xl:h-[342px] sm:space-y-0 sm:grid-rows-2 md:grid-rows-1 sm:grid grid-cols-4">
               <div className="col-span-full md:col-span-2 lg:col-span-2">
                 <Card className="p-0 gap-5 h-full flex flex-col justify-between">
                   <CardHeader className="px-7 pb-0 space-y-0">
@@ -387,8 +259,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="2xl:flex space-y-5 md:space-y-0 sm:grid-rows-1 sm:grid-cols-2 md:grid 2xl:w-[400px] 2xl:flex-col gap-5">
-          <div className="rounded col-span-full md:col-span-2 lg:col-span-1 lg p-7 border  ">
+        <div className="2xl:flex space-y-5  md:space-y-0 sm:grid-rows-1 sm:grid-cols-2 md:grid 2xl:w-[400px] 2xl:flex-col gap-5">
+          <div className="rounded-lg 2xl:h-[240px] col-span-full md:col-span-2 lg:col-span-1 lg p-7 border">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">Upcoming payments</h1>
               <Link to={"/funds"}>See All</Link>
@@ -431,7 +303,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="rounded col-span-full  md:col-span-2 lg:col-span-1 p-7 border">
+          <div className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-scroll  md:col-span-2 lg:col-span-1 p-7 border">
             <div className="flex justify-between items-center">
               <h1 className="gap-3 text-xl font-semibold">
                 Recent Transactions
@@ -453,13 +325,20 @@ const Dashboard = () => {
                     <div className="ml-3 w-full">
                       <div className="flex justify-between">
                         <div>
-                          <h1 className="font-medium">{item?.description}</h1>
+                          <h1 className="font-medium">{formatString(item?.description)}</h1>
                         </div>
                         <div>
-                          <h1 className="font-medium">₱{item?.amount.toFixed(2)}</h1>
+                          <h1 className="font-medium">
+                            ₱{item?.amount.toFixed(2)}
+                          </h1>
                         </div>
                       </div>
-                      <p className="text-gray-400 text-sm">{item?.category?.name} - {moment.tz(item?.date, "Asia/Manila").format("MMM DD, h:mm A")}</p>
+                      <p className="text-gray-400 text-sm">
+                        {item?.category?.name} -{" "}
+                        {moment
+                          .tz(item?.date, "Asia/Manila")
+                          .format("MMM DD, h:mm A")}
+                      </p>
                     </div>
                   </div>
                 </div>

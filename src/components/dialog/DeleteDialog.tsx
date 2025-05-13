@@ -6,11 +6,13 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFoo
 
 export function DeleteDialog({
   onDelete,
-  type,
+  description,
+  title,
   isLoading,
 }: {
   onDelete: () => void;
-  type: string;
+  description: string;
+  title: string;
   isLoading: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -25,10 +27,9 @@ export function DeleteDialog({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete {type === "Recurring" ? "Recurring" : ""} Expense</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this {type === "Recurring" ? "recurring" : ""} expense? This action cannot be
-            undone.
+            {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -8,62 +8,53 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "./ui/button";
 import { CalendarRange } from "lucide-react";
 import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveMonth } from "@/feature/reducers/active";
+import { RootState } from "@/store"; // Replace with your actual root state type
 
-const MonthPicker = ({ setStartDate, setEndDate }: any) => {
-  const [storedActiveMonth, setStoredActiveMonth] = useState(localStorage.getItem("activeMonth"));
+interface MonthPickerProps {
+  setStartDate: (date: Date) => void;
+  setEndDate: (date: Date) => void;
+}
 
-  // Parse the stored month or default to the current date
-  const activeMonth = storedActiveMonth
-    ? new Date(JSON.parse(storedActiveMonth))
-    : moment().endOf("month").toDate();
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 
-  console.log(activeMonth);
+const MonthPicker: React.FC<MonthPickerProps> = ({ setStartDate, setEndDate }) => {
+  const dispatch = useDispatch();
+  const activeMonth = useSelector((state: RootState) => state.active.activeMonth);
 
-  if (!storedActiveMonth) {
-    localStorage.setItem("activeMonth", JSON.stringify(new Date()));
-  }
+  const parsedActiveMonth = useMemo(() => moment(activeMonth), [activeMonth]);
+  const [currentYear, setCurrentYear] = useState(parsedActiveMonth.year());
 
-  const [currentYear, setCurrentYear] = useState(activeMonth.getFullYear());
+  const currentYearMonth = useMemo(() => moment().format("YYYY-MM"), []);
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  useEffect(() => {
+    setCurrentYear(parsedActiveMonth.year());
+  }, [parsedActiveMonth]);
 
   const handleMonthChange = (monthIndex: number) => {
-    const date = new Date(currentYear, monthIndex, 2);
-    localStorage.setItem("activeMonth", JSON.stringify(date));
-    setStoredActiveMonth(JSON.stringify(date));
+    const newDate = moment({ year: currentYear, month: monthIndex, day: 2 });
+    const isoString = newDate.toISOString();
 
-    setStartDate(startOfMonth(date));
-    setEndDate(endOfMonth(date));
+    dispatch(setActiveMonth({ activeMonth: isoString }));
+    setStartDate(startOfMonth(newDate.toDate()));
+    setEndDate(endOfMonth(newDate.toDate()));
   };
 
-  const handlePreviousYear = () => setCurrentYear((prevYear) => prevYear - 1);
-  const handleNextYear = () => setCurrentYear((prevYear) => prevYear + 1);
-
-  // Get the current month and year
-  const currentMonth = moment().month(); // Current month (0-11)
-  const currentYearMonth = moment().format("YYYY-MM"); // Current year and month (for comparison)
+  const isFuture = (monthIndex: number) =>
+    currentYearMonth < `${currentYear}-${String(monthIndex + 1).padStart(2, "0")}`;
 
   return (
     <div className="flex flex-col items-start">
       <Popover>
         <PopoverTrigger asChild>
-          <Button size={"sm"} variant={"outline"} className="font-normal">
+          <Button size="sm" variant="outline" className="font-normal">
             <CalendarRange />
-            <span className="hidden sm:inline">
-              {activeMonth ? format(activeMonth, "MMMM yyyy") : "Select Month"}
+            <span className="hidden sm:inline ml-2">
+              {activeMonth ? parsedActiveMonth.format("MMMM YYYY") : "Select Month"}
             </span>
           </Button>
         </PopoverTrigger>
@@ -71,15 +62,11 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
           <div className="flex flex-col items-center">
             {/* Year Navigation */}
             <div className="flex items-center justify-between w-full mb-4">
-              <Button
-                variant={"ghost"}
-                size={"sm"}
-                onClick={handlePreviousYear}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setCurrentYear(y => y - 1)}>
                 Prev
               </Button>
               <span className="sm:text-lg font-semibold">{currentYear}</span>
-              <Button variant={"ghost"} onClick={handleNextYear}>
+              <Button variant="ghost" size="sm" onClick={() => setCurrentYear(y => y + 1)}>
                 Next
               </Button>
             </div>
@@ -87,22 +74,24 @@ const MonthPicker = ({ setStartDate, setEndDate }: any) => {
             {/* Month Grid */}
             <div className="grid grid-cols-3 gap-3">
               {months.map((month, index) => {
-                const isFutureMonth = currentYearMonth < `${currentYear}-${String(index + 1).padStart(2, '0')}`;
+                const selected =
+                  parsedActiveMonth.year() === currentYear &&
+                  parsedActiveMonth.month() === index;
+                const future = isFuture(index);
 
                 return (
                   <Button
                     key={month}
-                    onClick={() => !isFutureMonth && handleMonthChange(index)}
+                    onClick={() => !future && handleMonthChange(index)}
+                    disabled={future}
                     className={`px-3 py-2 text-xs sm:text-sm rounded-md ${
-                      activeMonth.getFullYear() === currentYear &&
-                      activeMonth.getMonth() === index
-                        ? "bg-primary text-primary-foreground" // Highlight selected month
-                        : "bg-secondary hover:bg-accent-foreground text-accent-foreground hover:text-accent"
+                      selected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary hover:bg-accent text-accent-foreground"
                     }`}
-                    disabled={isFutureMonth} // Disable future months
                   >
                     {month}
-                  </Button>                                                                                                                                                                                                    
+                  </Button>
                 );
               })}
             </div>

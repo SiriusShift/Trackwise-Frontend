@@ -16,10 +16,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
-import { useGetCategoryQuery } from "@/feature/category/api/categoryApi";
+import {
+  useGetCategoryLimitQuery,
+  useGetCategoryQuery,
+} from "@/feature/category/api/categoryApi";
 import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
 import moment from "moment";
-import { setExpenseTab } from "@/feature/reducers/activeTab";
+import { setExpenseTab } from "@/feature/reducers/active";
 import { Input } from "@/components/ui/input";
 import {
   Collapsible,
@@ -33,11 +36,8 @@ import CommonTracker from "@/components/common/CommonTracker";
 
 const WalletPage = () => {
   const location = useLocation();
-  const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
-
-  let activeMonth = localStorage.getItem("activeMonth");
-  activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
-  console.log(moment(activeMonth));
+  const activeTab = useSelector((state: any) => state.active.expenseTab);
+  const activeMonth = useSelector((state: any) => state.active.activeMonth);
 
   // State Management
   const [search, setSearch] = useState<string>("");
@@ -79,9 +79,15 @@ const WalletPage = () => {
     { data: recurringData, isLoading: recurringLoading },
   ] = useLazyGetRecurringExpensesQuery();
 
-  console.log("recurring", recurringData);
-
   const { data: categoryData } = useGetCategoryQuery({});
+
+  const { data: categoryLimit, isLoading: categoryLimitLoading } =
+    useGetCategoryLimitQuery({
+      startDate: moment(activeMonth).startOf("month").utc().format(),
+      endDate: moment(activeMonth).endOf("month").utc().format(),
+    });
+
+    console.log(categoryLimit)
 
   const handleFilter = () => {
     const requestData = {
@@ -356,7 +362,12 @@ const WalletPage = () => {
           />
         )}
         {/* Data Table */}
-        <CommonTracker title="Budget Limit" mode="add"/>
+        <CommonTracker
+          data={categoryLimit}
+          isLoading={categoryLimitLoading}
+          title="Budget Limit"
+          mode="add"
+        />
       </div>
     </div>
   );

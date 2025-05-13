@@ -22,6 +22,11 @@ export const formatDate = (month: number, day: string, year: number) => {
   return `${monthWord} ${day}, ${year}`;
 };
 
+export const formatString = (str: string) => {
+  if (str.length <= 24) return str;
+  return str.slice(0, 19).concat("...");
+}
+
 
 export const numberInput = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
   let value = e.target.value;

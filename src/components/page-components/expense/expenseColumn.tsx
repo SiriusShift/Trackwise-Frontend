@@ -41,6 +41,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Date and Time",
     meta: {
       cellClassName: "border-b",
+      headerClassName: "inline-block w-32 flex items-center",
     },
     cell: ({ getValue }) => {
       const dateValue = getValue();
@@ -125,7 +126,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const expense = row.original;
       // console.log(expense);
 
-      const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
+      const activeTab = useSelector((state: any) => state.active.expenseTab);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
@@ -150,8 +151,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 View
               </DropdownMenuItem>
               <DeleteDialog
-                type="All"
                 onDelete={onDelete}
+                description="Are you sure you want to delete this expense? This action cannot be
+            undone"
+                title="Delete Expense"
                 isLoading={isLoading}
               />
             </DropdownMenuContent>
@@ -172,7 +175,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       return (
         <span>
           {dateValue ? moment(dateValue).format("MMMM DD, YYYY h:mm a") : "-"}
-          </span>
+        </span>
       );
     },
     meta: {
@@ -256,7 +259,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
       const expense = row.original;
       const dispatch = useDispatch();
       // const [isDropdownOpen, setDropdownOpen] = useState(false);
-      const activeTab = useSelector((state: any) => state.activeTab.expenseTab);
+      const activeTab = useSelector((state: any) => state.active.expenseTab);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
@@ -285,8 +288,10 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
                 View
               </DropdownMenuItem>
               <DeleteDialog
-                type="Recurring"
                 onDelete={onDelete}
+                description="Are you sure you want to delete this recurring expense? This action cannot be
+            undone"
+                title="Delete Recurring Expense"
                 isLoading={isLoading}
               />
             </DropdownMenuContent>

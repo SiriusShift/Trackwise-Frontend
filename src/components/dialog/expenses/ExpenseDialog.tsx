@@ -187,10 +187,11 @@ export function AddDialog({
         await triggerPatchExpense({
           data,
           id: data?.expenseId,
-        }).then(() => {
+        }).unwrap().then(() => {
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
         });
+
         reset({
           ...expenseSchema.defaultValues,
           userId: userId,
@@ -1254,7 +1255,7 @@ export function AddDialog({
                 </div>
                 <SheetFooter className="mt-auto flex gap-2 justify-between w-full">
                   <SheetClose asChild>
-                    <Button type="submit" disabled={!isValid || !isDirty}>
+                    <Button type="submit" disabled={!isValid || isLoading || !isDirty}>
                       {mode === "edit" ? "Update" : "Add"}
                     </Button>
                   </SheetClose>
@@ -1267,6 +1268,7 @@ export function AddDialog({
                           userId: userId,
                         })
                       }
+                      disabled={isLoading}
                       variant="secondary"
                     >
                       Close
