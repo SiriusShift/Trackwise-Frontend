@@ -68,9 +68,6 @@ function TrackerDialog({
     type: "Expense",
   });
 
-  const [triggerUpdate] = usePatchCategoryLimitMutation();
-  const [triggerPost] = usePostCategoryLimitMutation();
-
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
     mode: "onChange",
@@ -302,7 +299,6 @@ function TrackerDialog({
                 )}
                 <SheetTitle>
                   {mode === "add" ? "Add" : "Edit"}{" "}
-                  {/* {active === "Recurring" ? "recurring " : ""} expense */}
                 </SheetTitle>
               </div>
               <hr />

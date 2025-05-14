@@ -80,4 +80,6 @@ export interface commonTrackerProps {
   title: string;
   data: Object[];
   isLoading: Boolean;
+  addDescription: string;
+  editDescription: string;
 }

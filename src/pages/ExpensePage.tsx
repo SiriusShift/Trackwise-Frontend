@@ -17,8 +17,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
 import {
+  useDeleteCategoryLimitMutation,
   useGetCategoryLimitQuery,
   useGetCategoryQuery,
+  usePatchCategoryLimitMutation,
+  usePostCategoryLimitMutation,
 } from "@/feature/category/api/categoryApi";
 import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
 import moment from "moment";
@@ -33,6 +36,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CommonTab from "@/components/common/CommonTab";
 import CommonTracker from "@/components/common/CommonTracker";
+import { trackerFormType } from "@/types";
+import { assetsApi } from "@/feature/assets/api/assetsApi";
+import { toast } from "sonner";
 
 const WalletPage = () => {
   const location = useLocation();
@@ -87,7 +93,37 @@ const WalletPage = () => {
       endDate: moment(activeMonth).endOf("month").utc().format(),
     });
 
-    console.log(categoryLimit)
+  const [triggerUpdate] = usePatchCategoryLimitMutation();
+  const [triggerPost] = usePostCategoryLimitMutation();
+  const [deleteLimit] = useDeleteCategoryLimitMutation();
+
+  console.log(categoryLimit);
+
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    try {
+      if (data?.id) {
+        await triggerUpdate({
+          id: data?.id,
+          amount: {
+            amount: data?.amount,
+          },
+        });
+      } else {
+        await triggerPost({
+          categoryId: data?.category?.id,
+          amount: data?.amount,
+        });
+      }
+    } catch (err) {
+      toast.error("error");
+    }
+  };
+
+  const onDelete = async (data: any) => {
+    await deleteLimit(data.id);
+    toast.success("Expense limit deleted successfully");
+  };
 
   const handleFilter = () => {
     const requestData = {
@@ -365,8 +401,11 @@ const WalletPage = () => {
         <CommonTracker
           data={categoryLimit}
           isLoading={categoryLimitLoading}
+          editDescription="Adjust and update your budget limit to match your needs."
+          addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
           title="Budget Limit"
-          mode="add"
+          onSubmit={onSubmit}
+          onDelete={onDelete}
         />
       </div>
     </div>

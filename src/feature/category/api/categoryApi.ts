@@ -57,8 +57,19 @@ export const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category", "Cat
                 body: amount
             }),
             invalidatesTags: ["CategoryLimit"],
+        }),
+
+        deleteCategoryLimit: builder.mutation({
+            query: (id) => ({
+                url: `/category/deleteLimit/${id}`,
+                method: "PATCH",
+                headers: { 
+                    Accept: "application/json" 
+                },
+            }),
+            invalidatesTags: ["CategoryLimit"],
         })
     }),
 });
 
-export const { usePostCategoryMutation, useGetCategoryQuery, usePatchCategoryLimitMutation, usePostCategoryLimitMutation, useGetCategoryLimitQuery } = categoryApi;
+export const { usePostCategoryMutation, useGetCategoryQuery, usePatchCategoryLimitMutation, usePostCategoryLimitMutation, useGetCategoryLimitQuery, useDeleteCategoryLimitMutation } = categoryApi;
