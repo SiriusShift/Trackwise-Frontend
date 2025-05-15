@@ -53,19 +53,24 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 function TrackerDialog({
   title,
   mode,
+  onSubmit,
+  type,
+  isLoading,
   description,
   data,
 }: {
   title: string;
   mode: string;
   description: string;
+  type: string;
+  onSubmit: (data: any) => void;
   data: Object;
 }) {
   const [open, setOpen] = useState(false);
   const width = useScreenWidth();
   // RTK Query
   const { data: categoryData } = useGetCategoryQuery({
-    type: "Expense",
+    type: type,
   });
 
   const form = useForm<trackerFormType>({
@@ -84,31 +89,6 @@ function TrackerDialog({
   } = form;
 
   console.log(watch());
-
-  const onSubmit = async (data: trackerFormType) => {
-    console.log(data);
-    try {
-      if(mode === "edit") {
-        await triggerUpdate({
-          id: data?.id,
-          amount: {
-            amount: data?.amount,
-          },
-        })
-      }else{
-        await triggerPost({
-          categoryId: data?.category?.id,
-          amount: data?.amount
-        });
-      }
-
-      reset();
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-      toast.error("error");
-    }
-  };
 
   useEffect(() => {
     if (open && data) {

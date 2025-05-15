@@ -11,7 +11,6 @@ export const assetsApi = api.enhanceEndpoints({ addTagTypes: ["Assets"] }).injec
                 },
             }),
             providesTags: ["Assets"],
-            transformResponse: (response: any) => response.data
         }),
     }),
 });

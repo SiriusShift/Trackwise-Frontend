@@ -53,7 +53,8 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
   const dispatch = useDispatch();
   console.log(rowData);
 
-  const { data: assetData } = useGetAssetQuery();
+  let { data: assetData } = useGetAssetQuery();
+  assetData = assetData?.data;
   const [triggerPayment, { isLoading }] = usePostRecurringPaymentMutation();
 
   const form = useForm<payRecurringForm>({

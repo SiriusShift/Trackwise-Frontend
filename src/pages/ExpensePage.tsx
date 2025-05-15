@@ -47,7 +47,7 @@ const WalletPage = () => {
 
   // State Management
   const [search, setSearch] = useState<string>("");
-  const [status, setStatus] = useState<string>("All");
+  const [status, setStatus] = useState<string>("History");
   const [startDate, setStartDate] = useState<Date | null>(
     moment(activeMonth).startOf("month").toDate()
   );
@@ -367,7 +367,7 @@ const WalletPage = () => {
           </div>
         </div>
 
-        {activeTab === "All" ? (
+        {activeTab === "History" ? (
           <DataTable
             columns={expenseColumns}
             setPageIndex={setPageIndex}
@@ -404,6 +404,7 @@ const WalletPage = () => {
           editDescription="Adjust and update your budget limit to match your needs."
           addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
           title="Budget Limit"
+          type="Expense"
           onSubmit={onSubmit}
           onDelete={onDelete}
         />

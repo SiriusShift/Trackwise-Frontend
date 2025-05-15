@@ -39,7 +39,7 @@ const MonthPicker: React.FC<MonthPickerProps> = ({ setStartDate, setEndDate }) =
     const newDate = moment({ year: currentYear, month: monthIndex, day: 2 });
     const isoString = newDate.toISOString();
 
-    dispatch(setActiveMonth({ activeMonth: isoString }));
+    dispatch(setActiveMonth(isoString));
     setStartDate(startOfMonth(newDate.toDate()));
     setEndDate(endOfMonth(newDate.toDate()));
   };

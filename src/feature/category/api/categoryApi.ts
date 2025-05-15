@@ -62,7 +62,7 @@ export const categoryApi = api.enhanceEndpoints({ addTagTypes: ["Category", "Cat
         deleteCategoryLimit: builder.mutation({
             query: (id) => ({
                 url: `/category/deleteLimit/${id}`,
-                method: "PATCH",
+                method: "PUT",
                 headers: { 
                     Accept: "application/json" 
                 },

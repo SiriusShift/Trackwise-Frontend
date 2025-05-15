@@ -102,7 +102,7 @@ const Dashboard = () => {
     moment(activeMonth).startOf("month").toDate()
   );
   var timeZones = moment.tz.names();
-  console.log(timeZones);
+  // console.log(timeZones);
   const [endDate, setEndDate] = useState<Date | null>(
     moment(activeMonth).endOf("month").toDate()
   );

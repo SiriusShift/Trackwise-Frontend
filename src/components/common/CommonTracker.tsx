@@ -31,8 +31,14 @@ import { commonTrackerProps } from "@/types";
 const AddCard = ({
   title,
   addDescription,
+  onSubmit,
+  isLoading,
+  type,
 }: {
   title: string;
+  onSubmit: () => void;
+  isLoading: boolean;
+  type: string;
   addDescription: string;
 }) => (
   <CarouselItem className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
@@ -41,6 +47,9 @@ const AddCard = ({
         <TrackerDialog
           title={`Add ${title}`}
           description={addDescription}
+          onSubmit={onSubmit}
+          type={type}
+          isLoading={isLoading}
           mode="add"
         />
         <span className="ml-5">Set New Limit</span>
@@ -54,8 +63,12 @@ const TrackerCard = ({
   title,
   editDescription,
   onDelete,
+  type,
+  onSubmit,
   isLoading,
-}: any) => {
+}: commonTrackerProps & {
+  item: object;
+}) => {
   const percentage = item?.value > 0 ? (item?.total / item?.value) * 100 : 0;
   const endAngle = 90 - (percentage / 100) * 360;
   const Icon = Icons[item.category.icon] || Icons["BusFront"];
@@ -78,10 +91,12 @@ const TrackerCard = ({
               title={`Edit ${title}`}
               description={editDescription}
               mode="edit"
+              onSubmit={onSubmit}
               data={item}
+              type={type}
             />
             <DeleteDialog
-              onDelete={() => onDelete?.(item)}
+              onDelete={() => onDelete(item)}
               description={`Are you sure you want to delete this ${title.toLowerCase()}? This action cannot be undone.`}
               title={`Delete ${title}`}
               isLoading={isLoading}
@@ -146,12 +161,10 @@ function CommonTracker({
   editDescription,
   addDescription,
   isLoading,
+  type,
   onSubmit,
   onDelete,
-}: commonTrackerProps & {
-  onDelete?: (item: any) => void;
-  showAddCard?: boolean;
-}) {
+}: commonTrackerProps) {
   const width = useScreenWidth();
 
   const shouldShowNav =
@@ -171,14 +184,16 @@ function CommonTracker({
         className="relative w-full"
       >
         <CarouselContent className="h-full">
-          <AddCard addDescription={addDescription} title={title} />
+          <AddCard addDescription={addDescription} isLoading={isLoading} title={title} type={type} onSubmit={onSubmit} />
           {data?.map((item, index) => (
             <TrackerCard
               key={index}
               item={item}
               title={title}
               isLoading={isLoading}
+              type={type}
               onDelete={onDelete}
+              onSubmit={onSubmit}
               editDescription={editDescription}
             />
           ))}

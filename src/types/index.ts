@@ -79,7 +79,10 @@ export interface overviewWidgetProps {
 export interface commonTrackerProps {
   title: string;
   data: Object[];
-  isLoading: Boolean;
+  isLoading: boolean;
+  type: string;
+  onSubmit: () => void;
+  onDelete: () => void;
   addDescription: string;
   editDescription: string;
 }

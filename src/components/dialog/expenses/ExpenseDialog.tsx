@@ -127,7 +127,9 @@ export function AddDialog({
     type: "Expense",
   });
   const { data: frequencyData } = useGetFrequencyQuery();
-  const { data: assetData } = useGetAssetQuery();
+  let { data: assetData } = useGetAssetQuery();
+  assetData = assetData?.data;
+
   console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
   const [postRecurring] = usePostRecurringExpenseMutation();
@@ -167,7 +169,7 @@ export function AddDialog({
       if (active === "Recurring") {
         setValue("startDate", rowData?.date);
         setValue("frequency", rowData?.frequency);
-      } else if (active === "All") {
+      } else if (active === "History") {
         setValue("date", rowData?.date);
         setValue("source", rowData?.asset);
       }
@@ -213,7 +215,7 @@ export function AddDialog({
         } else {
           await postExpense({
             ...data,
-            status: active === "All" && "Paid",
+            status: active === "History" && "Paid",
             recurring: active === "Recurring" ? true : false,
             source: data?.source?.id || "",
             category: data?.category?.id || "",
@@ -277,7 +279,7 @@ export function AddDialog({
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="flex gap-4 flex-col">
                   <div
-                    className={`${active === "All" ? "order-1" : ""} space-y-4`}
+                    className={`${active === "History" ? "order-1" : ""} space-y-4`}
                   >
                     <div className="grid grid-cols-2 gap-5">
                       <FormField
@@ -341,7 +343,7 @@ export function AddDialog({
                                   placeholder="Enter amount"
                                   className="input-class text-sm pl-7"
                                   disabled={
-                                    active === "All" && !watch("source")
+                                    active === "History" && !watch("source")
                                   }
                                   onChange={(e) => {
                                     const value = Number(e.target.value);
@@ -350,7 +352,7 @@ export function AddDialog({
                                     console.log(balance);
 
                                     if (
-                                      active === "All" &&
+                                      active === "History" &&
                                       balance &&
                                       value > balance
                                     ) {
@@ -388,7 +390,7 @@ export function AddDialog({
                     />
                   </div>
 
-                  {active === "All" ? (
+                  {active === "History" ? (
                     <>
                       <FormField
                         control={control}
@@ -773,7 +775,7 @@ export function AddDialog({
                 className="flex flex-col justify-between h-[90%] gap-5"
               >
                 <div className="flex overflow-auto flex-col gap-5 px-1">
-                  {active === "All" ? (
+                  {active === "History" ? (
                     <>
                       <FormField
                         control={control}
@@ -1211,13 +1213,13 @@ export function AddDialog({
                             step="0.01"
                             placeholder="Enter amount"
                             className="input-class text-sm"
-                            disabled={active === "All" && !watch("source")}
+                            disabled={active === "History" && !watch("source")}
                             onChange={(e) => {
                               const value = Number(e.target.value);
                               const balance = watch("source")?.balance;
 
                               if (
-                                active === "All" &&
+                                active === "History" &&
                                 balance &&
                                 value > balance
                               ) {
