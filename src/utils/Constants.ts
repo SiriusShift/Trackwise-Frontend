@@ -235,3 +235,18 @@ export const categories = [
       "updatedAt": "2025-01-15T02:51:44.622Z"
   }
 ]
+
+export const type = [
+  {
+      "id": 1,
+      "name": "Expense",
+  },
+  {
+      "id": 2,
+      "name": "Income",
+  },
+  {
+      "id": 3,
+      "name": "Transfer",
+  }
+]

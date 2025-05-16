@@ -37,13 +37,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CommonTab from "@/components/common/CommonTab";
 import CommonTracker from "@/components/common/CommonTracker";
 import { trackerFormType } from "@/types";
-import { assetsApi } from "@/feature/assets/api/assetsApi";
 import { toast } from "sonner";
+import TypeSelect from "@/components/page-components/expense/typeSelect";
 
-const WalletPage = () => {
+const TransactionPage = () => {
   const location = useLocation();
   const activeTab = useSelector((state: any) => state.active.expenseTab);
   const activeMonth = useSelector((state: any) => state.active.activeMonth);
+  const activeType = useSelector((state: any) => state.active.type);
+  console.log(activeType);
 
   // State Management
   const [search, setSearch] = useState<string>("");
@@ -221,22 +223,25 @@ const WalletPage = () => {
           <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate} />
         </div>
         <p className="text-gray-400">
-          This is your overview of expenses for this month
+          This is your overview of {activeType} for this month
         </p>
       </div>
 
       {/* Toolbar */}
       <div className="flex flex-col gap-5">
-        <div className="flex gap-2 items-center justify-between">
-          <div className="relative hidden sm:inline h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
-            <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
-          </div>
+        <div className={`flex gap-2 overflow-x-auto items-center ${activeType === "Expense" ? "justify-between" : "justify-end"}`}>
+          {activeType === "Expense" && (
+            <div className="relative hidden sm:inline h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
+              <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
+            </div>
+          )}
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
+            <TypeSelect />
             <AddDialog mode="add" type="Expense" active={activeTab} />
             <Button size="sm" variant="outline">
               <ArrowDownToLine className="lg:mr-2" />
-              <span className="inline sm:hidden lg:inline">Export</span>
+              <span className="hidden lg:inline">Export</span>
             </Button>
             <FilterSheet
               setClear={clearFilter}
@@ -367,21 +372,7 @@ const WalletPage = () => {
           </div>
         </div>
 
-        {activeTab === "History" ? (
-          <DataTable
-            columns={expenseColumns}
-            setPageIndex={setPageIndex}
-            setPageSize={setPageSize}
-            totalPages={expensesData?.totalPages}
-            pageIndex={pageIndex}
-            date={endDate}
-            pageSize={pageSize}
-            trend={expensesData?.trend}
-            isLoading={expensesLoading || recurringLoading}
-            categoryExpenses={detailedExpense}
-            data={expensesData?.data || []}
-          />
-        ) : (
+        {activeTab === "Recurring" ? (
           <DataTable
             columns={recurringExpenseColumns}
             setPageIndex={setPageIndex}
@@ -395,6 +386,20 @@ const WalletPage = () => {
             isLoading={expensesLoading || recurringLoading}
             categoryExpenses={detailedExpense}
             data={recurringData?.data || []}
+          />
+        ) : (
+          <DataTable
+            columns={expenseColumns}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            totalPages={expensesData?.totalPages}
+            pageIndex={pageIndex}
+            date={endDate}
+            pageSize={pageSize}
+            trend={expensesData?.trend}
+            isLoading={expensesLoading || recurringLoading}
+            categoryExpenses={detailedExpense}
+            data={expensesData?.data || []}
           />
         )}
         {/* Data Table */}
@@ -413,4 +418,4 @@ const WalletPage = () => {
   );
 };
 
-export default WalletPage;
+export default TransactionPage;

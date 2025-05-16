@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import PayDialog from "@/components/dialog/expenses/PayDialog";
 import { assetsApi } from "@/feature/assets/api/assetsApi";
+import { categoryApi } from "@/feature/category/api/categoryApi";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -124,6 +125,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     // header: "Actions",
     cell: ({ row }) => {
       const expense = row.original;
+      const dispatch = useDispatch();
       // console.log(expense);
 
       const activeTab = useSelector((state: any) => state.active.expenseTab);
@@ -132,6 +134,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       const onDelete = async () => {
         await deleteExpense(expense.id);
+        dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
       };
 
       return (

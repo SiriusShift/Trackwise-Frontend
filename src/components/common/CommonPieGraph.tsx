@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import useScreenWidth from "@/hooks/useScreenWidth";
-import noChartData from "@/assets/images/noDataPie.png";
+import noChartData from "@/assets/images/empty-box.svg";
 
 const chartConfig = {
   width: 200,
@@ -78,8 +78,9 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
         <CardContent className="flex-1 justify-center flex content-center pb-0">
           {showChart ? (
             <ResponsiveContainer
-              width={chartConfig.width}
+              width={categoryExpenses.length > 0 ? chartConfig.width : 150}
               height={chartConfig.height}
+              className={"flex justify-center items-center"}
             >
               {categoryExpenses.length > 0 ? (
                 <PieChart>
@@ -121,7 +122,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend }: any) {
                   </Pie>
                 </PieChart>
               ) : (
-                <img src={noChartData} />
+                <img src={noChartData} width={50} />
               )}
             </ResponsiveContainer>
           ) : (

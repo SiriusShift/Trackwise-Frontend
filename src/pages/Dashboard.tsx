@@ -1,26 +1,14 @@
 import {
   Bar,
   BarChart,
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Label,
   LabelList,
   XAxis,
   YAxis,
-  RadialBar,
-  PolarRadiusAxis,
-  RadialBarChart,
 } from "recharts";
 
-import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import {useState } from "react";
 import {
-  UtensilsCrossed,
-  Banknote,
   Plane,
-  ArrowUpFromLine,
-  ArrowDownFromLine,
 } from "lucide-react";
 import * as Icons from "lucide-react";
 
@@ -42,7 +30,6 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { Progress } from "@/components/ui/progress";
 import { Link, useLocation } from "react-router-dom";
-import { log } from "console";
 import { navigationData } from "@/navigation/navigationData";
 import MonthPicker from "@/components/datePicker";
 import moment from "moment-timezone";
@@ -50,6 +37,8 @@ import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
 import OverviewWidget from "@/components/page-components/dashboard/OverviewWidget";
 import LimitWidget from "@/components/page-components/dashboard/LimitWidget";
 import { formatString } from "@/utils/CustomFunctions";
+import NoData from "@/assets/images/empty-box.png";
+import TransactionHistory from "@/components/page-components/dashboard/TransactionHistory";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -115,8 +104,6 @@ const Dashboard = () => {
   );
   const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
-  //RTK QUERY
-  const { data, isLoading } = useGetExpensesQuery();
   return (
     <div className="space-y-5">
       <div className="flex gap-5 justify-between">
@@ -303,48 +290,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-scroll  md:col-span-2 lg:col-span-1 p-7 border">
-            <div className="flex justify-between items-center">
-              <h1 className="gap-3 text-xl font-semibold">
-                Recent Transactions
-              </h1>
-              <Link to={"/expenses"}>See All</Link>
-            </div>
-            {data?.data.map((item: Object) => {
-              const LucidIcon = Icons[item.category?.icon];
-              return (
-                <div className="flex mt-5 rounded-md justify-between">
-                  <div className="flex w-full">
-                    <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                      <LucidIcon
-                        className="text-black"
-                        width={25}
-                        height={25}
-                      />
-                    </div>
-                    <div className="ml-3 w-full">
-                      <div className="flex justify-between">
-                        <div>
-                          <h1 className="font-medium">{formatString(item?.description)}</h1>
-                        </div>
-                        <div>
-                          <h1 className="font-medium">
-                            ₱{item?.amount.toFixed(2)}
-                          </h1>
-                        </div>
-                      </div>
-                      <p className="text-gray-400 text-sm">
-                        {item?.category?.name} -{" "}
-                        {moment
-                          .tz(item?.date, "Asia/Manila")
-                          .format("MMM DD, h:mm A")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <TransactionHistory />
         </div>
       </div>
     </div>

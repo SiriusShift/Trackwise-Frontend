@@ -247,7 +247,7 @@ export function AddDialog({
             {mode === "add" ? (
               <Button size="sm" variant="outline">
                 <Plus className="lg:mr-2" />
-                <span className="inline sm:hidden lg:inline">Add</span>
+                <span className="sm:hidden lg:inline">Add</span>
               </Button>
             ) : (
               <DropdownMenuItem
@@ -738,7 +738,7 @@ export function AddDialog({
             {mode === "add" ? (
               <Button size="sm" variant="outline">
                 <Plus className="lg:mr-2" />{" "}
-                <span className="inline sm:hidden lg:inline">Add</span>
+                <span className="hidden">Add</span>
               </Button>
             ) : (
               <DropdownMenuItem
@@ -774,7 +774,7 @@ export function AddDialog({
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col justify-between h-[90%] gap-5"
               >
-                <div className="flex overflow-auto flex-col gap-5 px-1">
+                <div className="flex overflow-auto flex-col gap-5 p-1">
                   {active === "History" ? (
                     <>
                       <FormField

@@ -264,8 +264,9 @@ export function DataTable<TData, TValue>({
 
         {/* Page Information */}
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          <span className="hidden sm:inline">Page</span> {pageIndex + 1} of{" "}
-          {totalPages}
+          <span className="hidden sm:inline">
+            Page {totalPages === 0 ? 0 : pageIndex + 1} of {totalPages}
+          </span>
         </div>
 
         {/* Pagination Buttons */}

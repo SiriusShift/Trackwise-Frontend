@@ -56,6 +56,7 @@ const ForgotPassword = () => {
       }
       startResendTimer();
     } catch (err) {
+      console.log(err)
       let errorMessage = "An error occurred"; // Default message
       if (err && (err as { data?: { message?: string } }).data) {
         errorMessage =

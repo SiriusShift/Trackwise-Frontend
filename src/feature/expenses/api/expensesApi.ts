@@ -8,7 +8,7 @@ export const expensesApi = api
       getExpenses: builder.query({
         query: (params) => ({
           params,
-          url: "/expenses/get",
+          url: "/transaction/getExpense",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -19,7 +19,7 @@ export const expensesApi = api
       }),
       postExpense: builder.mutation({
         query: (body) => ({
-          url: "/expenses/create",
+          url: "/transaction/createExpense",
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -31,7 +31,7 @@ export const expensesApi = api
 
       deleteExpense: builder.mutation({
         query: (id) => ({
-          url: `/expenses/deleteExpense/${id}`,
+          url: `/transaction/deleteExpense/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -42,7 +42,7 @@ export const expensesApi = api
 
       patchExpense: builder.mutation({
         query: ({data, id}) => ({
-          url: `/expenses/updateExpense/${id}`,
+          url: `/transaction/updateExpense/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -54,7 +54,7 @@ export const expensesApi = api
 
       postRecurringExpense: builder.mutation({
         query: (body) => ({
-          url: "/expenses/createRecurring",
+          url: "/transaction/createRecurring",
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -64,10 +64,22 @@ export const expensesApi = api
         invalidatesTags: ["RecurringExpense"],
       }),
 
+      updateRecurringExpense: builder.mutation({
+        query: ({data, id}) => ({
+          url: `/transaction/updateRecurring/${id}`,
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+          },
+          body: data,
+        }),
+        invalidatesTags: ["RecurringExpense"],
+      }),
+
       getDetailedExpense: builder.query({
         query: (params) => ({
           params,
-          url: "/expenses/getDetailedExpenses",
+          url: "/transaction/getDetailedExpenses",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -80,7 +92,7 @@ export const expensesApi = api
       getRecurringExpenses: builder.query({
         query: (params) => ({
           params,
-          url: "/expenses/getRecurring",
+          url: "/transaction/getRecurring",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -102,7 +114,7 @@ export const expensesApi = api
 
       postRecurringPayment : builder.mutation({
         query: ({body, id}) => ({
-          url: `/expenses/postRecurringPayment/${id}`,
+          url: `/transaction/postRecurringPayment/${id}`,
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -120,6 +132,7 @@ export const {
   useLazyGetExpensesQuery,
   usePostExpenseMutation,
   usePostRecurringExpenseMutation,
+  useUpdateRecurringExpenseMutation,
   useGetRecurringExpensesQuery,
   useGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
