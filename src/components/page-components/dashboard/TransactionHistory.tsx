@@ -4,7 +4,7 @@ import React from "react";
 import * as Icons from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
-
+import NoData from "../../../assets/images/empty-box.svg";
 const TransactionHistory = () => {
     
   //RTK QUERY

@@ -48,7 +48,6 @@ export const resetPasswordSchema = {
 
 export const expenseSchema = {
   schema: yup.object().shape({
-    userId: yup.string().required("User Id is required"),
     expenseId: yup.string().nullable(),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
@@ -61,7 +60,6 @@ export const expenseSchema = {
     recipient: yup.string().required("Receipient is required"),
   }),
   defaultValues: {
-    userId: null,
     expenseId: null,
     category: "",
     description: "",

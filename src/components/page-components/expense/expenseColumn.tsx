@@ -21,7 +21,7 @@ import moment from "moment";
 import { Badge } from "@/components/ui/badge";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
-import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
+import { AddDialog } from "@/components/dialog/expenses/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import PayDialog from "@/components/dialog/expenses/PayDialog";

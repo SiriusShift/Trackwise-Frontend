@@ -23,9 +23,8 @@ import {
   usePatchCategoryLimitMutation,
   usePostCategoryLimitMutation,
 } from "@/feature/category/api/categoryApi";
-import { AddDialog } from "@/components/dialog/expenses/ExpenseDialog";
+import { AddDialog } from "@/components/dialog/expenses/TransactionDialog";
 import moment from "moment";
-import { setExpenseTab } from "@/feature/reducers/active";
 import { Input } from "@/components/ui/input";
 import {
   Collapsible,
@@ -42,7 +41,6 @@ import TypeSelect from "@/components/page-components/expense/typeSelect";
 
 const TransactionPage = () => {
   const location = useLocation();
-  const activeTab = useSelector((state: any) => state.active.expenseTab);
   const activeMonth = useSelector((state: any) => state.active.activeMonth);
   const activeType = useSelector((state: any) => state.active.type);
   console.log(activeType);
@@ -129,8 +127,6 @@ const TransactionPage = () => {
 
   const handleFilter = () => {
     const requestData = {
-      // userId,
-      // active: activeTab,
       pageSize,
       pageIndex,
       startDate,
@@ -144,35 +140,19 @@ const TransactionPage = () => {
       }),
     };
 
-    if (activeTab === "Recurring") {
-      triggerRecurring(requestData);
-    } else {
-      triggerExpense(requestData);
-    }
+    triggerExpense(requestData);
   };
 
   const clearFilter = () => {
     setSearch("");
     setSelectedCategories([]);
-    if (activeTab === "Recurring") {
-      setStatus("");
-      triggerRecurring({
-        // userId,
-        startDate,
-        endDate,
-        pageSize,
-        pageIndex,
-      });
-    } else {
-      triggerExpense({
-        // userId,
-        startDate,
-        endDate,
-        // active: activeTab,
-        pageSize,
-        pageIndex,
-      });
-    }
+    triggerExpense({
+      // userId,
+      startDate,
+      endDate,
+      pageSize,
+      pageIndex,
+    });
   };
 
   const handleCheckboxChange = (category: any) => {
@@ -188,31 +168,13 @@ const TransactionPage = () => {
 
   //UseEffect
   useEffect(() => {
-    if (activeTab === "Recurring") {
-      triggerRecurring(
-        {
-          // userId,
-          startDate,
-          endDate,
-          pageSize,
-          pageIndex,
-        },
-        { preferCacheValue: true }
-      );
-    } else {
-      triggerExpense(
-        {
-          // userId,
-          startDate,
-          endDate,
-          // active: activeTab,
-          pageSize,
-          pageIndex,
-        },
-        { preferCacheValue: true }
-      );
-    }
-  }, [pageSize, pageIndex, startDate, endDate, activeTab]);
+    triggerExpense({
+      startDate,
+      endDate,
+      pageSize,
+      pageIndex,
+    });
+  }, [pageSize, pageIndex, startDate, endDate, activeType]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -229,16 +191,13 @@ const TransactionPage = () => {
 
       {/* Toolbar */}
       <div className="flex flex-col gap-5">
-        <div className={`flex gap-2 overflow-x-auto items-center ${activeType === "Expense" ? "justify-between" : "justify-end"}`}>
-          {activeType === "Expense" && (
-            <div className="relative hidden sm:inline h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
-              <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
-            </div>
-          )}
+        <div
+          className={`flex gap-2 overflow-x-auto items-center justify-between`}
+        >
+          <TypeSelect />
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
-            <TypeSelect />
-            <AddDialog mode="add" type="Expense" active={activeTab} />
+            <AddDialog mode="add" type={activeType} />
             <Button size="sm" variant="outline">
               <ArrowDownToLine className="lg:mr-2" />
               <span className="hidden lg:inline">Export</span>
@@ -250,9 +209,6 @@ const TransactionPage = () => {
               icon={<Filter width={17} />}
             >
               <div className="flex flex-col py-3 gap-5">
-                <div className="relative inline sm:hidden h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
-                  <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
-                </div>
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">
                     Search by description
@@ -326,82 +282,56 @@ const TransactionPage = () => {
                   </Collapsible>
                 </div>
                 <hr />
-                {activeTab === "Recurring" && (
-                  <>
-                    <div className="flex flex-col gap-2">
-                      <h1 className="text-sm font-semibold">Category</h1>
-                      <RadioGroup
-                        value={status}
-                        onValueChange={(value) => setStatus(value)} // Ensure value is updated
-                        className="space-y-2"
-                      >
-                        {/* Option 1 */}
-                        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-warning">
-                          <RadioGroupItem id="Unpaid" value="Unpaid" />
-                          <label
-                            htmlFor="Unpaid"
-                            className="text-sm font-medium"
-                          >
-                            Unpaid
-                          </label>
-                        </div>
-                        {/* Option 2 */}
-                        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
-                          <RadioGroupItem id="Paid" value="Paid" />
-                          <label htmlFor="Paid" className="text-sm font-medium">
-                            Paid
-                          </label>
-                        </div>
-                        {/* Option 3 */}
-                        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-destructive">
-                          <RadioGroupItem id="Overdue" value="Overdue" />
-                          <label
-                            htmlFor="Overdue"
-                            className="text-sm font-medium"
-                          >
-                            Overdue
-                          </label>
-                        </div>
-                      </RadioGroup>
+
+                <div className="flex flex-col gap-2">
+                  <h1 className="text-sm font-semibold">Category</h1>
+                  <RadioGroup
+                    value={status}
+                    onValueChange={(value) => setStatus(value)} // Ensure value is updated
+                    className="space-y-2"
+                  >
+                    {/* Option 1 */}
+                    <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-warning">
+                      <RadioGroupItem id="Unpaid" value="Unpaid" />
+                      <label htmlFor="Unpaid" className="text-sm font-medium">
+                        Unpaid
+                      </label>
                     </div>
-                    <hr />
-                  </>
-                )}
+                    {/* Option 2 */}
+                    <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
+                      <RadioGroupItem id="Paid" value="Paid" />
+                      <label htmlFor="Paid" className="text-sm font-medium">
+                        Paid
+                      </label>
+                    </div>
+                    {/* Option 3 */}
+                    <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-destructive">
+                      <RadioGroupItem id="Overdue" value="Overdue" />
+                      <label htmlFor="Overdue" className="text-sm font-medium">
+                        Overdue
+                      </label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <hr />
               </div>
             </FilterSheet>
           </div>
         </div>
 
-        {activeTab === "Recurring" ? (
-          <DataTable
-            columns={recurringExpenseColumns}
-            setPageIndex={setPageIndex}
-            setPageSize={setPageSize}
-            totalCount={recurringData?.totalCount}
-            totalPages={recurringData?.totalPages}
-            date={endDate}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            trend={expensesData?.trend}
-            isLoading={expensesLoading || recurringLoading}
-            categoryExpenses={detailedExpense}
-            data={recurringData?.data || []}
-          />
-        ) : (
-          <DataTable
-            columns={expenseColumns}
-            setPageIndex={setPageIndex}
-            setPageSize={setPageSize}
-            totalPages={expensesData?.totalPages}
-            pageIndex={pageIndex}
-            date={endDate}
-            pageSize={pageSize}
-            trend={expensesData?.trend}
-            isLoading={expensesLoading || recurringLoading}
-            categoryExpenses={detailedExpense}
-            data={expensesData?.data || []}
-          />
-        )}
+        <DataTable
+          columns={expenseColumns}
+          setPageIndex={setPageIndex}
+          setPageSize={setPageSize}
+          totalPages={expensesData?.totalPages}
+          pageIndex={pageIndex}
+          date={endDate}
+          pageSize={pageSize}
+          trend={expensesData?.trend}
+          isLoading={expensesLoading || recurringLoading}
+          categoryExpenses={detailedExpense}
+          data={expensesData?.data || []}
+        />
         {/* Data Table */}
         <CommonTracker
           data={categoryLimit}

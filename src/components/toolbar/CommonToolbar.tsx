@@ -1,5 +1,5 @@
 import React from "react";
-import { AddDialog } from "../dialog/expenses/ExpenseDialog";
+import { AddDialog } from "../dialog/expenses/TransactionDialog";
 import { Button } from "../ui/button";
 import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
 import { CommonToolbarProps } from "../../types/index";

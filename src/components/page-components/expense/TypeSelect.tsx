@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { setExpenseTab, setType } from "@/feature/reducers/active";
+import { setType } from "@/feature/reducers/active";
 import { type } from "@/utils/Constants";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,7 +17,6 @@ const TypeSelect = () => {
     <Select
       value={activeType}
       onValueChange={(value) => {
-        value === "Expense" ? dispatch(setExpenseTab("History")) : "";
         dispatch(setType(value))
       }}
     >
