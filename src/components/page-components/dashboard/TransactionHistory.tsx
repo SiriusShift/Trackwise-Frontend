@@ -4,9 +4,9 @@ import React from "react";
 import * as Icons from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
-import NoData from "../../../assets/images/empty-box.svg";
+import NoData from "@/assets/images/empty-box.png";
+
 const TransactionHistory = () => {
-    
   //RTK QUERY
   const { data, isLoading } = useGetExpensesQuery();
 
@@ -40,7 +40,10 @@ const TransactionHistory = () => {
                     </div>
                     <div>
                       <h1 className="font-medium">
-                        ₱{item?.amount.toLocaleString("en-PH", {minimumFractionDigits: 2})}
+                        ₱
+                        {item?.amount.toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                        })}
                       </h1>
                     </div>
                   </div>
