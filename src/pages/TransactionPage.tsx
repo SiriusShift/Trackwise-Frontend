@@ -192,23 +192,10 @@ const TransactionPage = () => {
       {/* Toolbar */}
       <div className="flex flex-col gap-5">
         <div
-<<<<<<< HEAD
           className={`flex gap-2 overflow-x-auto items-center justify-between`}
         >
           <TypeSelect />
           <div className="flex gap-2">
-=======
-          className={`flex gap-2 overflow-x-auto items-center ${
-            activeType === "Expense" ? "justify-between" : "justify-end"
-          }`}
-        >
-          {activeType === "Expense" && (
-            <div className="relative hidden sm:inline h-9 w-full sm:w-48 bg-secondary p-1 rounded-sm">
-              <CommonTab activeTab={activeTab} setTab={setExpenseTab} />
-            </div>
-          )}
-          <div className="flex py-1 gap-2">
->>>>>>> 5a7cff85488d57e6c3ac6a95b2fba579b335377c
             {/* <AlertDialogDemo /> */}
             <AddDialog mode="add" type={activeType} />
             <Button size="sm" variant="outline">
