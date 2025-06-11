@@ -23,7 +23,7 @@ import {
   usePatchCategoryLimitMutation,
   usePostCategoryLimitMutation,
 } from "@/feature/category/api/categoryApi";
-import { AddDialog } from "@/components/dialog/expenses/TransactionDialog";
+import { TransactionDialog } from "@/components/dialog/expenses/TransactionDialog";
 import moment from "moment";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,7 +37,7 @@ import CommonTab from "@/components/common/CommonTab";
 import CommonTracker from "@/components/common/CommonTracker";
 import { trackerFormType } from "@/types";
 import { toast } from "sonner";
-import TypeSelect from "@/components/page-components/expense/typeSelect";
+import TypeSelect from "@/components/page-components/expense/TypeSelect";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -197,7 +197,7 @@ const TransactionPage = () => {
           <TypeSelect />
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
-            <AddDialog mode="add" type={activeType} />
+            <TransactionDialog mode="add" type={activeType} />
             <Button size="sm" variant="outline">
               <ArrowDownToLine className="lg:mr-2" />
               <span className="hidden lg:inline">Export</span>

@@ -105,7 +105,7 @@ type AddExpenseFormData = {
   status: string;
 };
 
-export function AddDialog({
+export function TransactionDialog({
   type,
   mode,
   rowData,

@@ -21,7 +21,7 @@ import moment from "moment";
 import { Badge } from "@/components/ui/badge";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
-import { AddDialog } from "@/components/dialog/expenses/TransactionDialog";
+import { TransactionDialog } from "@/components/dialog/expenses/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import PayDialog from "@/components/dialog/expenses/PayDialog";
@@ -148,7 +148,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <AddDialog rowData={expense} active={activeTab} mode="edit" />
+              <TransactionDialog rowData={expense} active={activeTab} mode="edit" />
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -285,7 +285,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <PayDialog rowData={expense} />
-              <AddDialog rowData={expense} active={activeTab} mode="edit" />
+              <TransactionDialog rowData={expense} active={activeTab} mode="edit" />
               <DropdownMenuItem>
                 <Eye />
                 View
