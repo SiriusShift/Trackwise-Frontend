@@ -1,6 +1,6 @@
 import { navigationData } from "@/navigation/navigationData";
 import { useLocation } from "react-router-dom";
-import MonthPicker from "@/components/datePicker";
+import MonthPicker from "@/components/DatePicker";
 import { DataTable } from "@/components/common/CommonTable";
 import {
   expenseColumns,
@@ -41,7 +41,7 @@ import TypeSelect from "@/components/page-components/expense/TypeSelect";
 
 const TransactionPage = () => {
   const location = useLocation();
-  const activeMonth = useSelector((state: any) => state.active.activeMonth);
+  const active = useSelector((state: any) => state.active.active);
   const activeType = useSelector((state: any) => state.active.type);
   console.log(activeType);
 
@@ -49,11 +49,12 @@ const TransactionPage = () => {
   const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<string>("History");
   const [startDate, setStartDate] = useState<Date | null>(
-    moment(activeMonth).startOf("month").toDate()
+    moment(typeof active === "string" ? active : active?.from)
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    moment(activeMonth).endOf("month").toDate()
+    moment(typeof active === "string" ? active : active?.to)
   );
+  console.log(startDate, endDate);
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
@@ -89,15 +90,13 @@ const TransactionPage = () => {
 
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
     useGetCategoryLimitQuery({
-      startDate: moment(activeMonth).startOf("month").utc().format(),
-      endDate: moment(activeMonth).endOf("month").utc().format(),
+      startDate: startDate,
+      endDate: endDate,
     });
 
   const [triggerUpdate] = usePatchCategoryLimitMutation();
   const [triggerPost] = usePostCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
-
-  console.log(categoryLimit);
 
   const onSubmit = async (data: any) => {
     console.log(data);
@@ -175,6 +174,12 @@ const TransactionPage = () => {
       pageIndex,
     });
   }, [pageSize, pageIndex, startDate, endDate, activeType]);
+
+  useEffect(() => {
+    if(active === null) return
+    setStartDate(moment(typeof active === "string" ? active : active?.from));
+    setEndDate(moment(typeof active === "string" ? active : active?.to));
+  }, [active]);
 
   return (
     <div className="flex flex-col gap-5">

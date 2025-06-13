@@ -2,10 +2,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment";
 
 // Define the initial state as an object
-const initialState: { activeMonth: string; type: string; activeYear: string } =
+const initialState: { active: Object; type: string; mode: string; } =
   {
-    activeMonth: new Date().toISOString(), // ISO string
-    activeYear: moment().format("YYYY"),
+    active: new Date(),
+    mode: "daily",
     type: "Expense",
   };
 
@@ -13,17 +13,17 @@ export const active = createSlice({
   name: "active",
   initialState,
   reducers: {
-    setActiveMonth: (state, action: PayloadAction<string>) => {
-      state.activeMonth = action.payload;
+    setActive: (state, action: PayloadAction<Object>) => {
+      state.active = action.payload;
+    },
+    setMode: (state, action: PayloadAction<string>) => {
+      state.mode = action.payload;
     },
     setType: (state, action: PayloadAction<string>) => {
       state.type = action.payload;
     },
-    setActiveYear: (state, action: PayloadAction<string>) => {
-      state.activeYear = action.payload;
-    }
   },
 });
 
 // Export actions
-export const { setActiveMonth, setType, setActiveYear } = active.actions;
+export const { setActive, setType, setMode } = active.actions;

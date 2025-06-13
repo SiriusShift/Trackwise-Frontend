@@ -31,7 +31,7 @@ import { useTheme } from "@/components/theme-provider";
 import { Progress } from "@/components/ui/progress";
 import { Link, useLocation } from "react-router-dom";
 import { navigationData } from "@/navigation/navigationData";
-import MonthPicker from "@/components/datePicker";
+import MonthPicker from "@/components/DatePicker";
 import moment from "moment-timezone";
 import { useGetExpensesQuery } from "@/feature/expenses/api/expensesApi";
 import OverviewWidget from "@/components/page-components/dashboard/OverviewWidget";
