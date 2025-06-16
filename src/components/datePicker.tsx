@@ -4,17 +4,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { endOfWeek, isAfter, startOfWeek } from "date-fns";
+import { endOfWeek, formatDate, isAfter, startOfWeek } from "date-fns";
 import { Button } from "./ui/button";
 import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { setActive, setMode } from "@/feature/reducers/active";
-import { RootState } from "@/store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "./ui/calendar";
 import useScreenWidth from "@/hooks/useScreenWidth";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { RootState } from "@reduxjs/toolkit/query";
+import { formatDateDisplay } from "@/utils/CustomFunctions";
+import { assetsApi } from "@/feature/assets/api/assetsApi";
 
 interface DateRange {
   from: string;
@@ -36,43 +38,39 @@ const months = [
   "December",
 ];
 
-const Content = ({ mode, active }) => {
+const currentYear = new Date().getFullYear();
+const years = Array.from(
+  { length: currentYear - 2000 + 1 },
+  (_, i) => 2000 + i
+);
+const Content = () => {
   const dispatch = useDispatch();
-  const [activeYear, setActiveYear] = useState(new Date().getFullYear());
+  const active = useSelector((state: RootState) => state.active.active);
+  console.log(active);
+  const mode = useSelector((state: RootState) => state.active.mode);
 
+  const [activeYear, setActiveYear] = useState(new Date().getFullYear());
   const [date, setDate] = useState<Date | { from?: Date; to?: Date } | null>(
-    null
+    active
   );
+
+  // useEffect(() => {
+  //   if(mode && active) {
+  //     dispatch(assetsApi.util.invalidateTags(["Assets"]))
+  //   }
+  // }, [mode, active])
 
   // Set activeYear based on current active date
   useEffect(() => {
     if (active) {
-      if (mode === "daily" || mode === "monthly") {
+      if (mode === "daily") {
         const year = moment(active as string).year();
         setActiveYear(year);
-      } else if (mode === "weekly") {
+      } else {
         const range = active as DateRange;
         const year = moment(range.from).year();
         setActiveYear(year);
       }
-    }
-  }, [active, mode]);
-
-  useEffect(() => {
-    if (active) {
-      if (mode === "daily") {
-        setDate(new Date(active as string));
-      } else if (mode === "weekly") {
-        const range = active as DateRange;
-        setDate({
-          from: new Date(range.from),
-          to: new Date(range.to),
-        });
-      } else if (mode === "monthly") {
-        setDate(new Date(active as string));
-      }
-    } else {
-      setDate(null);
     }
   }, [active, mode]);
 
@@ -92,12 +90,14 @@ const Content = ({ mode, active }) => {
     }
 
     setDate(range);
+    console.log(range);
 
     if (range.from && range.to) {
       const data: DateRange = {
         from: range.from.toISOString(),
         to: range.to.toISOString(),
       };
+      console.log(data);
       dispatch(setActive(data));
     }
   };
@@ -109,15 +109,66 @@ const Content = ({ mode, active }) => {
       month: monthIndex,
       day: 1,
     }).toDate();
-    const newActive = newDate.toISOString();
-    dispatch(setActive(newActive));
-    setDate(newDate);
+    console.log(newDate);
+    const transformDate = {
+      from: moment(newDate).startOf("month").toISOString(),
+      to: moment(newDate).endOf("month").toISOString(),
+    };
+    console.log(transformDate);
+    dispatch(setActive(transformDate));
+    setDate(transformDate);
+  };
+
+  const handleYearChange = (year: number) => {
+    const date = moment({
+      year: year,
+      month: moment().month(),
+      day: 1,
+    }).toDate();
+    const transformDate = {
+      from: moment(date).startOf("year").toISOString(),
+      to: moment(date).endOf("year").toISOString(),
+    };
+    dispatch(setActive(transformDate));
+    setActiveYear(transformDate);
   };
 
   const handleModeChange = (newMode: string) => {
     dispatch(setMode(newMode));
-    dispatch(setActive(null));
-    setDate(null);
+    if (newMode === "daily") {
+      setDate(moment().toISOString());
+      dispatch(setActive(moment().toISOString()));
+    } else if (newMode === "weekly") {
+      const startOfWeek = moment().startOf("week").toISOString();
+      const endOfWeek = moment().endOf("week").toISOString();
+      console.log(endOfWeek);
+      const range = {
+        from: startOfWeek,
+        to: endOfWeek,
+      };
+      setDate(range);
+      dispatch(setActive(range));
+    } else if (newMode === "monthly") {
+      const startOfMonth = moment().startOf("month").toISOString();
+      const endOfMonth = moment().endOf("month").toISOString();
+      console.log(endOfMonth);
+      const range = {
+        from: startOfMonth,
+        to: endOfMonth,
+      };
+      setDate(range);
+      dispatch(setActive(range));
+    } else if (newMode === "yearly") {
+      const startOfYear = moment().startOf("year").toISOString();
+      const endOfYear = moment().endOf("year").toISOString();
+      console.log(endOfYear);
+      const range = {
+        from: startOfYear,
+        to: endOfYear,
+      };
+      setDate(range);
+      dispatch(setActive(range));
+    }
   };
 
   const isFutureMonth = (monthIndex: number): boolean => {
@@ -133,7 +184,9 @@ const Content = ({ mode, active }) => {
   const isSelectedMonth = (monthIndex: number): boolean => {
     if (!active || (mode !== "monthly" && mode !== "daily")) return false;
 
-    const activeMoment = moment(active as string);
+    console.log(active);
+    const activeMoment = moment(active?.from as string);
+    console.log(activeMoment.month());
     return (
       activeMoment.year() === activeYear && activeMoment.month() === monthIndex
     );
@@ -162,7 +215,7 @@ const Content = ({ mode, active }) => {
     );
   };
   return (
-    <div className="flex mt-5  sm::mt-0  flex-col items-center">
+    <div className="flex flex-col items-center">
       <Tabs value={mode} onValueChange={handleModeChange}>
         <TabsList className="flex w-full">
           <TabsTrigger className="w-1/3" value="daily">
@@ -173,6 +226,9 @@ const Content = ({ mode, active }) => {
           </TabsTrigger>
           <TabsTrigger className="w-1/3" value="monthly">
             Monthly
+          </TabsTrigger>
+          <TabsTrigger className="w-1/3" value="yearly">
+            Yearly
           </TabsTrigger>
         </TabsList>
 
@@ -270,65 +326,43 @@ const Content = ({ mode, active }) => {
             </div>
           </div>
         </TabsContent>
+
+        <TabsContent
+          value="yearly"
+          className="grid grid-cols-3 gap-1 overflow-auto max-h-64"
+        >
+          {years.map((year) => (
+            <Button
+              key={year}
+              onClick={() => handleYearChange(year)}
+              variant={year === activeYear ? "default" : "ghost"}
+              className="px-1 py-2 text-xs sm:text-sm rounded-md"
+            >
+              {year}
+            </Button>
+          ))}
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
 
 const MonthPicker: React.FC = () => {
-  const active = useSelector((state: RootState) => state.active.active);
-  const mode = useSelector((state: RootState) => state.active.mode);
-
   const width = useScreenWidth();
-
-  const formatDisplayText = (): string => {
-    if (!active) return "Select Date";
-
-    if (mode === "daily") {
-      return moment(active as string).format("MMMM D, YYYY");
-    } else if (mode === "weekly") {
-      const range = active as DateRange;
-      return `${moment(range.from).format("MMM D")} - ${moment(range.to).format(
-        "MMM D, YYYY"
-      )}`;
-    } else if (mode === "monthly") {
-      return moment(active as string).format("MMMM YYYY");
-    }
-
-    return "Select Date";
-  };
 
   return (
     <div className="flex flex-col items-start">
-      {width < 640 ? (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline" className="font-normal">
-              <CalendarRange />
-              <span className="hidden sm:inline ml-2">
-                {formatDisplayText()}
-              </span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-full h-dvh p-4">
-            <Content mode={mode} active={active} />
-          </DialogContent>
-        </Dialog>
-      ) : (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button size="sm" variant="outline" className="font-normal">
-              <CalendarRange />
-              <span className="hidden sm:inline ml-2">
-                {formatDisplayText()}
-              </span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent side="bottom" align="end" className="w-[325px] p-4">
-            <Content mode={mode} active={active} />
-          </PopoverContent>
-        </Popover>
-      )}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button size="sm" variant="outline" className="font-normal">
+            <CalendarRange />
+            <span className="hidden sm:inline ml-2">{formatDateDisplay()}</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent side="bottom" align="end" className="w-[325px]">
+          <Content />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

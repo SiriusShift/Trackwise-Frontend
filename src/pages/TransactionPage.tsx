@@ -38,6 +38,7 @@ import CommonTracker from "@/components/common/CommonTracker";
 import { trackerFormType } from "@/types";
 import { toast } from "sonner";
 import TypeSelect from "@/components/page-components/expense/TypeSelect";
+import { formatMode } from "@/utils/CustomFunctions";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -49,10 +50,10 @@ const TransactionPage = () => {
   const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<string>("History");
   const [startDate, setStartDate] = useState<Date | null>(
-    moment(typeof active === "string" ? active : active?.from)
+    moment(typeof active === "string" ? active : active?.from).toDate()
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    moment(typeof active === "string" ? active : active?.to)
+    moment(typeof active === "string" ? active : active?.to).toDate()
   );
   console.log(startDate, endDate);
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
@@ -177,8 +178,8 @@ const TransactionPage = () => {
 
   useEffect(() => {
     if(active === null) return
-    setStartDate(moment(typeof active === "string" ? active : active?.from));
-    setEndDate(moment(typeof active === "string" ? active : active?.to));
+    setStartDate(moment(typeof active === "string" ? active : active?.from).toDate());
+    setEndDate(moment(typeof active === "string" ? active : active?.to).toDate());
   }, [active]);
 
   return (
@@ -187,10 +188,10 @@ const TransactionPage = () => {
       <div>
         <div className="flex justify-between">
           <p className="text-xl font-semibold">{currentPageName?.name}</p>
-          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate} />
+          <MonthPicker />
         </div>
         <p className="text-gray-400">
-          This is your overview of {activeType} for this month
+          This is your overview of {activeType} for this {formatMode()}
         </p>
       </div>
 
@@ -205,7 +206,7 @@ const TransactionPage = () => {
             <TransactionDialog mode="add" type={activeType} />
             <Button size="sm" variant="outline">
               <ArrowDownToLine className="lg:mr-2" />
-              <span className="hidden lg:inline">Export</span>
+              <span className="hidden md:inline">Export</span>
             </Button>
             <FilterSheet
               setClear={clearFilter}

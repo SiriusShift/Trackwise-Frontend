@@ -15,4 +15,4 @@ export const assetsApi = api.enhanceEndpoints({ addTagTypes: ["Assets"] }).injec
     }),
 });
 
-export const { useGetAssetQuery } = assetsApi
+export const { useGetAssetQuery, useLazyGetAssetQuery } = assetsApi

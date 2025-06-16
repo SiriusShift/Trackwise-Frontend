@@ -48,7 +48,6 @@ export const resetPasswordSchema = {
 
 export const expenseSchema = {
   schema: yup.object().shape({
-    expenseId: yup.string().nullable(),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
     amount: yup
@@ -56,43 +55,16 @@ export const expenseSchema = {
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
     date: yup.date().required("Date is required"),
+    recurring: yup.boolean().required("Recurring is required"),
     source: yup.object().required("Source is required"),
-    recipient: yup.string().required("Receipient is required"),
   }),
   defaultValues: {
-    expenseId: null,
-    category: "",
+    category: null,
     description: "",
-    amount: "",
-    date: "",
-    source: "",
-    recipient: "",
-  },
-};
-
-export const recurringExpense = {
-  schema: yup.object().shape({
-    userId: yup.string().required("User Id is required"),
-    expenseId: yup.string().nullable(),
-    category: yup.object().required("Category is required"),
-    description: yup.string().required("Description is required"),
-    frequency: yup.object().required("Frequency is required"),
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    startDate: yup.date().required("Start date is required"),
-    recipient: yup.string().required("Receipient is required"),
-  }),
-  defaultValues: {
-    userId: null,
-    expenseId: "",
-    category: "",
-    description: "",
-    frequency: "",
-    amount: 0,
-    startDate: "",
-    recipient: "",
+    amount: null,
+    date: new Date(),
+    recurring: false,
+    source: null,
   },
 };
 

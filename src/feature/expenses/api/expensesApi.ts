@@ -2,7 +2,7 @@ import { api } from "@/feature/api";
 import { useGetAssetQuery } from "@/feature/assets/api/assetsApi";
 
 export const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Expenses", "RecurringExpense"] })
+  .enhanceEndpoints({ addTagTypes: ["Expenses"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getExpenses: builder.query({

@@ -27,7 +27,7 @@ export function FilterSheet({
       <SheetTrigger asChild>
         <Button size="sm" variant="outline" className="flex items-center gap-2">
           <Filter />
-          <span className="hidden lg:inline">Filter</span>
+          <span className="hidden md:inline">Filter</span>
         </Button>
       </SheetTrigger>
 

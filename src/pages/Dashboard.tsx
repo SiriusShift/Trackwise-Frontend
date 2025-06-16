@@ -6,7 +6,7 @@ import {
   YAxis,
 } from "recharts";
 
-import {useState } from "react";
+import {useEffect, useState } from "react";
 import {
   Plane,
 } from "lucide-react";
@@ -39,6 +39,7 @@ import LimitWidget from "@/components/page-components/dashboard/LimitWidget";
 import { formatString } from "@/utils/CustomFunctions";
 import NoData from "@/assets/images/empty-box.png";
 import TransactionHistory from "@/components/page-components/dashboard/TransactionHistory";
+import { useSelector } from "react-redux";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -84,25 +85,12 @@ const chartConfig = {
  * <Dashboard />
  */
 const Dashboard = () => {
-  const currentDay = new Date().getDate();
-  let activeMonth = localStorage.getItem("activeMonth");
-  activeMonth = activeMonth ? JSON.parse(activeMonth) : new Date();
-  const [startDate, setStartDate] = useState<Date | null>(
-    moment(activeMonth).startOf("month").toDate()
-  );
-  var timeZones = moment.tz.names();
-  // console.log(timeZones);
-  const [endDate, setEndDate] = useState<Date | null>(
-    moment(activeMonth).endOf("month").toDate()
-  );
-  const [activeDay, setActiveDay] = useState(currentDay);
-
   const { theme } = useTheme();
   const location = useLocation();
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname
   );
-  const totalVisitors = chartData1[0].bills + chartData1[0].food;
+  // const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   return (
     <div className="space-y-5">
@@ -114,20 +102,20 @@ const Dashboard = () => {
           </p>
         </div>
         <div>
-          <MonthPicker setStartDate={setStartDate} setEndDate={setEndDate} />
+          <MonthPicker />
         </div>
       </div>
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
             <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
-              <OverviewWidget startDate={startDate} endDate={endDate} />
+              <OverviewWidget />
               <LimitWidget />
-              <CalendarWidget
-                activeDay={activeDay}
+              {/* <CalendarWidget
+                // activeDay={activeDay}
                 colorTheme={theme}
-                handleClick={setActiveDay}
-              />
+                // handleClick={setActiveDay}
+              /> */}
             </div>
             <div className="gap-5 space-y-5 z-30 2xl:h-[342px] sm:space-y-0 sm:grid-rows-2 md:grid-rows-1 sm:grid grid-cols-4">
               <div className="col-span-full md:col-span-2 lg:col-span-2">
@@ -211,21 +199,7 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent className="px-7">
                     <div className="grid gap-5 grid-rows-2 sm:grid-rows-1 grid-cols-2">
-                      <div className="col-span-2 sm:col-span-1 mt-3 space-y-4">
-                        <Progress className="w-full rounded-sm" value={75} />
-                        <div className="border-l-2 border-dashed">
-                          <div className="p-3 space-x-3 sm:space-x-0 sm:space-y-3 flex items-start sm:block">
-                            <div className="w-12 flex justify-center items-center h-12 rounded-md bg-gray-100">
-                              <Plane className="text-black" />
-                            </div>
-                            <div>
-                              <h1 className="text-lg font-bold">Travel</h1>
-                              <p>₱ 5,392.00 / 35,200.00</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-span-2 sm:col-span-1 mt-3 space-y-4">
+                      <div className="col-span-2 mt-3 space-y-4">
                         <Progress className="w-full rounded-sm" value={75} />
                         <div className="border-l-2 border-dashed">
                           <div className="p-3 space-x-3 sm:space-x-0 sm:space-y-3 flex items-start sm:block">

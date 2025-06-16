@@ -28,7 +28,7 @@ const LimitWidget = () => {
   const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   return (
-    <CommonWidget title="Expense Limit">
+    <CommonWidget title="Expense Breakdown">
       <ChartContainer
         config={chartConfig1}
         className="mx-auto aspect-square z-0 w-full max-w-[250px]"
