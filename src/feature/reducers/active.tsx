@@ -4,8 +4,11 @@ import moment from "moment";
 // Define the initial state as an object
 const initialState: { active: Object; type: string; mode: string; } =
   {
-    active: new Date(),
-    mode: "daily",
+    active: {
+      from: moment().startOf("month"),
+      to: moment().endOf("month")
+    },
+    mode: "monthly",
     type: "Expense",
   };
 

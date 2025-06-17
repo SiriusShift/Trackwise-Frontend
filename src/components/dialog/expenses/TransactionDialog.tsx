@@ -6,6 +6,7 @@ import {
   Wallet,
   Pencil,
   Repeat,
+  CalendarRange,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -44,10 +45,13 @@ import {
 } from "@/components/ui/select";
 import { Input } from "../../ui/input";
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuRadioItem,
+  DropdownMenuRadioGroup,
+} from "@/components/ui/dropdown-menu";
 import moment from "moment";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -66,7 +70,6 @@ import { usePostExpenseMutation } from "@/feature/expenses/api/expensesApi";
 import { toast } from "sonner";
 import { frequencies } from "@/utils/Constants";
 // import { date } from "yup";
-import { DropdownMenuItem } from "../../ui/dropdown-menu";
 import {
   Dialog,
   DialogTrigger,
@@ -80,14 +83,21 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { useConfirm } from "@/context/ConfirmContext";
 import { title } from "process";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type AddExpenseFormData = {
   category: Object;
   description: string;
   amount: number;
-  recurring: boolean;
+  mode: string;
+  frequency: Object;
   date: Date;
   source: Object;
+  months: number;
 };
 
 export function TransactionDialog({
@@ -100,6 +110,7 @@ export function TransactionDialog({
   type: string;
   mode: string;
 }) {
+  const [open, setOpen] = useState(false)
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
 
@@ -110,8 +121,6 @@ export function TransactionDialog({
   const { data: frequencyData } = useGetFrequencyQuery();
   let { data: assetData } = useGetAssetQuery();
   assetData = assetData?.data;
-
-  console.log(assetData);
   const [postExpense, { isLoading }] = usePostExpenseMutation();
   const [triggerPatchExpense, { isLoading: patchLoading }] =
     usePatchExpenseMutation();
@@ -142,7 +151,7 @@ export function TransactionDialog({
       setValue("description", rowData?.description);
       setValue("amount", rowData?.amount);
       setValue("category", rowData?.category);
-      setInitialData(watch());
+      // setInitialData(watch());
     }
   }, [rowData]);
 
@@ -166,6 +175,7 @@ export function TransactionDialog({
         reset({
           ...expenseSchema.defaultValues,
         }); // Reset the form after successful submission
+        setOpen(false)
         toast.success("Expense updated successfully");
       } else {
         await confirm({
@@ -175,24 +185,28 @@ export function TransactionDialog({
           confirmText: "Add",
           cancelText: "Cancel",
           onConfirm: async () => {
-            await postExpense({
-              ...data,
-              recurring: data?.recurring,
-              source: data?.source?.id || "",
-              category: data?.category?.id || "",
-              amount: parseFloat(data?.amount),
-              date: moment(data?.date).utc().format(),
-              assetBalance: watch("source")?.remainingBalance,
-            }).then(() => {
+            try {
+              await postExpense({
+                ...data,
+                recurring: data?.recurring,
+                source: data?.source?.id || "",
+                category: data?.category?.id || "",
+                amount: parseFloat(data?.amount),
+                date: moment(data?.date).utc().format(),
+                assetBalance: watch("source")?.remainingBalance,
+              }).unwrap();
+
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-            });
+              reset({
+                ...expenseSchema.defaultValues,
+              });
+            } catch (err) {
+              console.log(err)
+              toast.error(err?.data?.error)
+            }
           },
         });
-
-        reset({
-          ...expenseSchema.defaultValues,
-        }); // Reset the form after successful submission
       }
     } catch (err) {
       console.log(err);
@@ -202,10 +216,10 @@ export function TransactionDialog({
 
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {mode === "add" ? (
-            <Button size="sm" variant="outline">
+            <Button onClick={() => setOpen(true)} size="sm" variant="outline">
               <Plus className="lg:mr-2" />
               <span className="hidden md:inline">Add</span>
             </Button>
@@ -213,16 +227,20 @@ export function TransactionDialog({
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
+                setOpen(true)
                 // setDropdownOpen(false); // Close the dropdown
               }}
-              disabled={rowData?.status === "Paid"}
+              // disabled={rowData?.status === "Paid"}
             >
               <Pencil /> Edit
             </DropdownMenuItem>
           )}
         </DialogTrigger>
 
-        <DialogContent onInteractOutside={(e) => isDirty && e.preventDefault()} className="w-full flex flex-col h-dvh sm:h-auto sm:w-md">
+        <DialogContent
+          onInteractOutside={(e) => isDirty && e.preventDefault()}
+          className="w-full flex flex-col h-dvh sm:h-auto sm:w-md"
+        >
           <DialogHeader>
             <DialogTitle>{mode === "add" ? "Add" : "Edit"} expense</DialogTitle>
             <DialogDescription>
@@ -444,7 +462,7 @@ export function TransactionDialog({
                                 </label>
                                 <input
                                   type="time"
-                                  className="border text-muted-foreground rounded-md px-2 py-1 text-sm"
+                                  className="border text-black rounded-md px-2 py-1 text-sm"
                                   value={
                                     field.value
                                       ? moment(field.value).format("HH:mm")
@@ -480,29 +498,111 @@ export function TransactionDialog({
                             </div>
                           </PopoverContent>
                         </Popover>
-                        <FormMessage>{errors.date?.message}</FormMessage>
+                        {/* <FormMessage>{errors.date?.message}</FormMessage> */}
                       </FormItem>
                     )}
                   />
                   <FormField
                     control={control}
-                    name="recurring"
+                    name="mode"
                     render={({ field }) => (
                       <FormItem className="flex items-end">
                         <FormControl>
-                          <Toggle
-                            variant="outline"
-                            pressed={field.value}
-                            onPressedChange={field.onChange}
-                          >
-                            <Repeat />
-                          </Toggle>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="font-normal gap-2"
+                              >
+                                <Repeat />
+                                {field.value && field.value !== "none" && (
+                                  <span className="hidden sm:inline capitalize">
+                                    {field.value}
+                                  </span>
+                                )}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuRadioGroup
+                                value={field.value}
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  setValue("frequency", null);
+                                  setValue("months", null);
+                                }}
+                              >
+                                <DropdownMenuRadioItem value="none">
+                                  None
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="recurring">
+                                  Recurring
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="installment">
+                                  Installment
+                                </DropdownMenuRadioItem>
+                              </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+                {watch("mode") === "recurring" && (
+                  <FormField
+                    name="frequency"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Frequency</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={(value) => {
+                              const selectedCategory = frequencyData?.find(
+                                (frequency) => frequency.name === value
+                              );
+                              field.onChange(selectedCategory);
+                            }}
+                            value={field.value?.name}
+                          >
+                            <SelectTrigger className="capitalize">
+                              <SelectValue placeholder="Select frequency" />
+                            </SelectTrigger>
+                            <SelectContent
+                              portal={false}
+                              className="max-h-[200px]"
+                            >
+                              {frequencyData?.map((frequency) => (
+                                <SelectItem
+                                  key={frequency.id}
+                                  value={frequency.name}
+                                >
+                                  {frequency.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                {watch("mode") === "installment" && (
+                  <FormField
+                    name="months"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Installment Term</FormLabel>
+                        <FormControl>
+                          <Input min={0} {...field} type="number" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  ></FormField>
+                )}
               </div>
 
               {/* Footer Buttons */}

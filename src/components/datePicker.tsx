@@ -40,13 +40,12 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from(
-  { length: currentYear - 2000 + 1 },
-  (_, i) => 2000 + i
+  { length: currentYear - 2000  + 1 },
+  (_, i) => currentYear - i
 );
 const Content = () => {
   const dispatch = useDispatch();
   const active = useSelector((state: RootState) => state.active.active);
-  console.log(active);
   const mode = useSelector((state: RootState) => state.active.mode);
 
   const [activeYear, setActiveYear] = useState(new Date().getFullYear());
@@ -90,14 +89,12 @@ const Content = () => {
     }
 
     setDate(range);
-    console.log(range);
 
     if (range.from && range.to) {
       const data: DateRange = {
         from: range.from.toISOString(),
         to: range.to.toISOString(),
       };
-      console.log(data);
       dispatch(setActive(data));
     }
   };
@@ -109,12 +106,10 @@ const Content = () => {
       month: monthIndex,
       day: 1,
     }).toDate();
-    console.log(newDate);
     const transformDate = {
       from: moment(newDate).startOf("month").toISOString(),
       to: moment(newDate).endOf("month").toISOString(),
     };
-    console.log(transformDate);
     dispatch(setActive(transformDate));
     setDate(transformDate);
   };
@@ -141,7 +136,6 @@ const Content = () => {
     } else if (newMode === "weekly") {
       const startOfWeek = moment().startOf("week").toISOString();
       const endOfWeek = moment().endOf("week").toISOString();
-      console.log(endOfWeek);
       const range = {
         from: startOfWeek,
         to: endOfWeek,
@@ -151,7 +145,6 @@ const Content = () => {
     } else if (newMode === "monthly") {
       const startOfMonth = moment().startOf("month").toISOString();
       const endOfMonth = moment().endOf("month").toISOString();
-      console.log(endOfMonth);
       const range = {
         from: startOfMonth,
         to: endOfMonth,
@@ -161,7 +154,6 @@ const Content = () => {
     } else if (newMode === "yearly") {
       const startOfYear = moment().startOf("year").toISOString();
       const endOfYear = moment().endOf("year").toISOString();
-      console.log(endOfYear);
       const range = {
         from: startOfYear,
         to: endOfYear,
@@ -184,9 +176,7 @@ const Content = () => {
   const isSelectedMonth = (monthIndex: number): boolean => {
     if (!active || (mode !== "monthly" && mode !== "daily")) return false;
 
-    console.log(active);
     const activeMoment = moment(active?.from as string);
-    console.log(activeMoment.month());
     return (
       activeMoment.year() === activeYear && activeMoment.month() === monthIndex
     );
@@ -215,23 +205,23 @@ const Content = () => {
     );
   };
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col w-full items-center">
       <Tabs value={mode} onValueChange={handleModeChange}>
         <TabsList className="flex w-full">
-          <TabsTrigger className="w-1/3" value="daily">
+          {/* <TabsTrigger className="w-1/3" value="daily">
             Daily
           </TabsTrigger>
           <TabsTrigger className="w-1/3" value="weekly">
             Weekly
-          </TabsTrigger>
-          <TabsTrigger className="w-1/3" value="monthly">
+          </TabsTrigger> */}
+          <TabsTrigger className="w-1/2" value="monthly">
             Monthly
           </TabsTrigger>
-          <TabsTrigger className="w-1/3" value="yearly">
+          <TabsTrigger className="w-1/2" value="yearly">
             Yearly
           </TabsTrigger>
         </TabsList>
-
+        {/* 
         <TabsContent value="daily">
           <Calendar
             mode="single"
@@ -283,7 +273,7 @@ const Content = () => {
             onSelect={handleWeeklyChange}
             disabled={(date) => isAfter(date, new Date())}
           />
-        </TabsContent>
+        </TabsContent> */}
 
         <TabsContent value="monthly">
           <div className="p-3">
@@ -336,7 +326,7 @@ const Content = () => {
               key={year}
               onClick={() => handleYearChange(year)}
               variant={year === activeYear ? "default" : "ghost"}
-              className="px-1 py-2 text-xs sm:text-sm rounded-md"
+              className="px-10 text-xs sm:text-sm rounded-md"
             >
               {year}
             </Button>

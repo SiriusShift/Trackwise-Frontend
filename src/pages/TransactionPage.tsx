@@ -53,7 +53,7 @@ const TransactionPage = () => {
     moment(typeof active === "string" ? active : active?.from).toDate()
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    moment(typeof active === "string" ? active : active?.to).toDate()
+    moment(typeof active !== "string" && active?.to).toDate()
   );
   console.log(startDate, endDate);
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
@@ -168,6 +168,9 @@ const TransactionPage = () => {
 
   //UseEffect
   useEffect(() => {
+    if(typeof startDate === "string"){
+      
+    }
     triggerExpense({
       startDate,
       endDate,

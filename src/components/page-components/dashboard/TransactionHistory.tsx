@@ -49,8 +49,7 @@ const TransactionHistory = () => {
                   </div>
                   <p className="text-gray-400 text-sm">
                     {item?.category?.name} -{" "}
-                    {moment
-                      .tz(item?.date, "Asia/Manila")
+                    {moment(item?.date)
                       .format("MMM DD, h:mm A")}
                   </p>
                 </div>
