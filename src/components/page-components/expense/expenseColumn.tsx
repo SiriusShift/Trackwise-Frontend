@@ -53,14 +53,14 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       );
     },
   },
-  {
-    accessorKey: "recipient",
-    header: "Recipient",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "recipient",
+  //   header: "Recipient",
+  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "category.name",
     header: "Category",

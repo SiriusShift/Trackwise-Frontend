@@ -66,6 +66,7 @@ export const expenseSchema = {
       then: (schema) => schema.required("Installment Term is required").positive("Months must be greater than 0"),
       otherwise: (schema) => schema.notRequired(),
     }),
+    image: yup.mixed(),
 
     source: yup.object().required("Source is required"),
   }),

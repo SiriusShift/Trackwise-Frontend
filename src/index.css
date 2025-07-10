@@ -11,6 +11,30 @@ body {
   overflow: hidden;
 } */
 
+
+* {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: hsl(var(--muted)) hsl(var(--background));
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px; /* optional to keep horizontal scrollbar thin */
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
 .sidebar-header,
 .sidebar-footer {
   transition: opacity 0.3s ease-in-out;

@@ -96,6 +96,7 @@ type AddExpenseFormData = {
   mode: string;
   frequency: Object;
   date: Date;
+  image: File;
   source: Object;
   months: number;
 };
@@ -110,7 +111,7 @@ export function TransactionDialog({
   type: string;
   mode: string;
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
 
@@ -175,7 +176,7 @@ export function TransactionDialog({
         reset({
           ...expenseSchema.defaultValues,
         }); // Reset the form after successful submission
-        setOpen(false)
+        setOpen(false);
         toast.success("Expense updated successfully");
       } else {
         await confirm({
@@ -194,6 +195,7 @@ export function TransactionDialog({
                 amount: parseFloat(data?.amount),
                 date: moment(data?.date).utc().format(),
                 assetBalance: watch("source")?.remainingBalance,
+                ...(data?.image && { image: data?.image }),
               }).unwrap();
 
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
@@ -202,8 +204,8 @@ export function TransactionDialog({
                 ...expenseSchema.defaultValues,
               });
             } catch (err) {
-              console.log(err)
-              toast.error(err?.data?.error)
+              console.log(err);
+              toast.error(err?.data?.error);
             }
           },
         });
@@ -213,6 +215,19 @@ export function TransactionDialog({
       toast.error("error");
     }
   };
+
+  const handleClose = () => {
+    confirm({
+      description: "Are you sure you want to close this dialog?",
+      title: "Close Dialog",
+      variant: "destructive",
+      confirmText: "Close",
+      cancelText: "Cancel",
+      onConfirm: () => {
+        setOpen(false);
+      },
+    })
+  }
 
   return (
     <>
@@ -227,7 +242,7 @@ export function TransactionDialog({
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
-                setOpen(true)
+                setOpen(true);
                 // setDropdownOpen(false); // Close the dropdown
               }}
               // disabled={rowData?.status === "Paid"}
@@ -601,8 +616,28 @@ export function TransactionDialog({
                         </FormControl>
                       </FormItem>
                     )}
-                  ></FormField>
+                  />
                 )}
+                <FormField
+                  name="image"
+                  control={control}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Attachment</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Upload Image"
+                          min={0}
+                          type="file"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Footer Buttons */}
@@ -612,7 +647,7 @@ export function TransactionDialog({
                 </Button>
 
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
+                  <Button type="button" onClick={() => isDirty ? handleClose() : setOpen(false)} variant="secondary">
                     Close
                   </Button>
                 </DialogClose>
