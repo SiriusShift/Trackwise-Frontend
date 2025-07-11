@@ -114,6 +114,7 @@ export function TransactionDialog({
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
+  console.log(rowData)
 
   // RTK QUERY
   const { data: categoryData } = useGetCategoryQuery({
@@ -152,6 +153,7 @@ export function TransactionDialog({
       setValue("description", rowData?.description);
       setValue("amount", rowData?.amount);
       setValue("category", rowData?.category);
+      setValue("image", rowData?.image)
       // setInitialData(watch());
     }
   }, [rowData]);
@@ -203,6 +205,7 @@ export function TransactionDialog({
               reset({
                 ...expenseSchema.defaultValues,
               });
+              setOpen(false);
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
@@ -621,19 +624,27 @@ export function TransactionDialog({
                 <FormField
                   name="image"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field : {onChange} }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Attachment</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Upload Image"
-                          min={0}
-                          type="file"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            field.onChange(file);
-                          }}
-                        />
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        console.log(file)
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            onChange(reader.result); // this updates the form field
+                            // setValue("fileName", file?.name)
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      id="imageUploader"
+                    />
                       </FormControl>
                     </FormItem>
                   )}

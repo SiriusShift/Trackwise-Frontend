@@ -126,7 +126,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     cell: ({ row }) => {
       const expense = row.original;
       const dispatch = useDispatch();
-      // console.log(expense);
+      console.log(row);
 
       const activeTab = useSelector((state: any) => state.active.expenseTab);
 
