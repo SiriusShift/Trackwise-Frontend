@@ -1,5 +1,5 @@
 import React from "react";
-import { AddDialog } from "../dialog/expenses/TransactionDialog";
+import { AddDialog } from "../dialog/transaction/TransactionDialog";
 import { Button } from "../ui/button";
 import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
 import { CommonToolbarProps } from "../../types/index";
@@ -16,13 +16,16 @@ function CommonToolbar({ type, children, active, title }: CommonToolbarProps) {
       <div className="flex w-full gap-2 overflow-x-auto items-center justify-start sm:justify-between whitespace-nowrap">
         {screenWidth > 640 ? children : null}
         <div className="flex gap-2 p-1">
-          <Input placeholder="Search.." className="w-auto hidden sm:inline sm:w-52 h-9" />
+          <Input
+            placeholder="Search.."
+            className="w-auto hidden sm:inline sm:w-52 h-9"
+          />
           <AddDialog type={type} active={active} />
           <Button size={"sm"} variant={"outline"}>
             <ArrowDownToLine />
             <span className="inline sm:hidden lg:inline">Export</span>
           </Button>
-          <FilterSheet title={title}/>
+          <FilterSheet title={title} />
         </div>
       </div>
     </div>

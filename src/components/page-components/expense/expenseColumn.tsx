@@ -21,10 +21,10 @@ import moment from "moment";
 import { Badge } from "@/components/ui/badge";
 import { DeleteDialog } from "@/components/dialog/DeleteDialog";
 import { useDeleteExpenseMutation } from "@/feature/expenses/api/expensesApi";
-import { TransactionDialog } from "@/components/dialog/expenses/TransactionDialog";
+import { TransactionDialog } from "@/components/dialog/transaction/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import PayDialog from "@/components/dialog/expenses/PayDialog";
+import PayDialog from "@/components/dialog/transaction/PayDialog";
 import { assetsApi } from "@/feature/assets/api/assetsApi";
 import { categoryApi } from "@/feature/category/api/categoryApi";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
@@ -148,7 +148,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <TransactionDialog rowData={expense} active={activeTab} mode="edit" />
+              <TransactionDialog
+                rowData={expense}
+                active={activeTab}
+                mode="edit"
+              />
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -285,7 +289,11 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <PayDialog rowData={expense} />
-              <TransactionDialog rowData={expense} active={activeTab} mode="edit" />
+              <TransactionDialog
+                rowData={expense}
+                active={activeTab}
+                mode="edit"
+              />
               <DropdownMenuItem>
                 <Eye />
                 View

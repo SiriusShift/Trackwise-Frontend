@@ -40,7 +40,7 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from(
-  { length: currentYear - 2000  + 1 },
+  { length: currentYear - 2000 + 1 },
   (_, i) => currentYear - i
 );
 const Content = () => {
@@ -72,32 +72,6 @@ const Content = () => {
       }
     }
   }, [active, mode]);
-
-  const handleDailyChange = (selectedDate: Date | undefined) => {
-    if (!selectedDate) return;
-
-    setDate(selectedDate);
-    dispatch(setActive(selectedDate.toISOString()));
-  };
-
-  const handleWeeklyChange = (
-    range: { from?: Date; to?: Date } | undefined
-  ) => {
-    if (!range) {
-      setDate(null);
-      return;
-    }
-
-    setDate(range);
-
-    if (range.from && range.to) {
-      const data: DateRange = {
-        from: range.from.toISOString(),
-        to: range.to.toISOString(),
-      };
-      dispatch(setActive(data));
-    }
-  };
 
   const handleMonthChange = (monthIndex: number) => {
     // Create first day of selected month
@@ -182,38 +156,10 @@ const Content = () => {
     );
   };
 
-  // Fix the weekly range_middle logic
-  const isDateInWeekRange = (checkDate: Date): boolean => {
-    if (
-      !date ||
-      typeof date !== "object" ||
-      !("from" in date) ||
-      !date.from ||
-      !date.to
-    ) {
-      return false;
-    }
-
-    const checkMoment = moment(checkDate);
-    const fromMoment = moment(date.from);
-    const toMoment = moment(date.to);
-
-    // Check if date is between from and to (excluding ends)
-    return (
-      checkMoment.isAfter(fromMoment, "day") &&
-      checkMoment.isBefore(toMoment, "day")
-    );
-  };
   return (
     <div className="flex flex-col w-full items-center">
       <Tabs value={mode} onValueChange={handleModeChange}>
         <TabsList className="flex w-full">
-          {/* <TabsTrigger className="w-1/3" value="daily">
-            Daily
-          </TabsTrigger>
-          <TabsTrigger className="w-1/3" value="weekly">
-            Weekly
-          </TabsTrigger> */}
           <TabsTrigger className="w-1/2" value="monthly">
             Monthly
           </TabsTrigger>
@@ -221,59 +167,6 @@ const Content = () => {
             Yearly
           </TabsTrigger>
         </TabsList>
-        {/* 
-        <TabsContent value="daily">
-          <Calendar
-            mode="single"
-            selected={date instanceof Date ? date : undefined}
-            onSelect={handleDailyChange}
-            disabled={(date) => isAfter(date, new Date())}
-          />
-        </TabsContent>
-
-        <TabsContent value="weekly">
-          <Calendar
-            modifiers={{
-              selected:
-                date && typeof date === "object" && "from" in date
-                  ? date
-                  : undefined,
-              range_start:
-                date && typeof date === "object" && "from" in date
-                  ? date.from
-                  : undefined,
-              range_end:
-                date && typeof date === "object" && "from" in date
-                  ? date.to
-                  : undefined,
-              range_middle: isDateInWeekRange,
-            }}
-            onDayClick={(day, modifiers) => {
-              if (modifiers.selected) {
-                setDate(null);
-                dispatch(setActive(null));
-                return;
-              }
-
-              const weekStart = startOfWeek(day);
-              const weekEnd = endOfWeek(day);
-
-              setDate({
-                from: weekStart,
-                to: weekEnd,
-              });
-
-              dispatch(
-                setActive({
-                  from: weekStart.toISOString(),
-                  to: weekEnd.toISOString(),
-                })
-              );
-            }}
-            onSelect={handleWeeklyChange}
-            disabled={(date) => isAfter(date, new Date())}
-          />
-        </TabsContent> */}
 
         <TabsContent value="monthly">
           <div className="p-3">
@@ -349,7 +242,7 @@ const MonthPicker: React.FC = () => {
             <span className="hidden sm:inline ml-2">{formatDateDisplay()}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent side="bottom" align="end" className="w-[325px]">
+        <PopoverContent side="bottom" align="end" className="sm:w-[325px]">
           <Content />
         </PopoverContent>
       </Popover>

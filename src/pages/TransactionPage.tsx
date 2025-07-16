@@ -23,7 +23,7 @@ import {
   usePatchCategoryLimitMutation,
   usePostCategoryLimitMutation,
 } from "@/feature/category/api/categoryApi";
-import { TransactionDialog } from "@/components/dialog/expenses/TransactionDialog";
+import { TransactionDialog } from "@/components/dialog/transaction/TransactionDialog";
 import moment from "moment";
 import { Input } from "@/components/ui/input";
 import {
@@ -168,8 +168,7 @@ const TransactionPage = () => {
 
   //UseEffect
   useEffect(() => {
-    if(typeof startDate === "string"){
-      
+    if (typeof startDate === "string") {
     }
     triggerExpense({
       startDate,
@@ -180,9 +179,13 @@ const TransactionPage = () => {
   }, [pageSize, pageIndex, startDate, endDate, activeType]);
 
   useEffect(() => {
-    if(active === null) return
-    setStartDate(moment(typeof active === "string" ? active : active?.from).toDate());
-    setEndDate(moment(typeof active === "string" ? active : active?.to).toDate());
+    if (active === null) return;
+    setStartDate(
+      moment(typeof active === "string" ? active : active?.from).toDate()
+    );
+    setEndDate(
+      moment(typeof active === "string" ? active : active?.to).toDate()
+    );
   }, [active]);
 
   return (

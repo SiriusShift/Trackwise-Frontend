@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { DeleteDialog } from "../dialog/DeleteDialog";
-import TrackerDialog from "../dialog/expenses/TrackerDialog";
+import TrackerDialog from "../dialog/transaction/TrackerDialog";
 import { commonTrackerProps } from "@/types";
 
 // Separated component for Add Card
@@ -184,7 +184,13 @@ function CommonTracker({
         className="relative w-full"
       >
         <CarouselContent className="h-full">
-          <AddCard addDescription={addDescription} isLoading={isLoading} title={title} type={type} onSubmit={onSubmit} />
+          <AddCard
+            addDescription={addDescription}
+            isLoading={isLoading}
+            title={title}
+            type={type}
+            onSubmit={onSubmit}
+          />
           {data?.map((item, index) => (
             <TrackerCard
               key={index}

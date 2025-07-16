@@ -56,16 +56,25 @@ export const expenseSchema = {
       .positive("Amount must be greater than 0"),
     date: yup.date().required("Date is required"),
     mode: yup.string().nullable(),
-    frequency: yup.object().nullable().when("mode", {
-      is: "recurring",
-      then: (schema) => schema.required("Frequency is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    months: yup.number().nullable().when("mode", {
-      is: "installment",
-      then: (schema) => schema.required("Installment Term is required").positive("Months must be greater than 0"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+    repeat: yup
+      .object()
+      .nullable()
+      .when("mode", {
+        is: "recurring",
+        then: (schema) => schema.required("Frequency is required"),
+        otherwise: (schema) => schema.notRequired(),
+      }),
+    months: yup
+      .number()
+      .nullable()
+      .when("mode", {
+        is: "installment",
+        then: (schema) =>
+          schema
+            .required("Installment Term is required")
+            .positive("Months must be greater than 0"),
+        otherwise: (schema) => schema.notRequired(),
+      }),
     image: yup.mixed(),
 
     source: yup.object().required("Source is required"),
