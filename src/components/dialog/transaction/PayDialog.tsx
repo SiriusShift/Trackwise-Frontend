@@ -1,7 +1,7 @@
-import useScreenWidth from "@/hooks/useScreenWidth";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { CreditCard, Loader, Pencil, Plus } from "lucide-react";
 import React from "react";
-import { Button } from "../../ui/button";
+import { Button } from "../../../shared/components/ui/button";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogDescription,
-} from "../../ui/alert-dialog";
+} from "../../../shared/components/ui/alert-dialog";
 import {
   Sheet,
   SheetTrigger,
@@ -20,33 +20,33 @@ import {
   SheetFooter,
   SheetTitle,
   SheetClose,
-} from "@/components/ui/sheet";
+} from "@/shared/components/ui/sheet";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { payRecurringSchema } from "@/schema/schema";
-import { payRecurringForm } from "@/types";
+import { payRecurringForm } from "@/shared/types";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../ui/form";
-import { Input } from "../../ui/input";
-import { numberInput } from "@/utils/CustomFunctions";
+} from "../../../shared/components/ui/form";
+import { Input } from "../../../shared/components/ui/input";
+import { numberInput } from "@/shared/utils/CustomFunctions";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
 import { toast } from "sonner";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGetAssetQuery } from "@/feature/assets/api/assetsApi";
+} from "@/shared/components/ui/select";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import { useDispatch } from "react-redux";
-import { usePostRecurringPaymentMutation } from "@/feature/expenses/api/expensesApi";
+import { usePostRecurringPaymentMutation } from "@/features/transactions/api/expensesApi";
 
 function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
   const width = useScreenWidth();

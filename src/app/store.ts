@@ -1,8 +1,8 @@
 "use client"
 import { configureStore } from '@reduxjs/toolkit';
-import { api } from '../feature/api'; // Import your API slice
-import { signFormSlice } from '../feature/authentication/reducers/userDetail';
-import { active } from '@/feature/reducers/active';
+import { api } from '../shared/services/api'; // Import your API slice
+import { signFormSlice } from '../shared/slices/userSlice';
+import { active } from '@/shared/slices/activeSlice';
 export const store = configureStore({
   reducer: {
     userDetails: signFormSlice.reducer,

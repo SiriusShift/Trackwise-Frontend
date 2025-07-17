@@ -1,7 +1,7 @@
-import { navigationData } from "@/navigation/navigationData";
+import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
-import MonthPicker from "@/components/DatePicker";
-import { DataTable } from "@/components/common/CommonTable";
+import MonthPicker from "@/shared/components/datePicker";
+import { DataTable } from "@/shared/components/Table/CommonTable";
 import {
   expenseColumns,
   recurringExpenseColumns,
@@ -11,9 +11,9 @@ import {
   useGetDetailedExpenseQuery,
   useLazyGetExpensesQuery,
   useLazyGetRecurringExpensesQuery,
-} from "@/feature/expenses/api/expensesApi";
+} from "@/features/transactions/api/expensesApi";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
 import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
 import {
@@ -22,23 +22,21 @@ import {
   useGetCategoryQuery,
   usePatchCategoryLimitMutation,
   usePostCategoryLimitMutation,
-} from "@/feature/category/api/categoryApi";
-import { TransactionDialog } from "@/components/dialog/transaction/TransactionDialog";
+} from "@/shared/api/categoryApi";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import moment from "moment";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/shared/components/ui/input";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import CommonTab from "@/components/common/CommonTab";
-import CommonTracker from "@/components/common/CommonTracker";
-import { trackerFormType } from "@/types";
+} from "@/shared/components/ui/collapsible";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
+import CommonTracker from "@/shared/components/Tracker/Tracker";
 import { toast } from "sonner";
-import TypeSelect from "@/components/page-components/expense/TypeSelect";
-import { formatMode } from "@/utils/CustomFunctions";
+import TypeSelect from "@/features/transactions/components/TypeSelect";
+import { formatMode } from "@/shared/utils/CustomFunctions";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -82,10 +80,10 @@ const TransactionPage = () => {
 
   console.log(detailedExpense);
 
-  const [
-    triggerRecurring,
-    { data: recurringData, isLoading: recurringLoading },
-  ] = useLazyGetRecurringExpensesQuery();
+  // const [
+  //   triggerRecurring,
+  //   { data: recurringData, isLoading: recurringLoading },
+  // ] = useLazyGetRecurringExpensesQuery();
 
   const { data: categoryData } = useGetCategoryQuery({});
 
@@ -192,13 +190,15 @@ const TransactionPage = () => {
     <div className="flex flex-col gap-5">
       {/* Header */}
       <div>
-        <div className="flex justify-between">
-          <p className="text-xl font-semibold">{currentPageName?.name}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-xl font-semibold">{currentPageName?.name}</p>
+            <p className="text-gray-400 text-sm">
+              Overview of {activeType} for this {formatMode()}
+            </p>
+          </div>
           <MonthPicker />
         </div>
-        <p className="text-gray-400">
-          This is your overview of {activeType} for this {formatMode()}
-        </p>
       </div>
 
       {/* Toolbar */}
@@ -340,22 +340,26 @@ const TransactionPage = () => {
           date={endDate}
           pageSize={pageSize}
           trend={expensesData?.trend}
-          isLoading={expensesLoading || recurringLoading}
+          isLoading={expensesLoading}
+          type={activeType}
           categoryExpenses={detailedExpense}
           data={expensesData?.data || []}
         />
         {/* Data Table */}
-        <CommonTracker
-          data={categoryLimit}
-          isLoading={categoryLimitLoading}
-          editDescription="Adjust and update your budget limit to match your needs."
-          addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
-          title="Budget Limit"
-          type="Expense"
-          onSubmit={onSubmit}
-          onDelete={onDelete}
-        />
       </div>
+
+      
+      <CommonTracker
+        data={categoryLimit}
+        isLoading={categoryLimitLoading}
+        editDescription="Adjust and update your budget limit to match your needs."
+        addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
+        title="Budget Limit"
+        type="Expense"
+        onSubmit={onSubmit}
+        onDelete={onDelete}
+      />
+
     </div>
   );
 };

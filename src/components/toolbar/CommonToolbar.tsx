@@ -1,11 +1,11 @@
 import React from "react";
-import { AddDialog } from "../dialog/transaction/TransactionDialog";
-import { Button } from "../ui/button";
+import { AddDialog } from "../../features/transactions/components/dialogs/TransactionDialog";
+import { Button } from "../../shared/components/ui/button";
 import { ArrowDownToLine, SlidersHorizontal } from "lucide-react";
-import { CommonToolbarProps } from "../../types/index";
-import MonthPicker from "../DatePicker";
-import { Input } from "../ui/input";
-import useScreenWidth from "@/hooks/useScreenWidth";
+import { CommonToolbarProps } from "../../shared/types/index";
+import MonthPicker from "../../shared/components/datePicker";
+import { Input } from "../../shared/components/ui/input";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { FilterSheet } from "../page-components/expense/FilterSheet";
 
 function CommonToolbar({ type, children, active, title }: CommonToolbarProps) {

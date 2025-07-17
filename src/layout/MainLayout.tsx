@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import { AppSidebar } from "@/components/app-sidebar";
-import Header from "../components/Header";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/shared/components/Sidebar";
+import Header from "../shared/components/Header";
+import { SidebarProvider } from "@/shared/components/ui/sidebar";
 
 function MainLayout() {
   return (
