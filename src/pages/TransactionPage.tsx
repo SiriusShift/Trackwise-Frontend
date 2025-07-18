@@ -1,11 +1,11 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
 import MonthPicker from "@/shared/components/datePicker";
-import { DataTable } from "@/shared/components/Table/CommonTable";
+import { DataTable } from "@/shared/components/table/CommonTable";
 import {
   expenseColumns,
   recurringExpenseColumns,
-} from "@/components/page-components/expense/expenseColumn";
+} from "@/features/transactions/components/table-columns/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
   useGetDetailedExpenseQuery,
@@ -15,7 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/shared/components/ui/button";
 import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
-import { FilterSheet } from "@/components/page-components/expense/FilterSheet";
+import { FilterSheet } from "@/shared/components/FilterSheet";
 import {
   useDeleteCategoryLimitMutation,
   useGetCategoryLimitQuery,
@@ -33,7 +33,7 @@ import {
 } from "@/shared/components/ui/collapsible";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import CommonTracker from "@/shared/components/Tracker/Tracker";
+import CommonTracker from "@/shared/components/tracker/Tracker";
 import { toast } from "sonner";
 import TypeSelect from "@/features/transactions/components/TypeSelect";
 import { formatMode } from "@/shared/utils/CustomFunctions";

@@ -1,7 +1,7 @@
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { CreditCard, Loader, Pencil, Plus } from "lucide-react";
 import React from "react";
-import { Button } from "../../../shared/components/ui/button";
+import { Button } from "../../../../shared/components/ui/button";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogDescription,
-} from "../../../shared/components/ui/alert-dialog";
+} from "../../../../shared/components/ui/alert-dialog";
 import {
   Sheet,
   SheetTrigger,
@@ -31,8 +31,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../shared/components/ui/form";
-import { Input } from "../../../shared/components/ui/input";
+} from "../../../../shared/components/ui/form";
+import { Input } from "../../../../shared/components/ui/input";
 import { numberInput } from "@/shared/utils/CustomFunctions";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
 import { toast } from "sonner";

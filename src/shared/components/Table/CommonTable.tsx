@@ -34,7 +34,7 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import NoData from "@/assets/images/noData.svg";
-import CommonPieGraph from "../../../components/common/CommonPieGraph";
+import CommonPieGraph from "../charts/CommonPieGraph";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {

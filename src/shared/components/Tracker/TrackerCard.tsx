@@ -16,7 +16,7 @@ import {
 } from "../ui/dropdown-menu";
 import { CarouselItem } from '../ui/carousel';
 import { Card } from '../ui/card';
-import TrackerDialog from '@/shared/components/Tracker/TrackerDialog';
+import TrackerDialog from '@/shared/components/tracker/TrackerDialog';
 
 const TrackerCard = ({
   item,

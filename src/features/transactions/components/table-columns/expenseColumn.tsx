@@ -23,7 +23,7 @@ import { useDeleteExpenseMutation } from "@/features/transactions/api/expensesAp
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import PayDialog from "@/components/dialog/transaction/PayDialog";
+import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
