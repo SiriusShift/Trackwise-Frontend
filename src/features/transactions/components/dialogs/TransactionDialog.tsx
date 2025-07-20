@@ -14,10 +14,7 @@ import { Button } from "@/shared/components/ui/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expenseSchema } from "@/schema/schema";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  categoryApi,
-  useGetCategoryQuery,
-} from "@/shared/api/categoryApi";
+import { categoryApi, useGetCategoryQuery } from "@/shared/api/categoryApi";
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
 import moment from "moment";
 import { usePatchExpenseMutation } from "@/features/transactions/api/expensesApi";
@@ -41,6 +38,7 @@ import {
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 
 import ExpenseForm from "@/features/transactions/components/dialogs/forms/ExpenseForm";
+import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
 
 type AddExpenseFormData = {
   category: Object;
@@ -65,6 +63,7 @@ export function TransactionDialog({
   mode: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [openFrequency, setOpenFrequency] = useState(false);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
   console.log(rowData);
@@ -170,6 +169,11 @@ export function TransactionDialog({
     }
   };
 
+  const handleCustomOpen = () => {
+    setOpenFrequency(true);
+    setOpen(false);
+  };
+
   const handleClose = () => {
     confirm({
       description: "Are you sure you want to close this dialog?",
@@ -186,7 +190,18 @@ export function TransactionDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={async (open) => {
+          if (!open) {
+            if (isDirty) {
+              handleClose();
+            } else {
+              setOpen(false);
+            }
+          }
+        }}
+      >
         <DialogTrigger asChild>
           {mode === "add" ? (
             <Button onClick={() => setOpen(true)} size="sm" variant="outline">
@@ -221,14 +236,13 @@ export function TransactionDialog({
           {/* Wrap the form with FormProvider */}
           <FormProvider {...form}>
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              // onSubmit={handleSubmit(onSubmit)}
               className="space-y-4 overflow-auto p-1"
             >
               <ExpenseForm
                 assetData={assetData}
-                control={control}
+                setOpenFrequency={handleCustomOpen}
                 categoryData={categoryData}
-                watch={watch}
               />
             </form>
             <DialogFooter className="flex flex-col sm:flex-row gap-2">
@@ -249,6 +263,13 @@ export function TransactionDialog({
           </FormProvider>
         </DialogContent>
       </Dialog>
+      <FormProvider {...form}>
+        <Repeat
+          open={openFrequency}
+          setParentDialogOpen={setOpen}
+          setOpen={setOpenFrequency}
+        />
+      </FormProvider>
     </>
   );
 }

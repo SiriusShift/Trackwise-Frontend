@@ -28,7 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { Calendar as CalendarIcon, Repeat } from "lucide-react";
+import { ArrowRight, Calendar as CalendarIcon, Repeat } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/shared/components/ui/calendar";
@@ -36,9 +36,11 @@ import { frequencies } from "@/shared/utils/Constants";
 import { Input } from "../../../../../shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import moment from "moment";
+import { useFormContext } from "react-hook-form";
 
-const ExpenseForm = ({ assetData, control, categoryData, watch }) => {
-  console.log(assetData);
+const ExpenseForm = ({ assetData, categoryData, setOpenFrequency }) => {
+  const { watch, control, setValue } = useFormContext();
+
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
@@ -289,7 +291,7 @@ const ExpenseForm = ({ assetData, control, categoryData, watch }) => {
                       value={field.value}
                       onValueChange={(value) => {
                         field.onChange(value);
-                        setValue("frequency", null);
+                        setValue("repeat", null);
                         setValue("months", null);
                       }}
                     >
@@ -312,38 +314,131 @@ const ExpenseForm = ({ assetData, control, categoryData, watch }) => {
         />
       </div>
       {watch("mode") === "recurring" && (
-        <FormField
-          name="repeat"
-          control={control}
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Frequency</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={(value) => {
-                    const selectedCategory = frequencies?.find(
-                      (frequency) => frequency.name === value
-                    );
-                    field.onChange(selectedCategory);
-                  }}
-                  value={field.value?.name}
-                >
-                  <SelectTrigger className="capitalize">
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent portal={false} className="max-h-[200px]">
-                    {frequencies?.map((frequency) => (
-                      <SelectItem key={frequency.id} value={frequency.name}>
-                        {frequency.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-5">
+          <div className="flex flex-col">
+            <FormLabel>Repeat</FormLabel>
+            <Button
+              className="mt-2 justify-between"
+              variant="outline"
+              onClick={() => setOpenFrequency(true)}
+              type="button"
+            >
+              {watch("repeat")?.name === "Custom"
+                ? watch("repeat")?.interval === 1
+                  ? `Every ${watch("repeat")?.interval} ${
+                      watch("repeat")?.unit
+                    }`
+                  : `Every ${watch("repeat")?.interval} ${
+                      watch("repeat")?.unit
+                    }s`
+                : watch("repeat") !== null
+                ? watch("repeat")?.name
+                : "Repeat every.."}
+              <ArrowRight />
+            </Button>
+          </div>
+
+          <FormField
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col w-full">
+                <FormLabel>End Date</FormLabel>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          `${moment(field.value).format(
+                            "MMM DD, YYYY hh:mm A"
+                          )}` // Format date & time
+                        ) : (
+                          <span>Pick a date & time</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-4" align="start">
+                    <div className="flex flex-col space-y-4">
+                      {/* Calendar for Date Selection */}
+                      <Calendar
+                        mode="single"
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => {
+                          const newDate = new Date(
+                            date.setHours(
+                              field.value
+                                ? new Date(field.value).getHours()
+                                : 0,
+                              field.value
+                                ? new Date(field.value).getMinutes()
+                                : 0
+                            )
+                          );
+                          console.log("Selected Date:", newDate);
+                          field.onChange(newDate); // Update date with time preserved
+                        }}
+                        initialFocus
+                        disabled={(date) => {
+                          const minDate = new Date("2000-01-01"); // Minimum date
+                          return date < minDate;
+                        }}
+                      />
+                      {/* Time Picker for Time Selection */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Time:</label>
+                        <input
+                          type="time"
+                          className="border text-black rounded-md px-2 py-1 text-sm"
+                          value={
+                            field.value
+                              ? moment(field.value).format("HH:mm")
+                              : ""
+                          }
+                          onSelect={(date) => {
+                            const newDate = new Date(
+                              date.setHours(
+                                field.value
+                                  ? new Date(field.value).getHours()
+                                  : 0,
+                                field.value
+                                  ? new Date(field.value).getMinutes()
+                                  : 0
+                              )
+                            );
+                            console.log("Selected Date:", newDate);
+                            field.onChange(newDate); // Update date with time preserved
+                          }}
+                          onChange={(e) => {
+                            const [hours, minutes] = e.target.value
+                              .split(":")
+                              .map(Number);
+                            const updatedDate = field.value
+                              ? new Date(field.value)
+                              : new Date(); // Use the selected date or default to now
+                            updatedDate.setHours(hours, minutes);
+                            console.log("Updated Time:", updatedDate);
+                            field.onChange(updatedDate); // Update time with the correct date preserved
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                {/* <FormMessage>{errors.date?.message}</FormMessage> */}
+              </FormItem>
+            )}
+          />
+        </div>
       )}
       {watch("mode") === "installment" && (
         <FormField

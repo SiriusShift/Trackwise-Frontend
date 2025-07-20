@@ -1,7 +1,5 @@
 import * as yup from "yup";
 
-
-
 export const expenseSchema = {
   schema: yup.object().shape({
     category: yup.object().required("Category is required"),

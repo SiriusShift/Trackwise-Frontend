@@ -86,3 +86,10 @@ export interface commonTrackerProps {
   addDescription: string;
   editDescription: string;
 }
+
+export interface frequencyProps {
+  id: number;
+  name: string;
+  interval: number | null;
+  unit: string | null;
+}

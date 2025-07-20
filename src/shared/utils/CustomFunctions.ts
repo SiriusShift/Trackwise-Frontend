@@ -58,30 +58,30 @@ export const formatMode = () => {
   if (mode === "weekly") return "week";
   if (mode === "monthly") return "month";
   if (mode === "yearly") return "year";
-}
+};
 
 export const numberInput = (
   e: React.ChangeEvent<HTMLInputElement>,
   field: any
 ) => {
   let value = e.target.value;
+  console.log(value);
 
-  // Log for debugging
-  console.log(field, value);
-
+  // Allow empty string for controlled input behavior
   if (value === "") {
-    value = "0";
+    field.onChange(null); // don't set 0 yet
+    return;
   }
 
-  // Remove leading zeros, except if it's a "0." for decimal values
-  else if (/^0+/.test(value) && value.length > 1 && value[1] !== ".") {
-    value = value.replace(/^0+/, ""); // Remove leading zeros
+  // Remove leading zeros, except for decimals like "0.1"
+  if (/^-?0+\d/.test(value) && value.length > 1 && value[1] !== ".") {
+    value = value.replace(/^(-?)0+/, "$1");
+    console.log(value);
   }
 
-  // Validate and allow only up to 2 decimal places
-  if (/^\d*\.?\d{0,2}$/.test(value)) {
-    // Ensure the value is correctly formatted and set it
-    field.onChange(Number(value));
+  // ✅ Allow negative numbers and up to 2 decimal places
+  if (/^-?\d*\.?\d{0,2}$/.test(value)) {
+    field.onChange(value);
   }
 };
 

@@ -1,7 +1,7 @@
 // app/components/SignInForm.tsx
 "use client";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+import { Input, PasswordInput } from "@/shared/components/ui/input";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../schema/authSchema";
 import Google from "@/assets/images/Google.svg";
@@ -102,9 +102,8 @@ const SignInPage = () => {
                 {...register("email")}
                 required
               />
-              <Input
+              <PasswordInput
                 placeholder="Password"
-                type="password"
                 className="w-full sm:w-96"
                 {...register("password")}
                 required
