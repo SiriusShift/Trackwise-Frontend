@@ -100,21 +100,29 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
   },
-  // {
-  //   accessorKey: "status",
-  //   header: "Status",
-  //   cell: ({ getValue }) => {
-  //     const status = getValue() as Expense["status"];
-  //     const statusColor =
-  //       status === "Paid"
-  //         ? "success"
-  //         : status === "Unpaid"
-  //         ? "warning"
-  //         : "destructive";
+  {
+    accessorKey: "status",
+    header: "Status",
+    meta: {
+      cellClassName: "border-b",
+    },
+    cell: ({ getValue }) => {
+      const status = getValue() as Expense["status"];
+      const statusColor =
+        status === "Paid"
+          ? "success"
+          : status === "Unpaid"
+          ? "warning"
+          : "destructive";
 
-  //     return <Badge variant={"outline"} ><div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`}/>{status || "unknown"}</Badge>;
-  //   },
-  // },
+      return (
+        <Badge variant={"outline"}>
+          <div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`} />
+          {status || "unknown"}
+        </Badge>
+      );
+    },
+  },
   {
     id: "actions",
     meta: {
@@ -130,8 +138,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
       console.log(row);
-
-      const activeTab = useSelector((state: any) => state.active.expenseTab);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
@@ -169,14 +175,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <TransactionDialog
+                type={activeType}
                 rowData={expense}
-                active={activeTab}
                 mode="edit"
               />
-              <DropdownMenuItem>
-                <Eye />
-                View
-              </DropdownMenuItem>
               <DropdownMenuItem>
                 <Eye />
                 View

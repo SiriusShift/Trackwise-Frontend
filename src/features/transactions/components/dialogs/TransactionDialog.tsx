@@ -110,6 +110,7 @@ export function TransactionDialog({
   }, [rowData]);
 
   const onSubmit = async (data: AddExpenseFormData) => {
+    console.log("data", data);
     try {
       if (mode === "edit") {
         // await confirm({
@@ -141,7 +142,6 @@ export function TransactionDialog({
             try {
               await postExpense({
                 ...data,
-                recurring: data?.recurring,
                 source: data?.source?.id || "",
                 category: data?.category?.id || "",
                 amount: parseFloat(data?.amount),
@@ -227,9 +227,9 @@ export function TransactionDialog({
           className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto sm:max-h-[90%] sm:min-h-lg sm:w-md"
         >
           <DialogHeader>
-            <DialogTitle>{mode === "add" ? "Add" : "Edit"} expense</DialogTitle>
+            <DialogTitle>{mode === "add" ? "Add" : "Edit"} {type}</DialogTitle>
             <DialogDescription>
-              Fill in the details to create a new expense
+              Fill in the details to create a new {type.toLocaleLowerCase()}
             </DialogDescription>
           </DialogHeader>
 
@@ -240,13 +240,14 @@ export function TransactionDialog({
               className="space-y-4 overflow-auto p-1"
             >
               <ExpenseForm
+                type={type}
                 assetData={assetData}
-                setOpenFrequency={handleCustomOpen}
+                setOpenFrequency={handleCustomOpen} 
                 categoryData={categoryData}
               />
             </form>
             <DialogFooter className="flex flex-col sm:flex-row gap-2">
-              <Button type="submit" disabled={!isValid}>
+              <Button onClick={handleSubmit(onSubmit)} disabled={!isValid}>
                 {mode === "edit" ? "Update" : "Add"}
               </Button>
 

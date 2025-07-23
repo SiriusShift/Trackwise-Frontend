@@ -39,7 +39,6 @@ export const expenseSchema = {
     amount: null,
     date: new Date(),
     mode: "none",
-    recurring: false,
     source: null,
   },
 };

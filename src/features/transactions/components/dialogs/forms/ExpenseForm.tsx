@@ -37,8 +37,9 @@ import { Input } from "../../../../../shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import moment from "moment";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 
-const ExpenseForm = ({ assetData, categoryData, setOpenFrequency }) => {
+const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
 
   return (
@@ -49,7 +50,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency }) => {
           control={control}
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Source</FormLabel>
+              <FormLabel>{type === "Income" ? "To" : "From"} </FormLabel>
               <FormControl>
                 <Select
                   onValueChange={(value) => {
@@ -62,7 +63,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency }) => {
                   value={field.value?.name}
                 >
                   <SelectTrigger className="capitalize">
-                    <SelectValue placeholder="Select source" />
+                    <SelectValue placeholder="Select account" />
                   </SelectTrigger>
                   <SelectContent portal={false} className="max-h-[200px]">
                     {assetData?.map((source) => (
@@ -143,7 +144,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency }) => {
                         const balance = watch("source")?.remainingBalance;
                         console.log(balance);
 
-                        if (balance && value > balance) {
+                        if (balance && type !== "Income" && value > balance) {
                           toast.error("Insufficient balance");
                           e.target.value = balance; // Reset to the maximum allowed value
                         } else {
