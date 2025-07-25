@@ -29,7 +29,7 @@ export const expenseSchema = {
             .positive("Months must be greater than 0"),
         otherwise: (schema) => schema.notRequired(),
       }),
-    image: yup.mixed(),
+    image: yup.mixed().nullable(),
 
     source: yup.object().required("Source is required"),
   }),

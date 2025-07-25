@@ -53,16 +53,18 @@ type AddExpenseFormData = {
 };
 
 export function TransactionDialog({
+  open,
   type,
   mode,
   rowData,
+  setOpen,
 }: {
-  // type: string;
-  rowData: Object;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  rowData?: Object;
   type: string;
   mode: string;
 }) {
-  const [open, setOpen] = useState(false);
   const [openFrequency, setOpenFrequency] = useState(false);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
@@ -91,20 +93,22 @@ export function TransactionDialog({
     control,
     reset,
     watch,
-    formState: { errors, isDirty, isValid },
+    formState: { isDirty, isValid },
   } = form;
 
-  console.log(watch(), isValid);
+  console.log(watch(), isValid, isDirty);
 
   useEffect(() => {
     if (rowData) {
-      setValue("date", rowData?.date);
-      setValue("source", rowData?.asset);
-      setValue("expenseId", rowData?.id);
-      setValue("description", rowData?.description);
-      setValue("amount", rowData?.amount);
-      setValue("category", rowData?.category);
-      setValue("image", rowData?.image);
+      reset({
+        date: rowData?.date,
+        source: rowData?.asset,
+        expenseId: rowData?.id,
+        description: rowData?.description,
+        amount: rowData?.amount,
+        category: rowData?.category,
+        image: rowData?.image,
+      });
       // setInitialData(watch());
     }
   }, [rowData]);
@@ -116,15 +120,34 @@ export function TransactionDialog({
         // await confirm({
         //   message: "Are you sure you want to update this expense?",
         // })
-        await triggerPatchExpense({
-          data,
-          id: data?.expenseId,
-        })
-          .unwrap()
-          .then(() => {
-            dispatch(assetsApi.util.invalidateTags(["Assets"]));
-            dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          });
+        await confirm({
+          description: "Are you sure you want to update this expense?",
+          title: "Update Expense",
+          variant: "info",
+          confirmText: "Add",
+          cancelText: "Cancel",
+          onConfirm: async () => {
+            try {
+              await triggerPatchExpense({
+                data,
+                id: data?.expenseId,
+              })
+                .unwrap()
+                .then(() => {
+                  dispatch(assetsApi.util.invalidateTags(["Assets"]));
+                  dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+                });
+
+              reset({
+                ...expenseSchema.defaultValues,
+              });
+              setOpen(false);
+            } catch (err) {
+              console.log(err);
+              toast.error(err?.data?.error);
+            }
+          },
+        });
 
         reset({
           ...expenseSchema.defaultValues,
@@ -176,7 +199,8 @@ export function TransactionDialog({
 
   const handleClose = () => {
     confirm({
-      description: "Are you sure you want to close this dialog?",
+      description:
+        "Are you sure you want to close this dialog? All unsaved input will be lost.",
       title: "Close Dialog",
       variant: "destructive",
       confirmText: "Close",
@@ -202,7 +226,7 @@ export function TransactionDialog({
           }
         }}
       >
-        <DialogTrigger asChild>
+        {/* <DialogTrigger asChild>
           {mode === "add" ? (
             <Button onClick={() => setOpen(true)} size="sm" variant="outline">
               <Plus className="lg:mr-2" />
@@ -213,21 +237,23 @@ export function TransactionDialog({
               onSelect={(e) => {
                 e.preventDefault();
                 setOpen(true);
-                // setDropdownOpen(false); // Close the dropdown
+                setDropdownOpen(false);
               }}
               // disabled={rowData?.status === "Paid"}
             >
               <Pencil /> Edit
             </DropdownMenuItem>
           )}
-        </DialogTrigger>
+        </DialogTrigger> */}
 
         <DialogContent
           onInteractOutside={(e) => isDirty && e.preventDefault()}
           className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto sm:max-h-[90%] sm:min-h-lg sm:w-md"
         >
           <DialogHeader>
-            <DialogTitle>{mode === "add" ? "Add" : "Edit"} {type}</DialogTitle>
+            <DialogTitle>
+              {mode === "add" ? "Add" : "Edit"} {type}
+            </DialogTitle>
             <DialogDescription>
               Fill in the details to create a new {type.toLocaleLowerCase()}
             </DialogDescription>
@@ -242,12 +268,15 @@ export function TransactionDialog({
               <ExpenseForm
                 type={type}
                 assetData={assetData}
-                setOpenFrequency={handleCustomOpen} 
+                setOpenFrequency={handleCustomOpen}
                 categoryData={categoryData}
               />
             </form>
             <DialogFooter className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={handleSubmit(onSubmit)} disabled={!isValid}>
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                disabled={!isValid || !isDirty}
+              >
                 {mode === "edit" ? "Update" : "Add"}
               </Button>
 
@@ -264,6 +293,7 @@ export function TransactionDialog({
           </FormProvider>
         </DialogContent>
       </Dialog>
+      {/* Form for custom frequency*/}
       <FormProvider {...form}>
         <Repeat
           open={openFrequency}

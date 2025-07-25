@@ -197,6 +197,7 @@ export const ConfirmProvider = ({
               e.preventDefault();
             }
           }}
+          className="w-[400px]"
         >
           <DialogHeader>
             <div className="flex flex-col items-center text-center">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Form,
   FormControl,
@@ -28,7 +28,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { ArrowRight, Calendar as CalendarIcon, Repeat } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar as CalendarIcon,
+  Repeat,
+  Upload,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/shared/components/ui/calendar";
@@ -41,6 +46,7 @@ import { toast } from "sonner";
 
 const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
+  const imageRef = useRef();
 
   return (
     <div className="flex gap-4 flex-col">
@@ -458,30 +464,125 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
       <FormField
         name="image"
         control={control}
-        render={({ field: { onChange } }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Attachment</FormLabel>
-            <FormControl>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  console.log(file);
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      onChange(reader.result); // this updates the form field
-                      // setValue("fileName", file?.name)
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                id="imageUploader"
-              />
-            </FormControl>
-          </FormItem>
-        )}
+        render={({ field: { onChange, value } }) => {
+          // Determine if this is an existing image (URL) or new upload (data URL)
+          const isExistingImage =
+            value && typeof value === "string" && !value.startsWith("data:");
+          const isNewUpload =
+            value && typeof value === "string" && value.startsWith("data:");
+
+          return (
+            <FormItem className="flex flex-col">
+              <FormLabel>Attachment</FormLabel>
+              <FormControl>
+                <div className="space-y-3">
+                  {/* Preview section */}
+                  <div className="relative border rounded p-3 bg-gray-50">
+                    <div className="flex items-start gap-3">
+                      {value ? (
+                        <img
+                          src={value}
+                          alt="Attachment preview"
+                          className="w-[85px] h-[85px]object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
+                          No image selected
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">
+                          {isExistingImage ? "Current Image" : "Upload Image"}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {isExistingImage
+                            ? "This image is stored in the database."
+                            : "Upload an image or attachment to store."}
+                        </p>
+                        <input
+                          type="file"
+                          ref={imageRef}
+                          accept="image/*"
+                          hidden
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                onChange(reader.result);
+                              };
+                              reader.readAsDataURL(file);
+                            } else {
+                              // If no file selected and there was an existing image, keep it
+                              // If no existing image, set to null
+                              if (!isExistingImage) {
+                                onChange(null);
+                              }
+                            }
+                          }}
+                          id="imageUploader"
+                          className={value ? "mt-2" : ""}
+                        />
+                        <div className="flex items-end gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => imageRef.current?.click()}
+                            className="flex items-center gap-2"
+                          >
+                            Upload
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="mt-2"
+                            onClick={() => onChange("")}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* File input */}
+                  {/* <div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            onChange(reader.result);
+                          };
+                          reader.readAsDataURL(file);
+                        } else {
+                          // If no file selected and there was an existing image, keep it
+                          // If no existing image, set to null
+                          if (!isExistingImage) {
+                            onChange(null);
+                          }
+                        }
+                      }}
+                      id="imageUploader"
+                      className={value ? "mt-2" : ""}
+                    />
+                    {value && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Choose a new file to replace the current image
+                      </p>
+                    )}
+                  </div> */}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
     </div>
   );

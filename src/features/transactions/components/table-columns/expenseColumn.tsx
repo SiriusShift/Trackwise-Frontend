@@ -27,6 +27,7 @@ import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { useState } from "react";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -133,7 +134,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     // header: "Actions",
     cell: ({ row }) => {
       const activeType = useSelector((state: any) => state.active.type);
-
+      const [dropdownOpen, setDropdownOpen] = useState(false);
+      const [dialogOpen, setDialogOpen] = useState(false);
+      console.log(open);
       const expense = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
@@ -165,7 +168,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu modal={false}>
+          <DropdownMenu modal={false} open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -174,11 +177,22 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <TransactionDialog
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDialogOpen(true); // open dialog
+                  setDropdownOpen(false); // close dropdown manually
+                }}
+              >
+                <Pencil /> Edit
+              </DropdownMenuItem>
+              {/* <TransactionDialog
                 type={activeType}
                 rowData={expense}
                 mode="edit"
-              />
+                setDropdownOpen={setOpen}
+              /> */}
               <DropdownMenuItem>
                 <Eye />
                 View
@@ -189,6 +203,13 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <TransactionDialog
+            open={dialogOpen}
+            setOpen={setDialogOpen}
+            type={activeType}
+            rowData={expense}
+            mode="edit"
+          />
         </>
       );
     },
