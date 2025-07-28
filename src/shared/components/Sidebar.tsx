@@ -12,7 +12,7 @@ import {
 import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../../routing/navigationData";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import {
   TooltipProvider,
   Tooltip,
@@ -28,6 +28,9 @@ import { useCookies } from "react-cookie";
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocationHook();
+  const parent = `/${location?.location?.pathname?.split("/")[1]}`;
+  console.log(parent);
+
   const [, , removeCookie] = useCookies(["user"]);
   const [active, setActive] = useState(location?.location?.pathname);
   console.log(active);
@@ -74,56 +77,64 @@ export function AppSidebar() {
         <SidebarGroup className="px-4 mt-4">
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {navigationData.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <>
-                      {screenWidth > 767 && screenWidth < 1024 ? (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Button
-                                className="hidden md:block lg:hidden"
-                                variant={active === item.path ? "default" : "ghost"}
-                                onClick={() => {setActive(item.path); router(item.path)}} // Ensure you're using `router.push` for navigation
+              {navigationData.map((item) => {
+                console.log(item?.name);
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild>
+                      <>
+                        {screenWidth > 767 && screenWidth < 1024 ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button
+                                  className="hidden md:block lg:hidden"
+                                  variant={
+                                    parent === item.path ? "default" : "ghost"
+                                  }
+                                  onClick={() => {
+                                    setActive(item.path);
+                                    router(item.path);
+                                  }} // Ensure you're using `router.push` for navigation
+                                >
+                                  <item.icon
+                                    style={{ width: "20px", height: "20px" }}
+                                  />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent
+                                side="right"
+                                sideOffset={5}
+                                className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
                               >
-                                <item.icon
-                                  style={{ width: "20px", height: "20px" }}
-                                />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="right"
-                              sideOffset={5}
-                              className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
-                            >
-                              <p className="tracking-wide">{item.name}</p>
-                              <TooltipArrow className="bg-background"/>{" "}
-                              {/* Add styles to customize the arrow */}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            setActive(item.path);
-                            router(item.path);
-                          }}
-                          variant={active === item.path ? "default" : "ghost"}
-                          className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
-                        >
-                          <item.icon
-                            style={{ width: "24px", height: "24px" }}
-                          />
-                          <span className="inline md:hidden lg:inline">
-                            {item.name}
-                          </span>
-                        </Button>
-                      )}
-                    </>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                                <p className="tracking-wide">{item.name}</p>
+                                <TooltipArrow className="bg-background" />{" "}
+                                {/* Add styles to customize the arrow */}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <Button
+                            onClick={() => {
+                              setActive(item.path);
+                              router(item.path);
+                            }}
+                            variant={parent === item.path ? "default" : "ghost"}
+                            className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                          >
+                            <item.icon
+                              style={{ width: "24px", height: "24px" }}
+                            />
+                            <span className="inline md:hidden lg:inline">
+                              {item.name}
+                            </span>
+                          </Button>
+                        )}
+                      </>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

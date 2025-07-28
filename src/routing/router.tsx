@@ -10,6 +10,11 @@ import Expense from "@/pages/TransactionPage";
 import LoanPage from "@/pages/LoanPage";
 import SavingsPage from "@/pages/AccountPage";
 import Settings from "@/pages/Settings";
+import SettingsLayout from "@/features/settings/SettingsLayout";
+import GeneralSettings from "@/features/settings/pages/GeneralSettings";
+import AccountSettings from "@/features/settings/pages/AccountSettings";
+import CategorySettings from "@/features/settings/pages/CategorySettings";
+import ThemeSettings from "@/features/settings/pages/ThemeSettings";
 
 export const router = createBrowserRouter([
     {
@@ -54,7 +59,25 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/settings",
-                element: <Settings />
+                element: <SettingsLayout />,
+                children: [
+                    {
+                        path: "/settings",
+                        element: <GeneralSettings />
+                    },
+                    {
+                        path: "/settings/account",
+                        element: <AccountSettings />
+                    },
+                    {
+                        path: "/settings/category",
+                        element: <CategorySettings/>
+                    },
+                    {
+                        path: "/settings/theme",
+                        element: <ThemeSettings />
+                    }
+                ]
             }
         ]
     }
