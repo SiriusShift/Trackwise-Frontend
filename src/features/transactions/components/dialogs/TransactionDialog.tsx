@@ -114,7 +114,26 @@ export function TransactionDialog({
   }, [rowData]);
 
   const onSubmit = async (data: AddExpenseFormData) => {
-    console.log("data", data);
+    const formData = new FormData();
+    Object.keys(data).forEach((key) => {
+      const value = data[key];
+
+      if (key === "source" && value?.id) {
+        formData.append("source", parseInt(value.id));
+      } else if (key === "category" && value?.id) {
+        formData.append("category", parseInt(value.id));
+      } else if (key === "amount") {
+        formData.append("amount", parseFloat(value));
+      } else if (key === "date") {
+        formData.append("date", moment(value).utc().format());
+      } else {
+        // fallback for any other field
+        formData.append(key, value);
+      }
+    });
+
+    console.log(formData);
+
     try {
       if (mode === "edit") {
         // await confirm({
@@ -129,7 +148,7 @@ export function TransactionDialog({
           onConfirm: async () => {
             try {
               await triggerPatchExpense({
-                data,
+                data: formData,
                 id: data?.expenseId,
               })
                 .unwrap()
@@ -163,15 +182,7 @@ export function TransactionDialog({
           cancelText: "Cancel",
           onConfirm: async () => {
             try {
-              await postExpense({
-                ...data,
-                source: data?.source?.id || "",
-                category: data?.category?.id || "",
-                amount: parseFloat(data?.amount),
-                date: moment(data?.date).utc().format(),
-                assetBalance: watch("source")?.remainingBalance,
-                ...(data?.image && { image: data?.image }),
-              }).unwrap();
+              await postExpense(formData).unwrap();
 
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));

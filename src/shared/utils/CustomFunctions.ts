@@ -33,20 +33,14 @@ export const formatString = (str: string) => {
 
 export const formatDateDisplay = (): string => {
   const active = useSelector((state: RootState) => state.active.active);
+  console.log(active);
   const mode = useSelector((state: RootState) => state.active.mode);
   if (!active) return "Select Date";
 
-  if (mode === "daily") {
-    return moment(active as string).format("MMMM D, YYYY");
-  } else if (mode === "weekly") {
-    const range = active as DateRange;
-    return `${moment(range.from).format("MMM D")} - ${moment(range.to).format(
-      "MMM D, YYYY"
-    )}`;
-  } else if (mode === "monthly") {
-    return moment(active as string).format("MMMM YYYY");
+  if (mode === "monthly") {
+    return moment(active?.to as string).format("MMMM YYYY");
   } else if (mode === "yearly") {
-    return moment(active as string).format("YYYY");
+    return moment(active?.to as string).format("YYYY");
   }
 
   return "Select Date";

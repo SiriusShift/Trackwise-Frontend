@@ -21,9 +21,9 @@ export const expensesApi = api
         query: (body) => ({
           url: "/transaction/createExpense",
           method: "POST",
-          headers: {
-            Accept: "application/json",
-          },
+          // headers: {
+          //   "Content-type": "multipart/form-data",
+          // },
           body,
         }),
         invalidatesTags: ["Expenses"],
@@ -33,9 +33,9 @@ export const expensesApi = api
         query: (id) => ({
           url: `/transaction/deleteExpense/${id}`,
           method: "PATCH",
-          headers: {
-            Accept: "application/json",
-          },
+          // headers: {
+          //   Accept: "application/json",
+          // },
         }),
         invalidatesTags: ["Expenses", "RecurringExpense"],
       }),

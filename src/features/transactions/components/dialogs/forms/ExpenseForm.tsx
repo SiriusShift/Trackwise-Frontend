@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Form,
   FormControl,
@@ -466,10 +466,27 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
         control={control}
         render={({ field: { onChange, value } }) => {
           // Determine if this is an existing image (URL) or new upload (data URL)
+          const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
           const isExistingImage =
             value && typeof value === "string" && !value.startsWith("data:");
-          const isNewUpload =
-            value && typeof value === "string" && value.startsWith("data:");
+
+          useEffect(() => {
+            if (value instanceof File) {
+              const url = URL.createObjectURL(value);
+              setPreviewUrl(url);
+
+              // Cleanup to avoid memory leak
+              return () => URL.revokeObjectURL(url);
+            } else if (typeof value === "string") {
+              setPreviewUrl(value); // use existing image url
+            } else {
+              setPreviewUrl(null);
+            }
+          }, [value]);
+
+          // const isNewUpload =
+          //   value && typeof value === "string" && value.startsWith("data:");
 
           return (
             <FormItem className="flex flex-col">
@@ -477,13 +494,13 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
               <FormControl>
                 <div className="space-y-3">
                   {/* Preview section */}
-                  <div className="relative border rounded p-3 bg-gray-50">
+                  <div className="relative border rounded p-3 bg-muted">
                     <div className="flex items-start gap-3">
-                      {value ? (
+                      {previewUrl ? (
                         <img
-                          src={value}
+                          src={previewUrl}
                           alt="Attachment preview"
-                          className="w-[85px] h-[85px]object-cover rounded"
+                          className="w-[85px] h-[85px] object-cover rounded"
                         />
                       ) : (
                         <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
@@ -507,11 +524,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                onChange(reader.result);
-                              };
-                              reader.readAsDataURL(file);
+                              onChange(file);
                             } else {
                               // If no file selected and there was an existing image, keep it
                               // If no existing image, set to null
@@ -538,7 +551,10 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                             variant="outline"
                             size="sm"
                             className="mt-2"
-                            onClick={() => onChange("")}
+                            onClick={() => {
+                              onChange("");
+                              setPreviewImage(null);
+                            }}
                           >
                             Remove
                           </Button>
