@@ -13,11 +13,11 @@ import { Separator } from "@/shared/components/ui/separator";
 
 const SettingsLayout = () => {
   const location = useLocationHook();
-  const [active, setActive] = useState(location?.location?.pathname);
 
-  const subNavigation = navigationData?.find((item) => item?.name === "Settings")?.sub
+  const subNavigation = navigationData?.find(
+    (item) => item?.name === "Settings"
+  )?.sub;
 
-  const navigate = useNavigate();
   return (
     <div className="flex flex-col gap-8">
       {/* Settings Header */}

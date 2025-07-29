@@ -47,7 +47,6 @@ import { toast } from "sonner";
 const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
   const imageRef = useRef();
-
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
