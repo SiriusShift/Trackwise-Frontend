@@ -25,3 +25,5 @@ export const frequencies = [
 ];
 
 export const frequencyList = ["day", "week", "month", "year"];
+
+export const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wenesday", "Thursday", "Friday", "Saturday"]

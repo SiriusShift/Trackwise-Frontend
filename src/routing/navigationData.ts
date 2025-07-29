@@ -21,6 +21,10 @@ export const navigationData = [
       { name: "Account", path: "/settings/account" },
       { name: "Category", path: "/settings/category" },
       { name: "Theme", path: "/settings/theme" },
+      { name: "Notifications", path: "/settings/notifications" },
+      { name: "Security", path: "/settings/security" },
+      { name: "Backup", path: "/settings/backup" },
+      // { name: "Billing", path: "/settings/billing" }, // Optional
     ],
   },
 ];

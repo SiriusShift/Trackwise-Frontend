@@ -70,3 +70,16 @@ export const payRecurringSchema = {
     // source: "",
   },
 };
+
+export const generalSettings = {
+  schema: yup.object().shape({
+    firstDayOfWeek: yup.string().required("First day of the week is required"),
+    shortDateFormat:  yup.string().required("Short date format is required"),
+    longDateFormat: yup.string().required("Long date format is required"),
+    shortTimeFormat: yup.string().required("Short time format is required"),
+    longtTimeFormat: yup.string().required("Long time format is required")
+  }),
+  defaultValues: {
+    dateFormat: "MMM DD, YYYY"
+  }
+}

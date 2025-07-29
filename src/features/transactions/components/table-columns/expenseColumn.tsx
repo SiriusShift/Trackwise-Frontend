@@ -49,7 +49,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMMM DD, YYYY h:mm a") : "-"}
+        {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
         </span>
       );
     },
@@ -62,6 +62,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   //     cellClassName: "border-b",
   //   },
   // },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ getValue }) => {
+      const amount = getValue() as number | undefined;
+      return <span>₱{amount?.toFixed(2) || "0"}</span>;
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
   {
     accessorKey: "category.name",
     header: "Category",
@@ -82,17 +93,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
   },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ getValue }) => {
-      const amount = getValue() as number | undefined;
-      return <span>₱{amount?.toFixed(2) || "0"}</span>;
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+
   {
     accessorKey: "asset.name",
     header: "Source",
@@ -168,7 +169,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu modal={false} open={dropdownOpen} onOpenChange={setDropdownOpen}>
+          <DropdownMenu
+            modal={false}
+            open={dropdownOpen}
+            onOpenChange={setDropdownOpen}
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
