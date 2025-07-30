@@ -27,6 +27,7 @@ interface SignupPayload{
     username: string,
     email: string,
     password: string,
+    timezone: string,
     otp: string
 }
 

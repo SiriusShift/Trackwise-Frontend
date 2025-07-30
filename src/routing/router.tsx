@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
                 element: <SettingsLayout />,
                 children: [
                     {
-                        path: "/settings",
+                        path: "/settings/general",
                         element: <GeneralSettings />
                     },
                     {

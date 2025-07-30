@@ -24,6 +24,7 @@ import {
   usePostSignupMutation,
 } from "../api/signupApi";
 import LayoutAuth from "../../../layout/AuthLayout";
+import moment from "moment-timezone"
 
 interface FormData {
   email: string;
@@ -42,6 +43,7 @@ const signUp = () => {
   // const device = encryptString(getBrowserInfo());
   const router = useNavigate();
   const dispatch = useDispatch();
+  const tz = moment.tz.guess()
 
   const [postVerify, { isLoading }] = usePostVerifyMutation();
   const [postSignup, { isLoading: postSignupLoading }] =
@@ -71,6 +73,7 @@ const signUp = () => {
         username: getValues("username"),
         email: getValues("email"),
         password: encryptedPassword || "",
+        timezone: tz,
         otp: code || "",
       }).unwrap();
       console.log(response);

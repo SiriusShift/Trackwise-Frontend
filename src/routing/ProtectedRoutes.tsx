@@ -6,6 +6,7 @@ import { useCookies } from "react-cookie";
 import { encryptString } from "@/shared/utils/CustomFunctions";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "@/shared/slices/userSlice";
+import { setSettings } from "@/shared/slices/settingsSlice";
 
 function ProtectedRoutes() {
   const navigate = useNavigate();
@@ -37,6 +38,12 @@ function ProtectedRoutes() {
               profileImage: response?.user?.profileImage,
             })
           );
+          dispatch(
+            setSettings({
+              timezone: response?.settings?.timezone,
+              timeFormat: response?.settings?.timeFormat
+            })
+          )
         }
         if(!cookies.user){
           const encryptedInfo = encryptString(response?.user);
