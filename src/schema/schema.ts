@@ -74,10 +74,12 @@ export const payRecurringSchema = {
 export const generalSettings = {
   schema: yup.object().shape({
     timezone: yup.string().required("Timezone is required"),
-    timeFormat: yup.object().required("Time format is required"),
+    timeFormat: yup.string().required("Time format is required"),
+    currency: yup.object().required("Currency is required"),
   }),
   defaultValues: {
     timezone: "MMM DD, YYYY",
-    timeFormat: "12"
+    timeFormat: "12",
+    currency: ""
   },
 };

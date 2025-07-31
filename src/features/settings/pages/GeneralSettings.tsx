@@ -30,8 +30,10 @@ import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/lib/utils";
 import moment from "moment-timezone";
 import { time } from "console";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Currency } from "lucide-react";
 import { useSelector } from "react-redux";
+import currency from "currency-codes";
+
 const GeneralSettings = () => {
   const settings = useSelector((state: any) => state.settings);
   const timezones = moment.tz.names();
@@ -42,6 +44,7 @@ const GeneralSettings = () => {
     defaultValues: generalSettings?.defaultValues,
   });
 
+  console.log(currency);
   const { control, reset, watch, setValue } = form;
 
   console.log(watch());
@@ -55,15 +58,18 @@ const GeneralSettings = () => {
   return (
     <FormProvider {...form}>
       <div className="flex flex-col gap-4">
+        {/* Date & Time Header */}
         <div className="space-y-2">
-          <h1 className="text-lg">Date & Time</h1>
+          <h1 className="text-lg font-semibold">Date & Time</h1>
           <Separator />
-        </div>{" "}
+        </div>
+
+        {/* Timezone */}
         <div className="flex flex-row items-center justify-between">
           <div>
-            <h2>Timezone</h2>
-            <p className="text-sm hidden sm:inline text-gray-400">
-              Choose your local timezone for accurate timestamps
+            <h2 className="font-medium">Timezone</h2>
+            <p className="text-sm text-muted-foreground hidden sm:inline">
+              Set your timezone to display dates and times accurately.
             </p>
           </div>
           <FormField
@@ -82,9 +88,7 @@ const GeneralSettings = () => {
                           !value && "text-muted-foreground"
                         )}
                       >
-                        {value
-                          ? timezones.find((timezone) => timezone === value)
-                          : "Select language"}
+                        {value || "Select timezone"}
                         <ChevronsUpDown className="opacity-50" />
                       </Button>
                     </FormControl>
@@ -96,21 +100,19 @@ const GeneralSettings = () => {
                         className="h-9"
                       />
                       <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>No results found.</CommandEmpty>
                         <CommandGroup>
-                          {timezones.map((language, index) => (
+                          {timezones.map((timezone, index) => (
                             <CommandItem
-                              value={language}
+                              value={timezone}
                               key={index}
-                              onSelect={() => {
-                                onChange(language);
-                              }}
+                              onSelect={() => onChange(timezone)}
                             >
-                              {language}
+                              {timezone}
                               <Check
                                 className={cn(
                                   "ml-auto",
-                                  language === value
+                                  timezone === value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
@@ -127,11 +129,13 @@ const GeneralSettings = () => {
             )}
           />
         </div>
+
+        {/* Time Format */}
         <div className="flex flex-row items-center justify-between">
           <div>
-            <h2>Time Format</h2>
-            <p className="text-sm hidden sm:inline text-gray-400">
-              Choose how time is displayed (e.g., 3:45 PM or 15:45)
+            <h2 className="font-medium">Time Format</h2>
+            <p className="text-sm text-muted-foreground hidden sm:inline">
+              Choose between 12-hour (AM/PM) or 24-hour time display.
             </p>
           </div>
           <FormField
@@ -142,8 +146,8 @@ const GeneralSettings = () => {
                 <FormControl>
                   <Tabs value={value} onValueChange={onChange}>
                     <TabsList>
-                      <TabsTrigger value="12">12</TabsTrigger>
-                      <TabsTrigger value="24">24</TabsTrigger>
+                      <TabsTrigger value="12">12-hour</TabsTrigger>
+                      <TabsTrigger value="24">24-hour</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </FormControl>
@@ -151,6 +155,80 @@ const GeneralSettings = () => {
               </FormItem>
             )}
           />
+        </div>
+
+        {/* Currency Header */}
+        <div className="space-y-2 pt-4">
+          <h1 className="text-lg font-semibold">Currency</h1>
+          <Separator />
+        </div>
+
+        {/* Duplicate Time Format - Replace or remove */}
+        <div className="flex flex-row items-center justify-between">
+          <div>
+            <h2 className="font-medium">Currency Format</h2>
+            <p className="text-sm text-muted-foreground hidden sm:inline">
+              Choose your preferred currency display format.
+            </p>
+          </div>
+          <FormField
+            name="currency"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <FormItem>
+                <FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-[200px] justify-between",
+                            !value && "text-muted-foreground"
+                          )}
+                        >
+                          {value?.currency || "Select timezone"}
+                          <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search timezone..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandGroup>
+                            {currency?.data?.map((currency, index) => (
+                              <CommandItem
+                                value={currency}
+                                key={index}
+                                onSelect={() => onChange(currency)}
+                              >
+                                {`${currency?.currency} (${currency?.code})`}
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    currency?.currency === value?.currency
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          {/* You might want to replace this duplicate timeFormat field with a real currency format option here */}
         </div>
       </div>
     </FormProvider>
