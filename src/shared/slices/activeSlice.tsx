@@ -2,15 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment";
 
 // Define the initial state as an object
-const initialState: { active: Object; type: string; mode: string; } =
-  {
-    active: {
-      from: moment().startOf("month"),
-      to: moment().endOf("month")
-    },
-    mode: "monthly",
-    type: "Expense",
-  };
+const initialState: { active: Object; type: string; mode: string } = {
+  active: {
+    from: moment().startOf("month"),
+    to: moment().endOf("month"),
+  },
+  mode: "monthly",
+  type: "Expense",
+};
 
 export const active = createSlice({
   name: "active",

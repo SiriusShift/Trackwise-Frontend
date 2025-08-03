@@ -157,9 +157,7 @@ export function TransactionDialog({
                   dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
                 });
 
-              reset({
-                ...expenseSchema.defaultValues,
-              });
+              reset();
               setOpen(false);
             } catch (err) {
               console.log(err);
@@ -168,9 +166,7 @@ export function TransactionDialog({
           },
         });
 
-        reset({
-          ...expenseSchema.defaultValues,
-        }); // Reset the form after successful submission
+        reset(); // Reset the form after successful submission
         setOpen(false);
         toast.success("Expense updated successfully");
       } else {
@@ -186,9 +182,7 @@ export function TransactionDialog({
 
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              reset({
-                ...expenseSchema.defaultValues,
-              });
+              reset();
               setOpen(false);
             } catch (err) {
               console.log(err);

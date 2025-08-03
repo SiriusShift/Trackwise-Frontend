@@ -124,6 +124,7 @@ export const {
   useUpdateRecurringExpenseMutation,
   useGetRecurringExpensesQuery,
   useGetDetailedExpenseQuery,
+  useLazyGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
   usePostRecurringPaymentMutation,
   usePatchExpenseMutation,

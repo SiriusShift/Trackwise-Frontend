@@ -188,7 +188,7 @@ const GeneralSettings = () => {
                             !value && "text-muted-foreground"
                           )}
                         >
-                          {value?.currency || "Select timezone"}
+                          {value?.currency || "Select currency"}
                           <ChevronsUpDown className="opacity-50" />
                         </Button>
                       </FormControl>
@@ -196,7 +196,7 @@ const GeneralSettings = () => {
                     <PopoverContent className="w-[200px] p-0">
                       <Command>
                         <CommandInput
-                          placeholder="Search timezone..."
+                          placeholder="Search currency..."
                           className="h-9"
                         />
                         <CommandList>

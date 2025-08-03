@@ -9,6 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import {
   useGetDetailedExpenseQuery,
+  useLazyGetDetailedExpenseQuery,
   useLazyGetExpensesQuery,
   useLazyGetRecurringExpensesQuery,
 } from "@/features/transactions/api/expensesApi";
@@ -41,6 +42,7 @@ import { formatMode } from "@/shared/utils/CustomFunctions";
 const TransactionPage = () => {
   const location = useLocation();
   const active = useSelector((state: any) => state.active.active);
+  const mode = useSelector((state: any) => state.active.mode);
   const activeType = useSelector((state: any) => state.active.type);
   console.log(activeType);
 
@@ -74,11 +76,8 @@ const TransactionPage = () => {
   const [triggerExpense, { data: expensesData, isLoading: expensesLoading }] =
     useLazyGetExpensesQuery();
 
-  const { data: detailedExpense } = useGetDetailedExpenseQuery({
-    // userId: userId,
-    startDate: startDate,
-    endDate: endDate,
-  });
+  const [triggerChart, { data: detailedExpense }] =
+    useLazyGetDetailedExpenseQuery();
 
   console.log(detailedExpense);
 
@@ -127,12 +126,10 @@ const TransactionPage = () => {
 
   const handleFilter = () => {
     const requestData = {
-      pageSize,
-      pageIndex,
       startDate,
       endDate,
-      ...(status && { Status: status }),
-      ...(search && { Search: search }), // Add `Search` only if truthy
+      ...(status && { status: status }),
+      ...(search && { search: search }), // Add `Search` only if truthy
       ...(selectedCategories.length > 0 && {
         Categories: JSON.stringify(
           selectedCategories.map((category) => category.id)
@@ -140,7 +137,8 @@ const TransactionPage = () => {
       }),
     };
 
-    triggerExpense(requestData);
+    triggerChart({ mode: formatMode(), ...requestData });
+    triggerExpense({ pageSize, pageIndex, ...requestData });
   };
 
   const clearFilter = () => {
@@ -213,7 +211,11 @@ const TransactionPage = () => {
             <div className="flex gap-2">
               {/* <AlertDialogDemo /> */}
 
-              <Button onClick={() => setDialogOpen(true)} size="sm" variant="outline">
+              <Button
+                onClick={() => setDialogOpen(true)}
+                size="sm"
+                variant="outline"
+              >
                 <Plus className="lg:mr-2" />
                 <span className="hidden md:inline">Add</span>
               </Button>

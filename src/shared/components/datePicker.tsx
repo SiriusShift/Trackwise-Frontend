@@ -10,7 +10,12 @@ import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { setActive, setMode } from "@/shared/slices/activeSlice";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 import { Calendar } from "./ui/calendar";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
@@ -23,7 +28,6 @@ interface DateRange {
   from: string;
   to: string;
 }
-
 
 const currentYear = new Date().getFullYear();
 const years = Array.from(
