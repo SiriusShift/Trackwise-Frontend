@@ -118,13 +118,7 @@ export function TransactionDialog({
     Object.keys(data).forEach((key) => {
       const value = data[key];
 
-      if (key === "source" && value?.id) {
-        formData.append("source", parseInt(value.id));
-      } else if (key === "category" && value?.id) {
-        formData.append("category", parseInt(value.id));
-      } else if (key === "amount") {
-        formData.append("amount", parseFloat(value));
-      } else if (key === "date") {
+      if (key === "date") {
         formData.append("date", moment(value).utc().format());
       } else {
         // fallback for any other field

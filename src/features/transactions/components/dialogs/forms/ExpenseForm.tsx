@@ -31,13 +31,22 @@ import {
 import {
   ArrowRight,
   Calendar as CalendarIcon,
+  Check,
+  ChevronsUpDown,
   Repeat,
   Upload,
 } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/shared/components/ui/command";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/shared/components/ui/calendar";
-import { frequencies } from "@/shared/utils/Constants";
 import { Input } from "../../../../../shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import moment from "moment";
@@ -46,6 +55,7 @@ import { toast } from "sonner";
 
 const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
+  console.log(watch());
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
@@ -90,41 +100,71 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
         />
         <div className="grid grid-cols-2 gap-5">
           <FormField
-            name="category"
             control={control}
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={(value) => {
-                      // Find the selected category object based on the value (category name)
-                      const selectedCategory = categoryData?.find(
-                        (category) => category.name === value
-                      );
-                      field.onChange(selectedCategory); // Set the entire object in the form state
-                    }}
-                    value={field.value?.name} // Set the category name as the value for display
-                  >
-                    <SelectTrigger className="capitalize">
-                      {/* Display the name of the selected category */}
-                      <SelectValue placeholder="Select a category">
-                        {field.value?.name || "Select a category"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent portal={false} className="max-h-[200px]">
-                      {categoryData?.map((category) => (
-                        <SelectItem key={category.id} value={category.name}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            name="category"
+            render={({ field: { onChange, value } }) => {
+              return (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Category</FormLabel>
+                  <Popover modal={false}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-[200px] justify-between",
+                            !value && "text-muted-foreground"
+                          )}
+                        >
+                          {value
+                            ? categoryData.find(
+                                (category) => category.id === value?.id
+                              )?.name
+                            : "Select category"}
+                          <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search category..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No framework found.</CommandEmpty>
+                          <CommandGroup>
+                            {categoryData.map((category) => (
+                              <CommandItem
+                                value={category}
+                                key={category.id}
+                                onSelect={() => {
+                                  onChange(category);
+                                }}
+                              >
+                                {category.name}
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    category.id === value?.id
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
+
           <FormField
             name="amount"
             control={control}

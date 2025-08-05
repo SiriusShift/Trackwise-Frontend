@@ -32,6 +32,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/shared/components/ui/collapsible";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import CommonTracker from "@/shared/components/tracker/Tracker";
@@ -42,7 +48,7 @@ import { formatMode } from "@/shared/utils/CustomFunctions";
 const TransactionPage = () => {
   const location = useLocation();
   const active = useSelector((state: any) => state.active.active);
-  const mode = useSelector((state: any) => state.active.mode);
+  const mode = formatMode();
   const activeType = useSelector((state: any) => state.active.type);
   console.log(activeType);
 
@@ -90,8 +96,8 @@ const TransactionPage = () => {
 
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
     useGetCategoryLimitQuery({
-      startDate: startDate,
-      endDate: endDate,
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
     });
 
   const [triggerUpdate] = usePatchCategoryLimitMutation();
@@ -137,7 +143,7 @@ const TransactionPage = () => {
       }),
     };
 
-    triggerChart({ mode: formatMode(), ...requestData });
+    triggerChart({ mode: mode, ...requestData });
     triggerExpense({ pageSize, pageIndex, ...requestData });
   };
 
@@ -169,10 +175,15 @@ const TransactionPage = () => {
     if (typeof startDate === "string") {
     }
     triggerExpense({
-      startDate,
-      endDate,
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
       pageSize,
       pageIndex,
+    });
+    triggerChart({
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
+      mode,
     });
   }, [pageSize, pageIndex, startDate, endDate, activeType]);
 
@@ -342,6 +353,14 @@ const TransactionPage = () => {
               </FilterSheet>
             </div>
           </div>
+
+          <Tabs defaultValue="account" className="w-full ">
+            <TabsList>
+              <TabsTrigger value="account">Regular</TabsTrigger>
+              <TabsTrigger value="recurring">Recurring</TabsTrigger>
+              <TabsTrigger value="password">Installment</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           <DataTable
             columns={expenseColumns}
