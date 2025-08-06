@@ -96,7 +96,7 @@ export function TransactionDialog({
     formState: { isDirty, isValid },
   } = form;
 
-  console.log(watch(), isValid, isDirty);
+  console.log(watch(), rowData);
 
   useEffect(() => {
     if (rowData) {
@@ -215,6 +215,7 @@ export function TransactionDialog({
     <>
       <Dialog
         open={open}
+        // modal={false}
         onOpenChange={async (open) => {
           if (!open) {
             if (isDirty) {

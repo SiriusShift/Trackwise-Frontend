@@ -81,8 +81,8 @@ export interface commonTrackerProps {
   data: Object[];
   isLoading: boolean;
   type: string;
-  onSubmit: () => void;
-  onDelete: () => void;
+  onSubmit: (data: any) => void;
+  onDelete: (data: any) => void;
   addDescription: string;
   editDescription: string;
 }

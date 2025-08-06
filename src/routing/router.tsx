@@ -6,7 +6,7 @@ import ForgotPassword from "@/features/auth/pages/ForgotPassword";
 import ProtectedRoutes from "./ProtectedRoutes";
 import Dashboard from "@/features/dashboard/pages/Dashboard";
 import ResetPassword from "@/features/auth/pages/ResetPassword";
-import Expense from "@/pages/TransactionPage";
+import TransactionPage from "@/features/transactions/pages/TransactionPage";
 import LoanPage from "@/pages/LoanPage";
 import SavingsPage from "@/pages/AccountPage";
 import Settings from "@/pages/Settings";
@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/transactions",
-                element: <Expense />
+                element: <TransactionPage />
             },
             {
                 path: "/accounts",

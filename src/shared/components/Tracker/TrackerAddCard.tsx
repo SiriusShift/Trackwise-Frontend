@@ -10,7 +10,7 @@ export const TrackerAddCard = ({
   type,
 }: {
   title: string;
-  onSubmit: () => void;
+  onSubmit: (data: any) => void;
   isLoading: boolean;
   type: string;
   addDescription: string;

@@ -52,10 +52,11 @@ import { Button } from "@/shared/components/ui/button";
 import moment from "moment";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import "@/shared/styles/Popover.css";
 
 const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
-  console.log(watch());
+  console.log(assetData);
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
@@ -63,37 +64,73 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
         <FormField
           name="source"
           control={control}
-          render={({ field }) => (
+          render={({ field: { value, onChange } }) => (
             <FormItem className="flex flex-col">
               <FormLabel>{type === "Income" ? "To" : "From"} </FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={(value) => {
-                    // Find the selected category object based on the value (category name)
-                    const selectedSource = assetData?.find(
-                      (source) => source.name === value
-                    );
-                    field.onChange(selectedSource); // Set the entire object in the form state
-                  }}
-                  value={field.value?.name}
-                >
-                  <SelectTrigger className="capitalize">
-                    <SelectValue placeholder="Select account" />
-                  </SelectTrigger>
-                  <SelectContent portal={false} className="max-h-[200px]">
-                    {assetData?.map((source) => (
-                      <SelectItem key={source.id} value={source.name}>
-                        <div className="flex justify-between items-center">
-                          <span>{source.name}</span>
-                          <span className="text-sm ml-2 text-gray-500">
-                            ₱{source?.remainingBalance}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "justify-between w-full",
+                        !value && "text-muted-foreground"
+                      )}
+                    >
+                      {value ? (
+                        <div className="space-x-2">
+                          <span>
+                            {
+                              assetData.find((asset) => asset.id === value?.id)
+                                ?.name
+                            }
+                          </span>
+                          <span>
+                            ₱{
+                              assetData.find((asset) => asset.id === value?.id)
+                                ?.balance
+                            }
                           </span>
                         </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
+                      ) : (
+                        "Select asset..."
+                      )}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Search asset" />
+                    <CommandList>
+                      {" "}
+                      <CommandEmpty>No assets found</CommandEmpty>
+                      <CommandGroup>
+                        {assetData?.map((asset) => (
+                          <CommandItem
+                            value={asset}
+                            key={asset.id}
+                            onSelect={() => {
+                              onChange(asset);
+                            }}
+                          >
+                            {asset.name}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                asset.id === value?.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}
@@ -106,7 +143,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
               return (
                 <FormItem className="flex flex-col">
                   <FormLabel>Category</FormLabel>
-                  <Popover modal={false}>
+                  <Popover modal={true}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -133,7 +170,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                           className="h-9"
                         />
                         <CommandList>
-                          <CommandEmpty>No framework found.</CommandEmpty>
+                          <CommandEmpty>No category found.</CommandEmpty>
                           <CommandGroup>
                             {categoryData.map((category) => (
                               <CommandItem

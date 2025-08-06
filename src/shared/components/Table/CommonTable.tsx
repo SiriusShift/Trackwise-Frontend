@@ -44,7 +44,6 @@ interface DataTableProps<TData, TValue> {
   pageIndex: number; // Current page index
   totalPages: number; // Total number of pages
   totalCount: number; // Total number of items
-  date: Date; // Date filter
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   categoryExpenses: any;
@@ -85,7 +84,6 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   pageSize,
-  date,
   pageIndex,
   totalPages,
   type,
@@ -208,7 +206,6 @@ export function DataTable<TData, TValue>({
             trend={categoryExpenses?.trend}
             type={type}
             categoryExpenses={categoryExpenses?.categoryExpenses}
-            date={date}
           />
         </div>
       </div>
@@ -293,7 +290,6 @@ export function DataTable<TData, TValue>({
           type={type}
           trend={categoryExpenses?.trend}
           categoryExpenses={categoryExpenses?.categoryExpenses}
-          date={date}
         />
       </div>
     </div>

@@ -20,7 +20,8 @@ import {
 import { TrendingDown, TrendingUp } from "lucide-react";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import noChartData from "@/assets/images/empty-box.svg";
-import { formatMode } from "@/shared/utils/CustomFunctions";
+import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import { useSelector } from "react-redux";
 
 const chartConfig = {
   width: 200,
@@ -45,7 +46,7 @@ const chartConfig = {
   ],
 };
 
-function CommonPieGraph({ categoryExpenses, date, total, trend, type }: any) {
+function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
   const [showChart, setShowChart] = React.useState(false);
   const location = useLocation();
 
@@ -66,7 +67,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend, type }: any) {
           {type} breakdown
         </CardTitle>
         <CardDescription className="text-center">
-          {moment(date).format("MMMM YYYY")}
+          {formatDateDisplay()}
         </CardDescription>
       </CardHeader>
 
@@ -159,7 +160,7 @@ function CommonPieGraph({ categoryExpenses, date, total, trend, type }: any) {
         </div>
         <div className="leading-none text-muted-foreground">
           Showing total {type?.toLocaleLowerCase()} for the {formatMode()} of{" "}
-          {moment(date).format("MMMM")}
+          {formatDateDisplay()}
         </div>
       </CardFooter>
     </Card>

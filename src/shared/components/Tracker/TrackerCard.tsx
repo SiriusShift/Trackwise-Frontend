@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { CarouselItem } from '../ui/carousel';
@@ -48,6 +49,9 @@ const TrackerCard = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              
+            </DropdownMenuItem>
             <TrackerDialog
               title={`Edit ${title}`}
               description={editDescription}

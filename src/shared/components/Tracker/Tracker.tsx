@@ -12,6 +12,7 @@ import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import TrackerDialog from "./TrackerDialog";
 import { commonTrackerProps } from "@/shared/types";
 import { TrackerAddCard } from "./TrackerAddCard";
+import TrackerCard from "./TrackerCard";
 
 
 

@@ -42,7 +42,7 @@ const SettingsLayout = () => {
             >
               <span className="flex justify-between pr-2 sm:pr-0">
                 <span className="flex gap-4">
-                  <item.icon className="sm:hidden" /> {item.name}{" "}
+                  <item.icon className="sm:hidden" /> {item.name }{" "}
                 </span>
                 <ArrowRightIcon className="sm:hidden" />
               </span>
@@ -73,7 +73,7 @@ const SettingsLayout = () => {
             </Button>
           )}
 
-          <h1 className="font-semibold text-xl">{activeTab}</h1>
+          <h1 className="font-semibold text-xl">{width < 640 ? activeTab : "Settings"}</h1>
         </div>
         <div>
           {width < 640 ? (
