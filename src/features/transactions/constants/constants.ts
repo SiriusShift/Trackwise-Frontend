@@ -5,6 +5,14 @@ export const type = [
   },
   {
     id: 2,
+    name: "Recurring"
+  },
+  {
+    id: 3,
+    name: "Installment"
+  },
+  {
+    id: 2,
     name: "Income",
   },
   {

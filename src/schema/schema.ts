@@ -40,6 +40,8 @@ export const expenseSchema = {
     date: new Date(),
     mode: "none",
     source: null,
+    image: null,
+    months: ""
   },
 };
 

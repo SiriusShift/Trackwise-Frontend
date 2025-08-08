@@ -1,9 +1,7 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
 import { DataTable } from "@/shared/components/table/CommonTable";
-import {
-  expenseColumns,
-} from "@/features/transactions/components/table-columns/expenseColumn";
+import { expenseColumns } from "@/features/transactions/components/table-columns/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
   useLazyGetDetailedExpenseQuery,
@@ -23,6 +21,8 @@ import { toast } from "sonner";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import PageHeader from "@/shared/components/PageHeader";
 import TransactionToolbar from "@/features/transactions/components/TransactionToolbar";
+import { useTransactionTrigger } from "@/shared/hooks/useLazyFetch";
+import { Expense } from "@/shared/types";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -59,9 +59,6 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
     });
 
-  const [triggerExpense, { data: expensesData, isLoading: expensesLoading }] =
-    useLazyGetExpensesQuery();
-
   const [triggerChart, { data: detailedExpense }] =
     useLazyGetDetailedExpenseQuery();
 
@@ -72,7 +69,7 @@ const TransactionPage = () => {
   const transactionConfigMap = {
     Expense: {
       columns: expenseColumns,
-      trigger: triggerExpense,
+      trigger: useLazyGetExpensesQuery,
     },
     // Recurring: {
     //   columns: recurringExpenseColumns,
@@ -82,10 +79,20 @@ const TransactionPage = () => {
     //   columns: installmentColumns,
     //   trigger: useLazyGetInstallmentExpensesQuery,
     // },
-    // Add more without modifying existing code
+    // Income: {
+    //   columns: recurringExpenseColumns,
+    //   trigger: useLazyGetRecurringExpensesQuery,
+    // },
+    // Transfer: {
+    //   columns: installmentColumns,
+    //   trigger: useLazyGetInstallmentExpensesQuery,
+    // },
   };
 
   const { columns, trigger } = transactionConfigMap[activeType] || {};
+
+  const { fetchData, data, isLoading } =
+    useTransactionTrigger<Expense[]>(trigger);
 
   //Functions
   const onSubmit = async (data: any) => {
@@ -116,7 +123,7 @@ const TransactionPage = () => {
 
   //UseEffect
   useEffect(() => {
-    triggerExpense({
+    fetchData({
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
       pageSize,
@@ -150,24 +157,24 @@ const TransactionPage = () => {
         {/* Toolbar */}
         <TransactionToolbar
           categoryData={categoryData}
-          transactionTrigger={trigger}
+          transactionTrigger={fetchData}
           startDate={startDate}
           endDate={endDate}
           activeType={activeType}
         />
 
         <DataTable
-          columns={expenseColumns}
+          columns={columns}
           setPageIndex={setPageIndex}
           setPageSize={setPageSize}
-          totalPages={expensesData?.totalPages}
+          totalPages={data?.totalPages}
           pageIndex={pageIndex}
           pageSize={pageSize}
-          trend={expensesData?.trend}
-          isLoading={expensesLoading}
+          trend={data?.trend}
+          isLoading={isLoading}
           type={activeType}
           categoryExpenses={detailedExpense}
-          data={expensesData?.data || []}
+          data={data?.data || []}
         />
         <CommonTracker
           data={categoryLimit}

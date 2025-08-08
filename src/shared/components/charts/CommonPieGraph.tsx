@@ -18,10 +18,8 @@ import {
   ChartTooltipContent,
 } from "@/shared/components/ui/chart";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import noChartData from "@/assets/images/empty-box.svg";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
-import { useSelector } from "react-redux";
 
 const chartConfig = {
   width: 200,
@@ -48,7 +46,6 @@ const chartConfig = {
 
 function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
   const [showChart, setShowChart] = React.useState(false);
-  const location = useLocation();
 
   // Delay chart rendering for smooth animation
   React.useEffect(() => {

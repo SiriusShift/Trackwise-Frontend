@@ -208,7 +208,7 @@ const TransactionToolbar = ({
           </FilterSheet>
         </div>
       </div>
-
+{/* 
       {activeType === "Expense" && (
         <Tabs defaultValue="account" className="w-full ">
           <TabsList>
@@ -217,7 +217,7 @@ const TransactionToolbar = ({
             <TabsTrigger value="password">Installment</TabsTrigger>
           </TabsList>
         </Tabs>
-      )}
+      )} */}
 
 
       {/* Data Table */}

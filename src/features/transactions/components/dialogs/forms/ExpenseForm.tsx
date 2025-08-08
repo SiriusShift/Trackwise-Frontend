@@ -52,7 +52,6 @@ import { Button } from "@/shared/components/ui/button";
 import moment from "moment";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import "@/shared/styles/Popover.css";
 
 const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   const { watch, control, setValue } = useFormContext();
@@ -531,8 +530,9 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
             <FormItem className="flex flex-col">
               <FormLabel>Installment Term</FormLabel>
               <FormControl>
-                <Input min={0} {...field} type="number" />
+                <Input min={0} {...field} placeholder="months" type="number" />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -576,7 +576,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                         <img
                           src={previewUrl}
                           alt="Attachment preview"
-                          className="w-[85px] h-[85px] object-cover rounded"
+                          className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded"
                         />
                       ) : (
                         <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">

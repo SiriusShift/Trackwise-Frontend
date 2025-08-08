@@ -137,7 +137,7 @@ export function TransactionDialog({
           description: "Are you sure you want to update this expense?",
           title: "Update Expense",
           variant: "info",
-          confirmText: "Add",
+          confirmText: "Update",
           cancelText: "Cancel",
           onConfirm: async () => {
             try {
@@ -153,16 +153,13 @@ export function TransactionDialog({
 
               reset();
               setOpen(false);
+              toast.success("Expense updated successfully");
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
             }
           },
         });
-
-        reset(); // Reset the form after successful submission
-        setOpen(false);
-        toast.success("Expense updated successfully");
       } else {
         await confirm({
           description: "Are you sure you want to add this expense?",

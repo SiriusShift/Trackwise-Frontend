@@ -123,7 +123,7 @@ export const ConfirmProvider = ({
   }, [options, handleClose]);
 
   const handleCancel = useCallback(async () => {
-    console.log("test")
+    console.log("test");
     try {
       // Show loading if requested
       if (options.showLoadingOnCancel) {
@@ -150,18 +150,18 @@ export const ConfirmProvider = ({
     switch (options.variant) {
       case "destructive":
         return {
-          iconClass: "bg-red-100 text-red-600",
+          iconClass: "text-red-600",
           Icon: AlertTriangle,
         };
       case "warning":
         return {
-          iconClass: "bg-yellow-100 text-yellow-600",
+          iconClass: "text-yellow-600",
           Icon: AlertCircle,
         };
       case "info":
       default:
         return {
-          iconClass: "bg-blue-100 text-blue-600",
+          iconClass: "text-blue-600",
           Icon: Info,
         };
     }
@@ -197,31 +197,32 @@ export const ConfirmProvider = ({
               e.preventDefault();
             }
           }}
-          className="w-[400px]"
         >
           <DialogHeader>
-            <div className="flex flex-col items-center text-center">
-              <div className={`p-3 rounded-full mb-4 ${iconClass}`}>
-                <Icon size={24} />
+            <div className="flex flex-col sm:flex-row items-center">
+              <div className={`p-3 rounded-sm  ${iconClass}`}>
+                <Icon size={40} />
               </div>
 
-              <DialogTitle>
-                {options.title || "Are you absolutely sure?"}
-              </DialogTitle>
+              <div className="flex flex-col px-4 gap-2">
+                <DialogTitle>
+                  {options.title || "Are you absolutely sure?"}
+                </DialogTitle>
 
-              {options.description && (
-                <DialogDescription>{options.description}</DialogDescription>
-              )}
+                {options.description && (
+                  <DialogDescription>{options.description}</DialogDescription>
+                )}
+              </div>
             </div>
           </DialogHeader>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
             <DialogClose asChild>
               <Button
                 onClick={handleCancel}
                 disabled={isLoading}
                 variant="outline"
-                className="mr-2"
+                className="order-2 sm:order-1"
               >
                 {isLoading && options.showLoadingOnCancel ? (
                   <ClipLoader size={15} color="currentColor" />
@@ -231,7 +232,11 @@ export const ConfirmProvider = ({
               </Button>
             </DialogClose>
 
-            <Button onClick={handleConfirm} disabled={isLoading}>
+            <Button
+              onClick={handleConfirm}
+              disabled={isLoading}
+              className="order-1 sm:order-1"
+            >
               {isLoading && options.showLoadingOnConfirm !== false ? (
                 <ClipLoader size={15} color="white" />
               ) : (
