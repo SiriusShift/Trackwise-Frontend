@@ -36,7 +36,7 @@ export const expenseSchema = {
   defaultValues: {
     category: null,
     description: "",
-    amount: null,
+    amount: "",
     date: new Date(),
     mode: "none",
     source: null,

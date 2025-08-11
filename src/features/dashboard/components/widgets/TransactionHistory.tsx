@@ -23,10 +23,10 @@ const TransactionHistory = () => {
           <h1>No Data Found</h1>
         </div>
       ) : (
-        data?.data.map((item: Object) => {
+        data?.data.map((item: Object, index) => {
           const LucidIcon = Icons[item.category?.icon];
           return (
-            <div className="flex mt-5 rounded-md justify-between">
+            <div key={index} className="flex mt-5 rounded-md justify-between">
               <div className="flex w-full">
                 <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
                   <LucidIcon className="text-black" width={25} height={25} />

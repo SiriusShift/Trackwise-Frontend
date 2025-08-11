@@ -18,7 +18,7 @@ const SettingsLayout = () => {
   const navigate = useNavigate();
   const width = useScreenWidth();
   console.log(width);
-  const [activeTab, setActiveTab] = useState();
+  const [activeTab, setActiveTab] = useState("Settings");
 
   console.log(location);
 
@@ -29,9 +29,10 @@ const SettingsLayout = () => {
   const Tabs = () => {
     return (
       <div className="sm:flex flex-col h-auto gap-2 sm:flex-row sm:pb-1 overflow-auto">
-        {subNavigation?.map((item) => {
+        {subNavigation?.map((item, index) => {
           return (
             <Link
+              key={index}
               className={`${
                 location?.location?.pathname === item?.path
                   ? "sm:border-b border-primary font-semibold text-primary"
@@ -42,7 +43,7 @@ const SettingsLayout = () => {
             >
               <span className="flex justify-between pr-2 sm:pr-0">
                 <span className="flex gap-4">
-                  <item.icon className="sm:hidden" /> {item.name }{" "}
+                  <item.icon className="sm:hidden" /> {item.name}{" "}
                 </span>
                 <ArrowRightIcon className="sm:hidden" />
               </span>
@@ -73,7 +74,9 @@ const SettingsLayout = () => {
             </Button>
           )}
 
-          <h1 className="font-semibold text-xl">{width < 640 ? activeTab : "Settings"}</h1>
+          <h1 className="font-semibold text-xl">
+            {width < 640 ? activeTab : "Settings"}
+          </h1>
         </div>
         <div>
           {width < 640 ? (

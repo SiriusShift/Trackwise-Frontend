@@ -120,6 +120,10 @@ export function TransactionDialog({
 
       if (key === "date") {
         formData.append("date", moment(value).utc().format());
+      } else if (key === "category") {
+        formData.append("category", value.id);
+      } else if (key === "source") {
+        formData.append("source", value.id);
       } else {
         // fallback for any other field
         formData.append(key, value);

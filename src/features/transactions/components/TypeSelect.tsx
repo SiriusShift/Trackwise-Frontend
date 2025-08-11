@@ -24,8 +24,8 @@ const TypeSelect = () => {
         <SelectValue placeholder="Type" />
       </SelectTrigger>
       <SelectContent>
-        {type?.map((item) => (
-          <SelectItem key={item.id} value={item.name}>
+        {type?.map((item, key) => (
+          <SelectItem key={item.id + key} value={item.name}>
             {item.name}
           </SelectItem>
         ))}

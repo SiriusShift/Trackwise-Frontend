@@ -145,7 +145,7 @@ const TransactionToolbar = ({
                   {/* Content */}
                   <CollapsibleContent>
                     <div className="flex flex-col gap-2 p-2 max-h-[200px] overflow-y-auto">
-                      {categoryData?.map((category) => (
+                      {categoryData?.map((category, index) => (
                         <div
                           key={category.id}
                           className="flex items-center gap-2"

@@ -12,11 +12,11 @@ export const type = [
     name: "Installment"
   },
   {
-    id: 2,
+    id: 4,
     name: "Income",
   },
   {
-    id: 3,
+    id: 5,
     name: "Transfer",
   },
 ];

@@ -80,58 +80,52 @@ export function AppSidebar() {
               {navigationData.map((item) => {
                 console.log(item?.name);
                 return (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild>
-                      <>
-                        {screenWidth > 767 && screenWidth < 1024 ? (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button
-                                  className="hidden md:block lg:hidden"
-                                  variant={
-                                    parent === item.path ? "default" : "ghost"
-                                  }
-                                  onClick={() => {
-                                    setActive(item.path);
-                                    router(item.path);
-                                  }} // Ensure you're using `router.push` for navigation
-                                >
-                                  <item.icon
-                                    style={{ width: "20px", height: "20px" }}
-                                  />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent
-                                side="right"
-                                sideOffset={5}
-                                className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
-                              >
-                                <p className="tracking-wide">{item.name}</p>
-                                <TooltipArrow className="bg-background" />{" "}
-                                {/* Add styles to customize the arrow */}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        ) : (
-                          <Button
-                            onClick={() => {
-                              setActive(item.path);
-                              router(item.path);
-                            }}
-                            variant={parent === item.path ? "default" : "ghost"}
-                            className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                  <SidebarMenuItem className="flex justify-center" key={item.name}>
+                    {screenWidth > 767 && screenWidth < 1024 ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <SidebarMenuButton
+                              className="hidden md:block lg:hidden"
+                              variant={
+                                parent === item.path ? "default" : "ghost"
+                              }
+                              onClick={() => {
+                                setActive(item.path);
+                                router(item.path);
+                              }} // Ensure you're using `router.push` for navigation
+                            >
+                              <item.icon
+                                style={{ width: "20px", height: "20px" }}
+                              />
+                            </SidebarMenuButton>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="right"
+                            sideOffset={5}
+                            className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
                           >
-                            <item.icon
-                              style={{ width: "24px", height: "24px" }}
-                            />
-                            <span className="inline md:hidden lg:inline">
-                              {item.name}
-                            </span>
-                          </Button>
-                        )}
-                      </>
-                    </SidebarMenuButton>
+                            <p className="tracking-wide">{item.name}</p>
+                            <TooltipArrow className="bg-background" />{" "}
+                            {/* Add styles to customize the arrow */}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setActive(item.path);
+                          router(item.path);
+                        }}
+                        variant={parent === item.path ? "default" : "ghost"}
+                        className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                      >
+                        <item.icon style={{ width: "24px", height: "24px" }} />
+                        <span className="inline md:hidden lg:inline">
+                          {item.name}
+                        </span>
+                      </SidebarMenuButton>
+                    )}
                   </SidebarMenuItem>
                 );
               })}
@@ -143,18 +137,16 @@ export function AppSidebar() {
       {/* Sidebar Footer */}
       <SidebarFooter>
         <div className="mx-3 py-2">
-          <SidebarMenuButton asChild>
-            <Button
-              variant={"ghost"}
-              className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
-              onClick={handleLogout}
-            >
-              <LogOut
-                style={{ width: "24px", height: "24px" }}
-                className="lg:mr-3"
-              />
-              <span className="inline md:hidden lg:inline">Logout</span>
-            </Button>
+          <SidebarMenuButton
+            variant="ghost"
+            className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+            onClick={handleLogout}
+          >
+            <LogOut
+              style={{ width: "24px", height: "24px" }}
+              className="lg:mr-3"
+            />
+            <span className="inline md:hidden lg:inline">Logout</span>
           </SidebarMenuButton>
         </div>
       </SidebarFooter>

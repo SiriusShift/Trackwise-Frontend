@@ -72,9 +72,10 @@ const Repeat = ({
           </DialogDescription> */}
           </DialogHeader>
 
-          {frequencies?.map((frequency: frequencyProps) => (
+          {frequencies?.map((frequency: frequencyProps, index : number) => (
             <Button
               value={active}
+              key={index}
               className="flex justify-between"
               variant={
                 active?.name === frequency?.name ? "secondary" : "outline"
