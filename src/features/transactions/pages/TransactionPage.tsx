@@ -1,12 +1,12 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
 import { DataTable } from "@/shared/components/table/CommonTable";
-import { expenseColumns } from "@/features/transactions/components/table-columns/expenseColumn";
+import { expenseColumns } from "@/features/transactions/components/table-columns/expense/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
   useLazyGetDetailedExpenseQuery,
   useLazyGetExpensesQuery,
-} from "@/features/transactions/api/expensesApi";
+} from "@/features/transactions/api/expense/expensesApi";
 import { useSelector } from "react-redux";
 import {
   useDeleteCategoryLimitMutation,
@@ -21,8 +21,10 @@ import { toast } from "sonner";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import PageHeader from "@/shared/components/PageHeader";
 import TransactionToolbar from "@/features/transactions/components/TransactionToolbar";
-import { useTransactionTrigger } from "@/shared/hooks/useLazyFetch";
+import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { Expense } from "@/shared/types";
+import { installmentColumn } from "../components/table-columns/expense/installmentColumn";
+import { useLazyGetInstallmentsQuery } from "../api/expense/installmentApi";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -75,10 +77,10 @@ const TransactionPage = () => {
     //   columns: recurringExpenseColumns,
     //   trigger: useLazyGetRecurringExpensesQuery,
     // },
-    // Installment: {
-    //   columns: installmentColumns,
-    //   trigger: useLazyGetInstallmentExpensesQuery,
-    // },
+    Installment: {
+      columns: installmentColumn,
+      trigger: useLazyGetInstallmentsQuery,
+    },
     // Income: {
     //   columns: recurringExpenseColumns,
     //   trigger: useLazyGetRecurringExpensesQuery,
@@ -92,7 +94,7 @@ const TransactionPage = () => {
   const { columns, trigger } = transactionConfigMap[activeType] || {};
 
   const { fetchData, data, isLoading } =
-    useTransactionTrigger<Expense[]>(trigger);
+    useTriggerFetch<Expense[]>(trigger);
 
   //Functions
   const onSubmit = async (data: any) => {

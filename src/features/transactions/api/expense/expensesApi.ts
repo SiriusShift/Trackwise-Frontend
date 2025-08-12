@@ -37,7 +37,7 @@ export const expensesApi = api
           //   Accept: "application/json",
           // },
         }),
-        invalidatesTags: ["Expenses", "RecurringExpense"],
+        invalidatesTags: ["Expenses"],
       }),
 
       patchExpense: builder.mutation({
@@ -49,7 +49,7 @@ export const expensesApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Expenses", "RecurringExpense"],
+        invalidatesTags: ["Expenses"],
       }),
 
       // postRecurringExpense: builder.mutation({
@@ -117,16 +117,10 @@ export const expensesApi = api
 
 export const {
   useGetExpensesQuery,
-  useLazyGetRecurringExpensesQuery,
   useLazyGetExpensesQuery,
   usePostExpenseMutation,
-  usePostRecurringExpenseMutation,
-  useUpdateRecurringExpenseMutation,
-  useGetRecurringExpensesQuery,
   useGetDetailedExpenseQuery,
   useLazyGetDetailedExpenseQuery,
   useDeleteExpenseMutation,
-  usePostRecurringPaymentMutation,
   usePatchExpenseMutation,
-  useGetFrequencyQuery,
 } = expensesApi;

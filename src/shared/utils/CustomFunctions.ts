@@ -75,7 +75,7 @@ export const numberInput = (
 
   // ✅ Allow negative numbers and up to 2 decimal places
   if (/^-?\d*\.?\d{0,2}$/.test(value)) {
-    field.onChange(value);
+    field.onChange(Number(value));
   }
 };
 

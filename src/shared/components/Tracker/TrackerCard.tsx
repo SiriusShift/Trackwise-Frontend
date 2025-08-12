@@ -1,4 +1,4 @@
-import { commonTrackerProps } from '@/shared/types';
+import { commonTrackerProps } from "@/shared/types";
 import * as Icons from "lucide-react";
 import { ChartContainer } from "../ui/chart";
 import {
@@ -15,9 +15,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { CarouselItem } from '../ui/carousel';
-import { Card } from '../ui/card';
-import TrackerDialog from '@/shared/components/tracker/TrackerDialog';
+import { CarouselItem } from "../ui/carousel";
+import { Card, CardContent } from "../ui/card";
+import TrackerDialog from "@/shared/components/tracker/TrackerDialog";
 
 const TrackerCard = ({
   item,
@@ -49,9 +49,6 @@ const TrackerCard = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              
-            </DropdownMenuItem>
             <TrackerDialog
               title={`Edit ${title}`}
               description={editDescription}
@@ -60,6 +57,10 @@ const TrackerCard = ({
               data={item}
               type={type}
             />
+            <DropdownMenuItem>
+              <Icons.Trash2 />
+              Delete
+            </DropdownMenuItem>
             {/* <DeleteDialog
               onDelete={() => onDelete(item)}
               description={`Are you sure you want to delete this ${title.toLowerCase()}? This action cannot be undone.`}
@@ -120,4 +121,4 @@ const TrackerCard = ({
   );
 };
 
-export default TrackerCard
+export default TrackerCard;

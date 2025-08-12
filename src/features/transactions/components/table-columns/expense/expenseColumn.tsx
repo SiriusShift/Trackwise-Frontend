@@ -19,11 +19,11 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/shared/components/ui/badge";
-import { useDeleteExpenseMutation } from "@/features/transactions/api/expensesApi";
+import { useDeleteExpenseMutation } from "@/features/transactions/api/expense/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
+// import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
@@ -49,7 +49,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-        {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
+          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
         </span>
       );
     },
@@ -336,7 +336,7 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <PayDialog rowData={expense} />
+              {/* <PayDialog rowData={expense} /> */}
               <TransactionDialog
                 rowData={expense}
                 active={activeTab}
@@ -346,13 +346,10 @@ export const recurringExpenseColumns: ColumnDef<Expense>[] = [
                 <Eye />
                 View
               </DropdownMenuItem>
-              <DeleteDialog
-                onDelete={onDelete}
-                description="Are you sure you want to delete this recurring expense? This action cannot be
-            undone"
-                title="Delete Recurring Expense"
-                isLoading={isLoading}
-              />
+              <DropdownMenuItem onClick={onDelete}>
+                <Trash2 />
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 

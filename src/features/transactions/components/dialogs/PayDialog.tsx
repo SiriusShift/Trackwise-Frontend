@@ -46,7 +46,7 @@ import {
 } from "@/shared/components/ui/select";
 import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import { useDispatch } from "react-redux";
-import { usePostRecurringPaymentMutation } from "@/features/transactions/api/expensesApi";
+import { usePostRecurringPaymentMutation } from "@/features/transactions/api/expense/expensesApi";
 
 function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
   const width = useScreenWidth();

@@ -31,7 +31,11 @@ export const expenseSchema = {
       }),
     image: yup.mixed().nullable(),
 
-    source: yup.object().required("Source is required"),
+    source: yup.object().when("mode", {
+      is: "none",
+      then: (schema) => schema.required("Source is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   }),
   defaultValues: {
     category: null,
@@ -41,9 +45,34 @@ export const expenseSchema = {
     mode: "none",
     source: null,
     image: null,
-    months: ""
+    months: "",
   },
 };
+
+export const installmentSchema = {
+  schema: yup.object().shape({
+    category: yup.object().required("Category is required"),
+    description: yup.string().required("Description is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+    date: yup.date().required("Date is required"),
+    months: yup
+      .number()
+      .required("Installment Term is required")
+      .positive("Months must be greater than 0"),
+  }),
+  defaultValues: {
+    category: null,
+    description: "",
+    amount: "",
+    date: new Date(),
+    months: "",
+  },
+};
+
+export const recurringSchema = {};
 
 export const trackerSchema = {
   schema: yup.object().shape({
@@ -82,6 +111,6 @@ export const generalSettings = {
   defaultValues: {
     timezone: "MMM DD, YYYY",
     timeFormat: "12",
-    currency: ""
+    currency: "",
   },
 };

@@ -10,25 +10,11 @@ import {
 } from "@/shared/components/ui/form";
 import { numberInput } from "@/shared/utils/CustomFunctions";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuRadioItem,
-  DropdownMenuRadioGroup,
-} from "@/shared/components/ui/dropdown-menu";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import {
-  ArrowRight,
-  Calendar as CalendarIcon,
-  Check,
-  ChevronsUpDown,
-  Repeat,
-  Upload,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -46,7 +32,7 @@ import moment from "moment";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
-const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
+const InstallmentForm = ({ categoryData, type }) => {
   const {
     watch,
     control,
@@ -59,82 +45,6 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
-        <FormField
-          name="source"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>{type === "Income" ? "To" : "From"} </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "justify-between w-full",
-                        !value && "text-muted-foreground"
-                      )}
-                    >
-                      {value ? (
-                        <div className="space-x-2">
-                          <span>
-                            {
-                              assetData.find((asset) => asset.id === value?.id)
-                                ?.name
-                            }
-                          </span>
-                          <span>
-                            ₱
-                            {
-                              assetData.find((asset) => asset.id === value?.id)
-                                ?.balance
-                            }
-                          </span>
-                        </div>
-                      ) : (
-                        "Select asset..."
-                      )}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="p-0">
-                  <Command>
-                    <CommandInput placeholder="Search asset" />
-                    <CommandList>
-                      {" "}
-                      <CommandEmpty>No assets found</CommandEmpty>
-                      <CommandGroup>
-                        {assetData?.map((asset) => (
-                          <CommandItem
-                            value={asset}
-                            key={asset.id}
-                            onSelect={() => {
-                              onChange(asset);
-                            }}
-                          >
-                            {asset.name}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                asset.id === value?.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <div className="grid grid-cols-2 gap-5">
           <FormField
             control={control}
@@ -220,7 +130,6 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                       step="0.01"
                       placeholder="Enter amount"
                       className="input-class text-sm pl-7"
-                      disabled={!watch("source")}
                       onChange={(e) => {
                         const value = Number(e.target.value);
                         const balance = watch("source")?.remainingBalance;
@@ -266,7 +175,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
         name="date"
         render={({ field }) => (
           <FormItem className="flex flex-col w-full">
-            <FormLabel>Date & Time</FormLabel>
+            <FormLabel>Start Date</FormLabel>
             <Popover modal={true}>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -278,9 +187,9 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                     )}
                   >
                     {field.value ? (
-                      `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
+                      `${moment(field.value).format("MMM DD, YYYY")}` // Format date & time
                     ) : (
-                      <span>Pick a date & time</span>
+                      <span>Pick a date</span>
                     )}
                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                   </Button>
@@ -309,7 +218,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                     }}
                   />
                   {/* Time Picker for Time Selection */}
-                  <div className="flex items-center justify-between">
+                  {/* <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Time:</label>
                     <input
                       type="time"
@@ -339,7 +248,7 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
                         field.onChange(updatedDate); // Update time with the correct date preserved
                       }}
                     />
-                  </div>
+                  </div> */}
                 </div>
               </PopoverContent>
             </Popover>
@@ -349,115 +258,25 @@ const ExpenseForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
       />
 
       <FormField
-        name="image"
+        name="months"
         control={control}
-        render={({ field: { onChange, value } }) => {
-          // Determine if this is an existing image (URL) or new upload (data URL)
-          const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-          const isExistingImage =
-            value && typeof value === "string" && !value.startsWith("data:");
-
-          useEffect(() => {
-            if (value instanceof File) {
-              const url = URL.createObjectURL(value);
-              setPreviewUrl(url);
-
-              // Cleanup to avoid memory leak
-              return () => URL.revokeObjectURL(url);
-            } else if (typeof value === "string") {
-              setPreviewUrl(value); // use existing image url
-            } else {
-              setPreviewUrl(null);
-            }
-          }, [value]);
-
-          // const isNewUpload =
-          //   value && typeof value === "string" && value.startsWith("data:");
-
-          return (
-            <FormItem className="flex flex-col">
-              <FormLabel>Attachment</FormLabel>
-              <FormControl>
-                <div className="space-y-3">
-                  {/* Preview section */}
-                  <div className="relative border rounded p-3 bg-muted">
-                    <div className="flex items-start gap-3">
-                      {previewUrl ? (
-                        <img
-                          src={previewUrl}
-                          alt="Attachment preview"
-                          className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded"
-                        />
-                      ) : (
-                        <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
-                          No image selected
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {isExistingImage ? "Current Image" : "Upload Image"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {isExistingImage
-                            ? "This image is stored in the database."
-                            : "Upload an image or attachment to store."}
-                        </p>
-                        <input
-                          type="file"
-                          ref={imageRef}
-                          accept="image/*"
-                          hidden
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              onChange(file);
-                            } else {
-                              // If no file selected and there was an existing image, keep it
-                              // If no existing image, set to null
-                              if (!isExistingImage) {
-                                onChange(null);
-                              }
-                            }
-                          }}
-                          id="imageUploader"
-                          className={value ? "mt-2" : ""}
-                        />
-                        <div className="flex items-end pt-2 gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => imageRef.current?.click()}
-                            className="flex items-center gap-2"
-                          >
-                            Upload
-                          </Button>
-                          {watch("image") && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                onChange("");
-                              }}
-                            >
-                              Remove
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          );
-        }}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Installment Duration</FormLabel>
+            <FormControl>
+              <Input
+                min={0}
+                {...field}
+                placeholder="Enter number of months"
+                type="number"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
       />
     </div>
   );
 };
 
-export default ExpenseForm;
+export default InstallmentForm;

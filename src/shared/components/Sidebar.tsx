@@ -12,7 +12,7 @@ import {
 import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../../routing/navigationData";
 import { useEffect, useState } from "react";
-import { useMatch, useNavigate } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import {
   TooltipProvider,
   Tooltip,
@@ -80,7 +80,10 @@ export function AppSidebar() {
               {navigationData.map((item) => {
                 console.log(item?.name);
                 return (
-                  <SidebarMenuItem className="flex justify-center" key={item.name}>
+                  <SidebarMenuItem
+                    className="flex justify-center"
+                    key={item.name}
+                  >
                     {screenWidth > 767 && screenWidth < 1024 ? (
                       <TooltipProvider>
                         <Tooltip>
@@ -113,17 +116,20 @@ export function AppSidebar() {
                       </TooltipProvider>
                     ) : (
                       <SidebarMenuButton
-                        onClick={() => {
-                          setActive(item.path);
-                          router(item.path);
-                        }}
                         variant={parent === item.path ? "default" : "ghost"}
-                        className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                        asChild
                       >
-                        <item.icon style={{ width: "24px", height: "24px" }} />
-                        <span className="inline md:hidden lg:inline">
-                          {item.name}
-                        </span>
+                        <Link
+                          to={item.path}
+                          className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                        >
+                          <item.icon
+                            style={{ width: "24px", height: "24px" }}
+                          />
+                          <span className="inline md:hidden lg:inline">
+                            {item.name}
+                          </span>
+                        </Link>
                       </SidebarMenuButton>
                     )}
                   </SidebarMenuItem>

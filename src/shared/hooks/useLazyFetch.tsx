@@ -1,11 +1,9 @@
-type AnyLazyQueryHook<TData = any> = () => [
-  (args?: any) => any, // the trigger function
+type AnyRtkHook<TData = any> = () => [
+  (args?: any) => any,
   { data?: TData; isLoading: boolean }
 ];
 
-export function useTransactionTrigger<TData = any>(
-  trigger?: AnyLazyQueryHook<TData>
-) {
+export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
   if (!trigger) {
     return {
       fetchData: null as null | ((args?: any) => any),
