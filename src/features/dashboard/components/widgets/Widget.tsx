@@ -4,9 +4,10 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { commonWidgetProps } from "@/shared/types";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
+import { IRootState } from "@/app/store";
 
 const WidgetLayout = ({children, title}: commonWidgetProps) => {
-  const activeMonth = useSelector((state: any) => state.active.activeMonth);
+  // const activeMonth = useSelector((state: IRootState) => state.active.active);
 
   return (
     <Card className={`border p-5 flex flex-col rounded-lg col-span-full ${title === "Calendar" ? "md:col-span-full" : "md:col-span-2"} xl:col-span-1 h-60 `}>

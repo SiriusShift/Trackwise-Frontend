@@ -187,6 +187,7 @@ export const ConfirmProvider = ({
         }}
       >
         <DialogContent
+        className="w-5/6 sm:w-auto"
           onInteractOutside={(e) => {
             if (shouldPreventClose || options.preventCloseOnOutsideClick) {
               e.preventDefault();

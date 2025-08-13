@@ -5,7 +5,7 @@ export interface Expense {
   description?: string; // Optional description
   amount: number; // Expense amount
   source: Object;
-  status: "Paid" | "Unpaid" | "Pending"; // Status of the expense
+  status: "Paid" | "Partial" | "Pending" | "Overdue" ; // Status of the expense
 }
 
 export interface Income {

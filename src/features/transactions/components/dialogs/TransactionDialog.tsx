@@ -1,4 +1,4 @@
-import { transactionConfigDialog } from "./config/transactionConfig";
+import { transactionConfig } from "../../config/transactionConfig";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
@@ -22,6 +22,7 @@ import {
   DialogClose,
 } from "@/shared/components/ui/dialog";
 import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
+import TransactionForm from "./forms/TransactionForm";
 
 export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
   const [openFrequency, setOpenFrequency] = useState(false);
@@ -32,9 +33,10 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
   let { data: assetData } = useGetAssetQuery();
   assetData = assetData?.data;
 
-  const { Form, postTrigger, editTrigger } =
-    transactionConfigDialog[type] || {};
-  const { fetchData, isLoading } = useTriggerFetch(
+  const { postTrigger, editTrigger } =
+    transactionConfig[type] || {};
+    
+  const { fetchData, isFetching } = useTriggerFetch(
     mode === "edit" ? editTrigger : postTrigger
   );
 
@@ -100,8 +102,9 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
       }
     });
 
-    const confirmConfig = {
+    confirm({
       title: mode === "edit" ? "Update Expense" : "Add Expense",
+      showLoadingOnConfirm: true,
       description:
         mode === "edit"
           ? "Are you sure you want to update this expense?"
@@ -128,9 +131,7 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
           toast.error(err?.data?.error || "Something went wrong");
         }
       },
-    };
-
-    confirm(confirmConfig);
+    });
   };
 
   return (
@@ -147,9 +148,9 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
       >
         <DialogContent
           onInteractOutside={(e) => isDirty && e.preventDefault()}
-          className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto sm:max-h-[90%] sm:min-h-lg sm:w-md"
+          className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto px-0 sm:max-h-[90%] p sm:min-h-lg sm:w-md"
         >
-          <DialogHeader>
+          <DialogHeader className="px-6">
             <DialogTitle>
               {mode === "add" ? "Add" : "Edit"} {type}
             </DialogTitle>
@@ -159,8 +160,8 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
             </DialogDescription>
           </DialogHeader>
 
-          <form className="space-y-4 overflow-auto p-1">
-            <Form
+          <form className="space-y-4 px-6 overflow-auto p-1">
+            <TransactionForm
               type={type}
               assetData={assetData}
               setOpenFrequency={handleCustomOpen}
@@ -168,7 +169,7 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
             />
           </form>
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <DialogFooter className="flex flex-col px-6 sm:flex-row gap-2">
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={!isValid || !isDirty}

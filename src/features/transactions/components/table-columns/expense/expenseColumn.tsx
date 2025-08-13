@@ -1,8 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  CheckCircle,
+  CircleAlert,
+  Clock,
   CreditCard,
   Eye,
+  Loader,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -64,7 +68,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   // },
   {
     accessorKey: "amount",
-    header: "Amount",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={"ghost"}
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <ArrowUpDown />
+        </Button>
+      );
+    },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
       return <span>₱{amount?.toFixed(2) || "0"}</span>;
@@ -110,17 +124,20 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
     cell: ({ getValue }) => {
       const status = getValue() as Expense["status"];
-      const statusColor =
-        status === "Paid"
-          ? "success"
-          : status === "Unpaid"
-          ? "warning"
-          : "destructive";
+
+      const iconMap = {
+        Paid: <CheckCircle className="text-green-500 mr-2" size={16} />,
+        Pending: (
+          <Loader className="text-yellow-500 mr-2" size={16} />
+        ),
+        Overdue: <CircleAlert className="text-red-500 mr-2" size={16} />,
+        Partial: <Clock className="text-red-500 mr-2" size={16} />,
+      };
 
       return (
-        <Badge variant={"outline"}>
-          <div className={`h-2 w-2 rounded-full mr-2 bg-${statusColor}`} />
-          {status || "unknown"}
+        <Badge variant="outline" className="p-1 px-2">
+          {iconMap[status] || null}
+          {status || "Unknown"}
         </Badge>
       );
     },

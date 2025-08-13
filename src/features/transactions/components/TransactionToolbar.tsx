@@ -18,6 +18,8 @@ import { TransactionDialog } from "./dialogs/TransactionDialog";
 const TransactionToolbar = ({
   startDate,
   endDate,
+  pageIndex,
+  pageSize,
   categoryData,
   transactionTrigger,
   activeType,
@@ -25,6 +27,8 @@ const TransactionToolbar = ({
   startDate: Date | null;
   endDate: Date | null;
   categoryData: Object;
+  pageSize: number;
+  pageIndex: number;
   transactionTrigger: () => void;
   activeType: string
 }) => {

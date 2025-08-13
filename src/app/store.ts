@@ -19,3 +19,5 @@ export const store = configureStore({
       api.middleware,
     ]), // Add the RTK Query middleware
 });
+
+export type IRootState = ReturnType<typeof store.getState>

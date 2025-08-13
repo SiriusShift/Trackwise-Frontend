@@ -9,28 +9,8 @@ export const expenseSchema = {
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
     date: yup.date().required("Date is required"),
-    mode: yup.string().nullable(),
-    repeat: yup
-      .object()
-      .nullable()
-      .when("mode", {
-        is: "recurring",
-        then: (schema) => schema.required("Frequency is required"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    months: yup
-      .number()
-      .nullable()
-      .when("mode", {
-        is: "installment",
-        then: (schema) =>
-          schema
-            .required("Installment Term is required")
-            .positive("Months must be greater than 0"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
     image: yup.mixed().nullable(),
-
+    recurring: yup.boolean(),
     source: yup.object().when("mode", {
       is: "none",
       then: (schema) => schema.required("Source is required"),
@@ -41,11 +21,10 @@ export const expenseSchema = {
     category: null,
     description: "",
     amount: "",
+    recurring: false,
     date: new Date(),
-    mode: "none",
     source: null,
     image: null,
-    months: "",
   },
 };
 

@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useState } from "react";
+import { IRootState } from "@/app/store";
 
 export const installmentColumn: ColumnDef<Expense>[] = [
   // {
@@ -91,7 +92,7 @@ export const installmentColumn: ColumnDef<Expense>[] = [
     },
     // header: "Actions",
     cell: ({ row }) => {
-      const activeType = useSelector((state: any) => state.active.type);
+      const activeType = useSelector((state: IRootState) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
       console.log(open);

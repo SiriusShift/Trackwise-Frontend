@@ -8,10 +8,11 @@ import {
 import { setType } from "@/shared/slices/activeSlice";
 import { type } from "@/features/transactions/constants/constants";
 import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "@/app/store";
 
 const TypeSelect = () => {
   const dispatch = useDispatch();
-  const activeType = useSelector((state: any) => state.active.type);
+  const activeType = useSelector((state: IRootState) => state.active.type);
 
   return (
     <Select

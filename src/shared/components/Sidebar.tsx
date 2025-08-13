@@ -89,18 +89,21 @@ export function AppSidebar() {
                         <Tooltip>
                           <TooltipTrigger>
                             <SidebarMenuButton
-                              className="hidden md:block lg:hidden"
+                              className="hidden md:block w-10 h-10 lg:hidden"
                               variant={
                                 parent === item.path ? "default" : "ghost"
                               }
-                              onClick={() => {
-                                setActive(item.path);
-                                router(item.path);
-                              }} // Ensure you're using `router.push` for navigation
+                              asChild
                             >
-                              <item.icon
-                                style={{ width: "20px", height: "20px" }}
-                              />
+                              <Link
+                                to={item.path}
+                                onClick={() => setActive(item.path)}
+                                className="lg:flex"
+                              >
+                                <item.icon
+                                  style={{ width: "24px", height: "24px" }}
+                                />
+                              </Link>
                             </SidebarMenuButton>
                           </TooltipTrigger>
                           <TooltipContent
@@ -116,11 +119,12 @@ export function AppSidebar() {
                       </TooltipProvider>
                     ) : (
                       <SidebarMenuButton
-                        variant={parent === item.path ? "default" : "ghost"}
+                        variant={parent === item.path ? "default" : "ghosts"}
                         asChild
                       >
                         <Link
                           to={item.path}
+                          onClick={() => setActive(item.path)}
                           className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
                         >
                           <item.icon

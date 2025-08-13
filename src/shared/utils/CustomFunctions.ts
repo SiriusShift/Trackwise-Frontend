@@ -3,8 +3,7 @@ import { saltkey } from "./saltkey";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { DateRange } from "react-day-picker";
-import { RootState } from "@reduxjs/toolkit/query";
-
+import { IRootState } from "@/app/store";
 export const formatDate = (month: number, day: string, year: number) => {
   const months = [
     "January",
@@ -32,9 +31,9 @@ export const formatString = (str: string) => {
 };
 
 export const formatDateDisplay = (): string => {
-  const active = useSelector((state: RootState) => state.active.active);
+  const active = useSelector((state: IRootState) => state.active.active);
   console.log(active);
-  const mode = useSelector((state: RootState) => state.active.mode);
+  const mode = useSelector((state: IRootState) => state.active.mode);
   if (!active) return "Select Date";
 
   if (mode === "monthly") {
@@ -47,7 +46,7 @@ export const formatDateDisplay = (): string => {
 };
 
 export const formatMode = () => {
-  const mode = useSelector((state: RootState) => state.active.mode);
+  const mode = useSelector((state: IRootState) => state.active.mode);
   if (mode === "daily") return "day";
   if (mode === "weekly") return "week";
   if (mode === "monthly") return "month";

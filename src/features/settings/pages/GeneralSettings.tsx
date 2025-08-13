@@ -33,9 +33,10 @@ import { time } from "console";
 import { Check, ChevronsUpDown, Currency } from "lucide-react";
 import { useSelector } from "react-redux";
 import currency from "currency-codes";
+import { IRootState } from "@/app/store";
 
 const GeneralSettings = () => {
-  const settings = useSelector((state: any) => state.settings);
+  const settings = useSelector((state: IRootState) => state.settings);
   const timezones = moment.tz.names();
   console.log(settings);
 
@@ -45,7 +46,7 @@ const GeneralSettings = () => {
   });
 
   console.log(currency);
-  const { control, reset, watch, setValue } = form;
+  const { control, reset, watch } = form;
 
   console.log(watch());
   useEffect(() => {

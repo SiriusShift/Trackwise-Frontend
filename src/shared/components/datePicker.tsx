@@ -23,6 +23,7 @@ import { RootState } from "@reduxjs/toolkit/query";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { months } from "@/shared/constants/dateConstants";
+import { IRootState } from "@/app/store";
 
 interface DateRange {
   from: string;
@@ -36,8 +37,8 @@ const years = Array.from(
 );
 const Content = () => {
   const dispatch = useDispatch();
-  const active = useSelector((state: RootState) => state.active.active);
-  const mode = useSelector((state: RootState) => state.active.mode);
+  const active = useSelector((state: IRootState) => state.active.active);
+  const mode = useSelector((state: IRootState) => state.active.mode);
 
   const [activeYear, setActiveYear] = useState(new Date().getFullYear());
   const [date, setDate] = useState<Date | { from?: Date; to?: Date } | null>(

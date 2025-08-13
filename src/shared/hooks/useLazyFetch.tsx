@@ -1,6 +1,6 @@
 type AnyRtkHook<TData = any> = () => [
   (args?: any) => any,
-  { data?: TData; isLoading: boolean }
+  { data?: TData; isFetching: boolean }
 ];
 
 export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
@@ -8,14 +8,15 @@ export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
     return {
       fetchData: null as null | ((args?: any) => any),
       data: undefined as TData | undefined,
-      isLoading: false,
+      isFetching: false,
     };
   }
 
   const [fetchData, result] = trigger();
+  console.log("Result",result?.isFetching)
   return {
     fetchData,
     data: result.data as TData | undefined,
-    isLoading: result.isLoading,
+    isFetching: result.isFetching,
   };
 }

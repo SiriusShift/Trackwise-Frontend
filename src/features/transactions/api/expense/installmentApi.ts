@@ -16,8 +16,15 @@ export const installmentApi = api.enhanceEndpoints({addTagTypes: ["Installment"]
                 method: "POST",
                 body
             })
+        }),
+        patchInstallment: builder.mutation({
+            query: (body) => ({
+                url: "/transaction/updateInstallment",
+                method: "POST",
+                body
+            })
         })
     })
 })
 
-export const {useGetInstallmentsQuery, useLazyGetInstallmentsQuery, usePostInstallmentMutation} = installmentApi
+export const {useGetInstallmentsQuery, useLazyGetInstallmentsQuery, usePostInstallmentMutation, usePatchInstallmentMutation} = installmentApi

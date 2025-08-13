@@ -7,6 +7,7 @@ import { encryptString } from "@/shared/utils/CustomFunctions";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "@/shared/slices/userSlice";
 import { setSettings } from "@/shared/slices/settingsSlice";
+import { IRootState } from "@/app/store";
 
 function ProtectedRoutes() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function ProtectedRoutes() {
   const dispatch = useDispatch();
   console.log(data);
   const [cookies, setCookie] = useCookies(["user"]);
-  const userInfo = useSelector((state) => state?.userDetails?.id)
+  const userInfo = useSelector((state: IRootState) => state?.userDetails?.id)
   console.log(userInfo);
 
   useEffect(() => {

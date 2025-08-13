@@ -29,24 +29,28 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   )
+useEffect(() => {
+  const root = window.document.documentElement
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
-  useEffect(() => {
-    const root = window.document.documentElement
-
+  const applyTheme = () => {
     root.classList.remove("light", "dark")
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light"
-
-      root.classList.add(systemTheme)
-      return
+      root.classList.add(mediaQuery.matches ? "dark" : "light")
+    } else {
+      root.classList.add(theme)
     }
+  }
 
-    root.classList.add(theme)
-  }, [theme])
+  applyTheme() // initial run
+  mediaQuery.addEventListener("change", applyTheme) // listen for system changes
+
+  return () => {
+    mediaQuery.removeEventListener("change", applyTheme)
+  }
+}, [theme])
+
 
   const value = {
     theme,

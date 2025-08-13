@@ -25,12 +25,14 @@ import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { Expense } from "@/shared/types";
 import { installmentColumn } from "../components/table-columns/expense/installmentColumn";
 import { useLazyGetInstallmentsQuery } from "../api/expense/installmentApi";
+import { transactionConfig } from "../config/transactionConfig";
+import { IRootState } from "@/app/store";
 
 const TransactionPage = () => {
   const location = useLocation();
-  const active = useSelector((state: any) => state.active.active);
+  const active = useSelector((state: IRootState) => state.active.active);
   const mode = formatMode();
-  const activeType = useSelector((state: any) => state.active.type);
+  const activeType = useSelector((state: IRootState) => state.active.type);
   console.log(activeType);
 
   // State Management
@@ -54,47 +56,24 @@ const TransactionPage = () => {
   // Queries
 
   const { data: categoryData } = useGetCategoryQuery({});
+  const [triggerChart, { data: detailedExpense }] =
+    useLazyGetDetailedExpenseQuery();
 
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
     useGetCategoryLimitQuery({
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
     });
-
-  const [triggerChart, { data: detailedExpense }] =
-    useLazyGetDetailedExpenseQuery();
-
   const [triggerUpdate] = usePatchCategoryLimitMutation();
   const [triggerPost] = usePostCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
 
-  const transactionConfigMap = {
-    Expense: {
-      columns: expenseColumns,
-      trigger: useLazyGetExpensesQuery,
-    },
-    // Recurring: {
-    //   columns: recurringExpenseColumns,
-    //   trigger: useLazyGetRecurringExpensesQuery,
-    // },
-    Installment: {
-      columns: installmentColumn,
-      trigger: useLazyGetInstallmentsQuery,
-    },
-    // Income: {
-    //   columns: recurringExpenseColumns,
-    //   trigger: useLazyGetRecurringExpensesQuery,
-    // },
-    // Transfer: {
-    //   columns: installmentColumns,
-    //   trigger: useLazyGetInstallmentExpensesQuery,
-    // },
-  };
+  const { columns, getTrigger } = transactionConfig[activeType] || {};
 
-  const { columns, trigger } = transactionConfigMap[activeType] || {};
+  const { fetchData, data, isFetching } = useTriggerFetch<Expense[]>(getTrigger);
 
-  const { fetchData, data, isLoading } =
-    useTriggerFetch<Expense[]>(trigger);
+
+  console.log(data)
 
   //Functions
   const onSubmit = async (data: any) => {
@@ -163,6 +142,8 @@ const TransactionPage = () => {
           startDate={startDate}
           endDate={endDate}
           activeType={activeType}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
         />
 
         <DataTable
@@ -173,7 +154,7 @@ const TransactionPage = () => {
           pageIndex={pageIndex}
           pageSize={pageSize}
           trend={data?.trend}
-          isLoading={isLoading}
+          isLoading={isFetching}
           type={activeType}
           categoryExpenses={detailedExpense}
           data={data?.data || []}
