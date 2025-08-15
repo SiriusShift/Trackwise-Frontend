@@ -48,6 +48,19 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
+@media (max-width: 640px) {
+  .responsive-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.875rem; /* slightly smaller text on mobile */
+  }
+
+  .responsive-calendar .rdp {
+    width: 100% !important;
+  }
+}
+
+
 @layer base {
   * {
     @apply border-border;
@@ -59,42 +72,38 @@ body {
     animation-fill-mode: forwards;
   }
   :root {
-    --background: 48 33.3333% 97.0588%;
-    --foreground: 48 19.6078% 20%;
-    --card: 48 33.3333% 97.0588%;
-    --card-foreground: 60 2.5641% 7.6471%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 50.7692 19.403% 13.1373%;
-    --primary: 15.1111 55.5556% 52.3529%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 46.1538 22.807% 88.8235%;
-    --secondary-foreground: 50.7692 8.4967% 30%;
-    --muted: 44 29.4118% 90%;
-    --muted-foreground: 50 2.3622% 50.1961%;
-    --accent: 46.1538 22.807% 88.8235%;
-    --accent-foreground: 50.7692 19.403% 13.1373%;
-    --destructive: 60 2.5641% 7.6471%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 144 60% 50%; /* Green for success */
-    --success-foreground: 0 0% 98%;
-    --warning: 39 100% 50%; /* Yellow for warning */
-    --warning-foreground: 0 0% 10%;
-    --border: 50 7.5% 84.3137%;
-    --input: 50.7692 7.9755% 68.0392%;
-    --ring: 15.1111 55.5556% 52.3529%;
-    --chart-1: 18.2813 57.1429% 43.9216%;
-    --chart-2: 251.4545 84.6154% 74.5098%;
-    --chart-3: 46.1538 28.2609% 81.9608%;
-    --chart-4: 256.5517 49.1525% 88.4314%;
-    --chart-5: 17.7778 60% 44.1176%;
-    --sidebar: 51.4286 25.9259% 94.7059%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 223.8136 -172.5242% 100%;
+    --foreground: 223.8136 0% 3.9388%;
+    --card: 223.8136 -172.5242% 100%;
+    --card-foreground: 223.8136 0% 3.9388%;
+    --popover: 223.8136 -172.5242% 100%;
+    --popover-foreground: 223.8136 0% 3.9388%;
+    --primary: 223.8136 0% 9.0527%;
+    --primary-foreground: 223.8136 0.0004% 98.0256%;
+    --secondary: 223.8136 0.0002% 96.0587%;
+    --secondary-foreground: 223.8136 0% 9.0527%;
+    --muted: 223.8136 0.0002% 96.0587%;
+    --muted-foreground: 223.8136 0% 45.1519%;
+    --accent: 223.8136 0.0002% 96.0587%;
+    --accent-foreground: 223.8136 0% 9.0527%;
+    --destructive: 351.7303 123.6748% 40.5257%;
+    --destructive-foreground: 223.8136 -172.5242% 100%;
+    --border: 223.8136 0.0001% 89.8161%;
+    --input: 223.8136 0.0001% 89.8161%;
+    --ring: 223.8136 0% 63.0163%;
+    --chart-1: 211.788 101.9718% 78.6759%;
+    --chart-2: 217.4076 91.3672% 59.5787%;
+    --chart-3: 221.4336 86.3731% 54.0624%;
+    --chart-4: 223.6587 78.718% 47.8635%;
+    --chart-5: 226.5426 70.0108% 39.9224%;
+    --sidebar: 223.8136 0.0004% 98.0256%;
+    --sidebar-foreground: 223.8136 0% 3.9388%;
+    --sidebar-primary: 223.8136 0% 9.0527%;
+    --sidebar-primary-foreground: 223.8136 0.0004% 98.0256%;
+    --sidebar-accent: 223.8136 0.0002% 96.0587%;
+    --sidebar-accent-foreground: 223.8136 0% 9.0527%;
+    --sidebar-border: 223.8136 0.0001% 89.8161%;
+    --sidebar-ring: 223.8136 0% 63.0163%;
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
       "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -102,7 +111,7 @@ body {
     --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
       "Liberation Mono", "Courier New", monospace;
-    --radius: 0.5rem;
+    --radius: 0.625rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
@@ -118,42 +127,46 @@ body {
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
-    --sidebar-background: 0 0% 98%;
+    /* --sidebar-background: 0 0% 98%; */
+    --success: 144 60% 50%; /* Green for success */
+    --success-foreground: 0 0% 98%;
+    --warning: 39 100% 50%; /* Yellow for warning */
+    --warning-foreground: 0 0% 10%;
   }
 
   .dark {
-    --background: 60 2.7027% 14.5098%;
-    --foreground: 46.1538 9.7744% 73.9216%;
-    --card: 60 2.7027% 14.5098%;
-    --card-foreground: 48 33.3333% 97.0588%;
-    --popover: 60 2.1277% 18.4314%;
-    --popover-foreground: 60 5.4545% 89.2157%;
-    --primary: 14.7692 63.1068% 59.6078%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 48 33.3333% 97.0588%;
-    --secondary-foreground: 60 2.1277% 18.4314%;
-    --muted: 60 3.8462% 10.1961%;
-    --muted-foreground: 51.4286 8.8608% 69.0196%;
-    --accent: 48 10.6383% 9.2157%;
-    --accent-foreground: 51.4286 25.9259% 94.7059%;
-    --destructive: 0 84.2365% 60.1961%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 60 5.0847% 23.1373%;
-    --input: 52.5 5.1282% 30.5882%;
-    --ring: 14.7692 63.1068% 59.6078%;
-    --chart-1: 18.2813 57.1429% 43.9216%;
-    --chart-2: 251.4545 84.6154% 74.5098%;
-    --chart-3: 48 10.6383% 9.2157%;
-    --chart-4: 248.2759 25.2174% 22.549%;
-    --chart-5: 17.7778 60% 44.1176%;
-    --sidebar: 30 3.3333% 11.7647%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 223.8136 0% 3.9388%;
+    --foreground: 223.8136 0.0004% 98.0256%;
+    --card: 223.8136 0% 9.0527%;
+    --card-foreground: 223.8136 0.0004% 98.0256%;
+    --popover: 223.8136 0% 14.9382%;
+    --popover-foreground: 223.8136 0.0004% 98.0256%;
+    --primary: 223.8136 0.0001% 89.8161%;
+    --primary-foreground: 223.8136 0% 9.0527%;
+    --secondary: 223.8136 0% 14.9382%;
+    --secondary-foreground: 223.8136 0.0004% 98.0256%;
+    --muted: 223.8136 0% 14.9382%;
+    --muted-foreground: 223.8136 0% 63.0163%;
+    --accent: 223.8136 0% 25.0471%;
+    --accent-foreground: 223.8136 0.0004% 98.0256%;
+    --destructive: 358.7594 101.8439% 69.8357%;
+    --destructive-foreground: 223.8136 0.0004% 98.0256%;
+    --border: 223.8136 0% 15.5096%;
+    --input: 223.8136 0% 20.3885%;
+    --ring: 223.8136 0% 45.1519%;
+    --chart-1: 211.788 101.9718% 78.6759%;
+    --chart-2: 217.4076 91.3672% 59.5787%;
+    --chart-3: 221.4336 86.3731% 54.0624%;
+    --chart-4: 223.6587 78.718% 47.8635%;
+    --chart-5: 226.5426 70.0108% 39.9224%;
+    --sidebar: 223.8136 0% 9.0527%;
+    --sidebar-foreground: 223.8136 0.0004% 98.0256%;
+    --sidebar-primary: 225.3451 84.0953% 48.9841%;
+    --sidebar-primary-foreground: 223.8136 0.0004% 98.0256%;
+    --sidebar-accent: 223.8136 0% 14.9382%;
+    --sidebar-accent-foreground: 223.8136 0.0004% 98.0256%;
+    --sidebar-border: 223.8136 0% 15.5096%;
+    --sidebar-ring: 223.8136 0% 32.1993%;
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
       "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -161,7 +174,7 @@ body {
     --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
       "Liberation Mono", "Courier New", monospace;
-    --radius: 0.5rem;
+    --radius: 0.625rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
@@ -175,6 +188,12 @@ body {
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
       0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-    --sidebar-background: 240 5.9% 10%;
+    /* --sidebar-background: 0 0% 0%; */
+
+    --success-dark: 144 40% 40%; /* Darker, muted green */
+    --success-foreground-dark: 0 0% 98%; /* Keep bright text for readability */
+
+    --warning-dark: 39 70% 45%; /* Darker golden yellow */
+    --warning-foreground-dark: 0 0% 98%; /* Keep light text */
   }
 }

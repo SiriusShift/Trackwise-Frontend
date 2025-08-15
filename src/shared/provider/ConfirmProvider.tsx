@@ -187,7 +187,8 @@ export const ConfirmProvider = ({
         }}
       >
         <DialogContent
-        className="w-5/6 sm:w-auto"
+        removeClose
+        className="w-4/5 sm:min-w-[425px] sm:w-auto"
           onInteractOutside={(e) => {
             if (shouldPreventClose || options.preventCloseOnOutsideClick) {
               e.preventDefault();
@@ -223,6 +224,7 @@ export const ConfirmProvider = ({
                 onClick={handleCancel}
                 disabled={isLoading}
                 variant="outline"
+                size={"sm"}
                 className="order-2 sm:order-1"
               >
                 {isLoading && options.showLoadingOnCancel ? (
@@ -236,6 +238,7 @@ export const ConfirmProvider = ({
             <Button
               onClick={handleConfirm}
               disabled={isLoading}
+              size={"sm"}
               className="order-1 sm:order-1"
             >
               {isLoading && options.showLoadingOnConfirm !== false ? (

@@ -33,9 +33,8 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
   let { data: assetData } = useGetAssetQuery();
   assetData = assetData?.data;
 
-  const { postTrigger, editTrigger } =
-    transactionConfig[type] || {};
-    
+  const { postTrigger, editTrigger } = transactionConfig[type] || {};
+
   const { fetchData, isFetching } = useTriggerFetch(
     mode === "edit" ? editTrigger : postTrigger
   );
@@ -53,6 +52,7 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
     formState: { isDirty, isValid },
   } = form;
 
+  console.log(watch())
   useEffect(() => {
     if (rowData && type === "Expense") {
       reset({
@@ -88,6 +88,7 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
       const value = data[key];
@@ -115,7 +116,7 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
       onConfirm: async () => {
         try {
           if (mode === "edit") {
-            await fetchData({ data: formData, id: data?.expenseId }).unwrap();
+            await fetchData({ data: formData, id: data?.id }).unwrap();
           } else {
             await fetchData(formData).unwrap();
           }

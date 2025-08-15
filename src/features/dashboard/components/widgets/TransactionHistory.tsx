@@ -3,7 +3,7 @@ import moment from "moment";
 import React from "react";
 import * as Icons from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetExpensesQuery } from "@/features/transactions/api/expense/expensesApi";
+import { useGetExpensesQuery } from "@/features/transactions/api/transaction/expensesApi";
 import NoData from "@/assets/images/empty-box.png";
 
 const TransactionHistory = () => {

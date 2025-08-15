@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   useLazyGetDetailedExpenseQuery,
   useLazyGetExpensesQuery,
-} from "@/features/transactions/api/expense/expensesApi";
+} from "@/features/transactions/api/transaction/expensesApi";
 import { useSelector } from "react-redux";
 import {
   useDeleteCategoryLimitMutation,
@@ -24,7 +24,7 @@ import TransactionToolbar from "@/features/transactions/components/TransactionTo
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { Expense } from "@/shared/types";
 import { installmentColumn } from "../components/table-columns/expense/installmentColumn";
-import { useLazyGetInstallmentsQuery } from "../api/expense/installmentApi";
+import { useLazyGetInstallmentsQuery } from "../api/transaction/installmentApi";
 import { transactionConfig } from "../config/transactionConfig";
 import { IRootState } from "@/app/store";
 

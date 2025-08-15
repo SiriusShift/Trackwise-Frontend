@@ -46,8 +46,18 @@ import moment from "moment";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Toggle } from "@/shared/components/ui/toggle";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import DatePicker from "@/shared/components/dialog/DatePicker";
 
-const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) => {
+const TransactionForm = ({
+  assetData,
+  categoryData,
+  setOpenFrequency,
+  type,
+}) => {
+  const [open, setOpen] = useState(false)
+  const width = useScreenWidth();
   const {
     watch,
     control,
@@ -100,7 +110,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="p-0">
+                <PopoverContent full className="p-0">
                   <Command>
                     <CommandInput placeholder="Search asset" />
                     <CommandList>
@@ -115,7 +125,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                               onChange(asset);
                             }}
                           >
-                            {asset.name}
+                            {asset.name} - ₱{asset?.balance}
                             <Check
                               className={cn(
                                 "ml-auto",
@@ -156,7 +166,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                           )}
                         >
                           {value
-                            ? categoryData.find(
+                            ? categoryData?.find(
                                 (category) => category.id === value?.id
                               )?.name
                             : "Select category"}
@@ -164,7 +174,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent full className="w-[200px] p-0">
                       <Command>
                         <CommandInput
                           placeholder="Search category..."
@@ -173,7 +183,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                         <CommandList>
                           <CommandEmpty>No category found.</CommandEmpty>
                           <CommandGroup>
-                            {categoryData.map((category) => (
+                            {categoryData?.map((category) => (
                               <CommandItem
                                 value={category}
                                 key={category.id}
@@ -269,86 +279,23 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
           render={({ field }) => (
             <FormItem className="flex flex-col w-full">
               <FormLabel>Date & Time</FormLabel>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
-                      ) : (
-                        <span>Pick a date & time</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-4" align="start">
-                  <div className="flex flex-col space-y-4">
-                    {/* Calendar for Date Selection */}
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => {
-                        const newDate = new Date(
-                          date.setHours(
-                            field.value ? new Date(field.value).getHours() : 0,
-                            field.value ? new Date(field.value).getMinutes() : 0
-                          )
-                        );
-                        console.log("Selected Date:", newDate);
-                        field.onChange(newDate); // Update date with time preserved
-                      }}
-                      initialFocus
-                      disabled={(date) => {
-                        const minDate = new Date("2000-01-01"); // Minimum date
-                        return date < minDate;
-                      }}
-                    />
-                    {/* Time Picker for Time Selection */}
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium">Time:</label>
-                      <input
-                        type="time"
-                        className="border text-black rounded-md px-2 py-1 text-sm"
-                        value={
-                          field.value ? moment(field.value).format("HH:mm") : ""
-                        }
-                        onSelect={(date) => {
-                          const newDate = new Date(
-                            date.setHours(
-                              field.value
-                                ? new Date(field.value).getHours()
-                                : 0,
-                              field.value
-                                ? new Date(field.value).getMinutes()
-                                : 0
-                            )
-                          );
-                          console.log("Selected Date:", newDate);
-                          field.onChange(newDate); // Update date with time preserved
-                        }}
-                        onChange={(e) => {
-                          const [hours, minutes] = e.target.value
-                            .split(":")
-                            .map(Number);
-                          const updatedDate = field.value
-                            ? new Date(field.value)
-                            : new Date(); // Use the selected date or default to now
-                          updatedDate.setHours(hours, minutes);
-                          console.log("Updated Time:", updatedDate);
-                          field.onChange(updatedDate); // Update time with the correct date preserved
-                        }}
-                      />
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <Button
+                variant={"outline"}
+                type="button"
+                className={cn(
+                  "text-left font-normal",
+                  !field.value && "text-muted-foreground"
+                )}
+                onClick={() => setOpen(true)}
+              >
+                {field.value ? (
+                  `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
+                ) : (
+                  <span>Pick a date & time</span>
+                )}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+              <DatePicker open={open} setOpen={setOpen} field={field} />
               {/* <FormMessage>{errors.date?.message}</FormMessage> */}
             </FormItem>
           )}
@@ -356,10 +303,13 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
         <FormField
           control={control}
           name="recurring"
-          render={({ field: {onChange, value} }) => (
+          render={({ field: { onChange, value } }) => (
             <FormItem className="flex items-end">
               <FormControl>
-                <Toggle value={value} onPressedChange={(pressed) => onChange(pressed)}>
+                <Toggle
+                  value={value}
+                  onPressedChange={(pressed) => onChange(pressed)}
+                >
                   <Repeat />
                 </Toggle>
               </FormControl>
@@ -399,65 +349,35 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
             render={({ field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>End Date</FormLabel>
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          `${moment(field.value).format(
-                            "MMM DD, YYYY hh:mm A"
-                          )}` // Format date & time
-                        ) : (
-                          <span>Pick a date & time</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-4" align="start">
-                    <div className="flex flex-col space-y-4">
-                      {/* Calendar for Date Selection */}
-                      <Calendar
-                        mode="single"
-                        selected={
-                          field.value ? new Date(field.value) : undefined
-                        }
-                        onSelect={(date) => {
-                          const newDate = new Date(
-                            date.setHours(
-                              field.value
-                                ? new Date(field.value).getHours()
-                                : 0,
-                              field.value
-                                ? new Date(field.value).getMinutes()
-                                : 0
-                            )
-                          );
-                          console.log("Selected Date:", newDate);
-                          field.onChange(newDate); // Update date with time preserved
-                        }}
-                        initialFocus
-                        disabled={(date) => {
-                          const minDate = new Date("2000-01-01"); // Minimum date
-                          return date < minDate;
-                        }}
-                      />
-                      {/* Time Picker for Time Selection */}
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium">Time:</label>
-                        <input
-                          type="time"
-                          className="border text-black rounded-md px-2 py-1 text-sm"
-                          value={
-                            field.value
-                              ? moment(field.value).format("HH:mm")
-                              : ""
+                {width > 630 ? (
+                  <Popover modal={true}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            `${moment(field.value).format(
+                              "MMM DD, YYYY hh:mm A"
+                            )}` // Format date & time
+                          ) : (
+                            <span>Pick a date & time</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-4" align="start">
+                      <div className="flex flex-col space-y-4">
+                        {/* Calendar for Date Selection */}
+                        <Calendar
+                          mode="single"
+                          selected={
+                            field.value ? new Date(field.value) : undefined
                           }
                           onSelect={(date) => {
                             const newDate = new Date(
@@ -473,22 +393,56 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
                             console.log("Selected Date:", newDate);
                             field.onChange(newDate); // Update date with time preserved
                           }}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(":")
-                              .map(Number);
-                            const updatedDate = field.value
-                              ? new Date(field.value)
-                              : new Date(); // Use the selected date or default to now
-                            updatedDate.setHours(hours, minutes);
-                            console.log("Updated Time:", updatedDate);
-                            field.onChange(updatedDate); // Update time with the correct date preserved
+                          initialFocus
+                          disabled={(date) => {
+                            const minDate = new Date("2000-01-01"); // Minimum date
+                            return date < minDate;
                           }}
                         />
+                        {/* Time Picker for Time Selection */}
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium">Time:</label>
+                          <input
+                            type="time"
+                            className="border text-black rounded-md px-2 py-1 text-sm"
+                            value={
+                              field.value
+                                ? moment(field.value).format("HH:mm")
+                                : ""
+                            }
+                            onSelect={(date) => {
+                              const newDate = new Date(
+                                date.setHours(
+                                  field.value
+                                    ? new Date(field.value).getHours()
+                                    : 0,
+                                  field.value
+                                    ? new Date(field.value).getMinutes()
+                                    : 0
+                                )
+                              );
+                              console.log("Selected Date:", newDate);
+                              field.onChange(newDate); // Update date with time preserved
+                            }}
+                            onChange={(e) => {
+                              const [hours, minutes] = e.target.value
+                                .split(":")
+                                .map(Number);
+                              const updatedDate = field.value
+                                ? new Date(field.value)
+                                : new Date(); // Use the selected date or default to now
+                              updatedDate.setHours(hours, minutes);
+                              console.log("Updated Time:", updatedDate);
+                              field.onChange(updatedDate); // Update time with the correct date preserved
+                            }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  ""
+                )}
                 {/* <FormMessage>{errors.date?.message}</FormMessage> */}
               </FormItem>
             )}
@@ -528,7 +482,7 @@ const TransactionForm = ({ assetData, categoryData, setOpenFrequency, type }) =>
               <FormControl>
                 <div className="space-y-3">
                   {/* Preview section */}
-                  <div className="relative border rounded p-3 bg-muted">
+                  <div className="relative border rounded p-3 bg-card">
                     <div className="flex items-start gap-3">
                       {previewUrl ? (
                         <img

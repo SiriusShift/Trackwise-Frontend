@@ -5,12 +5,12 @@ import {
   usePostExpenseMutation,
   usePatchExpenseMutation,
   useLazyGetExpensesQuery,
-} from "@/features/transactions/api/expense/expensesApi";
+} from "@/features/transactions/api/transaction/expensesApi";
 import {
   useLazyGetInstallmentsQuery,
   usePatchInstallmentMutation,
   usePostInstallmentMutation,
-} from "../api/expense/installmentApi";
+} from "../api/transaction/installmentApi";
 import { expenseColumns } from "../components/table-columns/expense/expenseColumn";
 import { useLazyGetAssetQuery } from "@/shared/api/assetsApi";
 import { installmentColumn } from "../components/table-columns/expense/installmentColumn";

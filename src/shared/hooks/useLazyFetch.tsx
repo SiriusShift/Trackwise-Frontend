@@ -13,7 +13,6 @@ export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
   }
 
   const [fetchData, result] = trigger();
-  console.log("Result",result?.isFetching)
   return {
     fetchData,
     data: result.data as TData | undefined,

@@ -109,7 +109,7 @@ export function AppSidebar() {
                           <TooltipContent
                             side="right"
                             sideOffset={5}
-                            className="p-2 px-4 rounded-lg shadow-md bg-primary text-background"
+                            className="p-2 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
                           >
                             <p className="tracking-wide">{item.name}</p>
                             <TooltipArrow className="bg-background" />{" "}
@@ -119,7 +119,7 @@ export function AppSidebar() {
                       </TooltipProvider>
                     ) : (
                       <SidebarMenuButton
-                        variant={parent === item.path ? "default" : "ghosts"}
+                        variant={parent === item.path ? "default" : "ghost"}
                         asChild
                       >
                         <Link
