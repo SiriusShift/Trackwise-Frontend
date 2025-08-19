@@ -6,6 +6,7 @@ export interface Expense {
   amount: number; // Expense amount
   source: Object;
   status: "Paid" | "Partial" | "Pending" | "Overdue" ; // Status of the expense
+  image: string;
 }
 
 export interface Income {

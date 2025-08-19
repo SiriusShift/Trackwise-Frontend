@@ -1,19 +1,19 @@
 // transactionConfig.ts
-import ExpenseForm from "@/features/transactions/components/dialogs/forms/TransactionForm";
-import InstallmentForm from "../components/dialogs/forms/InstallmentForm";
 import {
   usePostExpenseMutation,
   usePatchExpenseMutation,
   useLazyGetExpensesQuery,
+  useLazyGetGraphExpenseQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import {
   useLazyGetInstallmentsQuery,
   usePatchInstallmentMutation,
   usePostInstallmentMutation,
 } from "../api/transaction/installmentApi";
-import { expenseColumns } from "../components/table-columns/expense/expenseColumn";
-import { useLazyGetAssetQuery } from "@/shared/api/assetsApi";
-import { installmentColumn } from "../components/table-columns/expense/installmentColumn";
+import { expenseColumns } from "../components/table-columns/transaction/expenseColumn";
+import { useLazyGetGraphIncomeQuery, useLazyGetIncomeQuery, usePostIncomeMutation, useUpdateIncomeMutation } from "../api/transaction/incomeApi";
+import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
+import { expenseSchema, incomeSchema } from "@/schema/schema";
 
 export const transactionConfig = {
   Expense: {
@@ -21,9 +21,16 @@ export const transactionConfig = {
     editTrigger: usePatchExpenseMutation,
     columns: expenseColumns,
     getTrigger: useLazyGetExpensesQuery,
+    getChart: useLazyGetGraphExpenseQuery,
+    schema: expenseSchema
   },
   Income: {
-
+    postTrigger: usePostIncomeMutation,
+    editTrigger: useUpdateIncomeMutation,
+    columns: incomeColumns,
+    getTrigger: useLazyGetIncomeQuery,
+    getChart:  useLazyGetGraphIncomeQuery,
+    schema: incomeSchema
   },
   Transfer: {
     

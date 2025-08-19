@@ -46,39 +46,40 @@ interface DataTableProps<TData, TValue> {
   totalCount: number; // Total number of items
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
-  categoryExpenses: any;
+  graphData: any;
   isLoading: boolean;
+  graphLoading: boolean;
   type: string;
   total: number;
   trend: any;
 }
 
-const chartConfig = {
-  width: "100%", // Full width of the container
-  height: 210, // Fixed height for the chart
-  innerRadius: 55, // Inner radius for the pie chart
-  outerRadius: 80, // Outer radius for the pie chart
-  strokeWidth: 5, // Stroke width for the pie chart
-  strokeColor: "hsl(var(--background))", // Stroke color (primary background color)
-  dataKey: "total", // The key in the data for the value
-  nameKey: "categoryName", // The key in the data for the label
-  colors: [
-    "hsl(var(--chart-1))",
-    "hsl(var(--chart-2))",
-    "hsl(var(--chart-3))",
-    "hsl(var(--chart-4))",
-    "hsl(var(--chart-5))",
-    "hsl(var(--chart-6))",
-    "hsl(var(--chart-7))",
-    "hsl(var(--chart-8))",
-    "hsl(var(--chart-9))",
-    "hsl(var(--chart-10))",
-  ],
-  labelValueFontSize: 16, // Font size for the label value in the center
-  labelValueFontWeight: "bold", // Font weight for the label value
-  labelValueClassName: "text-destructive", // CSS class for the label value (color)
-  showTooltip: true, // Whether or not to display the tooltip
-};
+// const chartConfig = {
+//   width: "100%", // Full width of the container
+//   height: 210, // Fixed height for the chart
+//   innerRadius: 55, // Inner radius for the pie chart
+//   outerRadius: 80, // Outer radius for the pie chart
+//   strokeWidth: 5, // Stroke width for the pie chart
+//   strokeColor: "hsl(var(--background))", // Stroke color (primary background color)
+//   dataKey: "total", // The key in the data for the value
+//   nameKey: "categoryName", // The key in the data for the label
+//   colors: [
+//     "hsl(var(--chart-1))",
+//     "hsl(var(--chart-2))",
+//     "hsl(var(--chart-3))",
+//     "hsl(var(--chart-4))",
+//     "hsl(var(--chart-5))",
+//     "hsl(var(--chart-6))",
+//     "hsl(var(--chart-7))",
+//     "hsl(var(--chart-8))",
+//     "hsl(var(--chart-9))",
+//     "hsl(var(--chart-10))",
+//   ],
+//   labelValueFontSize: 16, // Font size for the label value in the center
+//   labelValueFontWeight: "bold", // Font weight for the label value
+//   labelValueClassName: "text-destructive", // CSS class for the label value (color)
+//   showTooltip: true, // Whether or not to display the tooltip
+// };
 
 export function DataTable<TData, TValue>({
   columns,
@@ -88,11 +89,11 @@ export function DataTable<TData, TValue>({
   totalPages,
   type,
   isLoading,
+  graphLoading,
   setPageIndex,
   setPageSize,
-  categoryExpenses,
+  graphData,
 }: DataTableProps<TData, TValue>) {
-  console.log(categoryExpenses);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -202,10 +203,11 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="hidden lg:inline">
           <CommonPieGraph
-            total={categoryExpenses?.totalExpense}
-            trend={categoryExpenses?.trend}
+            total={graphData?.total}
+            trend={graphData?.trend}
             type={type}
-            categoryExpenses={categoryExpenses?.categoryExpenses}
+            graphLoading={graphLoading}
+            data={graphData?.data}
           />
         </div>
       </div>
@@ -286,10 +288,11 @@ export function DataTable<TData, TValue>({
 
       <div className="inline lg:hidden">
         <CommonPieGraph
-          total={categoryExpenses?.totalExpense}
+          total={graphData?.total}
           type={type}
-          trend={categoryExpenses?.trend}
-          categoryExpenses={categoryExpenses?.categoryExpenses}
+          graphLoading={graphLoading}
+          trend={graphData?.trend}
+          data={graphData?.data}
         />
       </div>
     </div>

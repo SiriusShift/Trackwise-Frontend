@@ -49,12 +49,13 @@ import { numberInput } from "@/shared/utils/CustomFunctions";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
 import { toast } from "sonner";
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
+import { useSelector } from "react-redux";
+import { IRootState } from "@/app/store";
 
 function TrackerDialog({
   title,
   mode,
   onSubmit,
-  type,
   isLoading,
   description,
   data,
@@ -62,13 +63,15 @@ function TrackerDialog({
   title: string;
   mode: string;
   description: string;
-  type: string;
   isLoading: boolean;
   onSubmit: (data: any) => void;
   data?: Object;
 }) {
+  //STATE
   const [open, setOpen] = useState(false);
+  //HOOKS
   const width = useScreenWidth();
+  const type = useSelector((state: IRootState) => state.active.type);
   // RTK Query
   const { data: categoryData } = useGetCategoryQuery({
     type: type,
@@ -241,9 +244,9 @@ function TrackerDialog({
               <Button
                 variant={"outline"}
                 size={"icon"}
-                className="h-11 w-11 rounded-full border-primary border-2"
+                className="h-11 bg-card w-11 rounded-full border-primary border-2"
               >
-                <Plus size={30} />
+                <Plus className="text-primary" size={30} />
               </Button>
             )}
           </AlertDialogTrigger>
@@ -261,7 +264,7 @@ function TrackerDialog({
             <Button
               variant="outline"
               size="icon"
-              className="h-11 w-11 rounded-full border-primary border-2"
+              className="h-11 w-11 rounded-full bg-card border-primary border-2"
             >
               <Plus size={30} />
             </Button>
@@ -278,9 +281,7 @@ function TrackerDialog({
                 ) : (
                   <Pencil className="h-5 w-5" />
                 )}
-                <SheetTitle>
-                  {mode === "add" ? "Add" : "Edit"}{" "}
-                </SheetTitle>
+                <SheetTitle>{mode === "add" ? "Add" : "Edit"} </SheetTitle>
               </div>
               <hr />
             </SheetHeader>

@@ -1,4 +1,3 @@
-import React from "react";
 import moment from "moment";
 import { useLocation } from "react-router-dom";
 import { navigationData } from "@/routing/navigationData";
@@ -20,6 +19,8 @@ import {
 import { TrendingDown, TrendingUp } from "lucide-react";
 import noChartData from "@/assets/images/empty-box.svg";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import { Skeleton } from "../ui/skeleton";
+import { useEffect, useState } from "react";
 
 const chartConfig = {
   width: 200,
@@ -27,7 +28,7 @@ const chartConfig = {
   innerRadius: 55,
   outerRadius: 80,
   strokeWidth: 5,
-  strokeColor: "hsl(var(--background))",
+  strokeColor: "hsl(var(--card))",
   dataKey: "total",
   nameKey: "categoryName",
   colors: [
@@ -44,16 +45,19 @@ const chartConfig = {
   ],
 };
 
-function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
-  const [showChart, setShowChart] = React.useState(false);
+function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
+  const [showChart, setShowChart] = useState(false);
+
+  const dateDisplay = formatDateDisplay();
+  const modeDisplay = formatMode();
 
   // Delay chart rendering for smooth animation
-  React.useEffect(() => {
-    if (categoryExpenses) {
+  useEffect(() => {
+    if (data) {
       const timer = setTimeout(() => setShowChart(true), 200); // Delay by 500ms
       return () => clearTimeout(timer);
     }
-  }, [categoryExpenses]);
+  }, [data]);
 
   return (
     // return width > 1024 ? (
@@ -71,13 +75,13 @@ function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
       {/* Card Content */}
       <ChartContainer className="h-[225px] lg:h-auto" config={chartConfig}>
         <CardContent className="flex-1 justify-center flex content-center pb-0">
-          {showChart ? (
+          {showChart && !graphLoading ? (
             <ResponsiveContainer
-              width={categoryExpenses.length > 0 ? chartConfig.width : 150}
+              width={data?.length > 0 ? chartConfig.width : 150}
               height={chartConfig.height}
               className={"flex justify-center items-center"}
             >
-              {categoryExpenses.length > 0 ? (
+              {data?.length > 0 ? (
                 <PieChart>
                   <ChartTooltip
                     cursor={false}
@@ -89,7 +93,7 @@ function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
                     }
                   />
                   <Pie
-                    data={categoryExpenses}
+                    data={data}
                     dataKey={chartConfig.dataKey}
                     nameKey={chartConfig.nameKey}
                     innerRadius={chartConfig.innerRadius}
@@ -100,7 +104,7 @@ function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
                     startAngle={90} // Adjust this for your preferred starting position
                     endAngle={-270} // Ensure full 360° rotation
                   >
-                    {categoryExpenses?.map((entry, index) => (
+                    {data?.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={
@@ -131,34 +135,40 @@ function CommonPieGraph({ categoryExpenses, total, trend, type }: any) {
 
       {/* Card Footer */}
       <CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
-        <div className="flex items-center justify-center gap-2 font-medium leading-none">
-          {trend === "NaN" ? (
-            <span>No data for trend calculation</span>
-          ) : (
-            <>
+        {graphLoading ? (
+          <>
+            <Skeleton className="h-5 w-full rounded" />
+            <Skeleton className="h-3 w-full rounded" />
+            <Skeleton className="h-3 w-3/4 rounded" />
+          </>
+        ) : trend === "NaN" ? (
+          <span>No data for trend calculation for this {modeDisplay}</span>
+        ) : (
+          <div className="flex flex-col items-center text-center gap-2 text-sm">
+            <div className="flex items-center justify-center gap-2 font-medium leading-none">
               <span className="truncate">
                 Trending {trend > 0 ? "up" : "down"} this month by {trend}%
               </span>
               {trend > 0 ? (
                 <TrendingUp
                   className={`h-4 w-4 ${
-                    type === "Expenses" ? "text-destructive" : "text-success"
+                    type === "Expense" ? "text-destructive" : "text-success"
                   }`}
                 />
               ) : (
                 <TrendingDown
                   className={`h-4 w-4 ${
-                    type === "Expenses" ? "text-success" : "text-destructive"
+                    type === "Expense" ? "text-success" : "text-destructive"
                   }`}
                 />
               )}
-            </>
-          )}
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total {type?.toLocaleLowerCase()} for the {formatMode()} of{" "}
-          {formatDateDisplay()}
-        </div>
+            </div>
+            <div className="leading-none text-muted-foreground">
+              Showing total {type?.toLocaleLowerCase()} for the {modeDisplay} of{" "}
+              {dateDisplay}
+            </div>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

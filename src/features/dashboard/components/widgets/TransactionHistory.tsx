@@ -5,13 +5,14 @@ import * as Icons from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetExpensesQuery } from "@/features/transactions/api/transaction/expensesApi";
 import NoData from "@/assets/images/empty-box.png";
+import { Card } from "@/shared/components/ui/card";
 
 const TransactionHistory = () => {
   //RTK QUERY
   const { data, isLoading } = useGetExpensesQuery();
 
   return (
-    <div className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-auto  md:col-span-2 lg:col-span-1 p-7 border">
+    <Card className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-auto  md:col-span-2 lg:col-span-1 p-7 border">
       <div className="flex justify-between items-center">
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/expenses"}>See All</Link>
@@ -58,7 +59,7 @@ const TransactionHistory = () => {
           );
         })
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  Banknote,
   CheckCircle,
   CircleAlert,
   Clock,
@@ -32,6 +33,7 @@ import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useState } from "react";
+import ViewImage from "@/shared/components/dialog/ViewImage";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -154,11 +156,12 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const activeType = useSelector((state: any) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
+      const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
       const expense = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
-      console.log(row);
+      console.log(expense);
 
       const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
 
@@ -184,6 +187,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
       };
 
+      const onView = () => {
+        setDropdownOpen(false)
+        setViewOpen(true)
+      }
+
       return (
         <>
           <DropdownMenu
@@ -199,6 +207,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              {expense?.status !== "Paid" && (
+                <DropdownMenuItem>
+                  <Banknote /> Pay
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
@@ -215,7 +228,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 mode="edit"
                 setDropdownOpen={setOpen}
               /> */}
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={onView}>
                 <Eye />
                 View
               </DropdownMenuItem>
@@ -232,6 +245,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             rowData={expense}
             mode="edit"
           />
+          <ViewImage open={viewOpen} setOpen={setViewOpen} image={expense?.image}/>
         </>
       );
     },

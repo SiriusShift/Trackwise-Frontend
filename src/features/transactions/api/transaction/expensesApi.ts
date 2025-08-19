@@ -76,7 +76,7 @@ export const expensesApi = api
       //   invalidatesTags: ["RecurringExpense"],
       // }),
 
-      getDetailedExpense: builder.query({
+      getGraphExpense: builder.query({
         query: (params) => ({
           params,
           url: "/expense/graph",
@@ -119,8 +119,8 @@ export const {
   useGetExpensesQuery,
   useLazyGetExpensesQuery,
   usePostExpenseMutation,
-  useGetDetailedExpenseQuery,
-  useLazyGetDetailedExpenseQuery,
+  useGetGraphExpenseQuery,
+  useLazyGetGraphExpenseQuery,
   useDeleteExpenseMutation,
   usePatchExpenseMutation,
 } = expensesApi;

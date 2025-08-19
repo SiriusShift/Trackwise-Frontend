@@ -11,11 +11,49 @@ export const expenseSchema = {
     date: yup.date().required("Date is required"),
     image: yup.mixed().nullable(),
     recurring: yup.boolean(),
-    source: yup.object().when("mode", {
-      is: "none",
+    from: yup.object().when("recurring", {
+      is: false,
       then: (schema) => schema.required("Source is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
+    endDate: yup.date().nullable(),
+    auto: yup.boolean(),
+    repeat: yup.object().when("recurring", {
+      is: true,
+      then: (schema) => schema.required("Repeat is required"),
+      otherwise: (schema) => schema.notRequired()
+    })
+  }),
+  defaultValues: {
+    category: null,
+    description: "",
+    amount: "",
+    recurring: false,
+    date: new Date(),
+    endDate: null,
+    source: null,
+    image: null,
+    auto: false
+  },
+};
+
+export const incomeSchema = {
+  schema: yup.object().shape({
+    category: yup.object().required("Category is required"),
+    description: yup.string().required("Description is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+    date: yup.date().required("Date is required"),
+    image: yup.mixed().nullable(),
+    recurring: yup.boolean(),
+    to: yup.object().when("recurring", {
+      is: false,
+      then: (schema) => schema.required("Source is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    auto: yup.boolean()
   }),
   defaultValues: {
     category: null,
@@ -25,8 +63,46 @@ export const expenseSchema = {
     date: new Date(),
     source: null,
     image: null,
+    auto: null
   },
 };
+
+export const transferSchema = {
+  schema: yup.object().shape({
+    category: yup.object().required("Category is required"),
+    description: yup.string().required("Description is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+    date: yup.date().required("Date is required"),
+    image: yup.mixed().nullable(),
+    recurring: yup.boolean(),
+    from: yup.object().when("recurring", {
+      is: false,
+      then: (schema) => schema.required("Source is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),    to: yup.object().when("recurring", {
+      is: false,
+      then: (schema) => schema.required("Destination is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    auto: yup.boolean()
+  }),
+  defaultValues: {
+    category: null,
+    description: "",
+    amount: "",
+    recurring: false,
+    date: new Date(),
+    source: null,
+    image: null,
+    from: null,
+    to: null,
+    auto: null
+  },
+};
+
 
 export const installmentSchema = {
   schema: yup.object().shape({

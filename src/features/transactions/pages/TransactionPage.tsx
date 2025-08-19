@@ -1,11 +1,10 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
 import { DataTable } from "@/shared/components/table/CommonTable";
-import { expenseColumns } from "@/features/transactions/components/table-columns/expense/expenseColumn";
+import { expenseColumns } from "@/features/transactions/components/table-columns/transaction/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
-  useLazyGetDetailedExpenseQuery,
-  useLazyGetExpensesQuery,
+  useLazyGetGraphExpenseQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { useSelector } from "react-redux";
 import {
@@ -23,7 +22,7 @@ import PageHeader from "@/shared/components/PageHeader";
 import TransactionToolbar from "@/features/transactions/components/TransactionToolbar";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { Expense } from "@/shared/types";
-import { installmentColumn } from "../components/table-columns/expense/installmentColumn";
+import { installmentColumn } from "../components/table-columns/installmentColumn";
 import { useLazyGetInstallmentsQuery } from "../api/transaction/installmentApi";
 import { transactionConfig } from "../config/transactionConfig";
 import { IRootState } from "@/app/store";
@@ -32,8 +31,8 @@ const TransactionPage = () => {
   const location = useLocation();
   const active = useSelector((state: IRootState) => state.active.active);
   const mode = formatMode();
-  const activeType = useSelector((state: IRootState) => state.active.type);
-  console.log(activeType);
+  const type = useSelector((state: IRootState) => state.active.type);
+  console.log(type);
 
   // State Management
 
@@ -55,9 +54,9 @@ const TransactionPage = () => {
 
   // Queries
 
-  const { data: categoryData } = useGetCategoryQuery({});
-  const [triggerChart, { data: detailedExpense }] =
-    useLazyGetDetailedExpenseQuery();
+  const { data: categoryData } = useGetCategoryQuery({
+    type
+  });
 
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
     useGetCategoryLimitQuery({
@@ -68,10 +67,11 @@ const TransactionPage = () => {
   const [triggerPost] = usePostCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
 
-  const { columns, getTrigger } = transactionConfig[activeType] || {};
+  const { columns, getTrigger, getChart} = transactionConfig[type] || {};
 
   const { fetchData, data, isFetching } = useTriggerFetch<Expense[]>(getTrigger);
-
+  const { fetchData: fetchGraph, data: graphData, isFetching: fetchingGraph} = useTriggerFetch(getChart)
+  console.log("graphData",graphData)
 
   console.log(data)
 
@@ -110,12 +110,12 @@ const TransactionPage = () => {
       pageSize,
       pageIndex,
     });
-    triggerChart({
+    fetchGraph({
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
       mode,
     });
-  }, [pageSize, pageIndex, startDate, endDate, activeType]);
+  }, [pageSize, pageIndex, startDate, endDate, type]);
 
   useEffect(() => {
     if (active === null) return;
@@ -133,15 +133,15 @@ const TransactionPage = () => {
         {/* Header */}
         <PageHeader
           pageName={currentPageName?.name}
-          description={`Overview of ${activeType.toLocaleLowerCase()} for this ${formatMode()}`}
+          description={`Overview of ${type.toLocaleLowerCase()} for this ${formatMode()}`}
         />
         {/* Toolbar */}
         <TransactionToolbar
           categoryData={categoryData}
-          transactionTrigger={fetchData}
+          transactionTrigger={fetch}
+          triggerGraph={fetchGraph}
           startDate={startDate}
           endDate={endDate}
-          activeType={activeType}
           pageIndex={pageIndex}
           pageSize={pageSize}
         />
@@ -151,12 +151,13 @@ const TransactionPage = () => {
           setPageIndex={setPageIndex}
           setPageSize={setPageSize}
           totalPages={data?.totalPages}
+          graphLoading={fetchingGraph}
           pageIndex={pageIndex}
           pageSize={pageSize}
           trend={data?.trend}
           isLoading={isFetching}
-          type={activeType}
-          categoryExpenses={detailedExpense}
+          type={type}
+          graphData={graphData}
           data={data?.data || []}
         />
         <CommonTracker

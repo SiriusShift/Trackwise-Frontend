@@ -47,7 +47,6 @@ import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Toggle } from "@/shared/components/ui/toggle";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import DatePicker from "@/shared/components/dialog/DatePicker";
 
 const TransactionForm = ({
@@ -56,7 +55,7 @@ const TransactionForm = ({
   setOpenFrequency,
   type,
 }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const width = useScreenWidth();
   const {
     watch,
@@ -65,86 +64,175 @@ const TransactionForm = ({
     formState: { errors },
   } = useFormContext();
   console.log(watch());
+  console.log(type);
   console.log("Has errors", errors);
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
-        <FormField
-          name="source"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>{type === "Income" ? "To" : "From"} </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "justify-between w-full",
-                        !value && "text-muted-foreground"
-                      )}
-                    >
-                      {value ? (
-                        <div className="space-x-2">
-                          <span>
-                            {
-                              assetData.find((asset) => asset.id === value?.id)
-                                ?.name
-                            }
-                          </span>
-                          <span>
-                            ₱
-                            {
-                              assetData.find((asset) => asset.id === value?.id)
-                                ?.balance
-                            }
-                          </span>
-                        </div>
-                      ) : (
-                        "Select asset..."
-                      )}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent full className="p-0">
-                  <Command>
-                    <CommandInput placeholder="Search asset" />
-                    <CommandList>
-                      {" "}
-                      <CommandEmpty>No assets found</CommandEmpty>
-                      <CommandGroup>
-                        {assetData?.map((asset) => (
-                          <CommandItem
-                            value={asset}
-                            key={asset.id}
-                            onSelect={() => {
-                              onChange(asset);
-                            }}
+        {!watch("recurring") && (
+          <>
+            {(type === "Expense" || type === "Transfer") && (
+              <FormField
+                name="from"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>From</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between w-full",
+                              !value && "text-muted-foreground"
+                            )}
                           >
-                            {asset.name} - ₱{asset?.balance}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                asset.id === value?.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                            {value ? (
+                              <div className="space-x-2">
+                                <span>
+                                  {
+                                    assetData.find(
+                                      (asset) => asset.id === value?.id
+                                    )?.name
+                                  }
+                                </span>
+                                <span>
+                                  ₱
+                                  {
+                                    assetData.find(
+                                      (asset) => asset.id === value?.id
+                                    )?.balance
+                                  }
+                                </span>
+                              </div>
+                            ) : (
+                              "Select asset..."
+                            )}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent full className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search asset" />
+                          <CommandList>
+                            {" "}
+                            <CommandEmpty>No assets found</CommandEmpty>
+                            <CommandGroup>
+                              {assetData?.map((asset) => (
+                                <CommandItem
+                                  value={asset}
+                                  key={asset.id}
+                                  onSelect={() => {
+                                    onChange(asset);
+                                  }}
+                                >
+                                  {asset.name} - ₱{asset?.balance}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      asset.id === value?.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {(type === "Income" || type === "Transfer") && (
+              <FormField
+                name="to"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>To</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between w-full",
+                              !value && "text-muted-foreground"
+                            )}
+                          >
+                            {value ? (
+                              <div className="space-x-2">
+                                <span>
+                                  {
+                                    assetData.find(
+                                      (asset) => asset.id === value?.id
+                                    )?.name
+                                  }
+                                </span>
+                                <span>
+                                  ₱
+                                  {
+                                    assetData.find(
+                                      (asset) => asset.id === value?.id
+                                    )?.balance
+                                  }
+                                </span>
+                              </div>
+                            ) : (
+                              "Select asset..."
+                            )}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent full className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search asset" />
+                          <CommandList>
+                            {" "}
+                            <CommandEmpty>No assets found</CommandEmpty>
+                            <CommandGroup>
+                              {assetData?.map((asset) => (
+                                <CommandItem
+                                  value={asset}
+                                  key={asset.id}
+                                  onSelect={() => {
+                                    onChange(asset);
+                                  }}
+                                >
+                                  {asset.name} - ₱{asset?.balance}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      asset.id === value?.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <FormField
@@ -231,7 +319,7 @@ const TransactionForm = ({
                       step="0.01"
                       placeholder="Enter amount"
                       className="input-class text-sm pl-7"
-                      disabled={!watch("source")}
+                      disabled={type === "Expense" ? !watch("from") : type === "Income" ? !watch("to") : (!watch("from") && !watch("to")) }
                       onChange={(e) => {
                         const value = Number(e.target.value);
                         const balance = watch("source")?.remainingBalance;
@@ -345,104 +433,32 @@ const TransactionForm = ({
 
           <FormField
             control={control}
-            name="date"
+            name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>End Date</FormLabel>
-                {width > 630 ? (
-                  <Popover modal={true}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            `${moment(field.value).format(
-                              "MMM DD, YYYY hh:mm A"
-                            )}` // Format date & time
-                          ) : (
-                            <span>Pick a date & time</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-4" align="start">
-                      <div className="flex flex-col space-y-4">
-                        {/* Calendar for Date Selection */}
-                        <Calendar
-                          mode="single"
-                          selected={
-                            field.value ? new Date(field.value) : undefined
-                          }
-                          onSelect={(date) => {
-                            const newDate = new Date(
-                              date.setHours(
-                                field.value
-                                  ? new Date(field.value).getHours()
-                                  : 0,
-                                field.value
-                                  ? new Date(field.value).getMinutes()
-                                  : 0
-                              )
-                            );
-                            console.log("Selected Date:", newDate);
-                            field.onChange(newDate); // Update date with time preserved
-                          }}
-                          initialFocus
-                          disabled={(date) => {
-                            const minDate = new Date("2000-01-01"); // Minimum date
-                            return date < minDate;
-                          }}
-                        />
-                        {/* Time Picker for Time Selection */}
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium">Time:</label>
-                          <input
-                            type="time"
-                            className="border text-black rounded-md px-2 py-1 text-sm"
-                            value={
-                              field.value
-                                ? moment(field.value).format("HH:mm")
-                                : ""
-                            }
-                            onSelect={(date) => {
-                              const newDate = new Date(
-                                date.setHours(
-                                  field.value
-                                    ? new Date(field.value).getHours()
-                                    : 0,
-                                  field.value
-                                    ? new Date(field.value).getMinutes()
-                                    : 0
-                                )
-                              );
-                              console.log("Selected Date:", newDate);
-                              field.onChange(newDate); // Update date with time preserved
-                            }}
-                            onChange={(e) => {
-                              const [hours, minutes] = e.target.value
-                                .split(":")
-                                .map(Number);
-                              const updatedDate = field.value
-                                ? new Date(field.value)
-                                : new Date(); // Use the selected date or default to now
-                              updatedDate.setHours(hours, minutes);
-                              console.log("Updated Time:", updatedDate);
-                              field.onChange(updatedDate); // Update time with the correct date preserved
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  ""
-                )}
+                <Button
+                  variant={"outline"}
+                  type="button"
+                  className={cn(
+                    "text-left font-normal",
+                    !field.value && "text-muted-foreground"
+                  )}
+                  onClick={() => setOpen(true)}
+                >
+                  {field.value ? (
+                    `${moment(field.value).format("MMM DD, YYYY")}` // Format date & time
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+                <DatePicker
+                  open={open}
+                  setOpen={setOpen}
+                  field={field}
+                  removeTime={true}
+                />
                 {/* <FormMessage>{errors.date?.message}</FormMessage> */}
               </FormItem>
             )}

@@ -1,7 +1,7 @@
 import { transactionConfig } from "../../config/transactionConfig";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { toast } from "sonner";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { FormProvider, useForm } from "react-hook-form";
@@ -23,26 +23,28 @@ import {
 } from "@/shared/components/ui/dialog";
 import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
 import TransactionForm from "./forms/TransactionForm";
+import { IRootState } from "@/app/store";
 
-export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
+export function TransactionDialog({ open, mode, rowData, setOpen }) {
   const [openFrequency, setOpenFrequency] = useState(false);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
+  const type = useSelector((state: IRootState) => state.active.type);
 
   const { data: categoryData } = useGetCategoryQuery({ type });
   let { data: assetData } = useGetAssetQuery();
   assetData = assetData?.data;
 
-  const { postTrigger, editTrigger } = transactionConfig[type] || {};
+  const { postTrigger, editTrigger, schema } = transactionConfig[type] || {};
 
   const { fetchData, isFetching } = useTriggerFetch(
     mode === "edit" ? editTrigger : postTrigger
   );
 
   const form = useForm({
-    resolver: yupResolver(expenseSchema.schema),
+    resolver: yupResolver(schema?.schema),
     mode: "onChange",
-    defaultValues: expenseSchema.defaultValues,
+    defaultValues: schema?.defaultValues,
   });
 
   const {
@@ -52,18 +54,30 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
     formState: { isDirty, isValid },
   } = form;
 
-  console.log(watch())
+  console.log(watch());
   useEffect(() => {
-    if (rowData && type === "Expense") {
-      reset({
-        date: rowData?.date,
-        source: rowData?.asset,
-        id: rowData?.id,
-        description: rowData?.description,
-        amount: rowData?.amount,
-        category: rowData?.category,
-        image: rowData?.image,
-      });
+    if (rowData) {
+      if (type === "Expense") {
+        reset({
+          date: rowData?.date,
+          id: rowData?.id,
+          description: rowData?.description,
+          amount: rowData?.amount,
+          category: rowData?.category,
+          image: rowData?.image,
+          from: rowData?.asset,
+        });
+      } else if (type === "Income") {
+        reset({
+          date: rowData?.date,
+          id: rowData?.id,
+          description: rowData?.description,
+          amount: rowData?.amount,
+          category: rowData?.category,
+          image: rowData?.image,
+          to: rowData?.asset,
+        });
+      }
     }
   }, [rowData, reset, type]);
 
@@ -96,12 +110,18 @@ export function TransactionDialog({ open, type, mode, rowData, setOpen }) {
         formData.append("date", moment(value).utc().format());
       } else if (key === "category") {
         formData.append("category", value.id);
-      } else if (key === "source") {
-        formData.append("source", value.id);
+      } else if (key === "from" && type !== "Income") {
+        formData.append("from", value.id);
+      } else if (key === "to" && type !== "Expense") {
+        formData.append("to", value.id);
       } else {
         formData.append(key, value);
       }
     });
+
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
 
     confirm({
       title: mode === "edit" ? "Update Expense" : "Add Expense",

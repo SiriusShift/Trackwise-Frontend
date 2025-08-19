@@ -9,7 +9,7 @@ import { CalendarIcon, Clock } from "lucide-react";
 import { Input } from "../ui/input";
 // import TimePicker from "./TimePicker";
 
-const DatePicker = ({ field, setOpen, open }) => {
+const DatePicker = ({ field, setOpen, open, removeTime }) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
   return (
     <>
@@ -41,9 +41,10 @@ const DatePicker = ({ field, setOpen, open }) => {
               }}
             />
             {/* Time Picker for Time Selection */}
-            <div className="flex items-center px-4 justify-between">
-              <label className="text-sm font-lg">Time:</label>
-              {/* <Button
+            {!removeTime && (
+              <div className="flex items-center px-4 justify-between">
+                <label className="text-sm font-lg">Time:</label>
+                {/* <Button
                 variant="outline"
                 onClick={() => {
                   setOpen(false);
@@ -58,33 +59,34 @@ const DatePicker = ({ field, setOpen, open }) => {
                 <Clock />
               </Button> */}
 
-              <Input
-                type="time"
-                className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                value={field.value ? moment(field.value).format("HH:mm") : ""}
-                onSelect={(date) => {
-                  const newDate = new Date(
-                    date.setHours(
-                      field.value ? new Date(field.value).getHours() : 0,
-                      field.value ? new Date(field.value).getMinutes() : 0
-                    )
-                  );
-                  console.log("Selected Date:", newDate);
-                  field.onChange(newDate); // Update date with time preserved
-                }}
-                onChange={(e) => {
-                  const [hours, minutes] = e.target.value
-                    .split(":")
-                    .map(Number);
-                  const updatedDate = field.value
-                    ? new Date(field.value)
-                    : new Date(); // Use the selected date or default to now
-                  updatedDate.setHours(hours, minutes);
-                  console.log("Updated Time:", updatedDate);
-                  field.onChange(updatedDate); // Update time with the correct date preserved
-                }}
-              />
-            </div>
+                <Input
+                  type="time"
+                  className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  value={field.value ? moment(field.value).format("HH:mm") : ""}
+                  onSelect={(date) => {
+                    const newDate = new Date(
+                      date.setHours(
+                        field.value ? new Date(field.value).getHours() : 0,
+                        field.value ? new Date(field.value).getMinutes() : 0
+                      )
+                    );
+                    console.log("Selected Date:", newDate);
+                    field.onChange(newDate); // Update date with time preserved
+                  }}
+                  onChange={(e) => {
+                    const [hours, minutes] = e.target.value
+                      .split(":")
+                      .map(Number);
+                    const updatedDate = field.value
+                      ? new Date(field.value)
+                      : new Date(); // Use the selected date or default to now
+                    updatedDate.setHours(hours, minutes);
+                    console.log("Updated Time:", updatedDate);
+                    field.onChange(updatedDate); // Update time with the correct date preserved
+                  }}
+                />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 
 const ViewImage = ({
   image,
@@ -10,9 +10,12 @@ const ViewImage = ({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) => {
+  console.log(image)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
       <img src={image} />
+      </DialogContent>
     </Dialog>
   );
 };
