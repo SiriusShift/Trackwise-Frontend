@@ -8,7 +8,7 @@ export const expensesApi = api
       getExpenses: builder.query({
         query: (params) => ({
           params,
-          url: "/expense",
+          url: "/transaction/expense",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -19,7 +19,7 @@ export const expensesApi = api
       }),
       postExpense: builder.mutation({
         query: (body) => ({
-          url: "/expense",
+          url: "/transaction/expense",
           method: "POST",
           // headers: {
           //   "Content-type": "multipart/form-data",
@@ -31,7 +31,7 @@ export const expensesApi = api
 
       deleteExpense: builder.mutation({
         query: (id) => ({
-          url: `/expense/${id}`,
+          url: `/transaction/expense/${id}`,
           method: "PATCH",
           // headers: {
           //   Accept: "application/json",
@@ -42,7 +42,7 @@ export const expensesApi = api
 
       patchExpense: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/expense/${id}`,
+          url: `/transaction/expense/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -79,7 +79,7 @@ export const expensesApi = api
       getGraphExpense: builder.query({
         query: (params) => ({
           params,
-          url: "/expense/graph",
+          url: "/transaction/expense/graph",
           method: "GET",
           headers: {
             Accept: "application/json",

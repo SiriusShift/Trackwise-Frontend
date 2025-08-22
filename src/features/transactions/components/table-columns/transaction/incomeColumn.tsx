@@ -26,6 +26,7 @@ import moment from "moment";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TransactionDialog } from "../../dialogs/TransactionDialog";
+import ViewImage from "@/shared/components/dialog/ViewImage";
 
 export const incomeColumns: ColumnDef<Income>[] = [
   // {
@@ -144,8 +145,9 @@ export const incomeColumns: ColumnDef<Income>[] = [
       const activeType = useSelector((state: any) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
+      const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
-      const expense = row.original;
+      const income = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
       console.log(row);
@@ -173,6 +175,11 @@ export const incomeColumns: ColumnDef<Income>[] = [
       //     await deleteExpense(expense.id);
       //     dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
       //   };
+
+      const onView = () => {
+        setDropdownOpen(false);
+        setViewOpen(true);
+      };
 
       return (
         <>
@@ -219,8 +226,13 @@ export const incomeColumns: ColumnDef<Income>[] = [
             open={dialogOpen}
             setOpen={setDialogOpen}
             type={activeType}
-            rowData={expense}
+            rowData={income}
             mode="edit"
+          />
+          <ViewImage
+            open={viewOpen}
+            setOpen={setViewOpen}
+            image={income?.image}
           />
         </>
       );

@@ -112,7 +112,7 @@ export function AppSidebar() {
                             className="p-2 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
                           >
                             <p className="tracking-wide">{item.name}</p>
-                            <TooltipArrow className="bg-background" />{" "}
+                            {/* <TooltipArrow className="bg-primary-foreground" />{" "} */}
                             {/* Add styles to customize the arrow */}
                           </TooltipContent>
                         </Tooltip>

@@ -319,7 +319,15 @@ const TransactionForm = ({
                       step="0.01"
                       placeholder="Enter amount"
                       className="input-class text-sm pl-7"
-                      disabled={type === "Expense" ? !watch("from") : type === "Income" ? !watch("to") : (!watch("from") && !watch("to")) }
+                      disabled={
+                        !watch("recurring")
+                          ? type === "Expense"
+                            ? !watch("from")
+                            : type === "Income"
+                            ? !watch("to")
+                            : !watch("from") && !watch("to")
+                          : false
+                      }
                       onChange={(e) => {
                         const value = Number(e.target.value);
                         const balance = watch("source")?.remainingBalance;

@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import TypeSelect from "./TypeSelect";
 import { Button } from "@/shared/components/ui/button";
-import { ArrowDownToLine, ChevronDown, Filter, Plus } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ChevronDown,
+  Filter,
+  Plus,
+  Repeat,
+} from "lucide-react";
 import { FilterSheet } from "@/shared/components/FilterSheet";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -14,6 +20,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { DataTable } from "@/shared/components/table/CommonTable";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { TransactionDialog } from "./dialogs/TransactionDialog";
+import { Toggle } from "@/shared/components/ui/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 
 const TransactionToolbar = ({
   startDate,
@@ -82,7 +94,19 @@ const TransactionToolbar = ({
     <>
       <div className="flex flex-col gap-5">
         <div className="p-1 flex gap-2 overflow-x-auto items-center justify-between">
-          <TypeSelect />
+          <div className="flex gap-2">
+            <TypeSelect />
+            <Tooltip>
+              <TooltipTrigger>
+                <Toggle variant={"outline"} size={"sm"}>
+                  <Repeat />
+                </Toggle>
+              </TooltipTrigger>
+              <TooltipContent className="bg-primary text-primary-foreground" side="right">
+                Recurring
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}
 
@@ -227,11 +251,7 @@ const TransactionToolbar = ({
 
         {/* Data Table */}
       </div>
-      <TransactionDialog
-        open={dialogOpen}
-        setOpen={setDialogOpen}
-        mode="add"
-      />
+      <TransactionDialog open={dialogOpen} setOpen={setDialogOpen} mode="add" />
     </>
   );
 };

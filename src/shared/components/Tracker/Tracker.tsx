@@ -14,6 +14,7 @@ import { commonTrackerProps } from "@/shared/types";
 import { TrackerAddCard } from "./TrackerAddCard";
 import TrackerCard from "./TrackerCard";
 import TrackerSkeleton from "./TrackerSkeleton";
+import TrackerCardEmpty from "./TrackerCardEmpty";
 
 function Tracker({
   title,
@@ -34,8 +35,8 @@ function Tracker({
       : width >= 768 && width < 1280
       ? 1
       : 0;
-  const remaining = useMemo(() => length - data?.length, [length]);
-  console.log("length", length, remaining);
+  const remaining = length - (data?.length ?? 0);
+  console.log("length", length, data?.length, remaining);
   const shouldShowNav =
     (data?.length > 3 && width >= 1536) ||
     (data?.length > 2 && width >= 1280 && width < 1536) ||
@@ -60,7 +61,8 @@ function Tracker({
             type={type}
             onSubmit={onSubmit}
           />
-          {isLoading && [...Array(length)]?.map((_,i) => <TrackerSkeleton key={i}/>)}
+          {isLoading &&
+            [...Array(length)]?.map((_, i) => <TrackerSkeleton key={i} />)}
           {data?.map((item, index) => (
             <TrackerCard
               key={index}
@@ -73,6 +75,9 @@ function Tracker({
               editDescription={editDescription}
             />
           ))}
+          {remaining > 0 &&
+            !isLoading &&
+            [...Array(remaining)].map((_, i) => <TrackerCardEmpty />)}
         </CarouselContent>
 
         {shouldShowNav && (

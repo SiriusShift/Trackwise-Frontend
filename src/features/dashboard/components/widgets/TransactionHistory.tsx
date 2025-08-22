@@ -6,10 +6,11 @@ import { Link } from "react-router-dom";
 import { useGetExpensesQuery } from "@/features/transactions/api/transaction/expensesApi";
 import NoData from "@/assets/images/empty-box.png";
 import { Card } from "@/shared/components/ui/card";
+import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
 
 const TransactionHistory = () => {
   //RTK QUERY
-  const { data, isLoading } = useGetExpensesQuery();
+  const { data, isLoading } = useGetTransactionHistoryQuery();
 
   return (
     <Card className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-auto  md:col-span-2 lg:col-span-1 p-7 border">
@@ -24,7 +25,7 @@ const TransactionHistory = () => {
           <h1>No Data Found</h1>
         </div>
       ) : (
-        data?.data.map((item: Object, index) => {
+        data?.data?.map((item: Object, index) => {
           const LucidIcon = Icons[item.category?.icon];
           return (
             <div key={index} className="flex mt-5 rounded-md justify-between">

@@ -26,7 +26,7 @@ export const TrackerAddCard = ({
           isLoading={isLoading}
           mode="add"
         />
-        <span className="ml-5">Set New Limit</span>
+        <span className="ml-5">Add New Budget</span>
       </CardContent>
     </Card>
   </CarouselItem>

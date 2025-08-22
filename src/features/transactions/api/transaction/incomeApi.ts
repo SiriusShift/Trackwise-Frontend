@@ -6,7 +6,7 @@ export const incomeApi = api
     endpoints: (builder) => ({
       postIncome: builder.mutation({
         query: (body) => ({
-          url: "/income",
+          url: "/transaction/income",
           method: "POST",
           body,
         }),
@@ -14,7 +14,7 @@ export const incomeApi = api
       }),
       updateIncome: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/income/${id}`,
+          url: `/transaction/income/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -22,22 +22,23 @@ export const incomeApi = api
       }),
       getIncome: builder.query({
         query: (params) => ({
-          url: "/income",
+          url: "/transaction/income",
           method: "GET",
           params,
         }),
         providesTags: ["Income"],
       }),
       deleteIncome: builder.mutation({
-        query: (id) => ({
-          url: `/income/${id}`,
+        query: ({data, id}) => ({
+          url: `/transaction/income/${id}`,
           method: "PATCH",
+          body: data,
         }),
       }),
       getGraphIncome: builder.query({
         query: (params) => ({
           params,
-          url: "/income/graph",
+          url: "/transaction/income/graph",
           method: "GET",
           headers: {
             Accept: "application/json",
