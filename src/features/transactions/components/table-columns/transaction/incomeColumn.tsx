@@ -27,6 +27,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TransactionDialog } from "../../dialogs/TransactionDialog";
 import ViewImage from "@/shared/components/dialog/ViewImage";
+import { useDeleteIncomeMutation } from "@/features/transactions/api/transaction/incomeApi";
+import { categoryApi } from "@/shared/api/categoryApi";
+import { toast } from "sonner";
 
 export const incomeColumns: ColumnDef<Income>[] = [
   // {
@@ -149,32 +152,32 @@ export const incomeColumns: ColumnDef<Income>[] = [
       console.log(open);
       const income = row.original;
       const { confirm } = useConfirm();
-      const dispatch = useDispatch();
+      // const dispatch = useDispatch();
       console.log(row);
 
-      //   const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
+        const [deleteIncome, { isLoading }] = useDeleteIncomeMutation();
 
-      //   const onDelete = async () => {
-      //     confirm({
-      //       description: `Are you sure you want to delete this ${activeType}?`,
-      //       title: `Delete ${activeType}`,
-      //       variant: "info",
-      //       confirmText: "Delete",
-      //       showLoadingOnConfirm: true,
-      //       cancelText: "Cancel",
-      //       onConfirm: async () => {
-      //         try {
-      //           await deleteExpense(expense.id);
-      //           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-      //         } catch (err) {
-      //           console.log(err);
-      //           toast.error(err?.data?.error);
-      //         }
-      //       },
-      //     });
-      //     await deleteExpense(expense.id);
-      //     dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-      //   };
+        const onDelete = async () => {
+          confirm({
+            description: `Are you sure you want to delete this ${activeType}?`,
+            title: `Delete ${activeType}`,
+            variant: "info",
+            confirmText: "Delete",
+            showLoadingOnConfirm: true,
+            cancelText: "Cancel",
+            onConfirm: async () => {
+              try {
+                await deleteIncome({data: {
+                  delete: true
+                }, id: income.id});
+                // dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+              } catch (err) {
+                console.log(err);
+                toast.error(err?.data?.error);
+              }
+            },
+          });
+        };
 
       const onView = () => {
         setDropdownOpen(false);
@@ -212,11 +215,11 @@ export const incomeColumns: ColumnDef<Income>[] = [
                 mode="edit"
                 setDropdownOpen={setOpen}
               /> */}
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={onView}>
                 <Eye />
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={onDelete}>
                 <Trash2 />
                 Delete
               </DropdownMenuItem>

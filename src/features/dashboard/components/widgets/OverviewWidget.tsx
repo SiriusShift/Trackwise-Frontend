@@ -13,7 +13,7 @@ const OverviewWidget = () => {
     <Widget title="Overview">
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-gray-400">Balance</p>
+          <p className="text-foreground">Balance</p>
           <h1 className="text-3xl">
             ₱
             {data?.balance.toLocaleString("en-PH", {
@@ -21,7 +21,7 @@ const OverviewWidget = () => {
             })}
           </h1>
         </div>
-        <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-gray-100 ">
+        <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-white">
           <Banknote />
         </div>
       </div>

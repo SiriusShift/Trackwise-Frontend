@@ -216,9 +216,9 @@ const Dashboard = () => {
             {/* <hr className="w-full mt-3"/> */}
             <div className="flex mt-5 rounded-md flex-col gap-5 justify-between">
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-14 flex flex-col items-center ">
-                  <p className="text-black text-sm">Nov</p>
-                  <p className="text-black text-sm">13</p>
+                <div className="p-2 border rounded-md w-14 flex flex-col items-center ">
+                  <p className="text-foreground text-sm">Nov</p>
+                  <p className="text-foreground text-sm">13</p>
                 </div>
                 <div className="ml-3 w-full flex flex-col justify-center">
                   <div className="flex justify-between">
@@ -233,9 +233,9 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-14 flex flex-col items-center ">
-                  <p className="text-black text-sm">Sep</p>
-                  <p className="text-black text-sm">15</p>
+                <div className="p-2 border rounded-md  w-14 flex flex-col items-center ">
+                  <p className="text-foreground text-sm">Sep</p>
+                  <p className="text-foreground text-sm">15</p>
                 </div>
                 <div className="ml-3 w-full flex flex-col justify-center">
                   <div className="flex justify-between">

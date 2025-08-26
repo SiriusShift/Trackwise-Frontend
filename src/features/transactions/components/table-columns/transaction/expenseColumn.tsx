@@ -175,7 +175,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
           cancelText: "Cancel",
           onConfirm: async () => {
             try {
-              await deleteExpense(expense.id);
+              await deleteExpense({data: {
+                delete: true
+              } , id:expense.id});
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
             } catch (err) {
               console.log(err);
@@ -183,8 +185,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             }
           },
         });
-        await deleteExpense(expense.id);
-        dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
       };
 
       const onView = () => {

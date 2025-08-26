@@ -13,53 +13,76 @@ const TransactionHistory = () => {
   const { data, isLoading } = useGetTransactionHistoryQuery();
 
   return (
-    <Card className="rounded-lg 2xl:h-[342px] col-span-full overflow-y-auto  md:col-span-2 lg:col-span-1 p-7 border">
-      <div className="flex justify-between items-center">
+    <Card className="rounded-lg 2xl:h-[342px] col-span-full p-0 md:col-span-2 lg:col-span-1 border">
+      <div className="flex justify-between p-6 pb-4 border-b items-center">
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
-        <Link to={"/expenses"}>See All</Link>
+        <Link to={"/transactions"}>See All</Link>
       </div>
 
-      {data?.data.length === 0 ? (
-        <div className="flex flex-col gap-5 justify-center items-center h-[90%]">
-          <img src={NoData} width={150} />
-          <h1>No Data Found</h1>
-        </div>
-      ) : (
-        data?.data?.map((item: Object, index) => {
-          const LucidIcon = Icons[item.category?.icon];
-          return (
-            <div key={index} className="flex mt-5 rounded-md justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md bg-white w-12 flex justify-center items-center">
-                  <LucidIcon className="text-black" width={25} height={25} />
-                </div>
-                <div className="ml-3 w-full">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">
-                        {formatString(item?.description)}
-                      </h1>
+      <div className="overflow-y-auto max-h-[260px] px-6 pb-6">
+        {data?.data.length === 0 ? (
+          <div className="flex flex-col gap-5 justify-center items-center h-[90%]">
+            <img src={NoData} width={150} />
+            <h1>No Data Found</h1>
+          </div>
+        ) : (
+          data?.data?.map((item: Object, index) => {
+            const LucidIcon = Icons[item.category?.icon];
+            return (
+              <div
+                key={index}
+                className="flex mt-5 justify-between hover:bg-muted/50 p-3 -m-3 transition-all duration-200 cursor-pointer border-r-2 border-r-transparent hover:border-r-primary"
+              >
+                <div className="flex w-full">
+                  <div className="p-2 border rounded-md  w-12 flex justify-center items-center">
+                    <LucidIcon
+                      className="text-foreground"
+                      width={25}
+                      height={25}
+                    />
+                  </div>
+                  <div className="ml-3 w-full">
+                    <div className="flex justify-between">
+                      <div>
+                        <h1
+                          className="truncate max-w-[150px]"
+                          title={item?.description} // full on hover
+                        >
+                          {item?.description}
+                        </h1>
+                      </div>
+                      <div>
+                        <h1
+                          className={`${
+                            item?.type === "Expense"
+                              ? "text-destructive"
+                              : item?.type === "Income"
+                              ? "text-success"
+                              : "text-primary"
+                          } font-medium`}
+                        >
+                          ₱
+                          {item?.amount.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </h1>
+                      </div>
                     </div>
-                    <div>
-                      <h1 className="font-medium">
-                        ₱
-                        {item?.amount.toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </h1>
+                    <div className="flex justify-between">
+                      <p className="text-gray-400 text-xs">
+                        {item?.category?.name}
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        {moment(item?.date).format("MMM DD, h:mm A")}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-gray-400 text-sm">
-                    {item?.category?.name} -{" "}
-                    {moment(item?.date)
-                      .format("MMM DD, h:mm A")}
-                  </p>
                 </div>
               </div>
-            </div>
-          );
-        })
-      )}
+            );
+          })
+        )}
+      </div>
     </Card>
   );
 };

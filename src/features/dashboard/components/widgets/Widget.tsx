@@ -5,19 +5,20 @@ import { useSelector } from "react-redux";
 import { commonWidgetProps } from "@/shared/types";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
 import { IRootState } from "@/app/store";
+import { Separator } from "@/shared/components/ui/separator";
 
 const WidgetLayout = ({children, title}: commonWidgetProps) => {
   // const activeMonth = useSelector((state: IRootState) => state.active.active);
 
   return (
-    <Card className={`border p-5 flex flex-col rounded-lg col-span-full ${title === "Calendar" ? "md:col-span-full" : "md:col-span-2"} xl:col-span-1 h-60 `}>
+    <Card className={`border p-5 ${title === "Overview" && "bg-accent"} flex flex-col rounded-lg col-span-full ${title === "Calendar" ? "md:col-span-full" : "md:col-span-2"} xl:col-span-1 h-60 `}>
       <CardHeader className="flex p-0 flex-row justify-between">
         <CardTitle className="text-xl">{title}</CardTitle>
         {/* <CardDescription className="text-sm text-gray-400">
           {formatDateDisplay()}
         </CardDescription> */}
       </CardHeader>
-      <hr className="my-2 mb-4" />
+      <Separator className="my-2 mb-4 border-white"/>
       {children}
     </Card>
   );
