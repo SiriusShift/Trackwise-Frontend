@@ -55,5 +55,7 @@ export const {
   useUpdateIncomeMutation,
   usePostIncomeMutation,
   useDeleteIncomeMutation,
+  useGetGraphIncomeQuery,
+  useGetIncomeQuery,
   useLazyGetGraphIncomeQuery
 } = incomeApi;

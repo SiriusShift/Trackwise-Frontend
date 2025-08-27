@@ -43,15 +43,12 @@ interface DataTableProps<TData, TValue> {
   pageSize: number; // Number of rows per page
   pageIndex: number; // Current page index
   totalPages: number; // Total number of pages
-  totalCount: number; // Total number of items
   setPageIndex: React.Dispatch<React.SetStateAction<number>>; // Page index setter
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   graphData: any;
   isLoading: boolean;
   graphLoading: boolean;
   type: string;
-  total: number;
-  trend: any;
 }
 
 // const chartConfig = {

@@ -26,57 +26,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-
+import useDebounce from "@/shared/hooks/useDebounce";
 const TransactionToolbar = ({
-  startDate,
-  endDate,
-  pageIndex,
-  pageSize,
+  setSelectedCategories,
   categoryData,
-  transactionTrigger,
-  triggerGraph,
+  selectedCategories,
+  setSearch,
+  search,
+  status,
+  setStatus,
 }: {
-  startDate: Date | null;
-  endDate: Date | null;
   categoryData: Object;
-  pageSize: number;
-  pageIndex: number;
-  triggerGraph: () => void;
-  transactionTrigger: () => void;
+  search: String;
+  status: String;
+  setStatus: (search: String) => void;
+  setSearch: (search: String) => void;
+  selectedCategories: Array<any>;
+  setSelectedCategories: (selectedCategories: any) => void;
 }) => {
-  const [search, setSearch] = useState<string>("");
-  const [status, setStatus] = useState<string>("History");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const [selectedCategories, setSelectedCategories] = useState<any[]>([]); // Updated to store entire category object
-
-  const handleFilter = () => {
-    const requestData = {
-      startDate,
-      endDate,
-      ...(status && { status: status }),
-      ...(search && { search: search }), // Add `Search` only if truthy
-      ...(selectedCategories.length > 0 && {
-        Categories: JSON.stringify(
-          selectedCategories.map((category) => category.id)
-        ), // Add array of IDs
-      }),
-    };
-
-    triggerGraph({ mode: mode, ...requestData });
-    transactionTrigger({ pageSize, pageIndex, ...requestData });
-  };
+  const handleFilter = () => {};
 
   const clearFilter = () => {
     setSearch("");
     setSelectedCategories([]);
-    transactionTrigger({
-      // userId,
-      startDate,
-      endDate,
-      pageSize,
-      pageIndex,
-    });
+    setStatus("");
   };
 
   const handleCheckboxChange = (category: any) => {
@@ -102,7 +77,10 @@ const TransactionToolbar = ({
                   <Repeat />
                 </Toggle>
               </TooltipTrigger>
-              <TooltipContent className="bg-primary text-primary-foreground" side="right">
+              <TooltipContent
+                className="bg-primary text-primary-foreground"
+                side="right"
+              >
                 Recurring
               </TooltipContent>
             </Tooltip>

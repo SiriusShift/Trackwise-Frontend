@@ -4,6 +4,8 @@ import { DataTable } from "@/shared/components/table/CommonTable";
 import { expenseColumns } from "@/features/transactions/components/table-columns/transaction/expenseColumn";
 import { useEffect, useMemo, useState } from "react";
 import {
+  useGetExpensesQuery,
+  useGetGraphExpenseQuery,
   useLazyGetGraphExpenseQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { useSelector } from "react-redux";
@@ -26,13 +28,26 @@ import { installmentColumn } from "../components/table-columns/installmentColumn
 import { useLazyGetInstallmentsQuery } from "../api/transaction/installmentApi";
 import { transactionConfig } from "../config/transactionConfig";
 import { IRootState } from "@/app/store";
+import {
+  useGetGraphIncomeQuery,
+  useGetIncomeQuery,
+} from "../api/transaction/incomeApi";
+import {
+  useGetGraphTransferQuery,
+  useGetTransferQuery,
+} from "../api/transaction/transferApi";
+import useDebounce from "@/shared/hooks/useDebounce";
 
 const TransactionPage = () => {
   const location = useLocation();
   const active = useSelector((state: IRootState) => state.active.active);
   const mode = formatMode();
   const type = useSelector((state: IRootState) => state.active.type);
-  console.log(type);
+
+  const [search, setSearch] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+  const debouncedSeach = useDebounce(search, 500);
 
   // State Management
 
@@ -54,9 +69,12 @@ const TransactionPage = () => {
 
   // Queries
 
+  // Category
   const { data: categoryData } = useGetCategoryQuery({
-    type
+    type,
   });
+
+  // Expense Budget
 
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
     useGetCategoryLimitQuery({
@@ -67,14 +85,149 @@ const TransactionPage = () => {
   const [triggerPost] = usePostCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
 
-  const { columns, getTrigger, getChart} = transactionConfig[type] || {};
+  const { columns } = transactionConfig[type] || {};
 
-  const { fetchData, data, isFetching } = useTriggerFetch<Expense[]>(getTrigger);
-  const { fetchData: fetchGraph, data: graphData, isFetching: fetchingGraph} = useTriggerFetch(getChart)
-  console.log("graphData",graphData)
+  // Expense
+  const { data: expenseData, isFetching: expenseFetching } =
+    useGetExpensesQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Expense",
+      }
+    );
 
-  console.log(data)
+  const { data: expenseGraphData, isFetching: expenseGraphFetching } =
+    useGetGraphExpenseQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        mode,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Expense",
+      }
+    );
 
+  // Income
+  const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
+    {
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
+      pageSize,
+      pageIndex,
+      ...(status && { status: status }),
+      ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+      ...(selectedCategories.length > 0 && {
+        Categories: JSON.stringify(
+          selectedCategories.map((category) => category.id)
+        ), // Add array of IDs
+      }),
+    },
+    {
+      skip: type !== "Income",
+    }
+  );
+
+  const { data: incomeGraphData, isFetching: incomeGraphFetching } =
+    useGetGraphIncomeQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        mode,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Income",
+      }
+    );
+
+  //Transfer
+  const { data: transferData, isFetching: transferFetching } =
+    useGetTransferQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Transfer",
+      }
+    );
+
+  const { data: transferGraphData, isFetching: transferGraphFetching } =
+    useGetGraphTransferQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        mode,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Transfer",
+      }
+    );
+
+  // const [triggerChart, { data: chartData, isFetching: chartFetching }] =
+  //   getChart();
+
+  // Constant
+  const tableData =
+    type === "Expense"
+      ? expenseData
+      : type === "Income"
+      ? incomeData
+      : transferData;
+
+  const tableFetching = expenseFetching || incomeFetching || transferFetching;
+
+  const graphData =
+    type === "Expense"
+      ? expenseGraphData
+      : type === "Income"
+      ? incomeGraphData
+      : transferGraphData;
+
+  const graphFetching =
+    expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
   //Functions
   const onSubmit = async (data: any) => {
     console.log(data);
@@ -103,19 +256,14 @@ const TransactionPage = () => {
   };
 
   //UseEffect
-  useEffect(() => {
-    fetchData({
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
-      pageSize,
-      pageIndex,
-    });
-    fetchGraph({
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
-      mode,
-    });
-  }, [pageSize, pageIndex, startDate, endDate, type]);
+  // useEffect(() => {
+  //   trigger();
+  //   triggerChart({
+  //     startDate: startDate?.toISOString(),
+  //     endDate: endDate?.toISOString(),
+  //     mode,
+  //   });
+  // }, [pageSize, pageIndex, startDate, endDate, type]);
 
   useEffect(() => {
     if (active === null) return;
@@ -138,27 +286,27 @@ const TransactionPage = () => {
         {/* Toolbar */}
         <TransactionToolbar
           categoryData={categoryData}
-          transactionTrigger={fetch}
-          triggerGraph={fetchGraph}
-          startDate={startDate}
-          endDate={endDate}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
+          search={search}
+          status={status}
+          selectedCategories={selectedCategories}
+          setSearch={setSearch}
+          setStatus={setStatus}
+          setSelectedCategories={setSelectedCategories}
         />
 
         <DataTable
           columns={columns}
           setPageIndex={setPageIndex}
           setPageSize={setPageSize}
-          totalPages={data?.totalPages}
-          graphLoading={fetchingGraph}
+          totalPages={tableData?.totalPages}
+          graphLoading={graphFetching}
           pageIndex={pageIndex}
           pageSize={pageSize}
-          trend={data?.trend}
-          isLoading={isFetching}
+          // trend={tableData?.trend}
+          isLoading={tableFetching}
           type={type}
           graphData={graphData}
-          data={data?.data || []}
+          data={tableData?.data || []}
         />
         <CommonTracker
           data={categoryLimit}

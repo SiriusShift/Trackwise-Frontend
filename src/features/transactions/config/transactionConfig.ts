@@ -4,6 +4,8 @@ import {
   usePatchExpenseMutation,
   useLazyGetExpensesQuery,
   useLazyGetGraphExpenseQuery,
+  useGetGraphExpenseQuery,
+  useGetExpensesQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import {
   useLazyGetInstallmentsQuery,
@@ -11,7 +13,7 @@ import {
   usePostInstallmentMutation,
 } from "../api/transaction/installmentApi";
 import { expenseColumns } from "../components/table-columns/transaction/expenseColumn";
-import { useLazyGetGraphIncomeQuery, useLazyGetIncomeQuery, usePostIncomeMutation, useUpdateIncomeMutation } from "../api/transaction/incomeApi";
+import { useGetGraphIncomeQuery, useGetIncomeQuery, usePostIncomeMutation, useUpdateIncomeMutation } from "../api/transaction/incomeApi";
 import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
 import { expenseSchema, incomeSchema } from "@/schema/schema";
 
@@ -20,16 +22,12 @@ export const transactionConfig = {
     postTrigger: usePostExpenseMutation,
     editTrigger: usePatchExpenseMutation,
     columns: expenseColumns,
-    getTrigger: useLazyGetExpensesQuery,
-    getChart: useLazyGetGraphExpenseQuery,
     schema: expenseSchema
   },
   Income: {
     postTrigger: usePostIncomeMutation,
     editTrigger: useUpdateIncomeMutation,
     columns: incomeColumns,
-    getTrigger: useLazyGetIncomeQuery,
-    getChart:  useLazyGetGraphIncomeQuery,
     schema: incomeSchema
   },
   Transfer: {

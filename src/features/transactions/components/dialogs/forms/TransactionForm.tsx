@@ -63,7 +63,6 @@ const TransactionForm = ({
     setValue,
     formState: { errors },
   } = useFormContext();
-  console.log(watch());
   console.log(type);
   console.log("Has errors", errors);
   const imageRef = useRef();
@@ -473,6 +472,7 @@ const TransactionForm = ({
           />
         </div>
       )}
+      {!watch("recurring") && (
       <FormField
         name="image"
         control={control}
@@ -581,6 +581,8 @@ const TransactionForm = ({
           );
         }}
       />
+      )}
+
     </div>
   );
 };

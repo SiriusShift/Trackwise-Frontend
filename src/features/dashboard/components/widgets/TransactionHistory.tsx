@@ -7,10 +7,11 @@ import { useGetExpensesQuery } from "@/features/transactions/api/transaction/exp
 import NoData from "@/assets/images/empty-box.png";
 import { Card } from "@/shared/components/ui/card";
 import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const TransactionHistory = () => {
   //RTK QUERY
-  const { data, isLoading } = useGetTransactionHistoryQuery();
+  const { data, isFetching } = useGetTransactionHistoryQuery();
 
   return (
     <Card className="rounded-lg 2xl:h-[342px] col-span-full p-0 md:col-span-2 lg:col-span-1 border">
@@ -19,8 +20,15 @@ const TransactionHistory = () => {
         <Link to={"/transactions"}>See All</Link>
       </div>
 
-      <div className="overflow-y-auto max-h-[260px] px-6 pb-6">
-        {data?.data.length === 0 ? (
+      <div className="overflow-y-auto max-h-[270px] px-6 pb-6">
+        {isFetching ? (
+          <div className="py-4 space-y-3">
+            {" "}
+            {[...Array(4)].map((_, i) => {
+              return <Skeleton key={i} className="h-10 w-full" />;
+            })}
+          </div>
+        ) : data?.data.length === 0 ? (
           <div className="flex flex-col gap-5 justify-center items-center h-[90%]">
             <img src={NoData} width={150} />
             <h1>No Data Found</h1>

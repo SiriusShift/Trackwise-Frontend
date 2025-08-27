@@ -12,13 +12,13 @@ import { Filter } from "lucide-react";
 export function FilterSheet({
   title,
   children,
-  onSubmit,
+  // onSubmit,
   setClear,
   icon,
 }: {
   title: string;
   children: React.ReactNode;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  // onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   setClear: React.Dispatch<React.SetStateAction<string[]>>;
   icon?: React.ComponentType;
 }) {
@@ -49,9 +49,9 @@ export function FilterSheet({
 
         {/* Footer with fixed positioning */}
         <SheetFooter className="mt-auto flex gap-2 justify-between w-full">
-          <Button type="submit" onClick={onSubmit}>
+          {/* <Button type="submit" onClick={onSubmit}>
             Apply
-          </Button>
+          </Button> */}
           <Button variant="outline" type="reset" onClick={setClear}>
             Clear
           </Button>
