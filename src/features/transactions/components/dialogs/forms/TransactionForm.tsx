@@ -26,6 +26,7 @@ import {
   Calendar as CalendarIcon,
   Check,
   ChevronsUpDown,
+  CreditCard,
   Repeat,
   Upload,
 } from "lucide-react";
@@ -48,6 +49,7 @@ import { toast } from "sonner";
 import { Toggle } from "@/shared/components/ui/toggle";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import DatePicker from "@/shared/components/dialog/DatePicker";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 
 const TransactionForm = ({
   assetData,
@@ -69,6 +71,57 @@ const TransactionForm = ({
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
+        <div className="flex flex-row gap-1">
+          <FormField
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col w-full">
+                <FormLabel>Date & Time</FormLabel>
+                <Button
+                  variant={"outline"}
+                  type="button"
+                  className={cn(
+                    "text-left font-normal",
+                    !field.value && "text-muted-foreground"
+                  )}
+                  onClick={() => setOpen(true)}
+                >
+                  {field.value ? (
+                    `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
+                  ) : (
+                    <span>Pick a date & time</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+                <DatePicker open={open} setOpen={setOpen} field={field} />
+                {/* <FormMessage>{errors.date?.message}</FormMessage> */}
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="recurring"
+            render={({ field: { onChange, value } }) => (
+              <FormItem className="flex items-end">
+                <FormControl>
+                  <Toggle
+                    value={value}
+                    onPressedChange={(pressed) => {
+                      setValue("repeat", null);
+                      setValue("auto", false);
+                      setValue("endDate", "");
+                      onChange(pressed);
+                    }}
+                  >
+                    <Repeat />
+                  </Toggle>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         {!watch("recurring") && (
           <>
             {(type === "Expense" || type === "Transfer") && (
@@ -367,52 +420,6 @@ const TransactionForm = ({
         />
       </div>
 
-      <div className="flex flex-row gap-1">
-        <FormField
-          control={control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
-              <FormLabel>Date & Time</FormLabel>
-              <Button
-                variant={"outline"}
-                type="button"
-                className={cn(
-                  "text-left font-normal",
-                  !field.value && "text-muted-foreground"
-                )}
-                onClick={() => setOpen(true)}
-              >
-                {field.value ? (
-                  `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
-                ) : (
-                  <span>Pick a date & time</span>
-                )}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-              <DatePicker open={open} setOpen={setOpen} field={field} />
-              {/* <FormMessage>{errors.date?.message}</FormMessage> */}
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="recurring"
-          render={({ field: { onChange, value } }) => (
-            <FormItem className="flex items-end">
-              <FormControl>
-                <Toggle
-                  value={value}
-                  onPressedChange={(pressed) => onChange(pressed)}
-                >
-                  <Repeat />
-                </Toggle>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
       {watch("recurring") && (
         <div className="grid grid-cols-2 gap-5">
           <div className="flex flex-col">
@@ -451,6 +458,7 @@ const TransactionForm = ({
                     "text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
+                  disabled={watch("repeat") === null}
                   onClick={() => setOpen(true)}
                 >
                   {field.value ? (
@@ -473,116 +481,142 @@ const TransactionForm = ({
         </div>
       )}
       {!watch("recurring") && (
-      <FormField
-        name="image"
-        control={control}
-        render={({ field: { onChange, value } }) => {
-          // Determine if this is an existing image (URL) or new upload (data URL)
-          const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+        <FormField
+          name="image"
+          control={control}
+          render={({ field: { onChange, value } }) => {
+            // Determine if this is an existing image (URL) or new upload (data URL)
+            const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-          const isExistingImage =
-            value && typeof value === "string" && !value.startsWith("data:");
+            const isExistingImage =
+              value && typeof value === "string" && !value.startsWith("data:");
 
-          useEffect(() => {
-            if (value instanceof File) {
-              const url = URL.createObjectURL(value);
-              setPreviewUrl(url);
+            useEffect(() => {
+              if (value instanceof File) {
+                const url = URL.createObjectURL(value);
+                setPreviewUrl(url);
 
-              // Cleanup to avoid memory leak
-              return () => URL.revokeObjectURL(url);
-            } else if (typeof value === "string") {
-              setPreviewUrl(value); // use existing image url
-            } else {
-              setPreviewUrl(null);
-            }
-          }, [value]);
+                // Cleanup to avoid memory leak
+                return () => URL.revokeObjectURL(url);
+              } else if (typeof value === "string") {
+                setPreviewUrl(value); // use existing image url
+              } else {
+                setPreviewUrl(null);
+              }
+            }, [value]);
 
-          // const isNewUpload =
-          //   value && typeof value === "string" && value.startsWith("data:");
+            // const isNewUpload =
+            //   value && typeof value === "string" && value.startsWith("data:");
 
-          return (
-            <FormItem className="flex flex-col">
-              <FormLabel>Attachment</FormLabel>
-              <FormControl>
-                <div className="space-y-3">
-                  {/* Preview section */}
-                  <div className="relative border rounded p-3 bg-card">
-                    <div className="flex items-start gap-3">
-                      {previewUrl ? (
-                        <img
-                          src={previewUrl}
-                          alt="Attachment preview"
-                          className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded"
-                        />
-                      ) : (
-                        <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
-                          No image selected
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {isExistingImage ? "Current Image" : "Upload Image"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {isExistingImage
-                            ? "This image is stored in the database."
-                            : "Upload an image or attachment to store."}
-                        </p>
-                        <input
-                          type="file"
-                          ref={imageRef}
-                          accept="image/*"
-                          hidden
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              onChange(file);
-                            } else {
-                              // If no file selected and there was an existing image, keep it
-                              // If no existing image, set to null
-                              if (!isExistingImage) {
-                                onChange(null);
+            return (
+              <FormItem className="flex flex-col">
+                <FormLabel>Attachment</FormLabel>
+                <FormControl>
+                  <div className="space-y-3">
+                    {/* Preview section */}
+                    <div className="relative border rounded p-3 bg-card">
+                      <div className="flex items-start gap-3">
+                        {previewUrl ? (
+                          <img
+                            src={previewUrl}
+                            alt="Attachment preview"
+                            className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded"
+                          />
+                        ) : (
+                          <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
+                            No image selected
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {isExistingImage ? "Current Image" : "Upload Image"}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {isExistingImage
+                              ? "This image is stored in the database."
+                              : "Upload an image or attachment to store."}
+                          </p>
+                          <input
+                            type="file"
+                            ref={imageRef}
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                onChange(file);
+                              } else {
+                                // If no file selected and there was an existing image, keep it
+                                // If no existing image, set to null
+                                if (!isExistingImage) {
+                                  onChange(null);
+                                }
                               }
-                            }
-                          }}
-                          id="imageUploader"
-                          className={value ? "mt-2" : ""}
-                        />
-                        <div className="flex items-end pt-2 gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => imageRef.current?.click()}
-                            className="flex items-center gap-2"
-                          >
-                            Upload
-                          </Button>
-                          {watch("image") && (
+                            }}
+                            id="imageUploader"
+                            className={value ? "mt-2" : ""}
+                          />
+                          <div className="flex items-end pt-2 gap-2">
                             <Button
                               type="button"
                               variant="outline"
                               size="sm"
-                              onClick={() => {
-                                onChange("");
-                              }}
+                              onClick={() => imageRef.current?.click()}
+                              className="flex items-center gap-2"
                             >
-                              Remove
+                              Upload
                             </Button>
-                          )}
+                            {watch("image") && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  onChange("");
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
+      )}
+      {watch("recurring") && (
+        <FormField
+          control={control}
+          name="auto"
+          render={({ field: { onChange, value } }) => (
+            <FormItem className="flex items-end">
+              <FormControl className="flex items-center gap-4">
+                <div>
+                  <Checkbox
+                    checked={value}
+                    onCheckedChange={(checked) => onChange(checked)}
+                  />
+                  <p>Enable Auto-Pay for this recurring expense</p>
                 </div>
+
+                {/* <Toggle
+                  checked={value?.includes()}
+                  onPressedChange={(pressed) => onChange(pressed)}
+                >
+                  <CreditCard />
+                </Toggle> */}
               </FormControl>
               <FormMessage />
             </FormItem>
-          );
-        }}
-      />
+          )}
+        />
       )}
-
     </div>
   );
 };

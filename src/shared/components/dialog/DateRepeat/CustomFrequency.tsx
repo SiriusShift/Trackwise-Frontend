@@ -30,10 +30,10 @@ const CustomFrequency = ({
   const [frequency, setFrequency] = useState(frequencyList[0]);
   const [every, setEvery] = useState(1);
 
-  console.log(watch);
+  console.log(frequency, every, watch());
 
   useEffect(() => {
-    if (watch("mode") === "recurring") {
+    if (watch("recurring") === true) {
       setValue("repeat", {
         id: 9,
         name: "Custom",
