@@ -173,7 +173,8 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
         >
           <DialogHeader className="px-6">
             <DialogTitle>
-              {mode === "add" ? "Add" : "Edit"} {type}
+              {mode === "add" ? "Add" : "Edit"} {watch("auto") && "recurring"}{" "}
+              {type.toLowerCase()}
             </DialogTitle>
             <DialogDescription>
               Fill in the details to {mode === "add" ? "create" : "update"} this{" "}

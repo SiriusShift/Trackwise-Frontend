@@ -9,8 +9,27 @@ import { CalendarIcon, Clock } from "lucide-react";
 import { Input } from "../ui/input";
 // import TimePicker from "./TimePicker";
 
-const DatePicker = ({ field, setOpen, open, removeTime }) => {
+const DatePicker = ({
+  field,
+  setOpen,
+  open,
+  removeTime,
+  disablePast,
+}: {
+  field: {
+    onChange: (value: any) => void;
+    onBlur: () => void;
+    value: Date | string; // depends on your schema
+    ref: React.Ref<any>;
+    name: "date";
+  };
+  setOpen: (open: boolean) => void;
+  open: boolean;
+  removeTime?: boolean;
+  disablePast?: boolean;
+}) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
+  console.log(disablePast, open);
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -36,6 +55,10 @@ const DatePicker = ({ field, setOpen, open, removeTime }) => {
               }}
               initialFocus
               disabled={(date) => {
+                if (disablePast) {
+                  const today = moment().startOf("day").toDate();
+                  return date < today;
+                }
                 const minDate = new Date("2000-01-01"); // Minimum date
                 return date < minDate;
               }}

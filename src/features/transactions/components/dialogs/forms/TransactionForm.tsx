@@ -58,6 +58,7 @@ const TransactionForm = ({
   type,
 }) => {
   const [open, setOpen] = useState(false);
+  const [openEndDate, setOpenEndDate] = useState(false);
   const width = useScreenWidth();
   const {
     watch,
@@ -75,9 +76,21 @@ const TransactionForm = ({
           <FormField
             control={control}
             name="date"
-            render={({ field }) => (
+            render={({
+              field,
+            }: {
+              field: {
+                onChange: (value: any) => void;
+                onBlur: () => void;
+                value: Date | string; // depends on your schema
+                ref: React.Ref<any>;
+                name: "date";
+              };
+            }) => (
               <FormItem className="flex flex-col w-full">
-                <FormLabel>Date & Time</FormLabel>
+                <FormLabel>
+                  {watch("recurring") ? "Due date" : "Date & Time"}
+                </FormLabel>
                 <Button
                   variant={"outline"}
                   type="button"
@@ -94,7 +107,12 @@ const TransactionForm = ({
                   )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
-                <DatePicker open={open} setOpen={setOpen} field={field} />
+                <DatePicker
+                  disablePast={watch("recurring")}
+                  open={open}
+                  setOpen={setOpen}
+                  field={field}
+                />
                 {/* <FormMessage>{errors.date?.message}</FormMessage> */}
               </FormItem>
             )}
@@ -122,7 +140,36 @@ const TransactionForm = ({
             )}
           />
         </div>
-        {!watch("recurring") && (
+        {watch("recurring") && (
+          <FormField
+            control={control}
+            name="auto"
+            render={({ field: { onChange, value } }) => (
+              <FormItem className="flex items-end">
+                <FormControl className="flex items-center gap-4">
+                  <div>
+                    <Checkbox
+                      checked={value}
+                      onCheckedChange={(checked) => onChange(checked)}
+                    />
+                    <p>
+                      Enable auto pay for this recurring {type.toLowerCase()}
+                    </p>
+                  </div>
+
+                  {/* <Toggle
+                  checked={value?.includes()}
+                  onPressedChange={(pressed) => onChange(pressed)}
+                >
+                  <CreditCard />
+                </Toggle> */}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        {(!watch("recurring") || watch("auto")) && (
           <>
             {(type === "Expense" || type === "Transfer") && (
               <FormField
@@ -382,10 +429,18 @@ const TransactionForm = ({
                       }
                       onChange={(e) => {
                         const value = Number(e.target.value);
-                        const balance = watch("source")?.remainingBalance;
+                        const balance =
+                          type === "Income"
+                            ? watch("to")?.remainingBalance
+                            : watch("from")?.remainingBalance;
                         console.log(balance);
 
-                        if (balance && type !== "Income" && value > balance) {
+                        if (
+                          balance &&
+                          type !== "Income" &&
+                          !watch("recurring") &&
+                          value > balance
+                        ) {
                           toast.error("Insufficient balance");
                           e.target.value = balance; // Reset to the maximum allowed value
                         } else {
@@ -448,7 +503,17 @@ const TransactionForm = ({
           <FormField
             control={control}
             name="endDate"
-            render={({ field }) => (
+            render={({
+              field,
+            }: {
+              field: {
+                onChange: (value: any) => void;
+                onBlur: () => void;
+                value: Date | string; // depends on your schema
+                ref: React.Ref<any>;
+                name: "endDate";
+              };
+            }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>End Date</FormLabel>
                 <Button
@@ -469,8 +534,9 @@ const TransactionForm = ({
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
                 <DatePicker
-                  open={open}
-                  setOpen={setOpen}
+                  open={openEndDate}
+                  setOpen={setOpenEndDate}
+                  disablePast={false}
                   field={field}
                   removeTime={true}
                 />
@@ -588,33 +654,6 @@ const TransactionForm = ({
               </FormItem>
             );
           }}
-        />
-      )}
-      {watch("recurring") && (
-        <FormField
-          control={control}
-          name="auto"
-          render={({ field: { onChange, value } }) => (
-            <FormItem className="flex items-end">
-              <FormControl className="flex items-center gap-4">
-                <div>
-                  <Checkbox
-                    checked={value}
-                    onCheckedChange={(checked) => onChange(checked)}
-                  />
-                  <p>Enable Auto-Pay for this recurring expense</p>
-                </div>
-
-                {/* <Toggle
-                  checked={value?.includes()}
-                  onPressedChange={(pressed) => onChange(pressed)}
-                >
-                  <CreditCard />
-                </Toggle> */}
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
         />
       )}
     </div>

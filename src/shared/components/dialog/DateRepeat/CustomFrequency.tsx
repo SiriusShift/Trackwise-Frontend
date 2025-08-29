@@ -33,7 +33,7 @@ const CustomFrequency = ({
   console.log(frequency, every, watch());
 
   useEffect(() => {
-    if (watch("recurring") === true) {
+    if (watch("recurring") === true && open) {
       setValue("repeat", {
         id: 9,
         name: "Custom",
@@ -41,7 +41,7 @@ const CustomFrequency = ({
         unit: frequency,
       });
     }
-  }, [frequency, every, setValue]);
+  }, [frequency, every, setValue, open]);
 
   useEffect(() => {
     if (open) {

@@ -30,9 +30,10 @@ export const expensesApi = api
       }),
 
       deleteExpense: builder.mutation({
-        query: (id) => ({
+        query: ({data, id}) => ({
           url: `/transaction/expense/${id}`,
           method: "PATCH",
+          body: data
           // headers: {
           //   Accept: "application/json",
           // },
