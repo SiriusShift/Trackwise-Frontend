@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const incomeApi = api
-  .enhanceEndpoints({ addTagTypes: ["Income", "Graph"] })
+  .enhanceEndpoints({ addTagTypes: ["Income", "Recurring"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       postIncome: builder.mutation({
@@ -10,7 +10,7 @@ export const incomeApi = api
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Income", "Graph"],
+        invalidatesTags: ["Income"],
       }),
       updateIncome: builder.mutation({
         query: ({ data, id }) => ({
@@ -18,7 +18,7 @@ export const incomeApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["Income", "Graph"],
+        invalidatesTags: ["Income"],
       }),
       getIncome: builder.query({
         query: (params) => ({
@@ -29,12 +29,55 @@ export const incomeApi = api
         providesTags: ["Income"],
       }),
       deleteIncome: builder.mutation({
-        query: ({data, id}) => ({
+        query: ({ data, id }) => ({
           url: `/transaction/income/${id}`,
           method: "PATCH",
           body: data,
         }),
       }),
+      postRecurringIncome: builder.mutation({
+        query: (body) => ({
+          url: "/transaction/income/recurring",
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+          body,
+        }),
+      }),
+      updateRecurringIncome: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/income/recurring/${id}`,
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+          },
+          body: data,
+        }),
+        invalidatesTags: ["Recurring", "Income"],
+      }),
+
+      getRecurringIncome: builder.query({
+        query: (params) => ({
+          params,
+          url: "/transaction/income/recurring",
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }),
+        providesTags: ["Recurring"],
+      }),
+
+      deleteRecurringIncome: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/income/recurring/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Income"],
+      }),
+
       getGraphIncome: builder.query({
         query: (params) => ({
           params,
@@ -45,7 +88,7 @@ export const incomeApi = api
           },
         }),
         transformResponse: (response: any) => response.data,
-        providesTags: ["Graph"],
+        providesTags: ["Income"],
       }),
     }),
   });
@@ -57,5 +100,9 @@ export const {
   useDeleteIncomeMutation,
   useGetGraphIncomeQuery,
   useGetIncomeQuery,
-  useLazyGetGraphIncomeQuery
+  useLazyGetGraphIncomeQuery,
+  useGetRecurringIncomeQuery,
+  usePostRecurringIncomeMutation,
+  useUpdateRecurringIncomeMutation,
+  useDeleteRecurringIncomeMutation
 } = incomeApi;

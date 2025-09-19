@@ -18,12 +18,13 @@ import LayoutAuth from "@/layout/AuthLayout";
 import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { decryptString } from "@/shared/utils/CustomFunctions";
+import { Loader2 } from "lucide-react";
 
 const SignInPage = () => {
   const router = useNavigate();
   const location = useLocation();
   const [cookies] = useCookies(["user"]);
-  const [postSignin] = usePostSigninMutation();
+  const [postSignin, {isLoading: signinLoading}] = usePostSigninMutation();
 
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
@@ -119,10 +120,10 @@ const SignInPage = () => {
               </div>
               <Button
                 className="w-full sm:w-96 text-right"
-                disabled={!isValid}
+                disabled={!isValid || signinLoading}
                 type="submit"
               >
-                Login
+                {signinLoading && <Loader2 className="animate-spin"/> }Login
               </Button>
             </div>
             <div className="relative flex py-3 w-full sm:w-full items-center">

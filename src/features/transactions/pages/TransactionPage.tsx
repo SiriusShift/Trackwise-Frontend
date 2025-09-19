@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   useGetExpensesQuery,
   useGetGraphExpenseQuery,
+  useGetRecurringExpensesQuery,
   useLazyGetGraphExpenseQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { useSelector } from "react-redux";
@@ -31,23 +32,30 @@ import { IRootState } from "@/app/store";
 import {
   useGetGraphIncomeQuery,
   useGetIncomeQuery,
+  useGetRecurringIncomeQuery,
 } from "../api/transaction/incomeApi";
 import {
   useGetGraphTransferQuery,
+  useGetRecurringTransferQuery,
   useGetTransferQuery,
 } from "../api/transaction/transferApi";
 import useDebounce from "@/shared/hooks/useDebounce";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 
 const TransactionPage = () => {
   const location = useLocation();
+  const { confirm } = useConfirm();
   const active = useSelector((state: IRootState) => state.active.active);
   const mode = formatMode();
   const type = useSelector((state: IRootState) => state.active.type);
 
   const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [recurring, setRecurring] = useState<Boolean>(false);
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   const debouncedSeach = useDebounce(search, 500);
+
+  console.log(recurring, "recurring!");
 
   // State Management
 
@@ -61,11 +69,6 @@ const TransactionPage = () => {
 
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
-
-  // Current Page Name
-  const currentPageName = navigationData.find(
-    (item) => item.path === location.pathname
-  );
 
   // Queries
 
@@ -85,8 +88,7 @@ const TransactionPage = () => {
   const [triggerPost] = usePostCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
 
-  const { columns } = transactionConfig[type] || {};
-
+  const { columns, recurringColumns } = transactionConfig[type] || {};
   // Expense
   const { data: expenseData, isFetching: expenseFetching } =
     useGetExpensesQuery(
@@ -104,7 +106,28 @@ const TransactionPage = () => {
         }),
       },
       {
-        skip: type !== "Expense",
+        skip: type !== "Expense" && recurring === true,
+      }
+    );
+
+  const { data: recurringExpenseData, isFetching: recurringExpenseFetching } =
+    useGetRecurringExpensesQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        type: type,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Expense" || !recurring,
       }
     );
 
@@ -143,9 +166,30 @@ const TransactionPage = () => {
       }),
     },
     {
-      skip: type !== "Income",
+      skip: type !== "Income" || recurring === true,
     }
   );
+
+  const { data: recurringIncomeData, isFetching: recurringIncomeFetching } =
+    useGetRecurringIncomeQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        type: type,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Income" || !recurring,
+      }
+    );
 
   const { data: incomeGraphData, isFetching: incomeGraphFetching } =
     useGetGraphIncomeQuery(
@@ -183,7 +227,28 @@ const TransactionPage = () => {
         }),
       },
       {
-        skip: type !== "Transfer",
+        skip: type !== "Transfer" || recurring === true,
+      }
+    );
+
+  const { data: recurringTransferData, isFetching: recurringTransferFetching } =
+    useGetRecurringTransferQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        type: type,
+        ...(status && { status: status }),
+        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        ...(selectedCategories.length > 0 && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id)
+          ), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Transfer" || !recurring,
       }
     );
 
@@ -210,6 +275,7 @@ const TransactionPage = () => {
   //   getChart();
 
   // Constant
+
   const tableData =
     type === "Expense"
       ? expenseData
@@ -217,7 +283,32 @@ const TransactionPage = () => {
       ? incomeData
       : transferData;
 
-  const tableFetching = expenseFetching || incomeFetching || transferFetching;
+  const tableColumn = recurring ? recurringColumns : columns;
+
+  const recurringTableData =
+    type === "Expense"
+      ? recurringExpenseData
+      : type === "Income"
+      ? recurringIncomeData
+      : recurringTransferData;
+
+  const currentPageName = navigationData.find(
+    (item) => item.path === location.pathname
+  );
+  const totalPages = recurring
+    ? recurringTableData?.totalPages
+    : tableData?.totalPages;
+
+  console.log(totalPages, "total pages");
+
+  console.log(recurringExpenseData, "recurring data");
+  const tableFetching =
+    expenseFetching ||
+    incomeFetching ||
+    transferFetching ||
+    recurringExpenseFetching ||
+    recurringIncomeFetching ||
+    recurringTransferFetching;
 
   const graphData =
     type === "Expense"
@@ -233,6 +324,12 @@ const TransactionPage = () => {
     console.log(data);
     try {
       if (data?.id) {
+        confirm({
+          title: "Update budget limit",
+          description: "Are you sure you want to update this budget?",
+          variant: "info",
+          showLoadingOnConfirm: true,
+        });
         await triggerUpdate({
           id: data?.id,
           amount: {
@@ -288,17 +385,19 @@ const TransactionPage = () => {
           categoryData={categoryData}
           search={search}
           status={status}
+          recurring={recurring}
           selectedCategories={selectedCategories}
+          setRecurring={setRecurring}
           setSearch={setSearch}
           setStatus={setStatus}
           setSelectedCategories={setSelectedCategories}
         />
 
         <DataTable
-          columns={columns}
+          columns={tableColumn}
           setPageIndex={setPageIndex}
           setPageSize={setPageSize}
-          totalPages={tableData?.totalPages}
+          totalPages={totalPages}
           graphLoading={graphFetching}
           pageIndex={pageIndex}
           pageSize={pageSize}
@@ -306,7 +405,7 @@ const TransactionPage = () => {
           isLoading={tableFetching}
           type={type}
           graphData={graphData}
-          data={tableData?.data || []}
+          data={recurring ? recurringTableData?.data : tableData?.data || []}
         />
         <CommonTracker
           data={categoryLimit}

@@ -4,18 +4,21 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface SettingsState {
   timezone: string;
   timeFormat: string;
+  currency: string;
 }
 
 // Define a type for the payload
 interface SettingsPayload {
   timezone: string;
   timeFormat: string;
+  currency: string;
 }
 
 // Initial state
 const initialState: SettingsState = {
   timezone: "",
   timeFormat: "",
+  currency: ""
 };
 
 export const settingsSlice = createSlice({
@@ -25,6 +28,7 @@ export const settingsSlice = createSlice({
     setSettings: (state, action: PayloadAction<SettingsPayload>) => {
       state.timezone = action.payload.timezone;
       state.timeFormat = action.payload.timeFormat;
+      state.currency = action.payload.currency;
     },
   },
 });

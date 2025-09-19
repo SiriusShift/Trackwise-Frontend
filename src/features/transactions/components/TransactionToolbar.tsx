@@ -34,11 +34,15 @@ const TransactionToolbar = ({
   setSearch,
   search,
   status,
+  recurring,
+  setRecurring,
   setStatus,
 }: {
   categoryData: Object;
   search: String;
   status: String;
+  recurring: Boolean;
+  setRecurring: (recurring: Boolean) => void;
   setStatus: (search: String) => void;
   setSearch: (search: String) => void;
   selectedCategories: Array<any>;
@@ -73,7 +77,7 @@ const TransactionToolbar = ({
             <TypeSelect />
             <Tooltip>
               <TooltipTrigger>
-                <Toggle variant={"outline"} size={"sm"}>
+                <Toggle pressed={recurring} onPressedChange={(value) => setRecurring(value)} variant={"outline"} size={"sm"}>
                   <Repeat />
                 </Toggle>
               </TooltipTrigger>

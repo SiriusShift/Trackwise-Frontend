@@ -61,7 +61,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
 
   return (
     // return width > 1024 ? (
-    <Card className="flex flex-col h-full min-w-[250px] 2xl:w-[310px]">
+    <Card className="flex flex-col h-full min-w-[250px] xl:w-[300px]">
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-lg xl:text-xl text-center">
@@ -134,42 +134,44 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
       </ChartContainer>
 
       {/* Card Footer */}
-      <CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
-        {graphLoading ? (
-          <>
-            <Skeleton className="h-5 w-full rounded" />
-            <Skeleton className="h-3 w-full rounded" />
-            <Skeleton className="h-3 w-3/4 rounded" />
-          </>
-        ) : trend === "NaN" ? (
-          <span>No data for trend calculation for this {modeDisplay}</span>
+<CardFooter className="flex flex-col items-center text-center gap-2 text-sm">
+  {graphLoading ? (
+    <>
+      <Skeleton className="h-5 w-full rounded" />
+      <Skeleton className="h-3 w-full rounded" />
+      <Skeleton className="h-3 w-3/4 rounded" />
+    </>
+  ) : trend === "NaN" ? (
+    <span>No trend data available for this {modeDisplay}.</span>
+  ) : (
+    <div className="flex flex-col items-center text-center gap-2 text-sm">
+      <div className="flex items-center justify-center gap-2 font-medium leading-none">
+        <span className="truncate">
+          {trend > 0
+            ? `Up by ${trend}% this ${modeDisplay}`
+            : `Down by ${trend}% this ${modeDisplay}`}
+        </span>
+        {trend > 0 ? (
+          <TrendingUp
+            className={`h-4 w-4 ${
+              type === "Expense" ? "text-destructive" : "text-success"
+            }`}
+          />
         ) : (
-          <div className="flex flex-col items-center text-center gap-2 text-sm">
-            <div className="flex items-center justify-center gap-2 font-medium leading-none">
-              <span className="truncate">
-                Trending {trend > 0 ? "up" : "down"} this month by {trend}%
-              </span>
-              {trend > 0 ? (
-                <TrendingUp
-                  className={`h-4 w-4 ${
-                    type === "Expense" ? "text-destructive" : "text-success"
-                  }`}
-                />
-              ) : (
-                <TrendingDown
-                  className={`h-4 w-4 ${
-                    type === "Expense" ? "text-success" : "text-destructive"
-                  }`}
-                />
-              )}
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total {type?.toLocaleLowerCase()} for the {modeDisplay} of{" "}
-              {dateDisplay}
-            </div>
-          </div>
+          <TrendingDown
+            className={`h-4 w-4 ${
+              type === "Expense" ? "text-success" : "text-destructive"
+            }`}
+          />
         )}
-      </CardFooter>
+      </div>
+      <div className="leading-none text-muted-foreground">
+        Total {type?.toLowerCase()} shown for this {modeDisplay}.
+      </div>
+    </div>
+  )}
+</CardFooter>
+
     </Card>
   );
 }

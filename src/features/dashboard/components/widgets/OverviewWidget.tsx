@@ -2,17 +2,15 @@ import Widget from "@/features/dashboard/components/widgets/Widget";
 import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { overviewWidgetProps } from "@/shared/types";
-import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import { formatCurrency, formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
 const OverviewWidget = () => {
   const { data, isLoading } = useGetAssetQuery();
-  const balance = data?.balance.toLocaleString("en-PH", {
-    minimumFractionDigits: 2,
-  });
   const date = formatDateDisplay();
   const mode = formatMode();
+  const balance = formatCurrency(data?.balance)
   console.log(data);
   return (
     <Widget title="Overview">
@@ -37,7 +35,7 @@ const OverviewWidget = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-foreground">Balance</p>
-              <h1 className="text-3xl">₱{balance}</h1>
+              <h1 className="text-3xl">{balance}</h1>
             </div>
             <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-white">
               <Banknote />

@@ -21,7 +21,7 @@ const TypeSelect = () => {
         dispatch(setType(value))
       }}
     >
-      <SelectTrigger className="h-9 w-[150px]">
+      <SelectTrigger className="h-9 w-[125px]">
         <SelectValue placeholder="Type" />
       </SelectTrigger>
       <SelectContent>

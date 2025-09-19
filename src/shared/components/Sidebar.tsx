@@ -53,7 +53,7 @@ export function AppSidebar() {
     <Sidebar
       className={`transition-all duration-300 ease-in-out ${
         isExpanded ? "w-64" : "w-20"
-      } overflow-hidden`}
+      } overflow-hidden z-50`}
       style={{ willChange: "width, opacity" }} // Optimize for smooth transitions
     >
       {/* Sidebar Header */}

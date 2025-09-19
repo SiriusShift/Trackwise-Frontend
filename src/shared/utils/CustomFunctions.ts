@@ -2,27 +2,17 @@ import CryptoJS from "crypto-js";
 import { saltkey } from "./saltkey";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { TrendingDown, TrendingUp, ArrowRightLeft } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { IRootState } from "@/app/store";
-export const formatDate = (month: number, day: string, year: number) => {
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const monthWord = months[month];
-
-  return `${monthWord} ${day}, ${year}`;
+export const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 export const formatString = (str: string) => {
@@ -45,12 +35,22 @@ export const formatDateDisplay = (): string => {
   return "Select Date";
 };
 
+
+
 export const formatMode = () => {
   const mode = useSelector((state: IRootState) => state.active.mode);
   if (mode === "daily") return "day";
   if (mode === "weekly") return "week";
   if (mode === "monthly") return "month";
   if (mode === "yearly") return "year";
+};
+
+export const formatCurrency = (amount) => {
+  const currency = useSelector((state: IRootState) => state.settings.currency);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+  }).format(amount);
 };
 
 export const numberInput = (

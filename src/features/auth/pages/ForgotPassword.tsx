@@ -70,8 +70,8 @@ const ForgotPassword = () => {
     event.preventDefault();
     try {
       await resetTrigger({
-        id: parseInt(id || ""),
-        token: token,
+        // id: parseInt(id || ""),
+        token: watch("code"),
         password: watch("password"),
       }).unwrap();
       toast.success("Password reset successful");
@@ -79,6 +79,7 @@ const ForgotPassword = () => {
         router("/sign-in");
       }, 3000);
     } catch (err) {
+      console.log(err)
       let errorMessage = "An error occurred"; // Default message
       if (err && (err as { data?: { message?: string } }).data) {
         errorMessage =

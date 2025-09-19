@@ -25,6 +25,7 @@ import {
 } from "../api/signupApi";
 import LayoutAuth from "../../../layout/AuthLayout";
 import moment from "moment-timezone"
+import { Loader2 } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -185,10 +186,10 @@ const signUp = () => {
               </div>
               <Button
                 type="submit"
-                disabled={!isValid}
+                disabled={!isValid || isLoading}
                 className="w-full sm:w-96"
               >
-                Signup
+                {isLoading ? <Loader2 className="animate-spin"/> : "Signup"} 
               </Button>
               <div className="relative flex w-full items-center">
                 <div className="flex-grow border-t border-gray-400"></div>
@@ -234,8 +235,9 @@ const signUp = () => {
                 type="submit"
                 className="w-full sm:w-96 "
                 onClick={submitSignup}
+                disabled={postSignupLoading}
               >
-                Signup
+                {postSignupLoading ? <Loader2 className="animate-spin"/> : "Signup"} 
               </Button>
               <a
                 className="text-gray-600"

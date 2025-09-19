@@ -7,6 +7,12 @@ export interface Expense {
   source: Object;
   status: "Paid" | "Partial" | "Pending" | "Overdue" ; // Status of the expense
   image: string;
+  recurringId: number;
+  recurringTemplate: {
+    amount: number;
+    fromAssetId: number;
+    // isVariable: Boolean;
+  }
 }
 
 export interface Income {

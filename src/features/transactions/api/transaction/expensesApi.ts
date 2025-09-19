@@ -2,7 +2,7 @@ import { api } from "@/shared/services/api";
 import { useGetAssetQuery } from "@/shared/api/assetsApi";
 
 export const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Expenses"] })
+  .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getExpenses: builder.query({
@@ -10,12 +10,9 @@ export const expensesApi = api
           params,
           url: "/transaction/expense",
           method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
         }),
         // transformResponse: (response) => response.data,
-        providesTags: ["Expenses"],
+        providesTags: () => ["Expenses"],
       }),
       postExpense: builder.mutation({
         query: (body) => ({
@@ -30,10 +27,10 @@ export const expensesApi = api
       }),
 
       deleteExpense: builder.mutation({
-        query: ({data, id}) => ({
+        query: ({ data, id }) => ({
           url: `/transaction/expense/${id}`,
           method: "PATCH",
-          body: data
+          body: data,
           // headers: {
           //   Accept: "application/json",
           // },
@@ -45,74 +42,68 @@ export const expensesApi = api
         query: ({ data, id }) => ({
           url: `/transaction/expense/${id}`,
           method: "PATCH",
-          headers: {
-            Accept: "application/json",
-          },
           body: data,
         }),
         invalidatesTags: ["Expenses"],
       }),
 
-      // postRecurringExpense: builder.mutation({
-      //   query: (body) => ({
-      //     url: "/transaction/createRecurring",
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //     },
-      //     body,
-      //   }),
-      //   invalidatesTags: ["RecurringExpense"],
-      // }),
+      postRecurringExpense: builder.mutation({
+        query: (body) => ({
+          url: "/transaction/expense/recurring",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: ["Recurring", "Expenses"],
+      }),
 
-      // updateRecurringExpense: builder.mutation({
-      //   query: ({data, id}) => ({
-      //     url: `/transaction/updateRecurring/${id}`,
-      //     method: "PATCH",
-      //     headers: {
-      //       Accept: "application/json",
-      //     },
-      //     body: data,
-      //   }),
-      //   invalidatesTags: ["RecurringExpense"],
-      // }),
+      updateRecurringExpense: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/expense/recurring/${id}`,
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+          },
+          body: data,
+        }),
+        invalidatesTags: ["Recurring", "Expenses"],
+      }),
+
+      getRecurringExpenses: builder.query({
+        query: (params) => ({
+          params,
+          url: "/transaction/expense/recurring",
+          method: "GET",
+        }),
+        providesTags: ["Recurring"],
+      }),
+
+      deleteRecurringExpense: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/expense/recurring/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Expenses"],
+      }),
+
+      patchPayment: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/expense/pay/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Recurring", "Expenses"],
+      }),
 
       getGraphExpense: builder.query({
         query: (params) => ({
           params,
           url: "/transaction/expense/graph",
           method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
         }),
         transformResponse: (response: any) => response.data,
         providesTags: ["Expenses"],
       }),
-
-      // getRecurringExpenses: builder.query({
-      //   query: (params) => ({
-      //     params,
-      //     url: "/transaction/getRecurring",
-      //     method: "GET",
-      //     headers: {
-      //       Accept: "application/json",
-      //     },
-      //   }),
-      //   providesTags: ["RecurringExpense"],
-      // }),
-
-      // postRecurringPayment: builder.mutation({
-      //   query: ({ body, id }) => ({
-      //     url: `/transaction/postRecurringPayment/${id}`,
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //     },
-      //     body,
-      //   }),
-      //   invalidatesTags: ["RecurringExpense", "Expenses"],
-      // }),
     }),
   });
 
@@ -124,4 +115,9 @@ export const {
   useLazyGetGraphExpenseQuery,
   useDeleteExpenseMutation,
   usePatchExpenseMutation,
+  useGetRecurringExpensesQuery,
+  usePostRecurringExpenseMutation,
+  useUpdateRecurringExpenseMutation,
+  useDeleteRecurringExpenseMutation,
+  usePatchPaymentMutation
 } = expensesApi;

@@ -7,7 +7,11 @@ import moment from "moment";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expenseSchema } from "@/schema/schema";
-import { categoryApi, useGetCategoryQuery } from "@/shared/api/categoryApi";
+import {
+  categoryApi,
+  useGetCategoryLimitQuery,
+  useGetCategoryQuery,
+} from "@/shared/api/categoryApi";
 import { assetsApi, useGetAssetQuery } from "@/shared/api/assetsApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Button } from "@/shared/components/ui/button";
@@ -24,21 +28,49 @@ import {
 import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
 import TransactionForm from "./forms/TransactionForm";
 import { IRootState } from "@/app/store";
+import { transactionApi } from "../../api/transaction";
+import { frequencies } from "@/shared/constants/dateConstants";
 
 export function TransactionDialog({ open, mode, rowData, setOpen }) {
+  console.log(mode);
   const [openFrequency, setOpenFrequency] = useState(false);
+  const [recurring, setRecurring] = useState(false);
+  const startDate = useSelector(
+    (state: IRootState) => state.active.active.from
+  );
+  const endDate = useSelector((state: IRootState) => state.active.active.to);
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
   const type = useSelector((state: IRootState) => state.active.type);
 
   const { data: categoryData } = useGetCategoryQuery({ type });
   let { data: assetData } = useGetAssetQuery();
+  const { data: categoryLimit, isLoading: categoryLimitLoading } =
+    useGetCategoryLimitQuery({
+      startDate: startDate,
+      endDate: endDate,
+    });
+
+  console.log(categoryLimit);
+
   assetData = assetData?.data;
 
-  const { postTrigger, editTrigger, schema } = transactionConfig[type] || {};
+  const {
+    postTrigger,
+    editTrigger,
+    schema,
+    transactTrigger,
+    postRecurringTrigger,
+  } = transactionConfig[type] || {};
 
   const { fetchData, isFetching } = useTriggerFetch(
-    mode === "edit" ? editTrigger : postTrigger
+    mode === "edit"
+      ? editTrigger
+      : mode === "transact"
+      ? transactTrigger
+      : recurring === true
+      ? postRecurringTrigger
+      : postTrigger
   );
 
   const form = useForm({
@@ -51,22 +83,70 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
     handleSubmit,
     reset,
     watch,
-    formState: { isDirty, isValid },
+    formState: { isDirty, isValid, errors },
   } = form;
+  console.log(rowData);
 
-  console.log(watch());
   useEffect(() => {
     if (rowData) {
       if (type === "Expense") {
-        reset({
-          date: rowData?.date,
-          id: rowData?.id,
-          description: rowData?.description,
-          amount: rowData?.amount,
-          category: rowData?.category,
-          image: rowData?.image,
-          from: rowData?.asset,
-        });
+        console.log("test recurring1 ");
+        if (rowData?.recurringTemplate) {
+          reset({
+            date: rowData?.date,
+            id: rowData?.id,
+            description: "",
+            amount: rowData?.amount,
+            category: rowData?.category,
+            recurring: false,
+            image: rowData?.image,
+            from: rowData?.asset,
+          });
+        } else if (rowData?.interval) {
+          console.log("test recurring!");
+          reset({
+            date: rowData?.startDate,
+            id: rowData?.id,
+            description: rowData?.description,
+            amount: rowData?.amount,
+            endDate: rowData?.endDate,
+            recurring: true,
+            category: rowData?.category,
+            repeat: frequencies?.find(
+              (item) =>
+                item?.interval === rowData?.interval &&
+                item?.unit === rowData?.unit
+            ) ?? {
+              id: 9,
+              interval: rowData?.interval,
+              name: "Custom",
+              unit: rowData?.unit,
+            },
+            from: rowData?.asset,
+            auto: rowData?.auto,
+          });
+        } else if (mode === "transact") {
+          reset({
+            date: moment(),
+            transactMode: "transact",
+            id: rowData?.id,
+            description: rowData?.description,
+            amount: rowData?.amount,
+            category: rowData?.category,
+            image: rowData?.image,
+            from: rowData?.asset,
+          });
+        } else {
+          reset({
+            date: rowData?.date,
+            id: rowData?.id,
+            description: rowData?.description,
+            amount: rowData?.amount,
+            category: rowData?.category,
+            image: rowData?.image,
+            from: rowData?.asset,
+          });
+        }
       } else if (type === "Income") {
         reset({
           date: rowData?.date,
@@ -86,6 +166,17 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
     setOpen(false);
   };
 
+  const getTransactMode = (type) => {
+    switch (type?.toLowerCase()) {
+      case "expense":
+        return "Pay";
+      case "income":
+        return "Receive";
+      case "transfer":
+        return "Transfer";
+    }
+  };
+
   const handleClose = () => {
     confirm({
       description:
@@ -102,47 +193,103 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    console.log(data.id, "id");
+
+    // Build formData
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      const value = data[key];
-      if (key === "date") {
-        formData.append("date", moment(value).utc().format());
-      } else if (key === "category") {
-        formData.append("category", value.id);
-      } else if (key === "from" && type !== "Income") {
-        formData.append("from", value.id);
-      } else if (key === "to" && type !== "Expense") {
-        formData.append("to", value.id);
-      } else {
-        formData.append(key, value);
+    const formatDate = (date) => moment(date).utc().format();
+
+    Object.entries(data).forEach(([key, value]) => {
+      switch (key) {
+        case "date":
+          formData.append("date", formatDate(value));
+          break;
+        case "category":
+          formData.append("category", value?.id);
+          break;
+        case "from":
+          if (type !== "Income") formData.append("from", value?.id);
+          break;
+        case "to":
+          if (type !== "Expense") formData.append("to", value?.id);
+          break;
+        default:
+          formData.append(key, value);
       }
     });
 
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
+    if (watch("recurring")) {
+      formData.append("type", type);
     }
 
+    // Prepare formattedData (for recurring)
+    const formattedData = watch("recurring")
+      ? {
+          ...data,
+          category: data?.category?.id,
+          ...(data?.from && { from: data?.from?.id }),
+          ...(data?.to && { to: data?.to?.id }),
+          // isVariable: data?.mode === "variable",
+          date: formatDate(data?.date),
+          type,
+        }
+      : formData;
+
+    console.log(formattedData);
+
+    // Debug formData
+    for (const [k, v] of formData.entries()) {
+      console.log(k, v);
+    }
+    console.log(categoryLimit);
+
+    // Budget warning
+    const warning =
+      (type === "Expense" || type === "Transfer") &&
+      categoryLimit?.some(
+        (item) =>
+          watch("amount") + item?.total > item?.value &&
+          watch("category")?.name === item?.category?.name
+      )
+        ? "This will go over the budget"
+        : "";
+
+    // Confirmation modal
     confirm({
-      title: mode === "edit" ? "Update Expense" : "Add Expense",
-      showLoadingOnConfirm: true,
-      description:
+      title: `${
         mode === "edit"
-          ? "Are you sure you want to update this expense?"
-          : "Are you sure you want to add this expense?",
-      variant: "info",
+          ? "Update"
+          : mode === "transact"
+          ? getTransactMode(type)
+          : "Add"
+      } ${type}`,
+      showLoadingOnConfirm: true,
+      description: `Are you sure you want to ${
+        mode === "edit"
+          ? "update"
+          : mode === "transact"
+          ? getTransactMode(type)?.toLowerCase()
+          : "add"
+      } this ${
+        watch("recurring") ? "recurring " : ""
+      }${type.toLowerCase()}? ${warning}`,
+      variant: warning ? "warning" : "info",
       confirmText: mode === "edit" ? "Update" : "Add",
       cancelText: "Cancel",
       onConfirm: async () => {
         try {
           if (mode === "edit") {
-            await fetchData({ data: formData, id: data?.id }).unwrap();
-          } else {
-            await fetchData(formData).unwrap();
+            await fetchData({ data: formattedData, id: data?.id }).unwrap();
+          } else if (mode === "transact") {
+            await fetchData({ data: formattedData, id: data?.id }).unwrap();
+          }else{
+            await fetchData(formattedData).unwrap();
           }
 
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+          dispatch(transactionApi.util.invalidateTags(["History"]));
+
           reset();
           setOpen(false);
           toast.success(
@@ -173,12 +320,24 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
         >
           <DialogHeader className="px-6">
             <DialogTitle>
-              {mode === "add" ? "Add" : "Edit"} {watch("auto") && "recurring"}{" "}
-              {type.toLowerCase()}
+              {mode === "add"
+                ? `Add ${type}`
+                : mode === "transact"
+                ? `Pay ${type}`
+                : `Edit ${type}`}
             </DialogTitle>
             <DialogDescription>
-              Fill in the details to {mode === "add" ? "create" : "update"} this{" "}
-              {type.toLowerCase()}
+              {mode === "add"
+                ? `Fill in the details to create a new ${
+                    watch("recurring") ? "recurring " : ""
+                  }${type.toLowerCase()}.`
+                : mode === "transact"
+                ? `Confirm and complete payment for this ${
+                    watch("recurring") ? "recurring " : ""
+                  }${type.toLowerCase()}.`
+                : `Update the details of this ${
+                    watch("recurring") ? "recurring " : ""
+                  }${type.toLowerCase()}.`}
             </DialogDescription>
           </DialogHeader>
 
@@ -186,6 +345,8 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
             <TransactionForm
               type={type}
               assetData={assetData}
+              setRecurring={setRecurring}
+              mode={mode}
               setOpenFrequency={handleCustomOpen}
               categoryData={categoryData}
             />
@@ -194,9 +355,13 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
           <DialogFooter className="flex flex-col px-6 sm:flex-row gap-2">
             <Button
               onClick={handleSubmit(onSubmit)}
-              disabled={!isValid || !isDirty}
+              disabled={(!isDirty && mode !== "transact") || !isValid}
             >
-              {mode === "edit" ? "Update" : "Add"}
+              {mode === "edit"
+                ? "Update"
+                : mode === "transact"
+                ? getTransactMode(type)
+                : "Add"}
             </Button>
             <DialogClose asChild>
               <Button

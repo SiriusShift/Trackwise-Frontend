@@ -18,6 +18,8 @@ import {
 import { CarouselItem } from "../ui/carousel";
 import { Card, CardContent } from "../ui/card";
 import TrackerDialog from "@/shared/components/tracker/TrackerDialog";
+import { useSelector } from "react-redux";
+import { IRootState } from "@/app/store";
 
 const TrackerCard = ({
   item,
@@ -30,7 +32,10 @@ const TrackerCard = ({
 }: commonTrackerProps & {
   item: object;
 }) => {
-  const percentage = item?.value > 0 ? (item?.total / item?.value) * 100 : 0;
+  const mode = useSelector((state: IRootState) => state.active.mode);
+  const limit = mode === "monthly" ? item?.value : item?.value * 12;
+  console.log(limit)
+  const percentage = limit > 0 ? (item?.total / limit) * 100 : 0;
   const endAngle = 90 - (percentage / 100) * 360;
   const iconKey = (item?.category?.icon as keyof typeof Icons) || "BusFront";
   const Icon = Icons[iconKey];
@@ -88,7 +93,7 @@ const TrackerCard = ({
                 dataKey="value"
                 background
                 cornerRadius={10}
-                fill="hsl(var(--chart-1))"
+                fill={item?.total > limit ?  "hsl(var(--destructive))" : "hsl(var(--chart-1))"}
               />
               <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
                 <Label
@@ -112,7 +117,7 @@ const TrackerCard = ({
           <div className="flex flex-col">
             <h1>{item.category.name}</h1>
             <p>
-              ₱ {item.total.toFixed(2)} / {item.value.toFixed(2)}
+              ₱ {item.total.toFixed(2)} / {limit.toFixed(2)}
             </p>
           </div>
         </CardContent>

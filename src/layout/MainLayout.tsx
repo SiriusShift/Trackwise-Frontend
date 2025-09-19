@@ -8,9 +8,9 @@ function MainLayout() {
     <SidebarProvider>
       <div className="flex w-full h-full">
         <AppSidebar />
-        <div className="flex flex-col w-full overflow-auto">
+        <div className="flex-1 min-w-0">
           <Header />
-          <div className="px-5 py-5  ">
+          <div className="p-5">
             <Outlet />
           </div>
         </div>

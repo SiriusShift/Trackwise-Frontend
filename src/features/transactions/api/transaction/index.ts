@@ -1,6 +1,6 @@
 import { api } from "@/shared/services/api";
 
-const transactionApi = api
+export const transactionApi = api
   .enhanceEndpoints({ addTagTypes: ["History"] })
   .injectEndpoints({
     endpoints: (builder) => ({

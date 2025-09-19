@@ -42,7 +42,8 @@ function ProtectedRoutes() {
           dispatch(
             setSettings({
               timezone: response?.settings?.timezone,
-              timeFormat: response?.settings?.timeFormat
+              timeFormat: response?.settings?.timeFormat,
+              currency: response?.settings?.currency
             })
           )
         }

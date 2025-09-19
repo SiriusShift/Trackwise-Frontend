@@ -39,9 +39,10 @@ const ResetPassword = () => {
         toast.success("Password reset successful");
         setTimeout(() => {
           router("/sign-in");
-        }, 3000);
+        }, 500);
     } catch (err) {
-      let errorMessage = "An error occurred"; // Default message
+      console.log(err)
+      let errorMessage = "An error occurred!"; // Default message
       if (err && (err as { data?: { message?: string } }).data) {
         errorMessage =
           (err as { data: { message: string } }).data.message || errorMessage; // Extract the message or use default

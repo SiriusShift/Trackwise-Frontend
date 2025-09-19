@@ -26,10 +26,11 @@ import moment from "moment";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TransactionDialog } from "../../dialogs/TransactionDialog";
-import ViewImage from "@/shared/components/dialog/ViewImage";
+import ViewImage from "@/shared/components/dialog/ViewDialog/ViewImage";
 import { useDeleteIncomeMutation } from "@/features/transactions/api/transaction/incomeApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { toast } from "sonner";
+import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewDetailed";
 
 export const incomeColumns: ColumnDef<Income>[] = [
   // {
@@ -125,7 +126,8 @@ export const incomeColumns: ColumnDef<Income>[] = [
       const iconMap = {
         Received: <CheckCircle className="text-green-500 mr-2" size={16} />,
         Pending: <Loader className="text-yellow-500 mr-2" size={16} />,
-        Cancelled: <CircleX className="text-red-500 mr-2" size={16} />,
+        Overdue: <CircleAlert className="text-red-500 mr-2" size={16} />,
+        Partial: <Clock className="text-yellow-500 mr-2" size={16} />,
       };
 
       return (
@@ -155,29 +157,32 @@ export const incomeColumns: ColumnDef<Income>[] = [
       // const dispatch = useDispatch();
       console.log(row);
 
-        const [deleteIncome, { isLoading }] = useDeleteIncomeMutation();
+      const [deleteIncome, { isLoading }] = useDeleteIncomeMutation();
 
-        const onDelete = async () => {
-          confirm({
-            description: `Are you sure you want to delete this ${activeType}?`,
-            title: `Delete ${activeType}`,
-            variant: "info",
-            confirmText: "Delete",
-            showLoadingOnConfirm: true,
-            cancelText: "Cancel",
-            onConfirm: async () => {
-              try {
-                await deleteIncome({data: {
-                  delete: true
-                }, id: income.id});
-                // dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              } catch (err) {
-                console.log(err);
-                toast.error(err?.data?.error);
-              }
-            },
-          });
-        };
+      const onDelete = async () => {
+        confirm({
+          description: `Are you sure you want to delete this ${activeType}?`,
+          title: `Delete ${activeType}`,
+          variant: "info",
+          confirmText: "Delete",
+          showLoadingOnConfirm: true,
+          cancelText: "Cancel",
+          onConfirm: async () => {
+            try {
+              await deleteIncome({
+                data: {
+                  delete: true,
+                },
+                id: income.id,
+              });
+              // dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+            } catch (err) {
+              console.log(err);
+              toast.error(err?.data?.error);
+            }
+          },
+        });
+      };
 
       const onView = () => {
         setDropdownOpen(false);
@@ -232,12 +237,149 @@ export const incomeColumns: ColumnDef<Income>[] = [
             rowData={income}
             mode="edit"
           />
-          <ViewImage
+          <ViewDetailed
             open={viewOpen}
             setOpen={setViewOpen}
-            image={income?.image}
+            transaction={income}
           />
         </>
+      );
+    },
+  },
+];
+export const recurringIncomeColumns: ColumnDef<any>[] = [
+  {
+    accessorKey: "nextDueDate",
+    header: "Next Due",
+    cell: ({ getValue }) => {
+      const dateValue = getValue();
+      return (
+        <span>
+          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
+        </span>
+      );
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "category.name",
+    header: "Category",
+    cell: ({ getValue }) => (
+      <Badge variant="outline">{getValue() || "-"}</Badge>
+    ),
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ getValue }) => {
+      const amount = getValue() as number | undefined;
+      return <span>₱{amount?.toFixed(2) || "0"}</span>;
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorFn: (row) =>
+      `${row.interval} ${row.unit}${row.interval > 1 ? "s" : ""}`,
+    id: "repeat",
+    header: "Repeat Every",
+    cell: ({ getValue }) => <span>{getValue()}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "isActive",
+    header: "Active",
+    cell: ({ getValue }) => {
+      const active = getValue() as boolean;
+      return (
+        <Badge variant={active ? "success" : "destructive"}>
+          {active ? "Active" : "Inactive"}
+        </Badge>
+      );
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "auto",
+    header: "Auto",
+    cell: ({ getValue }) => {
+      const auto = getValue() as boolean;
+      return <Badge variant="outline">{auto ? "Yes" : "No"}</Badge>;
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  // {
+  //   accessorKey: "isVariable",
+  //   header: "Variable Amount",
+  //   cell: ({ getValue }) => {
+  //     const isVar = getValue() as boolean;
+  //     return (
+  //       <Badge variant="outline">{isVar ? "Yes" : "No"}</Badge>
+  //     );
+  //   },
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
+  {
+    id: "actions",
+    meta: {
+      headerClassName:
+        "sticky right-0 bg-background z-10 border-l border-b w-12",
+      cellClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
+    },
+    cell: ({ row }) => {
+      const recurring = row.original;
+      const dispatch = useDispatch();
+      const activeTab = useSelector((state: any) => state.active.expenseTab);
+
+      const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
+
+      const onDelete = async () => {
+        await deleteExpense(recurring.id).then(() => {
+          dispatch(assetsApi.util.invalidateTags(["Assets"]));
+        });
+        toast.success("Recurring entry deleted successfully");
+      };
+
+      return (
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Eye className="mr-2 h-4 w-4" /> View
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete}>
+              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

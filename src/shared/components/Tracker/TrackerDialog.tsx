@@ -97,7 +97,7 @@ function TrackerDialog({
   useEffect(() => {
     if (open && data) {
       setValue("category", data?.category);
-      setValue("amount", data?.limit);
+      setValue("amount", data?.value);
       setValue("id", data?.id);
     }
     return () => {

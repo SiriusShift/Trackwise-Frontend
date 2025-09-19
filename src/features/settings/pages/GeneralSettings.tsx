@@ -53,6 +53,7 @@ const GeneralSettings = () => {
     reset({
       timezone: settings?.timezone,
       timeFormat: settings?.timeFormat === "hh:mm A" ? "12" : "24",
+      currency: currency?.data?.find((item) => item?.code === settings?.currency)
     });
   }, []);
 

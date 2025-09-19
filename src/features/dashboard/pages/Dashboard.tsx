@@ -210,7 +210,7 @@ const Dashboard = () => {
         <div className="2xl:flex space-y-5  md:space-y-0 sm:grid-rows-1 sm:grid-cols-2 md:grid 2xl:w-[400px] 2xl:flex-col gap-5">
           <Card className="rounded-lg 2xl:h-[240px] col-span-full md:col-span-2 lg:col-span-1 lg p-7 border">
             <div className="flex justify-between items-center">
-              <h1 className="gap-3 text-xl font-semibold">Upcoming payments</h1>
+              <h1 className="gap-3 text-xl font-semibold">Pending payments</h1>
               <Link to={"/funds"}>See All</Link>
             </div>
             {/* <hr className="w-full mt-3"/> */}

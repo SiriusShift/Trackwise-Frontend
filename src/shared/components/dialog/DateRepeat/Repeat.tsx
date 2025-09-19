@@ -38,16 +38,19 @@ const Repeat = ({
 }) => {
   const [active, setActive] = useState(null);
   const [openCustom, setOpenCustom] = useState(false);
-  const { watch, control, setValue } = useFormContext();
+  const { watch, setValue } = useFormContext();
+  const selectedRepeat = watch("repeat");
 
   const handleClick = (frequency) => {
     if (frequency?.name !== "Custom") {
-      setValue("repeat", frequency);
+      setValue("repeat", frequency, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
     } else {
       setOpenCustom(true);
       setOpen(false);
     }
-    setActive(frequency);
   };
 
   console.log(active);
@@ -72,18 +75,18 @@ const Repeat = ({
           </DialogDescription> */}
           </DialogHeader>
 
-          {frequencies?.map((frequency: frequencyProps, index : number) => (
+          {frequencies?.map((frequency: frequencyProps, index: number) => (
             <Button
               value={active}
               key={index}
               className="flex justify-between"
               variant={
-                active?.name === frequency?.name ? "secondary" : "outline"
+                selectedRepeat?.name === frequency?.name ? "secondary" : "outline"
               }
               onClick={() => handleClick(frequency)}
             >
               {frequency?.name}
-              {active?.name === frequency?.name && <Check />}
+              {selectedRepeat?.name === frequency?.name && <Check />}
             </Button>
           ))}
         </DialogContent>

@@ -21,7 +21,7 @@ const DatePicker = ({
     onBlur: () => void;
     value: Date | string; // depends on your schema
     ref: React.Ref<any>;
-    name: "date";
+    name: String;
   };
   setOpen: (open: boolean) => void;
   open: boolean;

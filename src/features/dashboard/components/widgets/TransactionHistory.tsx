@@ -20,7 +20,7 @@ const TransactionHistory = () => {
         <Link to={"/transactions"}>See All</Link>
       </div>
 
-      <div className="overflow-y-auto max-h-[270px] px-6 pb-6">
+      <div className="overflow-y-auto h-full max-h-[270px] px-6 pb-6">
         {isFetching ? (
           <div className="py-4 space-y-3">
             {" "}
@@ -29,7 +29,7 @@ const TransactionHistory = () => {
             })}
           </div>
         ) : data?.data.length === 0 ? (
-          <div className="flex flex-col gap-5 justify-center items-center h-[90%]">
+          <div className="flex flex-col gap-5 justify-center items-center h-full">
             <img src={NoData} width={150} />
             <h1>No Data Found</h1>
           </div>

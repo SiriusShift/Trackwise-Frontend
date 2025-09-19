@@ -119,8 +119,8 @@ export function DataTable<TData, TValue>({
       {/* Filter */}
       {/* Table container with responsive and overflow behavior */}
       <div className="flex gap-5">
-        <div className="border relative w-full min-h-[375px] max-h-[400px] rounded-md z-0 overflow-auto">
-          <Table>
+        <div className="relative w-full min-h-[375px] max-h-[400px] rounded-md border overflow-x-auto">
+          <Table className="w-full table-auto">
             <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
