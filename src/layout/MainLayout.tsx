@@ -10,7 +10,7 @@ function MainLayout() {
         <AppSidebar />
         <div className="flex-1 min-w-0">
           <Header />
-          <div className="p-5">
+          <div>
             <Outlet />
           </div>
         </div>

@@ -30,7 +30,7 @@ import ViewImage from "@/shared/components/dialog/ViewDialog/ViewImage";
 import { useDeleteIncomeMutation } from "@/features/transactions/api/transaction/incomeApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { toast } from "sonner";
-import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewDetailed";
+import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 
 export const incomeColumns: ColumnDef<Income>[] = [
   // {

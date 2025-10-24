@@ -10,15 +10,13 @@ import { decryptString } from "@/shared/utils/CustomFunctions";
 
 const Header = () => {
   const [cookies] = useCookies();
-  const userInfo = cookies?.user
-    ? decryptString(cookies.user)
-    : null;
+  const userInfo = cookies?.user ? decryptString(cookies.user) : null;
 
   return (
-    <header className="flex bg-background z-50 border-b items-center">
+    <header className="sticky top-0 bg-background z-50 border-b items-center">
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
-          <SidebarTrigger className="inline md:hidden" />
+          <SidebarTrigger className="flex md:hidden" />
           <p className="hidden sm:inline">
             Good morning, {userInfo?.firstName}
           </p>
@@ -44,6 +42,5 @@ const Header = () => {
     </header>
   );
 };
-
 
 export default Header;

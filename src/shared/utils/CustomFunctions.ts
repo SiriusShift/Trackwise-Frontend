@@ -5,7 +5,7 @@ import moment from "moment";
 import { TrendingDown, TrendingUp, ArrowRightLeft } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { IRootState } from "@/app/store";
-export const formatDate = (dateString) => {
+export const formatDate = (dateString: Date) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -14,6 +14,10 @@ export const formatDate = (dateString) => {
     minute: "2-digit",
   });
 };
+
+export const CapitalCase = (text: string) => {
+  return String(text).charAt(0).toUpperCase() + String(text).slice(1)
+}
 
 export const formatString = (str: string) => {
   if (str.length <= 24) return str;

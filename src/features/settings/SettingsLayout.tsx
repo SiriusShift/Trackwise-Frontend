@@ -17,7 +17,6 @@ const SettingsLayout = () => {
   const location = useLocationHook();
   const navigate = useNavigate();
   const width = useScreenWidth();
-  console.log(width);
   const [activeTab, setActiveTab] = useState("Settings");
 
   console.log(location);
@@ -28,14 +27,14 @@ const SettingsLayout = () => {
 
   const Tabs = () => {
     return (
-      <div className="sm:flex flex-col h-auto gap-2 sm:flex-row sm:pb-1 overflow-auto">
+      <div className="sm:flex flex-col gap-2 sm:flex-row sm:pb-1 h-full">
         {subNavigation?.map((item, index) => {
           return (
             <Link
               key={index}
               className={`${
                 location?.location?.pathname === item?.path
-                  ? "sm:border-b border-primary font-semibold text-primary"
+                  ? "sm:border-b border-primary text-primary"
                   : "text-foreground sm:text-gray-400"
               } p-2`}
               to={item?.path}
@@ -55,7 +54,7 @@ const SettingsLayout = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-8">
+    <div className="flex flex-col h-full gap-4 p-5 sm:gap-8">
       {/* Settings Header */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
@@ -78,7 +77,7 @@ const SettingsLayout = () => {
             {width < 640 ? activeTab : "Settings"}
           </h1>
         </div>
-        <div>
+        <div className="h-full">
           {width < 640 ? (
             location?.location?.pathname === "/settings" ? (
               <Tabs />

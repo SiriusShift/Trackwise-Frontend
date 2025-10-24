@@ -28,10 +28,14 @@ import {
 import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
 import TransactionForm from "./forms/TransactionForm";
 import { IRootState } from "@/app/store";
-import { transactionApi } from "../../api/transaction";
+import {
+  transactionApi,
+  useUpdateTransactionHistoryMutation,
+} from "../../api/transaction";
 import { frequencies } from "@/shared/constants/dateConstants";
+import { expensesApi } from "../../api/transaction/expensesApi";
 
-export function TransactionDialog({ open, mode, rowData, setOpen }) {
+export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
   console.log(mode);
   const [openFrequency, setOpenFrequency] = useState(false);
   const [recurring, setRecurring] = useState(false);
@@ -43,6 +47,7 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
   const { confirm } = useConfirm();
   const type = useSelector((state: IRootState) => state.active.type);
 
+  const [editHistory, { isLoading }] = useUpdateTransactionHistoryMutation();
   const { data: categoryData } = useGetCategoryQuery({ type });
   let { data: assetData } = useGetAssetQuery();
   const { data: categoryLimit, isLoading: categoryLimitLoading } =
@@ -51,7 +56,7 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
       endDate: endDate,
     });
 
-  console.log(categoryLimit);
+  console.log(rowData);
 
   assetData = assetData?.data;
 
@@ -62,6 +67,8 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
     transactTrigger,
     postRecurringTrigger,
   } = transactionConfig[type] || {};
+
+  console.log(schema);
 
   const { fetchData, isFetching } = useTriggerFetch(
     mode === "edit"
@@ -86,18 +93,21 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
     formState: { isDirty, isValid, errors },
   } = form;
   console.log(rowData);
+  console.log(watch());
 
   useEffect(() => {
     if (rowData) {
       if (type === "Expense") {
         console.log("test recurring1 ");
         if (rowData?.recurringTemplate) {
+          console.log("template");
           reset({
             date: rowData?.date,
             id: rowData?.id,
             description: "",
-            amount: rowData?.amount,
+            amount: rowData?.remainingBalance,
             category: rowData?.category,
+            balance: rowData?.remainingBalance ?? null,
             recurring: false,
             image: rowData?.image,
             from: rowData?.asset,
@@ -122,29 +132,35 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
               name: "Custom",
               unit: rowData?.unit,
             },
-            from: rowData?.asset,
+            ...(rowData?.fromAssetId && { from: rowData?.fromAssetId }),
+            ...(rowData?.toAssetId && { to: rowData?.toAssetId }),
             auto: rowData?.auto,
           });
-        } else if (mode === "transact") {
-          reset({
-            date: moment(),
-            transactMode: "transact",
-            id: rowData?.id,
-            description: rowData?.description,
-            amount: rowData?.amount,
-            category: rowData?.category,
-            image: rowData?.image,
-            from: rowData?.asset,
-          });
+          // } else if (mode === "transact") {
+          //   console.log("test Transact!");
+          //   reset({
+          //     date: moment(),
+          //     transactMode: "transact",
+          //     id: rowData?.id,
+          //     description: rowData?.description,
+          //     amount: rowData?.remainingBalance,
+          //     category: rowData?.category,
+          //     image: rowData?.image,
+          //     balance: rowData?.remainingBalance ?? null,
+          //     from: rowData?.asset,
+          //   });
         } else {
+          console.log("else");
           reset({
             date: rowData?.date,
             id: rowData?.id,
             description: rowData?.description,
-            amount: rowData?.amount,
+            amount: mode === "transact" ? rowData?.remainingBalance :rowData?.amount,
             category: rowData?.category,
             image: rowData?.image,
-            from: rowData?.asset,
+            from: rowData?.asset || rowData?.fromAsset,
+            balance: rowData?.remainingBalance ?? null,
+            initialAmount: mode === "transact" ? 0 : rowData?.amount,
           });
         }
       } else if (type === "Income") {
@@ -278,14 +294,17 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
       cancelText: "Cancel",
       onConfirm: async () => {
         try {
-          if (mode === "edit") {
+          if (mode === "edit" && !history) {
             await fetchData({ data: formattedData, id: data?.id }).unwrap();
           } else if (mode === "transact") {
             await fetchData({ data: formattedData, id: data?.id }).unwrap();
-          }else{
+          } else if (history) {
+            await editHistory({ data: formattedData, id: data?.id }).unwrap();
+          } else {
             await fetchData(formattedData).unwrap();
           }
 
+          dispatch(expensesApi.util.invalidateTags(["Expenses", "Recurring"]));
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
           dispatch(transactionApi.util.invalidateTags(["History"]));
@@ -293,7 +312,17 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
           reset();
           setOpen(false);
           toast.success(
-            `${type} ${mode === "edit" ? "updated" : "added"} successfully`
+            `${type} ${
+              mode === "edit"
+                ? "updated"
+                : mode === "transact"
+                ? type === "Expense"
+                  ? "paid"
+                  : type === "Income"
+                  ? "received"
+                  : "transfered"
+                : "added"
+            } successfully`
           );
         } catch (err) {
           toast.error(err?.data?.error || "Something went wrong");
@@ -347,6 +376,7 @@ export function TransactionDialog({ open, mode, rowData, setOpen }) {
               assetData={assetData}
               setRecurring={setRecurring}
               mode={mode}
+              history={history}
               setOpenFrequency={handleCustomOpen}
               categoryData={categoryData}
             />

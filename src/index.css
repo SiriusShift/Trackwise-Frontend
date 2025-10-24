@@ -15,10 +15,29 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-webkit-credentials-auto-fill-button {
   display: none;
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
 /* 
 body {
   @apply font-sans antialiased bg-background text-foreground;
 } */
+
+.card {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted)) hsl(var(--card));
+}
+
+.card::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted));
+}
+
+.card::-webkit-scrollbar-track {
+  background-color: hsl(var(--card));
+}
 
 * {
   scrollbar-width: thin; /* For Firefox */

@@ -15,6 +15,9 @@ import GeneralSettings from "@/features/settings/pages/GeneralSettings";
 import AccountSettings from "@/features/settings/pages/AccountSettings";
 import CategorySettings from "@/features/settings/pages/CategorySettings";
 import ThemeSettings from "@/features/settings/pages/ThemeSettings";
+import NotificationSettings from "@/features/settings/pages/NotificationSettings";
+import SecuritySettings from "@/features/settings/pages/SecuritySettings";
+import BackupSettings from "@/features/settings/pages/BackupSettings";
 
 export const router = createBrowserRouter([
     {
@@ -76,6 +79,18 @@ export const router = createBrowserRouter([
                     {
                         path: "/settings/theme",
                         element: <ThemeSettings />
+                    },
+                    {
+                        path: "/settings/notifications",
+                        element: <NotificationSettings />
+                    },
+                    {
+                        path: "/settings/security",
+                        element: <SecuritySettings />
+                    },
+                    {
+                        path: "/settings/backup",
+                        element: <BackupSettings />
                     }
                 ]
             }

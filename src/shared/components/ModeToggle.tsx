@@ -1,38 +1,59 @@
 import { Moon, Sun } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
 import { useTheme } from "@/shared/provider/ThemeProvider";
+import { useRef } from "react";
+import { flushSync } from "react-dom";
 
 const ModeToggle = () => {
-  const { setTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  console.log(theme)
+  const changeTheme = async () => {
+    await document.startViewTransition(() => {
+      flushSync(() => {
+        const dark = document.documentElement.classList.toggle("dark");
+        setTheme(dark ? "dark" : "light");
+      });
+    }).ready;
+
+    const { top, left, width, height } =
+      buttonRef.current.getBoundingClientRect();
+    const y = top + height / 2;
+    const x = left + width / 2;
+    const right = window.innerWidth - left;
+    const bottom = window.innerHeight - top;
+    const maxRad = Math.hypot(Math.max(left, right), Math.max(top, bottom));
+    document.documentElement.animate(
+      {
+        clipPath: [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${maxRad}px at ${x}px ${y}px)`,
+        ],
+      },
+      {
+        duration: 700,
+        easing: "ease-in-out",
+        pseudoElement: "::view-transition-new(root)",
+      }
+    );
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Sun className="transition-transform transform rotate-0 scale-100 dark:rotate-[360deg] dark:scale-0 duration-300 ease-in-out" />
-          <Moon className="absolute transition-transform transform rotate-[360deg] scale-0 dark:rotate-0 dark:scale-100 duration-300 ease-in-out" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      ref={buttonRef}
+      onClick={changeTheme}
+      variant="ghost"
+      size="icon"
+      className="relative "
+    >
+      {theme === "dark" ? (
+        <Moon />
+      ) : (
+        <Sun  />
+      )}
+    </Button>
   );
 };
 

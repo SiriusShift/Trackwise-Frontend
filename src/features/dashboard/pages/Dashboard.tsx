@@ -80,7 +80,7 @@ const Dashboard = () => {
   // const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-5">
       <div className="flex gap-5 justify-between">
         <div>
           <p className="text-xl">{currentPageName?.name}</p>

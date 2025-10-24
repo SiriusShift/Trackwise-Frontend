@@ -1,8 +1,13 @@
 import Widget from "@/features/dashboard/components/widgets/Widget";
 import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import AnimateNumber from "@/shared/components/AnimateNumber";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { overviewWidgetProps } from "@/shared/types";
-import { formatCurrency, formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import {
+  formatCurrency,
+  formatDateDisplay,
+  formatMode,
+} from "@/shared/utils/CustomFunctions";
 import { Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -10,7 +15,7 @@ const OverviewWidget = () => {
   const { data, isLoading } = useGetAssetQuery();
   const date = formatDateDisplay();
   const mode = formatMode();
-  const balance = formatCurrency(data?.balance)
+  const balance = data?.balance;
   console.log(data);
   return (
     <Widget title="Overview">
@@ -21,12 +26,12 @@ const OverviewWidget = () => {
               <Skeleton className="h-4 w-12" />
               <Skeleton className="h-8 w-32" />
             </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-white">
+            <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-border">
               <Banknote />
             </div>
           </div>
           <div className="flex flex-col gap-1 mt-5">
-            <Skeleton className="w-56 h-4"/>
+            <Skeleton className="w-56 h-4" />
             <Skeleton className="w-40 h-4" />
           </div>
         </>
@@ -35,9 +40,10 @@ const OverviewWidget = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-foreground">Balance</p>
-              <h1 className="text-3xl">{balance}</h1>
+              {/* <p className="text-3xl">{balance}</p> */}
+              <div className="text-3xl flex gap-1">₱<AnimateNumber duration={2} value={balance} className="text-xl"/></div>
             </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-white">
+            <div className="w-12 h-12 rounded-md flex justify-center items-center border border-border">
               <Banknote />
             </div>
           </div>

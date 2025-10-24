@@ -36,6 +36,8 @@ import {
 import NoData from "@/assets/images/noData.svg";
 import CommonPieGraph from "../charts/CommonPieGraph";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import TransactionList from "@/features/transactions/components/TransactionList/TransactionList";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -95,6 +97,9 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const width = useScreenWidth();
+
+  console.log(data);
   const table = useReactTable({
     data,
     columns,
@@ -115,89 +120,97 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="min-w-full flex flex-col gap-5">
+    <div className="min-w-full flex flex-col sm:gap-5">
       {/* Filter */}
       {/* Table container with responsive and overflow behavior */}
       <div className="flex gap-5">
-        <div className="relative w-full min-h-[375px] max-h-[400px] rounded-md border overflow-x-auto">
-          <Table className="w-full table-auto">
-            <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className={
-                        header.column.columnDef.meta?.headerClassName || "" // Use headerClassName
-                      }
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody className="font-semibold">
-              {isLoading ? (
-                // Skeleton rows when data is loading
-                Array.from({ length: 5 }).map((_, rowIndex) => (
-                  <TableRow key={rowIndex}>
-                    {Array.from({ length: columns?.length - 1 || 5 }).map(
-                      (_, colIndex) => (
-                        <TableCell key={colIndex}>
-                          <Skeleton className="h-6 w-full rounded" />
-                        </TableCell>
-                      )
-                    )}
-                  </TableRow>
-                ))
-              ) : table.getRowModel().rows?.length ? (
-                // Render actual rows when data is available
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={`whitespace-nowrap ${
-                          cell.column.columnDef.meta?.cellClassName || ""
-                        }`}
+        {width > 639 ? (
+          <div className="relative w-full min-h-[375px] max-h-[400px] rounded-md border overflow-x-auto">
+            <Table className="w-full table-auto">
+              <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className={
+                          header.column.columnDef.meta?.headerClassName || "" // Use headerClassName
+                        }
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                // Fallback for no data
-                <TableRow>
-                  <TableCell
-                    colSpan={columns?.length}
-                    className="h-24 text-center"
-                  >
-                    <img
-                      src={NoData}
-                      className="mx-auto"
-                      width={350}
-                      alt="No Data"
-                    />
-                    <p>No data found</p>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableHeader>
+              <TableBody className="font-semibold">
+                {isLoading ? (
+                  // Skeleton rows when data is loading
+                  Array.from({ length: 5 }).map((_, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {Array.from({ length: columns?.length - 1 || 5 }).map(
+                        (_, colIndex) => (
+                          <TableCell key={colIndex}>
+                            <Skeleton className="h-6 w-full rounded" />
+                          </TableCell>
+                        )
+                      )}
+                    </TableRow>
+                  ))
+                ) : table.getRowModel().rows?.length ? (
+                  // Render actual rows when data is available
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={`whitespace-nowrap ${
+                            cell.column.columnDef.meta?.cellClassName || ""
+                          }`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  // Fallback for no data
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns?.length}
+                      className="h-24 text-center"
+                    >
+                      <img
+                        src={NoData}
+                        className="mx-auto"
+                        width={350}
+                        alt="No Data"
+                      />
+                      <p>No data found</p>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="w-full">
+            {" "}
+            <TransactionList transactions={data} isFetching={isLoading} />
+          </div>
+        )}
+
         <div className="hidden lg:inline">
           <CommonPieGraph
             total={graphData?.total}
@@ -210,7 +223,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex w-full py-1 gap-2 overflow-x-auto justify-between sm:justify-end whitespace-nowrap">
+      <div className="w-full hidden sm:flex py-1 gap-2 overflow-x-auto justify-between sm:justify-end whitespace-nowrap">
         {/* Rows per page */}
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium hidden sm:inline">Rows per page</p>
@@ -283,7 +296,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="inline lg:hidden">
+      <div className={`inline ${isLoading ? "mt-5" : null} lg:hidden`}>
         <CommonPieGraph
           total={graphData?.total}
           type={type}

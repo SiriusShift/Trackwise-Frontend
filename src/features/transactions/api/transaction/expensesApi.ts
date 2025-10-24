@@ -119,5 +119,5 @@ export const {
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,
   useDeleteRecurringExpenseMutation,
-  usePatchPaymentMutation
+  usePatchPaymentMutation,
 } = expensesApi;

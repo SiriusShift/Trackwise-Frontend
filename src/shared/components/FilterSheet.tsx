@@ -34,6 +34,7 @@ export function FilterSheet({
       {/* Mobile-friendly Sheet Content */}
       <SheetContent
         side="right"
+        onOpenAutoFocus={(e) => e.preventDefault()}
         className="w-full max-w-full sm:max-w-[18rem] p-5 h-screen flex flex-col"
       >
         <SheetHeader>

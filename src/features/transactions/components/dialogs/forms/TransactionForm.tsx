@@ -8,7 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { numberInput } from "@/shared/utils/CustomFunctions";
+import { formatCurrency, numberInput } from "@/shared/utils/CustomFunctions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +57,7 @@ import {
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { Separator } from "@/shared/components/ui/separator";
+import useFormatCurrency from "@/shared/hooks/useFormatCurrency";
 
 const TransactionForm = ({
   assetData,
@@ -64,12 +65,15 @@ const TransactionForm = ({
   setOpenFrequency,
   type,
   mode,
+  history,
   setRecurring,
 }) => {
-  console.log(mode);
+  console.log(history);
+  console.log(mode)
   const [open, setOpen] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
   const width = useScreenWidth();
+  const formatCurrency = useFormatCurrency();
   const {
     watch,
     control,
@@ -129,7 +133,7 @@ const TransactionForm = ({
               </FormItem>
             )}
           />
-          {mode !== "transact" && (
+          {mode !== "transact" && !history && (
             <FormField
               control={control}
               name="recurring"
@@ -245,11 +249,9 @@ const TransactionForm = ({
                                 </span>
                                 <span>
                                   ₱
-                                  {
-                                    assetData.find(
-                                      (asset) => asset.id === value?.id
-                                    )?.balance
-                                  }
+                                  {assetData
+                                    .find((asset) => asset.id === value?.id)
+                                    ?.remainingBalance.toFixed(2)}
                                 </span>
                               </div>
                             ) : (
@@ -274,7 +276,8 @@ const TransactionForm = ({
                                     onChange(asset);
                                   }}
                                 >
-                                  {asset.name} - ₱{asset?.balance}
+                                  {asset.name} - ₱
+                                  {asset?.remainingBalance.toFixed(2)}
                                   <Check
                                     className={cn(
                                       "ml-auto",
@@ -325,11 +328,9 @@ const TransactionForm = ({
                                 </span>
                                 <span>
                                   ₱
-                                  {
-                                    assetData.find(
-                                      (asset) => asset.id === value?.id
-                                    )?.balance
-                                  }
+                                  {assetData
+                                    .find((asset) => asset.id === value?.id)
+                                    ?.remainingBalance.toFixed(2)}
                                 </span>
                               </div>
                             ) : (
@@ -354,7 +355,8 @@ const TransactionForm = ({
                                     onChange(asset);
                                   }}
                                 >
-                                  {asset.name} - ₱{asset?.balance}
+                                  {asset.name} - ₱
+                                  {asset?.remainingBalance.toFixed(2)}
                                   <Check
                                     className={cn(
                                       "ml-auto",
@@ -394,6 +396,7 @@ const TransactionForm = ({
                         <Button
                           variant="outline"
                           role="combobox"
+                          disabled={history}
                           className={cn(
                             "justify-between",
                             !value && "text-muted-foreground"
@@ -482,7 +485,9 @@ const TransactionForm = ({
                           type === "Income"
                             ? watch("to")?.remainingBalance
                             : watch("from")?.remainingBalance;
-                        console.log(balance);
+                        const remainingBalance = Number(watch("balance")) + Number(watch("initialAmount"));
+
+                        console.log(remainingBalance)
 
                         if (
                           balance &&
@@ -492,6 +497,11 @@ const TransactionForm = ({
                         ) {
                           toast.error("Insufficient balance");
                           e.target.value = balance; // Reset to the maximum allowed value
+                        } else if (value > remainingBalance && (mode === "transact" || history)) {
+                          toast.error(
+                            `Amount exceeds the total balance of ${remainingBalance}`
+                          );
+                          e.target.value = balance; // Reset to the maximum allowed value
                         } else {
                           numberInput(e, field); // Proceed with normal input handling
                         }
@@ -499,6 +509,12 @@ const TransactionForm = ({
                     />
                   </div>
                 </FormControl>
+                {(mode === "transact" || history) && (
+                  <p className="text-xs text-muted-foreground">
+                    Balance: ₱{watch("balance")?.toFixed(2)}
+                  </p>
+                )}
+
                 <FormMessage />
               </FormItem>
             )}

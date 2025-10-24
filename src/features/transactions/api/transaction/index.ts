@@ -5,13 +5,22 @@ export const transactionApi = api
   .injectEndpoints({
     endpoints: (builder) => ({
       getTransactionHistory: builder.query({
-        query: () => ({
+        query: (params) => ({
           url: "/transaction/history",
           method: "GET",
+          params,
         }),
         providesTags: ["History"],
+      }),
+      updateTransactionHistory: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/edit/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["History"]
       }),
     }),
   });
 
-export const { useGetTransactionHistoryQuery } = transactionApi;
+export const { useGetTransactionHistoryQuery, useUpdateTransactionHistoryMutation } = transactionApi;

@@ -48,7 +48,7 @@ function Tracker({
       <h1 className="text-xl font-semibold mb-5">{title}</h1>
       <Carousel
         opts={{
-          align: "start",
+          align: "center",
           watchDrag: width < 768,
         }}
         className="relative w-full"

@@ -13,6 +13,8 @@ import {
   RefreshCcw,
   History,
   Trash2,
+  X,
+  Archive,
 } from "lucide-react";
 import { Expense } from "@/shared/types";
 import { Button } from "@/shared/components/ui/button";
@@ -26,7 +28,10 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import moment from "moment";
 import { Badge } from "@/shared/components/ui/badge";
-import { useDeleteExpenseMutation, usePatchPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
+import {
+  useDeleteExpenseMutation,
+  usePatchPaymentMutation,
+} from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -42,7 +47,9 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-tooltip";
-import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewDetailed";
+import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
+import StatusIcon from "../../statusIcon";
+import { setOpenDialog } from "@/shared/slices/activeSlice";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -92,7 +99,30 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>₱{amount?.toFixed(2) || "0"}</span>;
+      console.log(amount);
+      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
+    },
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
+  {
+    accessorKey: "remainingBalance",
+    header: "Balance",
+    // header: ({ column }) => {
+    //   return (
+    //     <Button
+    //       variant={"ghost"}
+    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //     >
+    //       Paid
+    //       <ArrowUpDown />
+    //     </Button>
+    //   );
+    // },
+    cell: ({ getValue }) => {
+      const amount = getValue() as number | undefined;
+      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
     },
     meta: {
       cellClassName: "border-b",
@@ -129,14 +159,14 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
   },
 
-  {
-    accessorKey: "asset.name",
-    header: "Source",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "asset.name",
+  //   header: "Source",
+  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "status",
     header: "Status",
@@ -146,16 +176,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     cell: ({ getValue }) => {
       const status = getValue() as Expense["status"];
 
-      const iconMap = {
-        Paid: <CheckCircle className="text-green-500 mr-2" size={16} />,
-        Pending: <Loader className="text-yellow-500 mr-2" size={16} />,
-        Overdue: <CircleAlert className="text-red-500 mr-2" size={16} />,
-        Partial: <Clock className="text-yellow-500 mr-2" size={16} />,
-      };
-
       return (
         <Badge variant="outline" className="p-1 px-2">
-          {iconMap[status] || null}
+          {StatusIcon[status] || null}
           {status || "Unknown"}
         </Badge>
       );
@@ -173,7 +196,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       // const activeType = useSelector((state: any) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
-      const [payOpen, setPayOpen] = useState(false);
+      const [mode, setMode] = useState<string>();
       const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
       const expense = row.original;
@@ -182,12 +205,12 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       console.log(expense);
 
       const [deleteExpense] = useDeleteExpenseMutation();
-      const [payExpense] = usePatchPaymentMutation()
+      const [payExpense] = usePatchPaymentMutation();
 
-      const onDelete = async () => {
+      const onArchive = async () => {
         confirm({
-          description: `Are you sure you want to delete this expense?`,
-          title: `Delete expense`,
+          description: `Are you sure you want to archive this expense?`,
+          title: `Archive expense`,
           variant: "info",
           confirmText: "Delete",
           showLoadingOnConfirm: true,
@@ -235,7 +258,8 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             },
           });
         } else {
-          setPayOpen(true); // open dialog
+          setMode("transact");
+          setDialogOpen(true); // open dialog
           setDropdownOpen(false); // close dropdown manually
         }
       };
@@ -280,21 +304,42 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 </Portal>
               </Tooltip>
 
-              {!expense?.recurringTemplate && (
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDialogOpen(true); // open dialog
-                    setDropdownOpen(false); // close dropdown manually
-                  }}
-                  // disabled={
-                  //   expense?.status !== "Paid"
-                  // }
-                >
-                  <Pencil /> Edit
-                </DropdownMenuItem>
-              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMode("edit");
+                        setDialogOpen(true); // open dialog
+                        setDropdownOpen(false); // close dropdown manually
+                      }}
+                      disabled={
+                        expense?.status === "Paid" ||
+                        expense?.status === "Partial"
+                      }
+                    >
+                      <Pencil /> Edit
+                    </DropdownMenuItem>
+                  </span>
+                </TooltipTrigger>
+                <Portal>
+                  <>
+                    {expense?.status === "Partial" && (
+                      <TooltipContent side="right" sideOffset={10}>
+                        Editing disabled — this expense is partially paid.
+                        Changing the amount could cause balance conflicts.
+                      </TooltipContent>
+                    )}
+                    {expense?.status === "Paid" && (
+                      <TooltipContent side="right" sideOffset={10}>
+                        Editing disabled — this expense is already paid.
+                      </TooltipContent>
+                    )}
+                  </>
+                </Portal>
+              </Tooltip>
 
               {/* <TransactionDialog
                 type={activeType}
@@ -306,9 +351,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 <Eye />
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete}>
-                <Trash2 />
-                Delete
+              <DropdownMenuItem onClick={onArchive}>
+                <Archive />
+                Archive
               </DropdownMenuItem>
               {expense?.recurringId && (
                 <DropdownMenuItem>
@@ -322,15 +367,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             open={dialogOpen}
             setOpen={setDialogOpen}
             rowData={expense}
-            mode={"edit"}
+            mode={mode}
           />
-          <TransactionDialog
-            open={payOpen}
-            setOpen={setPayOpen}
-            rowData={expense}
-            mode={"transact"}
-          />
-          <ViewDetailed
+
+          <ViewTransaction
             open={viewOpen}
             setOpen={setViewOpen}
             transaction={expense}
@@ -380,7 +420,7 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
     header: "Amount",
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>₱{amount?.toFixed(2) || "0"}</span>;
+      return <span>₱{Number(amount)?.toFixed(2) || "0"}</span>;
     },
     meta: {
       cellClassName: "border-b",
@@ -448,6 +488,7 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       const [dialogOpen, setDialogOpen] = useState(false);
+      const [viewOpen, setViewOpen] = useState(false);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const recurring = row.original;
       const dispatch = useDispatch();
@@ -460,6 +501,15 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
         });
         toast.success("Recurring entry deleted successfully");
+      };
+
+      const onCancel = async () => {};
+
+      const onArchive = () => {};
+
+      const onView = () => {
+        setDropdownOpen(false);
+        setViewOpen(true);
       };
 
       return (
@@ -477,9 +527,11 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Eye className="mr-2 h-4 w-4" /> View
+
+              <DropdownMenuItem onClick={onView}>
+                <Eye className="h-4 w-4" /> View
               </DropdownMenuItem>
+
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
@@ -488,10 +540,15 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
                   setDropdownOpen(false); // close dropdown manually
                 }}
               >
-                <Pencil className="mr-2 h-4 w-4" /> Edit
+                <Pencil className="h-4 w-4" /> Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete}>
-                <Trash2 className="mr-2 h-4 w-4" /> Deactivate
+
+              <DropdownMenuItem onClick={onCancel}>
+                <X className="h-4 w-4" /> Cancel
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={onArchive}>
+                <Archive className="h-4 w-4" /> Archive
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -500,6 +557,11 @@ export const recurringExpenseColumns: ColumnDef<any>[] = [
             setOpen={setDialogOpen}
             rowData={recurring}
             mode={"edit"}
+          />
+          <ViewTransaction
+            open={viewOpen}
+            setOpen={setViewOpen}
+            transaction={recurring}
           />
         </>
       );

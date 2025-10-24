@@ -20,7 +20,11 @@ export const expenseSchema = {
       })
       .nullable(),
     endDate: yup.date().nullable().notRequired(),
-    auto: yup.boolean(),
+    auto: yup.boolean().when("recurring", {
+      is: true,
+      then: (schema) => schema.required("Mode is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
     mode: yup.string().when("recurring", {
       is: true,
       then: (schema) => schema.required("Mode is required"),

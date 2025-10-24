@@ -21,8 +21,7 @@ import Expense from "@/assets/images/expense.svg";
 import Income from "@/assets/images/income.svg";
 import Transfer from "@/assets/images/transfer.svg";
 
-const ViewDetailed = ({ transaction, open, setOpen }) => {
-  const [imageOpen, setImageOpen] = useState(false);
+const ViewTransaction = ({ transaction, open, setOpen }) => {
   console.log(transaction);
   if (!transaction) return null;
 
@@ -32,6 +31,7 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
       case "received":
       case "paid":
         return "success";
+      case "partial":
       case "pending":
         return "warning";
       case "failed":
@@ -63,15 +63,15 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-full sm:max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl flex flex-col h-dvh sm:max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
               {getTypeIcon(transaction?.category?.type)}
               Transaction Details
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
+          <div className="space-y-6">
             {/* Main Transaction Info */}
             <div className="bg-secondary rounded-lg p-6">
               <div className="flex items-center justify-between">
@@ -89,13 +89,15 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-foreground">
-                    {transaction.category?.type === "Expense" ? "-" : "+"}
+                  <div className="text-xl sm:text-3xl font-bold text-foreground">
+                    {/* {transaction.category?.type === "Expense" ? "-" : "+"} */}
                     {formatCurrency(transaction.amount)}
                   </div>
-                  <Badge variant={getStatusColor(transaction?.status)}>
-                    {transaction.status}
-                  </Badge>
+                  {transaction?.status && (
+                    <Badge variant={getStatusColor(transaction?.status)}>
+                      {transaction.status}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
@@ -140,7 +142,7 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
                   <div>
                     <p className="text-sm text-muted-foreground">Date & Time</p>
                     <p className="font-medium">
-                      {formatDate(transaction.date)}
+                      {formatDate(transaction.date || transaction?.startDate)}
                     </p>
                   </div>
                 </div>
@@ -171,7 +173,6 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
             {/* Transaction History */}
             <DialogAccordion
               transaction={transaction}
-              setImageOpen={setImageOpen}
               getTypeIcon={getTypeIcon}
             />
 
@@ -179,13 +180,8 @@ const ViewDetailed = ({ transaction, open, setOpen }) => {
           </div>
         </DialogContent>
       </Dialog>
-      <ViewImage
-        image={transaction?.image}
-        open={imageOpen}
-        setOpen={setImageOpen}
-      />
     </>
   );
 };
 
-export default ViewDetailed;
+export default ViewTransaction;
