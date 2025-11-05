@@ -10,7 +10,7 @@ import { categoryApi } from "@/shared/api/categoryApi";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 
-const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
+const RecurringList = ({ history, setImageOpen, setOpen }) => {
   const { confirm } = useConfirm();
   const dispatch = useDispatch();
   console.log(history);
@@ -32,7 +32,7 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
           if (history?.transactionType === "Expense") {
             dispatch(expensesApi.util.invalidateTags(["Expenses", "Expenses"]));
           } else if (history?.transactionType === "Income") {
-            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]))
+            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
           } else if (history?.transactionType === "Transfer") {
           }
         } catch (err) {
@@ -56,7 +56,7 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
             </div> */}
             <div>
               <span className="font-semibold text-foreground text-base">
-                {history?.transactionType}
+                {history?.status}
               </span>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Transaction #{history?.id}
@@ -65,13 +65,10 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
           </div>
           <div className="text-right">
             <span
-              className={`font-bold text-lg ${
-                history?.transactionType === "Expense"
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-green-600 dark:text-green-400"
-              }`}
+              className={`font-bold text-lg 
+                  `}
             >
-              {history?.transactionType === "Expense" ? "-" : "+"}
+              {/* {history?.transactionType === "Expense" ? "-" : "+"} */}
               {formatCurrency(history?.amount)}
             </span>
           </div>
@@ -80,17 +77,9 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
         {/* Details Section */}
         <div className="space-y-3 mb-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground font-medium">
-              Date Paid:
-            </span>
+            <span className="text-muted-foreground font-medium">Date:</span>
             <span className="text-foreground font-medium">
               {formatDate(history?.date)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground font-medium">Source:</span>
-            <span className="text-foreground font-medium">
-              {history?.fromAsset?.name}
             </span>
           </div>
 
@@ -143,4 +132,4 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
   );
 };
 
-export default TransactionHistory;
+export default RecurringList;

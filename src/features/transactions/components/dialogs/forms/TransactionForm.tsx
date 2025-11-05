@@ -485,9 +485,11 @@ const TransactionForm = ({
                           type === "Income"
                             ? watch("to")?.remainingBalance
                             : watch("from")?.remainingBalance;
-                        const remainingBalance = Number(watch("balance")) + Number(watch("initialAmount"));
+                        const remainingBalance = Number(watch("balance") || 0) + Number(watch("initialAmount") || 0);
 
+                        console.log(watch())
                         console.log(remainingBalance)
+                        console.log(mode)
 
                         if (
                           balance &&

@@ -34,9 +34,11 @@ import {
 } from "../../api/transaction";
 import { frequencies } from "@/shared/constants/dateConstants";
 import { expensesApi } from "../../api/transaction/expensesApi";
+import { incomeApi } from "../../api/transaction/incomeApi";
+import { transferApi } from "../../api/transaction/transferApi";
 
 export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
-  console.log(mode);
+  console.log(mode, "mode");
   const [openFrequency, setOpenFrequency] = useState(false);
   const [recurring, setRecurring] = useState(false);
   const startDate = useSelector(
@@ -68,8 +70,6 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     postRecurringTrigger,
   } = transactionConfig[type] || {};
 
-  console.log(schema);
-
   const { fetchData, isFetching } = useTriggerFetch(
     mode === "edit"
       ? editTrigger
@@ -92,11 +92,9 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     watch,
     formState: { isDirty, isValid, errors },
   } = form;
-  console.log(rowData);
-  console.log(watch());
 
   useEffect(() => {
-    if (rowData) {
+    if (rowData && open) {
       if (type === "Expense") {
         console.log("test recurring1 ");
         if (rowData?.recurringTemplate) {
@@ -150,12 +148,13 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           //     from: rowData?.asset,
           //   });
         } else {
-          console.log("else");
+          console.log("mode!", mode);
           reset({
             date: rowData?.date,
             id: rowData?.id,
             description: rowData?.description,
-            amount: mode === "transact" ? rowData?.remainingBalance :rowData?.amount,
+            amount:
+              mode === "transact" ? rowData?.remainingBalance : rowData?.amount,
             category: rowData?.category,
             image: rowData?.image,
             from: rowData?.asset || rowData?.fromAsset,
@@ -175,7 +174,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         });
       }
     }
-  }, [rowData, reset, type]);
+  }, [open]);
 
   const handleCustomOpen = () => {
     setOpenFrequency(true);
@@ -209,8 +208,6 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
   };
 
   const onSubmit = async (data) => {
-    console.log(data.id, "id");
-
     // Build formData
     const formData = new FormData();
     const formatDate = (date) => moment(date).utc().format();
@@ -251,14 +248,6 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         }
       : formData;
 
-    console.log(formattedData);
-
-    // Debug formData
-    for (const [k, v] of formData.entries()) {
-      console.log(k, v);
-    }
-    console.log(categoryLimit);
-
     // Budget warning
     const warning =
       (type === "Expense" || type === "Transfer") &&
@@ -294,17 +283,25 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       cancelText: "Cancel",
       onConfirm: async () => {
         try {
-          if (mode === "edit" && !history) {
-            await fetchData({ data: formattedData, id: data?.id }).unwrap();
-          } else if (mode === "transact") {
-            await fetchData({ data: formattedData, id: data?.id }).unwrap();
-          } else if (history) {
+          if (history) {
             await editHistory({ data: formattedData, id: data?.id }).unwrap();
+          } else if (["edit", "transact"].includes(mode)) {
+            await fetchData({ data: formattedData, id: data?.id }).unwrap();
           } else {
             await fetchData(formattedData).unwrap();
           }
 
-          dispatch(expensesApi.util.invalidateTags(["Expenses", "Recurring"]));
+          if (type === "Expense") {
+            dispatch(
+              expensesApi.util.invalidateTags(["Expenses", "Recurring"])
+            );
+          } else if (type === "Income") {
+            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
+          } else if (type === "Transfer") {
+            dispatch(
+              transferApi.util.invalidateTags(["Transfer", "Recurring"])
+            );
+          }
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
           dispatch(transactionApi.util.invalidateTags(["History"]));

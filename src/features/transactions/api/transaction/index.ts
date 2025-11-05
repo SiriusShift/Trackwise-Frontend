@@ -18,9 +18,20 @@ export const transactionApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["History"]
+        invalidatesTags: ["History"],
+      }),
+      deleteTransactionHistory: builder.mutation({
+        query: (id) => ({
+          url: `/transaction/delete/${id}`,
+          method: "PATCH",
+        }),
+        invalidatesTags: ["History"],
       }),
     }),
   });
 
-export const { useGetTransactionHistoryQuery, useUpdateTransactionHistoryMutation } = transactionApi;
+export const {
+  useGetTransactionHistoryQuery,
+  useUpdateTransactionHistoryMutation,
+  useDeleteTransactionHistoryMutation
+} = transactionApi;

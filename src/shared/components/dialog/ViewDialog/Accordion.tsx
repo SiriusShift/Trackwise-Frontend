@@ -15,6 +15,7 @@ import TransactionHistory from "./TransactionHistory";
 import ViewImage from "./ViewImage";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import RecurringDetails from "./RecurringInfo";
+import RecurringList from "./RecurringList";
 
 const DialogAccordion = ({ transaction }) => {
   console.log(transaction);
@@ -24,6 +25,10 @@ const DialogAccordion = ({ transaction }) => {
   const [preview, setPreview] = useState(null);
 
   const isAuto = transaction?.recurringTemplate?.auto ? true : null;
+  const list =
+    transaction?.generatedExpenses ||
+    transaction?.generatedIncomes ||
+    transaction?.generatedTransfers;
 
   const handleImageOpen = (image) => {
     setPreview(image);
@@ -45,22 +50,21 @@ const DialogAccordion = ({ transaction }) => {
         <AccordionItem value="recurring">
           <AccordionTrigger>Repeat Settings</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
-            <RecurringDetails details={transaction?.recurringTemplate}/>
+            <RecurringDetails details={transaction?.recurringTemplate} />
           </AccordionContent>
         </AccordionItem>
       )}
 
-      {transaction.transactionHistory &&
-        transaction.transactionHistory.length > 0 && (
+      {transaction?.transactionHistory &&
+        transaction?.transactionHistory?.length > 0 && (
           <AccordionItem value="history">
             <AccordionTrigger>Transaction History</AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 text-balance">
-              {transaction.transactionHistory.map((history) => (
+              {transaction?.transactionHistory?.map((history) => (
                 <>
                   <TransactionHistory
                     setOpen={() => handleEdit(history)}
                     open={open}
-                    isAuto={isAuto}
                     setImageOpen={() => handleImageOpen(history.image)}
                     history={history}
                     transaction={transaction}
@@ -78,7 +82,7 @@ const DialogAccordion = ({ transaction }) => {
                 rowData={{
                   ...active,
                   category: transaction?.category,
-                  remainingBalance: transaction?.remainingBalance
+                  remainingBalance: transaction?.remainingBalance,
                 }}
                 open={open}
                 setOpen={setOpen}
@@ -86,6 +90,40 @@ const DialogAccordion = ({ transaction }) => {
             </AccordionContent>
           </AccordionItem>
         )}
+      {list?.length > 0 && (
+        <AccordionItem value="list">
+          <AccordionTrigger>Generated {transaction?.type}s</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 text-balance">
+            {list.map((history) => (
+              <>
+                <RecurringList
+                  setOpen={() => handleEdit(history)}
+                  open={open}
+                  setImageOpen={() => handleImageOpen(history.image)}
+                  history={history}
+                  transaction={transaction}
+                />
+              </>
+            ))}
+            <ViewImage
+              image={preview}
+              open={imageOpen}
+              setOpen={setImageOpen}
+            />
+            <TransactionDialog
+              mode="edit"
+              history={true}
+              rowData={{
+                ...active,
+                category: transaction?.category,
+                remainingBalance: transaction?.remainingBalance,
+              }}
+              open={open}
+              setOpen={setOpen}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      )}
     </Accordion>
   );
 };

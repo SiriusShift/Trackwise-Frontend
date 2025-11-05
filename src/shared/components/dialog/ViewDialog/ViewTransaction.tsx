@@ -67,7 +67,8 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
               {getTypeIcon(transaction?.category?.type)}
-              Transaction Details
+              {transaction?.interval ? "Recurring " : "Transaction "}
+               Details
             </DialogTitle>
           </DialogHeader>
 
@@ -109,7 +110,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                   <Icon.Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      Transaction ID
+                      {transaction?.interval && "Recurring "}ID
                     </p>
                     <p className="font-medium">#{transaction.id}</p>
                   </div>

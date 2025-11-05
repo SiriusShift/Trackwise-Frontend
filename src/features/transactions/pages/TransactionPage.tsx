@@ -76,7 +76,7 @@ const TransactionPage = () => {
     type,
   });
 
-  const { data: categoryLimit, isLoading: categoryLimitLoading } =
+  const { data: categoryLimit, isFetching: categoryLimitLoading } =
     useGetCategoryLimitQuery({
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
@@ -87,7 +87,7 @@ const TransactionPage = () => {
 
   const { columns, recurringColumns } = transactionConfig[type] || {};
   // Expense
-  const { data: expenseData, isLoading: expenseFetching } =
+  const { data: expenseData, isFetching: expenseFetching } =
     useGetExpensesQuery(
       {
         startDate: startDate?.toISOString(),
@@ -107,7 +107,7 @@ const TransactionPage = () => {
       }
     );
 
-  const { data: recurringExpenseData, isLoading: recurringExpenseFetching } =
+  const { data: recurringExpenseData, isFetching: recurringExpenseFetching } =
     useGetRecurringExpensesQuery(
       {
         startDate: startDate?.toISOString(),
@@ -128,7 +128,7 @@ const TransactionPage = () => {
       }
     );
 
-  const { data: expenseGraphData, isLoading: expenseGraphFetching } =
+  const { data: expenseGraphData, isFetching: expenseGraphFetching } =
     useGetGraphExpenseQuery(
       {
         startDate: startDate?.toISOString(),
@@ -148,7 +148,7 @@ const TransactionPage = () => {
     );
 
   // Income
-  const { data: incomeData, isLoading: incomeFetching } = useGetIncomeQuery(
+  const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
     {
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
@@ -167,7 +167,7 @@ const TransactionPage = () => {
     }
   );
 
-  const { data: recurringIncomeData, isLoading: recurringIncomeFetching } =
+  const { data: recurringIncomeData, isFetching: recurringIncomeFetching } =
     useGetRecurringIncomeQuery(
       {
         startDate: startDate?.toISOString(),
@@ -188,7 +188,7 @@ const TransactionPage = () => {
       }
     );
 
-  const { data: incomeGraphData, isLoading: incomeGraphFetching } =
+  const { data: incomeGraphData, isFetching: incomeGraphFetching } =
     useGetGraphIncomeQuery(
       {
         startDate: startDate?.toISOString(),
@@ -208,7 +208,7 @@ const TransactionPage = () => {
     );
 
   //Transfer
-  const { data: transferData, isLoading: transferFetching } =
+  const { data: transferData, isFetching: transferFetching } =
     useGetTransferQuery(
       {
         startDate: startDate?.toISOString(),
@@ -228,7 +228,7 @@ const TransactionPage = () => {
       }
     );
 
-  const { data: recurringTransferData, isLoading: recurringTransferFetching } =
+  const { data: recurringTransferData, isFetching: recurringTransferFetching } =
     useGetRecurringTransferQuery(
       {
         startDate: startDate?.toISOString(),
@@ -249,7 +249,7 @@ const TransactionPage = () => {
       }
     );
 
-  const { data: transferGraphData, isLoading: transferGraphFetching } =
+  const { data: transferGraphData, isFetching: transferGraphFetching } =
     useGetGraphTransferQuery(
       {
         startDate: startDate?.toISOString(),

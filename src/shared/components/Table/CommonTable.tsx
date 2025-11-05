@@ -296,7 +296,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className={`inline ${isLoading ? "mt-5" : null} lg:hidden`}>
+      <div className={`inline ${isLoading || data?.length === 0 ? "mt-5" : null} lg:hidden`}>
         <CommonPieGraph
           total={graphData?.total}
           type={type}
