@@ -75,7 +75,7 @@ const TransactionToolbar = ({
         <div className="p-1 flex gap-2 overflow-x-auto items-center justify-between">
           <div className="flex gap-2">
             <TypeSelect />
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger>
                 <Toggle pressed={recurring} onPressedChange={(value) => setRecurring(value)} variant={"outline"} size={"sm"}>
                   <Repeat />
@@ -87,7 +87,7 @@ const TransactionToolbar = ({
               >
                 Recurring
               </TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
           </div>
           <div className="flex gap-2">
             {/* <AlertDialogDemo /> */}

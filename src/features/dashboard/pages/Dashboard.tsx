@@ -88,9 +88,6 @@ const Dashboard = () => {
             This is your overview dashboard for this month
           </p>
         </div>
-        <div>
-          <MonthPicker />
-        </div>
       </div>
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">

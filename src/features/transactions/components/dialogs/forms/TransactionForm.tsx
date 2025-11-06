@@ -69,7 +69,7 @@ const TransactionForm = ({
   setRecurring,
 }) => {
   console.log(history);
-  console.log(mode)
+  console.log(mode);
   const [open, setOpen] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
   const width = useScreenWidth();
@@ -117,7 +117,11 @@ const TransactionForm = ({
                   onClick={() => setOpen(true)}
                 >
                   {field.value ? (
-                    `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
+                    watch("recurring") ? (
+                      `${moment(field.value).format("MMM DD, YYYY")}` // Format date & time
+                    ) : (
+                      `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
+                    )
                   ) : (
                     <span>Pick a date & time</span>
                   )}
@@ -125,6 +129,7 @@ const TransactionForm = ({
                 </Button>
                 <DatePicker
                   disablePast={watch("recurring")}
+                  removeTime={watch("recurring")}
                   open={open}
                   setOpen={setOpen}
                   field={field}
@@ -152,8 +157,10 @@ const TransactionForm = ({
                         }
                         if (pressed) {
                           setValue("mode", "fixed");
+                          setValue("date", moment().startOf("day"));
                         } else {
                           setValue("mode", null);
+                          setValue("date", moment());
                         }
                         setValue("image", null);
                         onChange(pressed);
@@ -411,7 +418,7 @@ const TransactionForm = ({
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent full className="w-[200px] p-0">
+                    <PopoverContent full className="w-[200px] h-52 p-0">
                       <Command>
                         <CommandInput
                           placeholder="Search category..."
@@ -485,11 +492,13 @@ const TransactionForm = ({
                           type === "Income"
                             ? watch("to")?.remainingBalance
                             : watch("from")?.remainingBalance;
-                        const remainingBalance = Number(watch("balance") || 0) + Number(watch("initialAmount") || 0);
+                        const remainingBalance =
+                          Number(watch("balance") || 0) +
+                          Number(watch("initialAmount") || 0);
 
-                        console.log(watch())
-                        console.log(remainingBalance)
-                        console.log(mode)
+                        console.log(watch());
+                        console.log(remainingBalance);
+                        console.log(mode);
 
                         if (
                           balance &&
@@ -499,7 +508,10 @@ const TransactionForm = ({
                         ) {
                           toast.error("Insufficient balance");
                           e.target.value = balance; // Reset to the maximum allowed value
-                        } else if (value > remainingBalance && (mode === "transact" || history)) {
+                        } else if (
+                          value > remainingBalance &&
+                          (mode === "transact" || history)
+                        ) {
                           toast.error(
                             `Amount exceeds the total balance of ${remainingBalance}`
                           );
