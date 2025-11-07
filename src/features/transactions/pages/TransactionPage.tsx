@@ -81,9 +81,7 @@ const TransactionPage = () => {
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
     });
-  const [triggerUpdate] = usePatchCategoryLimitMutation();
-  const [triggerPost] = usePostCategoryLimitMutation();
-  const [deleteLimit] = useDeleteCategoryLimitMutation();
+
 
   const { columns, recurringColumns } = transactionConfig[type] || {};
   // Expense
@@ -309,34 +307,6 @@ const TransactionPage = () => {
   const graphFetching =
     expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
 
-  //Functions
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    try {
-      if (data?.id) {
-        confirm({
-          title: "Update budget limit",
-          description: "Are you sure you want to update this budget?",
-          variant: "info",
-          showLoadingOnConfirm: true,
-        });
-        await triggerUpdate({
-          id: data?.id,
-          amount: {
-            amount: data?.amount,
-          },
-        });
-      } else {
-        await triggerPost({
-          categoryId: data?.category?.id,
-          amount: data?.amount,
-        });
-      }
-    } catch (err) {
-      toast.error("error");
-    }
-  };
-
   const onDelete = async (data: any) => {
     await deleteLimit(data.id);
     toast.success("Expense limit deleted successfully");
@@ -479,7 +449,6 @@ const TransactionPage = () => {
           addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
           title="Budget Limit"
           type="Expense"
-          onSubmit={onSubmit}
           onDelete={onDelete}
         />
       </div>

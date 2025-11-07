@@ -72,13 +72,13 @@ const TransactionHistory = () => {
   console.log(transactions);
 
   return (
-    <Card className="rounded-lg 2xl:h-[342px] col-span-full p-0 md:col-span-2 lg:col-span-1 border">
+    <Card className="rounded-lg xl:h-[342px] col-span-full p-0 md:col-span-2 lg:col-span-1 border flex flex-col">
       <div className="flex justify-between p-6 pb-4 border-b items-center">
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/transactions"}>See All</Link>
       </div>
 
-      <div className="w-full">
+      <div className="w-full flex-1">
         {isFetching && transactions.length === 0 ? (
           <div className="py-4 px-6 space-y-3">
             {[...Array(4)].map((_, i) => (

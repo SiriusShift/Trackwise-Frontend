@@ -1,5 +1,5 @@
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { Pencil, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -122,6 +122,17 @@ function TrackerDialog({
     });
   };
 
+  const submitHandler = async (formData: trackerFormType) => {
+    try {
+      await onSubmit(formData); // pass form data properly
+      setOpen(false); // close only after success
+      reset(trackerSchema.defaultValues);
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
   useEffect(() => {
     if (open && data) {
       setValue("category", data?.category);
@@ -148,7 +159,7 @@ function TrackerDialog({
           }}
         >
           <DialogContent
-            onInteractOutside={(e) => isDirty && e.preventDefault()}
+            onInteractOutside={(e) => (isDirty || isLoading) && e.preventDefault()}
             className="sm:min-w-[550px]"
           >
             <DialogHeader>
@@ -156,7 +167,7 @@ function TrackerDialog({
               <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(submitHandler)}
               className="h-full flex flex-col justify-between p-1 gap-2 overflow-auto"
             >
               <div className="flex flex-col gap-5">
@@ -237,12 +248,20 @@ function TrackerDialog({
                     type="button"
                     onClick={() => (isDirty ? handleClose() : setOpen(false))}
                     variant="secondary"
+                    disabled={isLoading}
                   >
                     Close
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={!isValid || !isDirty}>
-                  {mode === "edit" ? "Update" : "Set"} budget
+                <Button
+                  type="submit"
+                  disabled={!isValid || !isDirty || isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    `${mode === "edit" ? "Update" : "Set"} budget`
+                  )}
                 </Button>
               </DialogFooter>
             </form>

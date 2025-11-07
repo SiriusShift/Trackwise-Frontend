@@ -62,25 +62,24 @@ export const numberInput = (
   field: any
 ) => {
   let value = e.target.value;
-  console.log(value);
 
-  // Allow empty string for controlled input behavior
+  // Allow empty string
   if (value === "") {
-    field.onChange(null); // don't set 0 yet
+    field.onChange("");
     return;
   }
 
-  // Remove leading zeros, except for decimals like "0.1"
-  if (/^-?0+\d/.test(value) && value.length > 1 && value[1] !== ".") {
+  // Remove leading zeros (but keep "0." valid)
+  if (/^-?0+\d/.test(value) && value[1] !== ".") {
     value = value.replace(/^(-?)0+/, "$1");
-    console.log(value);
   }
 
-  // ✅ Allow negative numbers and up to 2 decimal places
+  // Allow up to 2 decimals
   if (/^-?\d*\.?\d{0,2}$/.test(value)) {
-    field.onChange(Number(value));
+    field.onChange(value); // store as string
   }
 };
+
 
 export const decryptString = (data: any) => {
   if (!data) return null;

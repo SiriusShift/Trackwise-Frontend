@@ -89,19 +89,14 @@ export const generalSettings = {
 
 export const notificationSettings = {
   schema: yup.object().shape({
-    notifyExpenseDays: yup.number().required("Notify expense days is required"),
-    notifyIncomeDays: yup.number().required("Notify income days is required"),
-    notifyLoanDays: yup.number().required("Notify loan days is required"),
+    notifyDays: yup.number().required("Notify expense days is required"),
     emailNotification: yup.boolean().required("Email Notification is required"),
     mobileNotification: yup.boolean().required("Mobile Notification is required"),
-    budgetNotification: yup.boolean().required("Budget is required"),
+    // budgetNotification: yup.boolean().required("Budget is required"),
   }),
   defaultValues: {
-    notifyExpenseDays: 1,
-    notifyIncomeDays: 1,
-    notifyLoanDays: 1,
+    notifyDays: 1,
     emailNotification: false,
     mobileNotification: false,
-    budgetNotification: false
   },
 };

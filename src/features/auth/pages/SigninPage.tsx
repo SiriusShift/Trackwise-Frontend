@@ -144,7 +144,7 @@ const SignInPage = () => {
             </Button>
             <p className="mt-2 text-sm text-center">
               Don't have an account?{" "}
-              <a className="font-bold " onClick={() => router("/sign-up")}>
+              <a className="font-bold cursor-pointer" onClick={() => router("/sign-up")}>
                 Sign Up
               </a>
             </p>

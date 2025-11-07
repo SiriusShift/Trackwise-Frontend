@@ -15,6 +15,11 @@ import { TrackerAddCard } from "./TrackerAddCard";
 import TrackerCard from "./TrackerCard";
 import TrackerSkeleton from "./TrackerSkeleton";
 import TrackerCardEmpty from "./TrackerCardEmpty";
+import {
+  useDeleteCategoryLimitMutation,
+  usePatchCategoryLimitMutation,
+  usePostCategoryLimitMutation,
+} from "@/shared/api/categoryApi";
 
 function Tracker({
   title,
@@ -23,7 +28,6 @@ function Tracker({
   addDescription,
   isLoading,
   type,
-  onSubmit,
   onDelete,
 }: commonTrackerProps) {
   const width = useScreenWidth();
@@ -43,6 +47,38 @@ function Tracker({
     (data?.length > 1 && width >= 768 && width < 1280) ||
     (data?.length > 0 && width < 768);
 
+  const [triggerPost, { isLoading: createLoading }] =
+    usePostCategoryLimitMutation();
+  const [triggerUpdate, {isLoading: updateLoading}] = usePatchCategoryLimitMutation();
+  const [deleteLimit] = useDeleteCategoryLimitMutation();
+
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    try {
+      if (data?.id) {
+        confirm({
+          title: "Update budget limit",
+          description: "Are you sure you want to update this budget?",
+          variant: "info",
+          showLoadingOnConfirm: true,
+        });
+        await triggerUpdate({
+          id: data?.id,
+          amount: {
+            amount: data?.amount,
+          },
+        });
+      } else {
+        await triggerPost({
+          categoryId: data?.category?.id,
+          amount: data?.amount,
+        });
+      }
+    } catch (err) {
+      toast.error("error");
+    }
+  };
+
   return (
     <div className="relative w-full">
       <h1 className="text-xl font-semibold mb-5">{title}</h1>
@@ -56,7 +92,7 @@ function Tracker({
         <CarouselContent className="h-full">
           <TrackerAddCard
             addDescription={addDescription}
-            isLoading={isLoading}
+              isLoading={createLoading || updateLoading}
             title={title}
             type={type}
             onSubmit={onSubmit}
@@ -68,7 +104,7 @@ function Tracker({
               key={index}
               item={item}
               title={title}
-              isLoading={isLoading}
+              isLoading={createLoading || updateLoading}
               type={type}
               onDelete={onDelete}
               onSubmit={onSubmit}

@@ -91,6 +91,7 @@ const signUp = () => {
 
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    console.log("test")
     if (isValid) {
       try {
         const response = await postVerify({
@@ -117,24 +118,23 @@ const signUp = () => {
     window.location.href = 'http://localhost:5000/auth/google/sign-up'; // Redirect to backend OAuth route
   };
 
-  const resendCode = () => {
-    setCountdown(60); // 1 minute countdown
-  };
+const resendCode = () => {
+  setIsDisabled(true);     // ⬅️ disable resend immediately
+  setCountdown(60);        // ⬅️ start 60-second countdown
+};
 
-  useEffect(() => {
-    // If countdown is greater than 0, start the countdown
-    if (countdown > 0) {
-      const timer = setInterval(() => {
-        setCountdown((prevCountdown) => prevCountdown - 1);
-      }, 1000);
+useEffect(() => {
+  if (countdown > 0) {
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
 
-      // Clear the interval when countdown reaches 0
-      return () => clearInterval(timer);
-    } else {
-      // Re-enable the button when countdown reaches 0
-      setIsDisabled(false);
-    }
-  }, [countdown]);
+    return () => clearInterval(timer);
+  } else {
+    setIsDisabled(false);  // ⬅️ re-enable when timer ends
+  }
+}, [countdown]);
+
 
   return (
     <>
@@ -204,7 +204,7 @@ const signUp = () => {
               </Button>
               <p className="text-center text-sm">
                 Already have an account?{" "}
-                <a className="font-bold" onClick={() => router("/sign-in")}>
+                <a className="font-bold cursor-pointer" onClick={() => router("/sign-in")}>
                   Login
                 </a>
               </p>
@@ -226,9 +226,18 @@ const signUp = () => {
                   <InputOTPSlot index={5} className="sm:h-12 sm:w-14" />
                 </InputOTPGroup>
               </InputOTP>
-              <a className="text-gray-400">
-                Didn't receive a code? Resend {isDisabled ? `${countdown}` : ""}
-              </a>
+<a
+  className={`cursor-pointer ${
+    isDisabled ? "text-gray-400 pointer-events-none" : "text-blue-500"
+  }`}
+  onClick={!isDisabled ? onSubmit : undefined}
+>
+  {isDisabled
+    ? `Resend in ${countdown}s`
+    : "Didn't receive a code? Resend"}
+</a>
+
+
             </div>
             <div className="gap-3 flex flex-col items-center">
               <Button

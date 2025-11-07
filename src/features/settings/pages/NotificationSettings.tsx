@@ -6,6 +6,7 @@ import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import NotificationSetting from "./components/NotificationSetting";
 import { Separator } from "@/shared/components/ui/separator";
+import { Input } from "@/shared/components/ui/input";
 
 const NotificationSettings = () => {
   const form = useForm({
@@ -18,7 +19,7 @@ const NotificationSettings = () => {
   return (
     <FormProvider {...form}>
       <section className="space-y-6">
-                <div className="space-y-2">
+        <div className="space-y-2">
           <h1 className="text-lg font-semibold">Settings</h1>
           <Separator />
         </div>
@@ -67,55 +68,36 @@ const NotificationSettings = () => {
           />
         </div>
 
-        {/* 🟢 Category Notification */}
-        <div className="flex flex-row justify-between items-center">
-          <div>
-            <h1 className="text-base font-medium">Category</h1>
-            <p className="text-sm text-muted-foreground hidden sm:inline">
-              Get alerts when a specific spending category (like Food or
-              Utilities) exceeds its limit or reaches a certain threshold.
+        {/* <div className="space-y-2">
+          <h1 className="text-lg font-semibold">Transactions</h1>
+          <Separator />
+        </div> */}
+
+        {/* Expense / Income / Loan Notifications */}
+        <div className="flex flex-row justify-between items-center border-border last:border-0">
+          <div className="space-y-1">
+            <h1 className="font-medium">Notifications</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">
+              Set how many days in advance you’d like to be notified before an
+              expense is due.
             </p>
           </div>
           <FormField
-            name="categoryNotification"
+            name="notifyDays"
             control={control}
             render={({ field }) => (
               <FormItem>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
+                <Input
+                  {...field}
+                  type="number"
+                  min="0"
+                  className="w-36 text-start"
+                  placeholder="Days"
                 />
               </FormItem>
             )}
           />
         </div>
-
-        <div className="space-y-2">
-          <h1 className="text-lg font-semibold">Transactions</h1>
-          <Separator />
-        </div>
-
-        {/* Expense / Income / Loan Notifications */}
-        <NotificationSetting
-          title="Expense Notifications"
-          description="Choose how many days before an expense’s due date you’d like to be notified."
-          name="notifyExpenseDays"
-          control={control}
-        />
-
-        <NotificationSetting
-          title="Income Notifications"
-          description="Choose how many days before an income’s due date you’d like to be notified."
-          name="notifyIncomeDays"
-          control={control}
-        />
-
-        <NotificationSetting
-          title="Loan Notifications"
-          description="Choose how many days before a loan repayment is due you’d like to be notified."
-          name="notifyLoanDays"
-          control={control}
-        />
       </section>
     </FormProvider>
   );
