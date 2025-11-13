@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
-	darkMode: ["class"],
+	darkMode: ["media", "class"],
 	content: [
 	  "./src/**/*.{js,ts,jsx,tsx}", // Include your source files
 	  "./public/index.html"         // Include any HTML files
@@ -20,24 +20,15 @@ module.exports = {
     			md: 'calc(var(--radius) - 2px)',
     			sm: 'calc(var(--radius) - 4px)'
     		},
-			animation:{
-				blink: 'blink 5s ease-in-out infinite'
-			},
-			keyframes: {
-				blink: {
-					"0%, 100%": { opacity: "1" },
-					"50%": { opacity: "0" },
-				  },
-			},
     		colors: {
-				success: {
-					DEFAULT: 'hsl(var(--success))',
-					foreground: 'hsl(var(--success-foreground))'
-				},
-				warning:{
-					DEFAULT: 'hsl(var(--warning))',
-					foreground: 'hsl(var(--warning-foreground))'
-				},
+    			success: {
+    				DEFAULT: 'hsl(var(--success))',
+    				foreground: 'hsl(var(--success-foreground))'
+    			},
+    			warning: {
+    				DEFAULT: 'hsl(var(--warning))',
+    				foreground: 'hsl(var(--warning-foreground))'
+    			},
     			background: 'hsl(var(--background))',
     			foreground: 'hsl(var(--foreground))',
     			card: {
@@ -79,7 +70,7 @@ module.exports = {
     				'5': 'hsl(var(--chart-5))'
     			},
     			sidebar: {
-    				DEFAULT: 'hsl(var(--sidebar-background))',
+    				DEFAULT: 'hsl(var(--sidebar))',
     				foreground: 'hsl(var(--sidebar-foreground))',
     				primary: 'hsl(var(--sidebar-primary))',
     				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
@@ -88,6 +79,28 @@ module.exports = {
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
     			}
+    		},
+    		keyframes: {
+    			'accordion-down': {
+    				from: {
+    					height: '0'
+    				},
+    				to: {
+    					height: 'var(--radix-accordion-content-height)'
+    				}
+    			},
+    			'accordion-up': {
+    				from: {
+    					height: 'var(--radix-accordion-content-height)'
+    				},
+    				to: {
+    					height: '0'
+    				}
+    			}
+    		},
+    		animation: {
+    			'accordion-down': 'accordion-down 0.2s ease-out',
+    			'accordion-up': 'accordion-up 0.2s ease-out'
     		}
     	}
     },

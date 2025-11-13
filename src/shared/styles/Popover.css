@@ -1,0 +1,4 @@
+.PopoverContent {
+	width: var(--radix-popover-trigger-width) !important;
+	max-height: var(--radix-popover-content-available-height) !important;
+}

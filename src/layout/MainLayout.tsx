@@ -1,16 +1,16 @@
 import { Outlet } from "react-router-dom";
-import { AppSidebar } from "@/components/app-sidebar";
-import Header from "../components/Header";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/shared/components/Sidebar";
+import Header from "../shared/components/Header";
+import { SidebarProvider } from "@/shared/components/ui/sidebar";
 
 function MainLayout() {
   return (
     <SidebarProvider>
       <div className="flex w-full h-full">
         <AppSidebar />
-        <div className="flex flex-col w-full overflow-auto">
+        <div className="flex-1 min-w-0">
           <Header />
-          <div className="px-5 py-5  ">
+          <div>
             <Outlet />
           </div>
         </div>

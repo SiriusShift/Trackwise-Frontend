@@ -1,11 +1,15 @@
 "use client"
 import { configureStore } from '@reduxjs/toolkit';
-import { api } from '../feature/api'; // Import your API slice
-import { signFormSlice } from '../feature/authentication/reducers/userDetail';
-
+import { api } from '../shared/services/api'; // Import your API slice
+import { signFormSlice } from '../shared/slices/userSlice';
+import { active } from '@/shared/slices/activeSlice';
+import { settingsSlice} from "@/shared/slices/settingsSlice"
 export const store = configureStore({
   reducer: {
     userDetails: signFormSlice.reducer,
+    active: active.reducer,
+    settings: settingsSlice.reducer,
+
     // Add the RTK Query reducer
     [api.reducerPath]: api.reducer,
 
@@ -15,3 +19,5 @@ export const store = configureStore({
       api.middleware,
     ]), // Add the RTK Query middleware
 });
+
+export type IRootState = ReturnType<typeof store.getState>

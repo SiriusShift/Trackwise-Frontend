@@ -1,53 +1,7 @@
 import * as yup from "yup";
 
-export const signupSchema = {
+export const transferSchema = {
   schema: yup.object().shape({
-    firstName: yup.string().required("First Name is required"),
-    lastName: yup.string().required("Last Name is required"),
-    username: yup.string().required("Username is required"),
-    email: yup.string().email().required("Email is required"),
-    password: yup
-      .string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters long")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-      ),
-  }),
-
-  defaultValues: {
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-  },
-};
-
-export const loginSchema = {
-  schema: yup.object().shape({
-    email: yup.string().email().required("Email is required"),
-    password: yup.string().required("Password is required"),
-  }),
-  defaultValues: {
-    email: "",
-    password: "",
-  },
-};
-
-export const resetPasswordSchema = {
-  schema: yup.object({
-    password: yup.string().required("Password is required"),
-    passwordConfirmation: yup
-      .string()
-      .oneOf([yup.ref("password")], "Passwords must match"),
-  }),
-};
-
-export const expenseSchema = {
-  schema: yup.object().shape({
-    userId: yup.string().required("User Id is required"),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
     amount: yup
@@ -55,42 +9,94 @@ export const expenseSchema = {
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
     date: yup.date().required("Date is required"),
-    source: yup.object().required("Source is required"),
-    recipient: yup.string().required("Receipient is required"),
+    image: yup.mixed().nullable(),
+    recurring: yup.boolean(),
+    from: yup.object().when("recurring", {
+      is: false,
+      then: (schema) => schema.required("Source is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    to: yup.object().when("recurring", {
+      is: false,
+      then: (schema) => schema.required("Destination is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    auto: yup.boolean(),
   }),
-  defaultValues : {
-    userId: null,
-    category: "",
+  defaultValues: {
+    category: null,
     description: "",
     amount: "",
-    date: "",
-    source: "",
-    recipient: ""
-  }
-}
+    recurring: false,
+    date: new Date(),
+    source: null,
+    image: null,
+    from: null,
+    to: null,
+    auto: null,
+  },
+};
 
-
-export const recurringExpense = {
+export const installmentSchema = {
   schema: yup.object().shape({
-    userId: yup.string().required("User Id is required"),
     category: yup.object().required("Category is required"),
     description: yup.string().required("Description is required"),
-    frequency: yup.object().required("Frequency is required"),
     amount: yup
       .number()
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
-    startDate: yup.date().required("Start date is required"),
-    recipient: yup.string().required("Receipient is required"),
-
+    date: yup.date().required("Date is required"),
+    months: yup
+      .number()
+      .required("Installment Term is required")
+      .positive("Months must be greater than 0"),
   }),
-  defaultValues : {
-    userId: null,
-    category: "",
+  defaultValues: {
+    category: null,
     description: "",
-    frequency: "",
+    amount: "",
+    date: new Date(),
+    months: "",
+  },
+};
+
+export const trackerSchema = {
+  schema: yup.object().shape({
+    category: yup.object().required("Category is required"),
+    amount: yup
+      .number()
+      .required("Amount is required")
+      .positive("Amount must be greater than 0"),
+  }),
+  defaultValues: {
+    category: "",
     amount: 0,
-    startDate: "",
-    recipient: ""
-  }
-}
+  },
+};
+
+export const generalSettings = {
+  schema: yup.object().shape({
+    timezone: yup.string().required("Timezone is required"),
+    timeFormat: yup.string().required("Time format is required"),
+    currency: yup.object().required("Currency is required"),
+  }),
+  defaultValues: {
+    timezone: "MMM DD, YYYY",
+    timeFormat: "12",
+    currency: "",
+  },
+};
+
+export const notificationSettings = {
+  schema: yup.object().shape({
+    notifyDays: yup.number().required("Notify expense days is required"),
+    emailNotification: yup.boolean().required("Email Notification is required"),
+    mobileNotification: yup.boolean().required("Mobile Notification is required"),
+    // budgetNotification: yup.boolean().required("Budget is required"),
+  }),
+  defaultValues: {
+    notifyDays: 1,
+    emailNotification: false,
+    mobileNotification: false,
+  },
+};
