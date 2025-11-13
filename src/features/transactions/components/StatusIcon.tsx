@@ -9,7 +9,7 @@ import {
   CircleCheck,
 } from "lucide-react";
 
-const StatusIcon = {
+export const StatusIcon = {
   Pending: <Loader className="text-yellow-500 mr-2" size={16} />,
   Paid: <CheckCircle className="text-green-500 mr-2" size={16} />,
   Received: <CircleCheck className="text-green-500 mr-2" size={16} />,
@@ -20,4 +20,3 @@ const StatusIcon = {
   Partial: <Clock className="text-orange-400 mr-2" size={16} />,
 };
 
-export default StatusIcon;

@@ -1,6 +1,6 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
-import { DataTable } from "@/shared/components/table/CommonTable";
+import { DataTable } from "@/shared/components/Table/CommonTable";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   useGetExpensesQuery,
@@ -9,15 +9,11 @@ import {
 } from "@/features/transactions/api/transaction/expensesApi";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  useDeleteCategoryLimitMutation,
   useGetCategoryLimitQuery,
   useGetCategoryQuery,
-  usePatchCategoryLimitMutation,
-  usePostCategoryLimitMutation,
 } from "@/shared/api/categoryApi";
 import moment from "moment";
-import CommonTracker from "@/shared/components/tracker/Tracker";
-import { toast } from "sonner";
+import CommonTracker from "@/shared/components/Tracker/Tracker";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import PageHeader from "@/shared/components/PageHeader";
 import TransactionToolbar from "@/features/transactions/components/TransactionToolbar";
@@ -35,11 +31,10 @@ import {
 } from "../api/transaction/transferApi";
 import useDebounce from "@/shared/hooks/useDebounce";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { Button } from "@/shared/components/ui/button";
-import { Calendar, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import TransactionList from "../components/TransactionList/TransactionList";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 const TransactionPage = () => {

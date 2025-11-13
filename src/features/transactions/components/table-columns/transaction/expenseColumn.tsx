@@ -48,7 +48,7 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-tooltip";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import StatusIcon from "../../statusIcon";
+import {StatusIcon} from "@/features/transactions/components/statusIcon";
 import { setOpenDialog } from "@/shared/slices/activeSlice";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 

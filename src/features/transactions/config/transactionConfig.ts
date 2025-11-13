@@ -2,25 +2,14 @@
 import {
   usePostExpenseMutation,
   usePatchExpenseMutation,
-  useLazyGetExpensesQuery,
-  useLazyGetGraphExpenseQuery,
-  useGetGraphExpenseQuery,
-  useGetExpensesQuery,
   usePostRecurringExpenseMutation,
   usePatchPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
-import {
-  useLazyGetInstallmentsQuery,
-  usePatchInstallmentMutation,
-  usePostInstallmentMutation,
-} from "../api/transaction/installmentApi";
 import {
   expenseColumns,
   recurringExpenseColumns,
 } from "../components/table-columns/transaction/expenseColumn";
 import {
-  useGetGraphIncomeQuery,
-  useGetIncomeQuery,
   usePostIncomeMutation,
   useUpdateIncomeMutation,
 } from "../api/transaction/incomeApi";

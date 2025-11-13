@@ -1,4 +1,4 @@
-import TrackerDialog from "@/shared/components/tracker/TrackerDialog";
+import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { Card, CardContent } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import { Button } from "../ui/button";

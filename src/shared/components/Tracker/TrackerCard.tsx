@@ -17,7 +17,7 @@ import {
 } from "../ui/dropdown-menu";
 import { CarouselItem } from "../ui/carousel";
 import { Card, CardContent } from "../ui/card";
-import TrackerDialog from "@/shared/components/tracker/TrackerDialog";
+import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/store";
 import { useState } from "react";

@@ -1,4 +1,3 @@
-import React, { useMemo } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -6,15 +5,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import { Card, CardContent } from "../ui/card";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 
-import TrackerDialog from "./TrackerDialog";
 import { commonTrackerProps } from "@/shared/types";
-import { TrackerAddCard } from "./TrackerAddCard";
-import TrackerCard from "./TrackerCard";
+import { TrackerAddCard } from "@/shared/components/Tracker/TrackerAddCard";
+import TrackerCard from "@/shared/components/Tracker/TrackerCard";
 import TrackerSkeleton from "./TrackerSkeleton";
-import TrackerCardEmpty from "./TrackerCardEmpty";
+import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import {
   useDeleteCategoryLimitMutation,
   usePatchCategoryLimitMutation,
