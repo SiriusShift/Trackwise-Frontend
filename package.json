@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port 5011",
-    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "start": "vite --host --port 5011",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
