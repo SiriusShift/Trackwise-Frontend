@@ -15,6 +15,14 @@ export interface Expense {
   }
 }
 
+export interface Field {
+      onChange: (value: any) => void;
+      onBlur: () => void;
+      value: Date | string; // depends on your schema
+      ref: React.Ref<any>;
+      name: String;
+}
+
 export interface Income {
   id: number;
   date: Date;

@@ -1,3 +1,4 @@
+import moment from "moment";
 import * as yup from "yup";
 export const expenseSchema = {
   schema: yup.object().shape({
@@ -12,9 +13,10 @@ export const expenseSchema = {
     // recurring: yup.boolean(),
     from: yup
       .object()
-      .when(["recurring", "auto"], {
-        is: (recurring: boolean, auto: boolean) =>
-          (recurring && auto) || !recurring,
+      .when(["recurring", "auto", "date"], {
+        is: (recurring: boolean, auto: boolean, date: Date) =>
+          (recurring && auto) ||
+          (!recurring && moment(date).isSameOrBefore(moment())),
         then: (schema) => schema.required("Source is required"),
         otherwise: (schema) => schema.notRequired(),
       })

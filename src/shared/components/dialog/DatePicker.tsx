@@ -7,22 +7,22 @@ import moment from "moment";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon, Clock } from "lucide-react";
 import { Input } from "../ui/input";
+import { Field } from "@/shared/types";
 // import TimePicker from "./TimePicker";
 
 const DatePicker = ({
   field,
   setOpen,
+  setDate,
   open,
   removeTime,
   disablePast,
 }: {
-  field: {
-    onChange: (value: any) => void;
-    onBlur: () => void;
-    value: Date | string; // depends on your schema
-    ref: React.Ref<any>;
-    name: String;
-  };
+  field: Field
+  setDate: (
+    field: Field,
+    date: Date
+  ) => void;
   setOpen: (open: boolean) => void;
   open: boolean;
   removeTime?: boolean;
@@ -51,7 +51,7 @@ const DatePicker = ({
                   )
                 );
                 console.log("Selected Date:", newDate);
-                field.onChange(newDate); // Update date with time preserved
+                setDate(field, newDate);
               }}
               initialFocus
               disabled={(date) => {

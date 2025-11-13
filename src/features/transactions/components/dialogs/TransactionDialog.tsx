@@ -90,6 +90,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { isDirty, isValid, errors },
   } = form;
 
@@ -147,6 +148,18 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           //     balance: rowData?.remainingBalance ?? null,
           //     from: rowData?.asset,
           //   });
+        } else if (mode === "transact") {
+          console.log("mode!", mode);
+          reset({
+            date: moment(),
+            id: rowData?.id,
+            description: rowData?.description,
+            amount: rowData?.remainingBalance,
+            category: rowData?.category,
+            image: rowData?.image,
+            balance: rowData?.remainingBalance ?? null,
+            initialAmount: mode === "transact" ? 0 : rowData?.amount,
+          });
         } else {
           console.log("mode!", mode);
           reset({
@@ -157,7 +170,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
               mode === "transact" ? rowData?.remainingBalance : rowData?.amount,
             category: rowData?.category,
             image: rowData?.image,
-            from: rowData?.asset || rowData?.fromAsset,
+            from: rowData?.asset || rowData?.fromAsset || null,
             balance: rowData?.remainingBalance ?? null,
             initialAmount: mode === "transact" ? 0 : rowData?.amount,
           });
@@ -253,7 +266,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       (type === "Expense" || type === "Transfer") &&
       categoryLimit?.some(
         (item) =>
-          watch("amount") + item?.total > item?.value &&
+          Number(watch("amount")) + Number(item?.total) > item?.value &&
           watch("category")?.name === item?.category?.name
       )
         ? "This will go over the budget"

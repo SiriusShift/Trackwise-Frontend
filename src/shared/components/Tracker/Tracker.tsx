@@ -20,6 +20,8 @@ import {
   usePatchCategoryLimitMutation,
   usePostCategoryLimitMutation,
 } from "@/shared/api/categoryApi";
+import { toast } from "sonner";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 
 function Tracker({
   title,
@@ -28,9 +30,9 @@ function Tracker({
   addDescription,
   isLoading,
   type,
-  onDelete,
 }: commonTrackerProps) {
   const width = useScreenWidth();
+  const { confirm } = useConfirm();
   const length =
     width >= 1536
       ? 3
@@ -49,33 +51,63 @@ function Tracker({
 
   const [triggerPost, { isLoading: createLoading }] =
     usePostCategoryLimitMutation();
-  const [triggerUpdate, {isLoading: updateLoading}] = usePatchCategoryLimitMutation();
+  const [triggerUpdate, { isLoading: updateLoading }] =
+    usePatchCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
 
   const onSubmit = async (data: any) => {
     console.log(data);
     try {
       if (data?.id) {
-        confirm({
-          title: "Update budget limit",
-          description: "Are you sure you want to update this budget?",
+        await confirm({
+          title: "Confirm Update",
+          description: "Update this budget limit with your new amount?",
           variant: "info",
           showLoadingOnConfirm: true,
-        });
-        await triggerUpdate({
-          id: data?.id,
-          amount: {
-            amount: data?.amount,
+          onConfirm: async () => {
+            await triggerUpdate({
+              id: data?.id,
+              amount: { amount: data?.amount },
+            }).unwrap();
           },
         });
       } else {
-        await triggerPost({
-          categoryId: data?.category?.id,
-          amount: data?.amount,
+        await confirm({
+          title: "Create Budget Limit",
+          description:
+            "Would you like to create a new budget limit for this category?",
+          variant: "info",
+          showLoadingOnConfirm: true,
+          onConfirm: async () => {
+            return await triggerPost({
+              categoryId: data?.category?.id,
+              amount: data?.amount,
+            }).unwrap();
+          },
         });
       }
     } catch (err) {
-      toast.error("error");
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const onDelete = async (data: any) => {
+    console.log(data);
+    console.log("Deleting budget...");
+    try {
+      confirm({
+        title: "Delete budget",
+        description: "Are you sure you want to delete this budget?",
+        variant: "warning",
+        showLoadingOnConfirm: true,
+        onConfirm: async () => {
+          await deleteLimit(data.id).unwrap();
+          toast.success("Budget limit deleted successfully.");
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete budget limit. Please try again.");
     }
   };
 
@@ -92,9 +124,10 @@ function Tracker({
         <CarouselContent className="h-full">
           <TrackerAddCard
             addDescription={addDescription}
-              isLoading={createLoading || updateLoading}
+            isLoading={createLoading || updateLoading}
             title={title}
             type={type}
+            data={data}
             onSubmit={onSubmit}
           />
           {isLoading &&

@@ -11,6 +11,7 @@ export const TrackerAddCard = ({
   onSubmit,
   isLoading,
   type,
+  data
 }: {
   title: string;
   onSubmit: (data: any) => void;
@@ -45,6 +46,7 @@ export const TrackerAddCard = ({
         type={type}
         isLoading={isLoading}
         mode="add"
+        data={data}
       />
     </>
   );

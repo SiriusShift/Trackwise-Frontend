@@ -85,12 +85,16 @@ function TrackerDialog({
   // const [open, setOpen] = useState(false);
   //HOOKS
   const width = useScreenWidth();
-  const { confirm } = useConfirm(1);
+  const { confirm, isOpen } = useConfirm(1);
   const type = useSelector((state: IRootState) => state.active.type);
   // RTK Query
   const { data: categoryData } = useGetCategoryQuery({
     type: type,
   });
+
+  console.log(data)
+  const filteredCategory = Array.isArray(data) ? categoryData?.filter((item) => data?.some((category) => item?.id !== category?.category?.id)) : categoryData
+  console.log(filteredCategory)
 
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
@@ -124,7 +128,7 @@ function TrackerDialog({
 
   const submitHandler = async (formData: trackerFormType) => {
     try {
-      await onSubmit(formData); // pass form data properly
+      onSubmit(formData); // pass form data properly
       setOpen(false); // close only after success
       reset(trackerSchema.defaultValues);
     } catch (error) {
@@ -134,10 +138,13 @@ function TrackerDialog({
   };
 
   useEffect(() => {
+    if(Array.isArray(data)) return
     if (open && data) {
-      setValue("category", data?.category);
-      setValue("amount", data?.value);
-      setValue("id", data?.id);
+      reset({
+        category: data?.category,
+        amount: data?.value,
+        id: data?.id,
+      });
     }
     return () => {
       if (!open) {
@@ -145,6 +152,7 @@ function TrackerDialog({
       }
     };
   }, [open, data, setValue, reset]);
+  
   return (
     <>
       <FormProvider {...form}>
@@ -159,7 +167,9 @@ function TrackerDialog({
           }}
         >
           <DialogContent
-            onInteractOutside={(e) => (isDirty || isLoading) && e.preventDefault()}
+            onInteractOutside={(e) =>
+              (isDirty || isLoading) && e.preventDefault()
+            }
             className="sm:min-w-[550px]"
           >
             <DialogHeader>
@@ -198,7 +208,7 @@ function TrackerDialog({
                             portal={false}
                             className="max-h-[200px]"
                           >
-                            {categoryData?.map((category) => (
+                            {filteredCategory?.map((category) => (
                               <SelectItem
                                 key={category.id}
                                 value={category.name}

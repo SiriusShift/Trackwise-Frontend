@@ -10,13 +10,6 @@ import {
 } from "@/shared/components/ui/form";
 import { formatCurrency, numberInput } from "@/shared/utils/CustomFunctions";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuRadioItem,
-  DropdownMenuRadioGroup,
-} from "@/shared/components/ui/dropdown-menu";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -58,6 +51,7 @@ import {
 } from "@/shared/components/ui/tabs";
 import { Separator } from "@/shared/components/ui/separator";
 import useFormatCurrency from "@/shared/hooks/useFormatCurrency";
+import { Field } from "@/shared/types";
 
 const TransactionForm = ({
   assetData,
@@ -82,6 +76,17 @@ const TransactionForm = ({
   } = useFormContext();
   console.log(watch());
   console.log("Has errors", errors);
+
+  const onDateChange = (field, date) => {
+    field.onChange(date);
+    if (watch("date") > moment()) {
+      setValue("image", null);
+      setValue("date", moment(watch("date")).startOf("day").toDate());
+    } else if (watch("date") <= moment()) {
+      setValue("date", moment());
+    }
+  };
+
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
@@ -90,17 +95,7 @@ const TransactionForm = ({
           <FormField
             control={control}
             name="date"
-            render={({
-              field,
-            }: {
-              field: {
-                onChange: (value: any) => void;
-                onBlur: () => void;
-                value: Date | string; // depends on your schema
-                ref: React.Ref<any>;
-                name: "date";
-              };
-            }) => (
+            render={({ field }: { field: Field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>
                   {watch("recurring") ? "Due date" : "Date & Time"}{" "}
@@ -117,7 +112,7 @@ const TransactionForm = ({
                   onClick={() => setOpen(true)}
                 >
                   {field.value ? (
-                    watch("recurring") ? (
+                    watch("recurring") || watch("date") > moment() ? (
                       `${moment(field.value).format("MMM DD, YYYY")}` // Format date & time
                     ) : (
                       `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
@@ -128,8 +123,9 @@ const TransactionForm = ({
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
                 <DatePicker
+                  setDate={onDateChange}
                   disablePast={watch("recurring")}
-                  removeTime={watch("recurring")}
+                  removeTime={watch("recurring") || watch("date") > moment()}
                   open={open}
                   setOpen={setOpen}
                   field={field}
@@ -223,169 +219,170 @@ const TransactionForm = ({
             />
           </>
         )}
-        {(!watch("recurring") || watch("auto")) && (
-          <>
-            {(type === "Expense" || type === "Transfer") && (
-              <FormField
-                name="from"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>
-                      From <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "justify-between w-full",
-                              !value && "text-muted-foreground"
-                            )}
-                          >
-                            {value ? (
-                              <div className="space-x-2">
-                                <span>
-                                  {
-                                    assetData.find(
-                                      (asset) => asset.id === value?.id
-                                    )?.name
-                                  }
-                                </span>
-                                <span>
-                                  ₱
-                                  {assetData
-                                    .find((asset) => asset.id === value?.id)
-                                    ?.remainingBalance.toFixed(2)}
-                                </span>
-                              </div>
-                            ) : (
-                              "Select asset..."
-                            )}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent full className="p-0">
-                        <Command>
-                          <CommandInput placeholder="Search asset" />
-                          <CommandList>
-                            {" "}
-                            <CommandEmpty>No assets found</CommandEmpty>
-                            <CommandGroup>
-                              {assetData?.map((asset) => (
-                                <CommandItem
-                                  value={asset}
-                                  key={asset.id}
-                                  onSelect={() => {
-                                    onChange(asset);
-                                  }}
-                                >
-                                  {asset.name} - ₱
-                                  {asset?.remainingBalance.toFixed(2)}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto",
-                                      asset.id === value?.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+        {(!watch("recurring") || watch("auto")) &&
+          (watch("date") <= moment() || mode) && (
+            <>
+              {(type === "Expense" || type === "Transfer") && (
+                <FormField
+                  name="from"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>
+                        From <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "justify-between w-full",
+                                !value && "text-muted-foreground"
+                              )}
+                            >
+                              {value ? (
+                                <div className="space-x-2">
+                                  <span>
+                                    {
+                                      assetData.find(
+                                        (asset) => asset.id === value?.id
+                                      )?.name
+                                    }
+                                  </span>
+                                  <span>
+                                    ₱
+                                    {assetData
+                                      .find((asset) => asset.id === value?.id)
+                                      ?.remainingBalance.toFixed(2)}
+                                  </span>
+                                </div>
+                              ) : (
+                                "Select asset..."
+                              )}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent full className="p-0">
+                          <Command>
+                            <CommandInput placeholder="Search asset" />
+                            <CommandList>
+                              {" "}
+                              <CommandEmpty>No assets found</CommandEmpty>
+                              <CommandGroup>
+                                {assetData?.map((asset) => (
+                                  <CommandItem
+                                    value={asset}
+                                    key={asset.id}
+                                    onSelect={() => {
+                                      onChange(asset);
+                                    }}
+                                  >
+                                    {asset.name} - ₱
+                                    {asset?.remainingBalance.toFixed(2)}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        asset.id === value?.id
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
-            {(type === "Income" || type === "Transfer") && (
-              <FormField
-                name="to"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>To</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "justify-between w-full",
-                              !value && "text-muted-foreground"
-                            )}
-                          >
-                            {value ? (
-                              <div className="space-x-2">
-                                <span>
-                                  {
-                                    assetData.find(
-                                      (asset) => asset.id === value?.id
-                                    )?.name
-                                  }
-                                </span>
-                                <span>
-                                  ₱
-                                  {assetData
-                                    .find((asset) => asset.id === value?.id)
-                                    ?.remainingBalance.toFixed(2)}
-                                </span>
-                              </div>
-                            ) : (
-                              "Select asset..."
-                            )}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent full className="p-0">
-                        <Command>
-                          <CommandInput placeholder="Search asset" />
-                          <CommandList>
-                            {" "}
-                            <CommandEmpty>No assets found</CommandEmpty>
-                            <CommandGroup>
-                              {assetData?.map((asset) => (
-                                <CommandItem
-                                  value={asset}
-                                  key={asset.id}
-                                  onSelect={() => {
-                                    onChange(asset);
-                                  }}
-                                >
-                                  {asset.name} - ₱
-                                  {asset?.remainingBalance.toFixed(2)}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto",
-                                      asset.id === value?.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </>
-        )}
+              {(type === "Income" || type === "Transfer") && (
+                <FormField
+                  name="to"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>To</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "justify-between w-full",
+                                !value && "text-muted-foreground"
+                              )}
+                            >
+                              {value ? (
+                                <div className="space-x-2">
+                                  <span>
+                                    {
+                                      assetData.find(
+                                        (asset) => asset.id === value?.id
+                                      )?.name
+                                    }
+                                  </span>
+                                  <span>
+                                    ₱
+                                    {assetData
+                                      .find((asset) => asset.id === value?.id)
+                                      ?.remainingBalance.toFixed(2)}
+                                  </span>
+                                </div>
+                              ) : (
+                                "Select asset..."
+                              )}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent full className="p-0">
+                          <Command>
+                            <CommandInput placeholder="Search asset" />
+                            <CommandList>
+                              {" "}
+                              <CommandEmpty>No assets found</CommandEmpty>
+                              <CommandGroup>
+                                {assetData?.map((asset) => (
+                                  <CommandItem
+                                    value={asset}
+                                    key={asset.id}
+                                    onSelect={() => {
+                                      onChange(asset);
+                                    }}
+                                  >
+                                    {asset.name} - ₱
+                                    {asset?.remainingBalance.toFixed(2)}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        asset.id === value?.id
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </>
+          )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
@@ -480,10 +477,12 @@ const TransactionForm = ({
                       disabled={
                         !watch("recurring")
                           ? type === "Expense"
-                            ? !watch("from")
+                            ? !watch("from") && watch("date") <= moment()
                             : type === "Income"
-                            ? !watch("to")
-                            : !watch("from") && !watch("to")
+                            ? !watch("to") && watch("date") <= moment()
+                            : !watch("from") &&
+                              !watch("to") &&
+                              watch("date") <= moment()
                           : false
                       }
                       onChange={(e) => {
@@ -503,7 +502,7 @@ const TransactionForm = ({
                         if (
                           balance &&
                           type !== "Income" &&
-                          (!watch("recurring") || watch("auto")) &&
+                          !watch("recurring") &&
                           value > balance
                         ) {
                           toast.error("Insufficient balance");
@@ -668,9 +667,9 @@ const TransactionForm = ({
       )}
 
       {!watch("recurring") &&
-        (watch("date") < moment() ||
-          mode !== "transact" ||
-          mode === "transact") && (
+        ((watch("date") < moment() && mode === "add") ||
+          mode === "transact" ||
+          mode === "edit") && (
           <FormField
             name="image"
             control={control}

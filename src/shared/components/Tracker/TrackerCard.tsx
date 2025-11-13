@@ -30,8 +30,15 @@ const TrackerCard = ({
   type,
   onSubmit,
   isLoading,
+  key,
 }: commonTrackerProps & {
   item: object;
+  title: string;
+  editDescription: string;
+  onDelete: () => void;
+  onSubmit: () => void;
+  type: string;
+  isLoading: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const mode = useSelector((state: IRootState) => state.active.mode);
@@ -44,7 +51,10 @@ const TrackerCard = ({
 
   return (
     <>
-      <CarouselItem className="basis-[80%] md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
+      <CarouselItem
+        key={key}
+        className="basis-[80%] md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
+      >
         <Card className="h-full relative">
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -66,7 +76,7 @@ const TrackerCard = ({
                 <Icons.Pencil />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(item)}>
                 <Icons.Trash2 />
                 Delete
               </DropdownMenuItem>

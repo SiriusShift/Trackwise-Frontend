@@ -79,7 +79,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
     },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      return <span>₱{amount?.toFixed(2) || "0"}</span>;
+      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
     },
     meta: {
       cellClassName: "border-b",

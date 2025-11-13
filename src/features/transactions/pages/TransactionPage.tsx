@@ -307,10 +307,7 @@ const TransactionPage = () => {
   const graphFetching =
     expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
 
-  const onDelete = async (data: any) => {
-    await deleteLimit(data.id);
-    toast.success("Expense limit deleted successfully");
-  };
+
 
   //UseEffect
   // useEffect(() => {
@@ -449,7 +446,6 @@ const TransactionPage = () => {
           addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
           title="Budget Limit"
           type="Expense"
-          onDelete={onDelete}
         />
       </div>
     </>
