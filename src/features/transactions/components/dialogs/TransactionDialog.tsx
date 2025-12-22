@@ -153,7 +153,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           reset({
             date: moment(),
             id: rowData?.id,
-            description: rowData?.description,
+            description: "",
             amount: rowData?.remainingBalance,
             category: rowData?.category,
             image: rowData?.image,
@@ -256,7 +256,6 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           ...(data?.from && { from: data?.from?.id }),
           ...(data?.to && { to: data?.to?.id }),
           // isVariable: data?.mode === "variable",
-          date: formatDate(data?.date),
           type,
         }
       : formData;
@@ -271,6 +270,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       )
         ? "This will go over the budget"
         : "";
+
+    console.log(formattedData)
 
     // Confirmation modal
     confirm({

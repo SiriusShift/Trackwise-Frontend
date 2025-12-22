@@ -86,7 +86,7 @@ export const expensesApi = api
         invalidatesTags: ["Expenses"],
       }),
 
-      patchPayment: builder.mutation({
+      postPayment: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transaction/expense/pay/${id}`,
           method: "PATCH",
@@ -104,6 +104,14 @@ export const expensesApi = api
         transformResponse: (response: any) => response.data,
         providesTags: ["Expenses"],
       }),
+
+      postAutoPayment: builder.mutation({
+        query: ({data, id}) => ({
+          url: `/transaction/expense/pay/auto/${id}`,
+          method: "POST",
+          body: data
+        })
+      })
     }),
   });
 
@@ -119,5 +127,6 @@ export const {
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,
   useDeleteRecurringExpenseMutation,
-  usePatchPaymentMutation,
+  usePostPaymentMutation,
+  usePostAutoPaymentMutation
 } = expensesApi;

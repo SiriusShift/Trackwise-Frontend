@@ -30,7 +30,8 @@ import moment from "moment";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   useDeleteExpenseMutation,
-  usePatchPaymentMutation,
+  usePostAutoPaymentMutation,
+  usePostPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,8 +49,9 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-tooltip";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import {StatusIcon} from "@/features/transactions/components/statusIcon";
+import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { setOpenDialog } from "@/shared/slices/activeSlice";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -205,7 +207,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       console.log(expense);
 
       const [deleteExpense] = useDeleteExpenseMutation();
-      const [payExpense] = usePatchPaymentMutation();
+      const [payAuto] = usePostAutoPaymentMutation();
 
       const onArchive = async () => {
         confirm({
@@ -224,6 +226,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 id: expense.id,
               });
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+              dispatch(assetsApi.util.invalidateTags(["Assets"]))
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
@@ -232,9 +235,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         });
       };
 
-      const onCancel = async () => {
-        
-      }
+      const onCancel = async () => {};
 
       const onPayment = async () => {
         console.log(expense?.recurringTemplate, "expense payment");
@@ -248,16 +249,16 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             showLoadingOnConfirm: true,
             onConfirm: async () => {
               try {
-                await payExpense({
-                  data: { delete: true },
+                await payAuto({
                   id: expense.id,
-                });
+                  data: {
+                    type: "Expense",
+                  },
+                }).unwrap();
                 dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               } catch (err) {
-                console.error(err);
-                toast.error(
-                  err?.data?.error || "Something went wrong. Please try again."
-                );
+                let errorMessage = handleCatchErrorMessage(err); // Default message
+                toast.error(errorMessage);
               }
             },
           });
@@ -273,124 +274,123 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         setViewOpen(true);
       };
 
-return (
-  <>
-    <DropdownMenu
-      modal={false}
-      open={dropdownOpen}
-      onOpenChange={setDropdownOpen}
-    >
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+      return (
+        <>
+          <DropdownMenu
+            modal={false}
+            open={dropdownOpen}
+            onOpenChange={setDropdownOpen}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-        {/* --- Pay --- */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <DropdownMenuItem
-                onSelect={onPayment}
-                disabled={expense?.status === "Paid"}
-              >
-                <Banknote /> Pay
+              {/* --- Pay --- */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <DropdownMenuItem
+                      onSelect={onPayment}
+                      disabled={expense?.status === "Paid"}
+                    >
+                      <Banknote /> Pay
+                    </DropdownMenuItem>
+                  </span>
+                </TooltipTrigger>
+                <Portal>
+                  {expense?.status === "Paid" && (
+                    <TooltipContent side="right" sideOffset={10}>
+                      Already paid
+                    </TooltipContent>
+                  )}
+                </Portal>
+              </Tooltip>
+
+              {/* --- Edit --- */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMode("edit");
+                        setDialogOpen(true);
+                        setDropdownOpen(false);
+                      }}
+                      disabled={
+                        expense?.status === "Paid" ||
+                        expense?.status === "Partial"
+                      }
+                    >
+                      <Pencil /> Edit
+                    </DropdownMenuItem>
+                  </span>
+                </TooltipTrigger>
+                <Portal>
+                  <>
+                    {expense?.status === "Partial" && (
+                      <TooltipContent side="right" sideOffset={10}>
+                        Editing disabled — this expense is partially paid.
+                        Changing the amount could cause balance conflicts.
+                      </TooltipContent>
+                    )}
+                    {expense?.status === "Paid" && (
+                      <TooltipContent side="right" sideOffset={10}>
+                        Editing disabled — this expense is already paid.
+                      </TooltipContent>
+                    )}
+                  </>
+                </Portal>
+              </Tooltip>
+
+              {/* --- View --- */}
+              <DropdownMenuItem onClick={onView}>
+                <Eye /> View
               </DropdownMenuItem>
-            </span>
-          </TooltipTrigger>
-          <Portal>
-            {expense?.status === "Paid" && (
-              <TooltipContent side="right" sideOffset={10}>
-                Already paid
-              </TooltipContent>
-            )}
-          </Portal>
-        </Tooltip>
 
-        {/* --- Edit --- */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setMode("edit");
-                  setDialogOpen(true);
-                  setDropdownOpen(false);
-                }}
-                disabled={
-                  expense?.status === "Paid" ||
-                  expense?.status === "Partial"
-                }
-              >
-                <Pencil /> Edit
+              {/* --- Cancel Recurring --- */}
+              {expense?.recurringTemplate && (
+                <DropdownMenuItem onClick={oncancel}>
+                  <X /> Cancel
+                </DropdownMenuItem>
+              )}
+
+              {/* --- Archive --- */}
+              <DropdownMenuItem onClick={onArchive}>
+                <Archive /> Archive
               </DropdownMenuItem>
-            </span>
-          </TooltipTrigger>
-          <Portal>
-            <>
-              {expense?.status === "Partial" && (
-                <TooltipContent side="right" sideOffset={10}>
-                  Editing disabled — this expense is partially paid. Changing
-                  the amount could cause balance conflicts.
-                </TooltipContent>
+
+              {/* --- Payment History --- */}
+              {expense?.recurringId && (
+                <DropdownMenuItem onClick={onHistory}>
+                  <History /> Payment History
+                </DropdownMenuItem>
               )}
-              {expense?.status === "Paid" && (
-                <TooltipContent side="right" sideOffset={10}>
-                  Editing disabled — this expense is already paid.
-                </TooltipContent>
-              )}
-            </>
-          </Portal>
-        </Tooltip>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        {/* --- View --- */}
-        <DropdownMenuItem onClick={onView}>
-          <Eye /> View
-        </DropdownMenuItem>
+          {/* Dialogs */}
+          <TransactionDialog
+            open={dialogOpen}
+            setOpen={setDialogOpen}
+            rowData={expense}
+            mode={mode}
+          />
 
-        {/* --- Cancel Recurring --- */}
-        {expense?.recurringTemplate && (
-          <DropdownMenuItem onClick={oncancel}>
-            <X /> Cancel
-          </DropdownMenuItem>
-        )}
-
-        {/* --- Archive --- */}
-        <DropdownMenuItem onClick={onArchive}>
-          <Archive /> Archive
-        </DropdownMenuItem>
-
-        {/* --- Payment History --- */}
-        {expense?.recurringId && (
-          <DropdownMenuItem onClick={onHistory}>
-            <History /> Payment History
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-
-    {/* Dialogs */}
-    <TransactionDialog
-      open={dialogOpen}
-      setOpen={setDialogOpen}
-      rowData={expense}
-      mode={mode}
-    />
-
-    <ViewTransaction
-      open={viewOpen}
-      setOpen={setViewOpen}
-      transaction={expense}
-    />
-  </>
-);
-
+          <ViewTransaction
+            open={viewOpen}
+            setOpen={setViewOpen}
+            transaction={expense}
+          />
+        </>
+      );
     },
   },
 ];

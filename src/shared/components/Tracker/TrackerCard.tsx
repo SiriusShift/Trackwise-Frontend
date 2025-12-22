@@ -29,7 +29,6 @@ const TrackerCard = ({
   onDelete,
   type,
   onSubmit,
-  isLoading,
   key,
 }: commonTrackerProps & {
   item: object;
@@ -38,9 +37,9 @@ const TrackerCard = ({
   onDelete: () => void;
   onSubmit: () => void;
   type: string;
-  isLoading: boolean;
+  key: number
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   const mode = useSelector((state: IRootState) => state.active.mode);
   const limit = mode === "monthly" ? item?.value : item?.value * 12;
   console.log(limit);
@@ -80,12 +79,7 @@ const TrackerCard = ({
                 <Icons.Trash2 />
                 Delete
               </DropdownMenuItem>
-              {/* <DeleteDialog
-              onDelete={() => onDelete(item)}
-              description={`Are you sure you want to delete this ${title.toLowerCase()}? This action cannot be undone.`}
-              title={`Delete ${title}`}
-              isLoading={isLoading}
-            /> */}
+
             </DropdownMenuContent>
           </DropdownMenu>
           <CardContent className="flex h-[100px] items-center p-3">

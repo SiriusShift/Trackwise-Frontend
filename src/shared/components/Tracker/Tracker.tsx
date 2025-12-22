@@ -19,6 +19,7 @@ import {
 } from "@/shared/api/categoryApi";
 import { toast } from "sonner";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { useState } from "react";
 
 function Tracker({
   title,
@@ -28,7 +29,7 @@ function Tracker({
   isLoading,
   type,
 }: commonTrackerProps) {
-  const width = useScreenWidth();
+    const width = useScreenWidth();
   const { confirm } = useConfirm();
   const length =
     width >= 1536
@@ -66,6 +67,8 @@ function Tracker({
               id: data?.id,
               amount: { amount: data?.amount },
             }).unwrap();
+            setOpen(false)
+            return;
           },
         });
       } else {
@@ -76,10 +79,12 @@ function Tracker({
           variant: "info",
           showLoadingOnConfirm: true,
           onConfirm: async () => {
-            return await triggerPost({
+            await triggerPost({
               categoryId: data?.category?.id,
               amount: data?.amount,
             }).unwrap();
+            setOpen(false)
+            return
           },
         });
       }

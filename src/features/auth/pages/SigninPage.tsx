@@ -17,7 +17,7 @@ import { setUserInfo } from "@/shared/slices/userSlice";
 import LayoutAuth from "@/layout/AuthLayout";
 import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
-import { decryptString } from "@/shared/utils/CustomFunctions";
+import { decryptString, handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { Loader2 } from "lucide-react";
 
 const SignInPage = () => {
@@ -69,12 +69,8 @@ const SignInPage = () => {
           password: watch("password"),
         }).unwrap();
         router("/");
-      } catch (err) {
-        let errorMessage = "An error occurred"; // Default message
-        if (err && (err as { data?: { message?: string } }).data) {
-          errorMessage =
-            (err as { data: { message: string } }).data.message || errorMessage; // Extract the message or use default
-        }
+      } catch (error) {
+        let errorMessage = handleCatchErrorMessage(error); // Default message
         toast.error(errorMessage);
       }
     } else {

@@ -1,5 +1,5 @@
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { Loader2, Pencil, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Pencil, Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -46,7 +46,6 @@ import {
 } from "@/shared/api/categoryApi";
 import { Input } from "../ui/input";
 import { numberInput } from "@/shared/utils/CustomFunctions";
-import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
 import { toast } from "sonner";
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
 import { useSelector } from "react-redux";
@@ -58,9 +57,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "../ui/dialog";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { cn } from "@/lib/utils";
+import { Command, CommandEmpty, CommandInput } from "../ui/command";
+import { CommandGroup, CommandItem, CommandList } from "../ui/command";
 
 function TrackerDialog({
   title,
@@ -92,9 +95,14 @@ function TrackerDialog({
     type: type,
   });
 
-  console.log(data)
-  const filteredCategory = Array.isArray(data) ? categoryData?.filter((item) => data?.some((category) => item?.id !== category?.category?.id)) : categoryData
-  console.log(filteredCategory)
+  console.log(categoryData);
+  const filteredCategory =
+    Array.isArray(data) && data?.length > 0
+      ? categoryData?.filter((item) =>
+          data?.some((category) => item?.id !== category?.category?.id)
+        )
+      : categoryData;
+  console.log(filteredCategory);
 
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
@@ -123,22 +131,14 @@ function TrackerDialog({
         setOpen(false);
         reset();
       },
+      onCancel: () => {
+        console.log("Test")
+      }
     });
   };
 
-  const submitHandler = async (formData: trackerFormType) => {
-    try {
-      onSubmit(formData); // pass form data properly
-      setOpen(false); // close only after success
-      reset(trackerSchema.defaultValues);
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong. Please try again.");
-    }
-  };
-
   useEffect(() => {
-    if(Array.isArray(data)) return
+    if (Array.isArray(data)) return;
     if (open && data) {
       reset({
         category: data?.category,
@@ -152,7 +152,7 @@ function TrackerDialog({
       }
     };
   }, [open, data, setValue, reset]);
-  
+
   return (
     <>
       <FormProvider {...form}>
@@ -177,7 +177,7 @@ function TrackerDialog({
               <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
             <form
-              onSubmit={handleSubmit(submitHandler)}
+              onSubmit={handleSubmit(onSubmit)}
               className="h-full flex flex-col justify-between p-1 gap-2 overflow-auto"
             >
               <div className="flex flex-col gap-5">
@@ -185,43 +185,70 @@ function TrackerDialog({
                 <FormField
                   control={control}
                   name="category"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value) => {
-                            const selectedCategory = categoryData?.find(
-                              (category) => category.name === value
-                            );
-                            field.onChange(selectedCategory);
-                          }}
-                          value={field.value?.name}
-                          disabled={mode === "edit"}
-                        >
-                          <SelectTrigger className="capitalize">
-                            <SelectValue placeholder="Select a category">
-                              {field.value?.name || "Select a category"}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent
-                            portal={false}
-                            className="max-h-[200px]"
-                          >
-                            {filteredCategory?.map((category) => (
-                              <SelectItem
-                                key={category.id}
-                                value={category.name}
+                  render={({ field: { onChange, value } }) => {
+                    return (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>
+                          Category <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <Popover modal={true}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "justify-between",
+                                  !value && "text-muted-foreground"
+                                )}
                               >
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                                {value
+                                  ? categoryData?.find(
+                                      (category) => category.id === value?.id
+                                    )?.name
+                                  : "Select category"}
+                                <ChevronsUpDown className="opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent full className="w-[200px] h-52 p-0">
+                            <Command>
+                              <CommandInput
+                                placeholder="Search category..."
+                                className="h-9"
+                              />
+                              <CommandList>
+                                <CommandEmpty>No category found.</CommandEmpty>
+                                <CommandGroup>
+                                  {categoryData?.map((category) => (
+                                    <CommandItem
+                                      value={category}
+                                      key={category.id}
+                                      onSelect={() => {
+                                        onChange(category);
+                                      }}
+                                      className="flex p-2"
+                                    >
+                                      {category.name}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto",
+                                          category.id === value?.id
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 {/* Amount Field */}
@@ -267,11 +294,11 @@ function TrackerDialog({
                   type="submit"
                   disabled={!isValid || !isDirty || isLoading}
                 >
-                  {isLoading ? (
+                  {/* {isLoading ? (
                     <Loader2 className="animate-spin" />
-                  ) : (
-                    `${mode === "edit" ? "Update" : "Set"} budget`
-                  )}
+                  ) : ( */}
+                    {mode === "edit" ? "Update" : "Set"} budget
+                  {/* )} */}
                 </Button>
               </DialogFooter>
             </form>

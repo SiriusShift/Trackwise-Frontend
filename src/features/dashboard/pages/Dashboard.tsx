@@ -27,6 +27,8 @@ import MonthPicker from "@/shared/components/datePicker";
 import OverviewWidget from "@/features/dashboard/components/widgets/OverviewWidget";
 import LimitWidget from "@/features/dashboard/components/widgets/LimitWidget";
 import TransactionHistory from "@/features/dashboard/components/widgets/TransactionHistory";
+import ExpenseWidget from "../components/widgets/ExpenseWidget";
+import IncomeWidget from "../components/widgets/IncomeWidget";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -94,7 +96,8 @@ const Dashboard = () => {
           <div className="flex w-full flex-col gap-5">
             <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
               <OverviewWidget />
-              <LimitWidget />
+              <ExpenseWidget />
+              <IncomeWidget />
               {/* <CalendarWidget
                 // activeDay={activeDay}
                 colorTheme={theme}

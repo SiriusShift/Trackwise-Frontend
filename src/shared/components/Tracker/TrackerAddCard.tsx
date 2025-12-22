@@ -46,7 +46,7 @@ export const TrackerAddCard = ({
         type={type}
         isLoading={isLoading}
         mode="add"
-        data={data}
+        // data={data}
       />
     </>
   );

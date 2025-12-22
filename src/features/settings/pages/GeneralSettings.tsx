@@ -38,6 +38,7 @@ import { IRootState } from "@/app/store";
 const GeneralSettings = () => {
   const settings = useSelector((state: IRootState) => state.settings);
   const timezones = moment.tz.names();
+  console.log(timezones)
   console.log(settings);
 
   const form = useForm({

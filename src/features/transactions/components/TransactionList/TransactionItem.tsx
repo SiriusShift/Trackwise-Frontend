@@ -1,6 +1,6 @@
 import React from "react";
 import * as Icons from "lucide-react";
-import StatusIcon from "../statusIcon";
+import {StatusIcon} from "@/features/transactions/components/statusIcon";
 import { motion } from "motion/react";
 import { Badge } from "@/shared/components/ui/badge";
 import moment from "moment";

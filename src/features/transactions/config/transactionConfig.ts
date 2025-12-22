@@ -3,7 +3,7 @@ import {
   usePostExpenseMutation,
   usePatchExpenseMutation,
   usePostRecurringExpenseMutation,
-  usePatchPaymentMutation,
+  usePostPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import {
   expenseColumns,
@@ -22,7 +22,7 @@ import { incomeSchema } from "../schema/income.schema";
 
 export const transactionConfig = {
   Expense: {
-    transactTrigger: usePatchPaymentMutation,
+    transactTrigger: usePostPaymentMutation,
     postTrigger: usePostExpenseMutation,
     editTrigger: usePatchExpenseMutation,
     postRecurringTrigger: usePostRecurringExpenseMutation,

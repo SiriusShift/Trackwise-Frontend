@@ -99,9 +99,12 @@ export const encryptString = (data: any) => {
 };
 
 //Error Handling
-export const handleCatchErrorMessage = (error: any) => {
+export const handleCatchErrorMessage = (error) => {
+  console.log(error);
   if (error?.data?.error?.message) {
     return error?.data?.error?.message;
+  } else if (error?.data?.message) {
+    return error?.data?.message;
   } else if (error?.status === 400) {
     return "Something went wrong with your request.";
   } else if (error?.status === 401) {
