@@ -92,20 +92,63 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="flex flex-col 2xl:flex-row gap-5">
-        <div className="gap-5 flex 2xl:w-4/5 flex-col 2xl:flex-row">
+        <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
-            <div className="grid grid-cols-4 xl:grid-cols-3 md:grid-rows-1 lg:grid-rows-1 gap-5">
+            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5">
               <OverviewWidget />
               <ExpenseWidget />
               <IncomeWidget />
+              <Card className="rounded-lg col-span-2 lg:col-span-full 2xl:col-span-1 p-5 border">
+                <div className="flex justify-between items-center">
+                  <h1 className="gap-3 text-xl font-semibold">Payment Due</h1>
+                  <Link to={"/funds"}>See All</Link>
+                </div>
+                <hr className="w-full mt-3" />
+                <div className="flex mt-3 rounded-md flex-col gap-5 justify-between">
+                  <div className="flex w-full">
+                    <div className="p-2 border rounded-md w-14 flex flex-col items-center ">
+                      <p className="text-foreground text-sm">Nov</p>
+                      <p className="text-foreground text-sm">13</p>
+                    </div>
+                    <div className="ml-3 w-full flex flex-col justify-center">
+                      <div className="flex justify-between">
+                        <div>
+                          <h1 className="font-medium">Electric</h1>
+                        </div>
+                        <div>
+                          <h1 className="font-medium">₱ 3,540.21</h1>
+                        </div>
+                      </div>
+                      <p className="text-gray-400">Monthly expense</p>
+                    </div>
+                  </div>
+                  <div className="flex w-full">
+                    <div className="p-2 border rounded-md  w-14 flex flex-col items-center ">
+                      <p className="text-foreground text-sm">Sep</p>
+                      <p className="text-foreground text-sm">15</p>
+                    </div>
+                    <div className="ml-3 w-full flex flex-col justify-center">
+                      <div className="flex justify-between">
+                        <div>
+                          <h1 className="font-medium">Water</h1>
+                        </div>
+                        <div>
+                          <h1 className="font-medium">₱ 1,000.00</h1>
+                        </div>
+                      </div>
+                      <p className="text-gray-400">Monthly expense</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
               {/* <CalendarWidget
                 // activeDay={activeDay}
                 colorTheme={theme}
                 // handleClick={setActiveDay}
               /> */}
             </div>
-            <div className="gap-5 space-y-5 z-30 2xl:h-[342px] sm:space-y-0 sm:grid-rows-2 md:grid-rows-1 sm:grid grid-cols-4">
-              <div className="col-span-full md:col-span-2 lg:col-span-2">
+            <div className="gap-5 space-y-5 sm:space-y-0 sm:grid-rows-2 md:grid-rows-2 xl:grid-rows-1 sm:grid grid-cols-4 xl:grid-cols-3">
+              <div className="col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1">
                 <Card className="p-0 gap-5 h-full flex flex-col justify-between">
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
@@ -171,7 +214,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-              <div className="col-span-full md:col-span-2 lg:col-span-2">
+              <div className="col-span-full md:col-span-2 lg:col-span-2  xl:col-span-1">
                 <Card className="p-0 gap-5 h-full flex flex-col">
                   <CardHeader className="px-7 pb-0 space-y-0">
                     <div className="flex justify-between">
@@ -204,54 +247,9 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+              <TransactionHistory />
             </div>
           </div>
-        </div>
-        <div className="2xl:flex space-y-5  md:space-y-0 sm:grid-rows-1 sm:grid-cols-2 md:grid 2xl:w-[400px] 2xl:flex-col gap-5">
-          <Card className="rounded-lg 2xl:h-[240px] col-span-full md:col-span-2 lg:col-span-1 lg p-7 border">
-            <div className="flex justify-between items-center">
-              <h1 className="gap-3 text-xl font-semibold">Pending payments</h1>
-              <Link to={"/funds"}>See All</Link>
-            </div>
-            {/* <hr className="w-full mt-3"/> */}
-            <div className="flex mt-5 rounded-md flex-col gap-5 justify-between">
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md w-14 flex flex-col items-center ">
-                  <p className="text-foreground text-sm">Nov</p>
-                  <p className="text-foreground text-sm">13</p>
-                </div>
-                <div className="ml-3 w-full flex flex-col justify-center">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Electric</h1>
-                    </div>
-                    <div>
-                      <h1 className="font-medium">₱ 3,540.21</h1>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">Monthly expense</p>
-                </div>
-              </div>
-              <div className="flex w-full">
-                <div className="p-2 border rounded-md  w-14 flex flex-col items-center ">
-                  <p className="text-foreground text-sm">Sep</p>
-                  <p className="text-foreground text-sm">15</p>
-                </div>
-                <div className="ml-3 w-full flex flex-col justify-center">
-                  <div className="flex justify-between">
-                    <div>
-                      <h1 className="font-medium">Water</h1>
-                    </div>
-                    <div>
-                      <h1 className="font-medium">₱ 1,000.00</h1>
-                    </div>
-                  </div>
-                  <p className="text-gray-400">Monthly expense</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-          <TransactionHistory />
         </div>
       </div>
     </div>

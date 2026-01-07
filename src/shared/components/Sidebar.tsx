@@ -26,7 +26,6 @@ import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import useLocationHook from "@/shared/hooks/useLocation";
 import { useCookies } from "react-cookie";
 export function AppSidebar() {
-  const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocationHook();
   const parent = `/${location?.location?.pathname?.split("/")[1]}`;
   console.log(parent);
@@ -51,24 +50,18 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`transition-all duration-300 ease-in-out ${
-        isExpanded ? "w-64" : "w-20"
-      } overflow-hidden z-50`}
+      className={`transition-all duration-300 ease-in-out w-20 overflow-hidden z-50`}
       style={{ willChange: "width, opacity" }} // Optimize for smooth transitions
     >
       {/* Sidebar Header */}
       <SidebarHeader className="mx-2 py-3 ">
         <div
-          className={`flex items-center ml-3 transition-opacity duration-300 ease-in-out ${
-            isExpanded ? "opacity-100" : "opacity-0"
-          } lg:ms-3 mt-3 justify-start`}
+          className={`flex items-center ml-3 transition-opacity duration-300 ease-in-out opacity-100 lg:ms-3 mt-3 justify-start`}
         >
           <WalletMinimal className="text-primary" />
-          {isExpanded && (
             <h1 className="text-lg ml-4 inline md:hidden lg:inline font-bold">
               Trackwise
             </h1>
-          )}
         </div>
       </SidebarHeader>
 

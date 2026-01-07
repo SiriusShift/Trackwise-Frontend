@@ -31,7 +31,6 @@ import { Badge } from "@/shared/components/ui/badge";
 import {
   useDeleteExpenseMutation,
   usePostAutoPaymentMutation,
-  usePostPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { useDispatch, useSelector } from "react-redux";

@@ -16,7 +16,7 @@ const Header = () => {
     <header className="sticky top-0 bg-background z-50 border-b items-center">
       <div className="flex w-full justify-between py-3 px-6">
         <div className="flex items-center gap-5">
-          <SidebarTrigger className="flex md:hidden" />
+          <SidebarTrigger className="flex" />
           <p className="hidden sm:inline">
             Good morning, {userInfo?.firstName}
           </p>

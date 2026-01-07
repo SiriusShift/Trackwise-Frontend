@@ -72,7 +72,7 @@ const TransactionHistory = () => {
   console.log(transactions);
 
   return (
-    <Card className="rounded-lg xl:h-[342px] col-span-full p-0 md:col-span-2 lg:col-span-1 border flex flex-col">
+    <Card className="rounded-lg xl:h-[342px] col-span-full p-0 md:col-span-4  xl:col-span-1 border flex flex-col">
       <div className="flex justify-between p-6 pb-4 border-b items-center">
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/transactions"}>See All</Link>
