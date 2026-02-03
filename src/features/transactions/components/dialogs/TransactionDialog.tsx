@@ -61,7 +61,9 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
   console.log(rowData);
 
   assetData = assetData?.data;
+  console.log(assetData)
 
+  
   const {
     postTrigger,
     editTrigger,
@@ -93,14 +95,44 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     setValue,
     formState: { isDirty, isValid, errors },
   } = form;
+ useEffect(() => {
+    if (!open || !rowData) return;
 
-  useEffect(() => {
-    if (rowData && open) {
+    const getResetData = () => {
+      const isRecurringTemplate = rowData?.recurringIncome;
+      const isRecurring = rowData?.interval;
+      const isTransact = mode === "transact";
+
+      // Common data for recurring
+      if (isRecurring) {
+        return {
+          date: rowData?.startDate,
+          id: rowData?.id,
+          description: rowData?.description,
+          amount: rowData?.amount,
+          endDate: rowData?.endDate,
+          recurring: true,
+          category: rowData?.category,
+          repeat: frequencies?.find(
+            (item) =>
+              item?.interval === rowData?.interval &&
+              item?.unit === rowData?.unit
+          ) ?? {
+            id: 9,
+            interval: rowData?.interval,
+            name: "Custom",
+            unit: rowData?.unit,
+          },
+          ...(rowData?.fromAssetId && { from: rowData?.fromAssetId }),
+          ...(rowData?.toAssetId && { to: rowData?.toAssetId }),
+          auto: rowData?.auto,
+        };
+      }
+
+      // Type-specific logic
       if (type === "Expense") {
-        console.log("test recurring1 ");
-        if (rowData?.recurringTemplate) {
-          console.log("template");
-          reset({
+        if (isRecurringTemplate) {
+          return {
             date: rowData?.date,
             id: rowData?.id,
             description: "",
@@ -110,47 +142,11 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
             recurring: false,
             image: rowData?.image,
             from: rowData?.asset,
-          });
-        } else if (rowData?.interval) {
-          console.log("test recurring!");
-          reset({
-            date: rowData?.startDate,
-            id: rowData?.id,
-            description: rowData?.description,
-            amount: rowData?.amount,
-            endDate: rowData?.endDate,
-            recurring: true,
-            category: rowData?.category,
-            repeat: frequencies?.find(
-              (item) =>
-                item?.interval === rowData?.interval &&
-                item?.unit === rowData?.unit
-            ) ?? {
-              id: 9,
-              interval: rowData?.interval,
-              name: "Custom",
-              unit: rowData?.unit,
-            },
-            ...(rowData?.fromAssetId && { from: rowData?.fromAssetId }),
-            ...(rowData?.toAssetId && { to: rowData?.toAssetId }),
-            auto: rowData?.auto,
-          });
-          // } else if (mode === "transact") {
-          //   console.log("test Transact!");
-          //   reset({
-          //     date: moment(),
-          //     transactMode: "transact",
-          //     id: rowData?.id,
-          //     description: rowData?.description,
-          //     amount: rowData?.remainingBalance,
-          //     category: rowData?.category,
-          //     image: rowData?.image,
-          //     balance: rowData?.remainingBalance ?? null,
-          //     from: rowData?.asset,
-          //   });
-        } else if (mode === "transact") {
-          console.log("mode!", mode);
-          reset({
+          };
+        }
+
+        if (isTransact) {
+          return {
             date: moment(),
             id: rowData?.id,
             description: "",
@@ -158,25 +154,54 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
             category: rowData?.category,
             image: rowData?.image,
             balance: rowData?.remainingBalance ?? null,
-            initialAmount: mode === "transact" ? 0 : rowData?.amount,
-          });
-        } else {
-          console.log("mode!", mode);
-          reset({
+            initialAmount: 0,
+            from: rowData?.asset,
+          };
+        }
+
+        return {
+          date: rowData?.date,
+          id: rowData?.id,
+          description: rowData?.description,
+          amount: rowData?.amount,
+          category: rowData?.category,
+          image: rowData?.image,
+          from: rowData?.asset || rowData?.fromAsset || null,
+          balance: rowData?.remainingBalance ?? null,
+          initialAmount: rowData?.amount,
+        };
+      }
+
+      if (type === "Income") {
+        if (isRecurringTemplate) {
+          return {
             date: rowData?.date,
             id: rowData?.id,
-            description: rowData?.description,
-            amount:
-              mode === "transact" ? rowData?.remainingBalance : rowData?.amount,
+            description: "",
+            amount: rowData?.remainingBalance,
+            category: rowData?.category,
+            balance: rowData?.remainingBalance ?? null,
+            recurring: false,
+            image: rowData?.image,
+            to: rowData?.asset,
+          };
+        }
+
+        if (isTransact) {
+          return {
+            date: moment(),
+            id: rowData?.id,
+            description: "",
+            amount: rowData?.remainingBalance,
             category: rowData?.category,
             image: rowData?.image,
-            from: rowData?.asset || rowData?.fromAsset || null,
             balance: rowData?.remainingBalance ?? null,
-            initialAmount: mode === "transact" ? 0 : rowData?.amount,
-          });
+            initialAmount: 0,
+            to: rowData?.asset,
+          };
         }
-      } else if (type === "Income") {
-        reset({
+
+        return {
           date: rowData?.date,
           id: rowData?.id,
           description: rowData?.description,
@@ -184,10 +209,62 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           category: rowData?.category,
           image: rowData?.image,
           to: rowData?.asset,
-        });
+          balance: rowData?.remainingBalance ?? null,
+          initialAmount: rowData?.amount,
+        };
       }
-    }
-  }, [open]);
+
+      if (type === "Transfer") {
+        if (isRecurringTemplate) {
+          return {
+            date: rowData?.date,
+            id: rowData?.id,
+            description: "",
+            amount: rowData?.remainingBalance,
+            category: rowData?.category,
+            balance: rowData?.remainingBalance ?? null,
+            recurring: false,
+            image: rowData?.image,
+            from: rowData?.fromAsset,
+            to: rowData?.toAsset,
+          };
+        }
+
+        if (isTransact) {
+          return {
+            date: moment(),
+            id: rowData?.id,
+            description: "",
+            amount: rowData?.remainingBalance,
+            category: rowData?.category,
+            image: rowData?.image,
+            balance: rowData?.remainingBalance ?? null,
+            initialAmount: 0,
+            from: rowData?.fromAsset,
+            to: rowData?.toAsset,
+          };
+        }
+
+        return {
+          date: rowData?.date,
+          id: rowData?.id,
+          description: rowData?.description,
+          amount: rowData?.amount,
+          category: rowData?.category,
+          image: rowData?.image,
+          from: rowData?.fromAsset,
+          to: rowData?.toAsset,
+          balance: rowData?.remainingBalance ?? null,
+          initialAmount: rowData?.amount,
+        };
+      }
+
+      return {};
+    };
+
+    const resetData = getResetData();
+    reset(resetData);
+  }, [open, type, rowData, mode, reset]);
 
   const handleCustomOpen = () => {
     setOpenFrequency(true);
@@ -363,7 +440,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
               {mode === "add"
                 ? `Add ${type}`
                 : mode === "transact"
-                ? `Pay ${type}`
+                ? `${getTransactMode(type)} ${type}`
                 : `Edit ${type}`}
             </DialogTitle>
             <DialogDescription>
@@ -372,7 +449,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
                     watch("recurring") ? "recurring " : ""
                   }${type.toLowerCase()}.`
                 : mode === "transact"
-                ? `Confirm and complete payment for this ${
+                ? `Confirm and complete transaction for this ${
                     watch("recurring") ? "recurring " : ""
                   }${type.toLowerCase()}.`
                 : `Update the details of this ${

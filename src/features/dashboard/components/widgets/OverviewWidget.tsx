@@ -11,8 +11,7 @@ import {
 import { Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
-const OverviewWidget = () => {
-  const { data, isLoading } = useGetAssetQuery();
+const OverviewWidget = ({data, isLoading}) => {
   const date = formatDateDisplay();
   const mode = formatMode();
   const balance = data?.balance;
@@ -48,23 +47,23 @@ const OverviewWidget = () => {
             </div>
           </div>
           <div className="flex gap-1 mt-5">
-            {isNaN(data?.trend) ? (
+            {isNaN(data?.balanceTrend) ? (
               <p>No data last {mode}</p>
             ) : (
               <>
                 <p>Compare to last {mode}</p>
                 <p
                   className={
-                    data?.trend > 0 ? "text-green-500" : "text-red-500"
+                    data?.balanceTrend > 0 ? "text-green-500" : "text-red-500"
                   }
                 >
-                  {data?.trend > 0 ? "+" : ""}
-                  {data?.trend ? data?.trend : 0}%
+                  {data?.balanceTrend > 0 ? "+" : ""}
+                  {data?.balanceTrend ? data?.balanceTrend : 0}%
                 </p>
               </>
             )}
           </div>
-          <p className="text-gray-400">{date}</p>
+          {/* <p className="text-gray-400">{date}</p> */}
         </>
       )}
     </Widget>

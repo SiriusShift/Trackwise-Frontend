@@ -29,16 +29,17 @@ function Tracker({
   isLoading,
   type,
 }: commonTrackerProps) {
-    const width = useScreenWidth();
+  const [open, setOpen] = useState(false);
+  const width = useScreenWidth();
   const { confirm } = useConfirm();
   const length =
     width >= 1536
       ? 3
       : width >= 1280 && width < 1536
-      ? 2
-      : width >= 768 && width < 1280
-      ? 1
-      : 0;
+        ? 2
+        : width >= 768 && width < 1280
+          ? 1
+          : 0;
   const remaining = length - (data?.length ?? 0);
   console.log("length", length, data?.length, remaining);
   const shouldShowNav =
@@ -47,51 +48,7 @@ function Tracker({
     (data?.length > 1 && width >= 768 && width < 1280) ||
     (data?.length > 0 && width < 768);
 
-  const [triggerPost, { isLoading: createLoading }] =
-    usePostCategoryLimitMutation();
-  const [triggerUpdate, { isLoading: updateLoading }] =
-    usePatchCategoryLimitMutation();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
-
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    try {
-      if (data?.id) {
-        await confirm({
-          title: "Confirm Update",
-          description: "Update this budget limit with your new amount?",
-          variant: "info",
-          showLoadingOnConfirm: true,
-          onConfirm: async () => {
-            await triggerUpdate({
-              id: data?.id,
-              amount: { amount: data?.amount },
-            }).unwrap();
-            setOpen(false)
-            return;
-          },
-        });
-      } else {
-        await confirm({
-          title: "Create Budget Limit",
-          description:
-            "Would you like to create a new budget limit for this category?",
-          variant: "info",
-          showLoadingOnConfirm: true,
-          onConfirm: async () => {
-            await triggerPost({
-              categoryId: data?.category?.id,
-              amount: data?.amount,
-            }).unwrap();
-            setOpen(false)
-            return
-          },
-        });
-      }
-    } catch (err) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-  };
 
   const onDelete = async (data: any) => {
     console.log(data);
@@ -126,11 +83,9 @@ function Tracker({
         <CarouselContent className="h-full">
           <TrackerAddCard
             addDescription={addDescription}
-            isLoading={createLoading || updateLoading}
             title={title}
             type={type}
             data={data}
-            onSubmit={onSubmit}
           />
           {isLoading &&
             [...Array(length)]?.map((_, i) => <TrackerSkeleton key={i} />)}
@@ -139,10 +94,8 @@ function Tracker({
               key={index}
               item={item}
               title={title}
-              isLoading={createLoading || updateLoading}
               type={type}
               onDelete={onDelete}
-              onSubmit={onSubmit}
               editDescription={editDescription}
             />
           ))}

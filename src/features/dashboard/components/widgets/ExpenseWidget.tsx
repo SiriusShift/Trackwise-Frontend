@@ -11,11 +11,10 @@ import {
 import { ArrowUpFromLine, Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
-const ExpenseWidget = () => {
-  const { data, isLoading } = useGetAssetQuery();
+const ExpenseWidget = ({data, isLoading}) => {
   const date = formatDateDisplay();
   const mode = formatMode();
-  const balance = data?.balance;
+  const balance = Number(data?.expense);
   console.log(data);
   return (
     <Widget title="Expense">
@@ -27,7 +26,7 @@ const ExpenseWidget = () => {
               <Skeleton className="h-8 w-32" />
             </div>
             <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-border">
-              <Banknote />
+              <ArrowUpFromLine />
             </div>
           </div>
           <div className="flex flex-col gap-1 mt-5">
@@ -48,18 +47,18 @@ const ExpenseWidget = () => {
             </div>
           </div>
           <div className="flex gap-1 mt-5">
-            {isNaN(data?.trend) ? (
+            {isNaN(data?.expenseTrend) ? (
               <p>No data last {mode}</p>
             ) : (
               <>
                 <p>Compare to last {mode}</p>
                 <p
                   className={
-                    data?.trend > 0 ? "text-green-500" : "text-red-500"
+                    data?.expenseTrend > 0 ? "text-red-500" : "text-green-500"
                   }
                 >
-                  {data?.trend > 0 ? "+" : ""}
-                  {data?.trend ? data?.trend : 0}%
+                  {data?.expenseTrend > 0 ? "+" : ""}
+                  {data?.expenseTrend ? data?.expenseTrend : 0}%
                 </p>
               </>
             )}

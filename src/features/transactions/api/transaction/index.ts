@@ -27,11 +27,19 @@ export const transactionApi = api
         }),
         invalidatesTags: ["History"],
       }),
+      getStatistics: builder.query({
+        query: (params) => ({
+          url: `/transaction/statistics`,
+          method: "GET",
+          params
+        }),
+      }),
     }),
   });
 
 export const {
   useGetTransactionHistoryQuery,
   useUpdateTransactionHistoryMutation,
-  useDeleteTransactionHistoryMutation
+  useDeleteTransactionHistoryMutation,
+  useGetStatisticsQuery
 } = transactionApi;

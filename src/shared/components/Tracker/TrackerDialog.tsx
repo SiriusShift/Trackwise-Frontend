@@ -68,8 +68,6 @@ import { CommandGroup, CommandItem, CommandList } from "../ui/command";
 function TrackerDialog({
   title,
   mode,
-  onSubmit,
-  isLoading,
   open,
   setOpen,
   description,
@@ -78,7 +76,6 @@ function TrackerDialog({
   title: string;
   mode: string;
   description: string;
-  isLoading: boolean;
   setOpen: (open: boolean) => void;
   open: boolean;
   onSubmit: (data: any) => void;
@@ -94,7 +91,12 @@ function TrackerDialog({
   const { data: categoryData } = useGetCategoryQuery({
     type: type,
   });
+  const [triggerPost, { isLoading: createLoading }] =
+    usePostCategoryLimitMutation();
+  const [triggerUpdate, { isLoading: updateLoading }] =
+    usePatchCategoryLimitMutation();
 
+  const isLoading = createLoading || updateLoading
   console.log(categoryData);
   const filteredCategory =
     Array.isArray(data) && data?.length > 0
@@ -136,6 +138,47 @@ function TrackerDialog({
       }
     });
   };
+
+  
+    const onSubmit = async (data: any) => {
+      console.log(data);
+      try {
+        if (data?.id) {
+          await confirm({
+            title: "Confirm Update",
+            description: "Update this budget limit with your new amount?",
+            variant: "info",
+            showLoadingOnConfirm: true,
+            onConfirm: async () => {
+              await triggerUpdate({
+                id: data?.id,
+                amount: { amount: data?.amount },
+              }).unwrap();
+              setOpen(false);
+              return;
+            },
+          });
+        } else {
+          await confirm({
+            title: "Create Budget Limit",
+            description:
+              "Would you like to create a new budget limit for this category?",
+            variant: "info",
+            showLoadingOnConfirm: true,
+            onConfirm: async () => {
+              await triggerPost({
+                categoryId: data?.category?.id,
+                amount: data?.amount,
+              }).unwrap();
+              setOpen(false);
+              return;
+            },
+          });
+        }
+      } catch (err) {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
+    };
 
   useEffect(() => {
     if (Array.isArray(data)) return;

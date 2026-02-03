@@ -45,15 +45,15 @@ const Content = () => {
     active
   );
 
-  // useEffect(() => {
-  //   if(mode && active) {
-  //     dispatch(assetsApi.util.invalidateTags(["Assets"]))
-  //   }
-  // }, [mode, active])
+  useEffect(() => {
+    if(active !== date) {
+      dispatch(assetsApi.util.invalidateTags(["Assets"]))
+    }
+  }, [mode, active])
 
   // Set activeYear based on current active date
   useEffect(() => {
-    if (active) {
+    if (active !== date) {
       if (mode === "daily") {
         const year = moment(active as string).year();
         setActiveYear(year);

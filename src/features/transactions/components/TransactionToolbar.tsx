@@ -185,9 +185,9 @@ const TransactionToolbar = ({
                   >
                     {/* Option 1 */}
                     <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-warning">
-                      <RadioGroupItem id="Unpaid" value="Unpaid" />
-                      <label htmlFor="Unpaid" className="text-sm font-medium">
-                        Unpaid
+                      <RadioGroupItem id="Pending" value="Pending" />
+                      <label htmlFor="Pending" className="text-sm font-medium">
+                        Pending
                       </label>
                     </div>
                     {/* Option 2 */}

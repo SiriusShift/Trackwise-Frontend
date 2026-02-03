@@ -132,7 +132,7 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
                           <div className="flex justify-between items-center">
                             <span>{source.name}</span>
                             <span className="text-sm ml-2 text-gray-500">
-                              ₱{source?.remainingBalance}
+                              ₱{source?.balance}
                             </span>
                           </div>
                         </SelectItem>

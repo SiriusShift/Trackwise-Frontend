@@ -10,11 +10,11 @@ import { resetPasswordSchema } from "../schema/authSchema";
 const ResetPassword = () => {
   const router = useNavigate();
   const location = useLocation();
-  const [resetTrigger] = usePostResetPasswordMutation(); 
+  const [resetTrigger] = usePostResetPasswordMutation();
 
   const queryParams = new URLSearchParams(location.search);
-  const token = queryParams.get('token');
-  const id = queryParams.get('id');
+  const token = queryParams.get("token");
+  const id = queryParams.get("id");
   const {
     register,
     formState: { errors, isValid },
@@ -26,22 +26,21 @@ const ResetPassword = () => {
   });
   console.log(watch());
 
-
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     console.log("hello");
     event.preventDefault();
     try {
-        await resetTrigger({
-            id: parseInt(id || ""),
-            token: token,
-            password: watch("password"),
-        }).unwrap();
-        toast.success("Password reset successful");
-        setTimeout(() => {
-          router("/sign-in");
-        }, 500);
+      await resetTrigger({
+        id: parseInt(id || ""),
+        token: token,
+        password: watch("password"),
+      }).unwrap();
+      toast.success("Password reset successful");
+      setTimeout(() => {
+        router("/sign-in");
+      }, 500);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       let errorMessage = "An error occurred!"; // Default message
       if (err && (err as { data?: { message?: string } }).data) {
         errorMessage =
@@ -60,10 +59,7 @@ const ResetPassword = () => {
       >
         <div className="mt-5 w-full gap-5 flex-col flex">
           <div>
-            <Input
-              placeholder="Password"
-              {...register("password")}
-            />
+            <Input placeholder="Password" {...register("password")} />
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}

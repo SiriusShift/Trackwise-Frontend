@@ -19,7 +19,7 @@ const DatePicker = ({
   disablePast,
 }: {
   field: Field
-  setDate: (
+  setDate?: (
     field: Field,
     date: Date
   ) => void;
@@ -51,7 +51,10 @@ const DatePicker = ({
                   )
                 );
                 console.log("Selected Date:", newDate);
+                if(setDate){
                 setDate(field, newDate);
+                }
+                field.onChange(newDate)
               }}
               initialFocus
               disabled={(date) => {

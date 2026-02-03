@@ -29,6 +29,12 @@ import LimitWidget from "@/features/dashboard/components/widgets/LimitWidget";
 import TransactionHistory from "@/features/dashboard/components/widgets/TransactionHistory";
 import ExpenseWidget from "../components/widgets/ExpenseWidget";
 import IncomeWidget from "../components/widgets/IncomeWidget";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import PageHeader from "@/shared/components/PageHeader";
+import { formatMode } from "@/shared/utils/CustomFunctions";
+import { useSelector } from "react-redux";
+import { IRootState } from "@/app/store";
+import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -76,28 +82,34 @@ const chartConfig = {
 const Dashboard = () => {
   const { theme } = useTheme();
   const location = useLocation();
+  const active = useSelector((state: IRootState) => state.active.active);
+  const mode = useSelector((state: IRootState) => state.active.mode);
+
   const currentPageName = navigationData.find(
-    (item) => item.path === location.pathname
+    (item) => item.path === location.pathname,
   );
+
+  const { data, isFetching } = useGetStatisticsQuery({
+    startDate: active.from,
+    endDate: active.to,
+    mode: formatMode(mode),
+  });
+
   // const totalVisitors = chartData1[0].bills + chartData1[0].food;
 
   return (
     <div className="space-y-5 p-5">
-      <div className="flex gap-5 justify-between">
-        <div>
-          <p className="text-xl">{currentPageName?.name}</p>
-          <p className="text-gray-400">
-            This is your overview dashboard for this month
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        pageName={currentPageName?.name}
+        description={`Overview of Dashboard for this ${formatMode()}`}
+      />
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
             <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5">
-              <OverviewWidget />
-              <ExpenseWidget />
-              <IncomeWidget />
+              <OverviewWidget data={data} isLoading={isFetching} />
+              <ExpenseWidget data={data} isLoading={isFetching} />
+              <IncomeWidget data={data} isLoading={isFetching} />
               <Card className="rounded-lg col-span-2 lg:col-span-full 2xl:col-span-1 p-5 border">
                 <div className="flex justify-between items-center">
                   <h1 className="gap-3 text-xl font-semibold">Payment Due</h1>

@@ -2,21 +2,17 @@
 import {
   usePostExpenseMutation,
   usePatchExpenseMutation,
-  usePostRecurringExpenseMutation,
   usePostPaymentMutation,
+  usePostRecurringExpenseMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
-import {
-  expenseColumns,
-  recurringExpenseColumns,
-} from "../components/table-columns/transaction/expenseColumn";
+import { expenseColumns } from "../components/table-columns/transaction/expenseColumn";
 import {
   usePostIncomeMutation,
+  usePostReceiveMutation,
+  usePostRecurringIncomeMutation,
   useUpdateIncomeMutation,
 } from "../api/transaction/incomeApi";
-import {
-  incomeColumns,
-  recurringIncomeColumns,
-} from "../components/table-columns/transaction/incomeColumn";
+import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
 import { expenseSchema } from "../schema/expense.schema";
 import { incomeSchema } from "../schema/income.schema";
 
@@ -27,15 +23,14 @@ export const transactionConfig = {
     editTrigger: usePatchExpenseMutation,
     postRecurringTrigger: usePostRecurringExpenseMutation,
     columns: expenseColumns,
-    recurringColumns: recurringExpenseColumns,
     schema: expenseSchema,
   },
   Income: {
     postTrigger: usePostIncomeMutation,
-    postRecurringTrigger: usePostRecurringExpenseMutation,
+    transactTrigger: usePostReceiveMutation,
     editTrigger: useUpdateIncomeMutation,
+    postRecurringTrigger: usePostRecurringIncomeMutation,
     columns: incomeColumns,
-    recurringColumns: recurringIncomeColumns,
     schema: incomeSchema,
   },
   Transfer: {},
