@@ -38,11 +38,12 @@ import { incomeApi } from "../../api/transaction/incomeApi";
 import { transferApi } from "../../api/transaction/transferApi";
 
 export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
+  console.log(rowData, "data");
   console.log(mode, "mode");
   const [openFrequency, setOpenFrequency] = useState(false);
   const [recurring, setRecurring] = useState(false);
   const startDate = useSelector(
-    (state: IRootState) => state.active.active.from
+    (state: IRootState) => state.active.active.from,
   );
   const endDate = useSelector((state: IRootState) => state.active.active.to);
   const dispatch = useDispatch();
@@ -61,9 +62,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
   console.log(rowData);
 
   assetData = assetData?.data;
-  console.log(assetData)
+  console.log(assetData);
 
-  
   const {
     postTrigger,
     editTrigger,
@@ -76,10 +76,10 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     mode === "edit"
       ? editTrigger
       : mode === "transact"
-      ? transactTrigger
-      : recurring === true
-      ? postRecurringTrigger
-      : postTrigger
+        ? transactTrigger
+        : recurring === true
+          ? postRecurringTrigger
+          : postTrigger,
   );
 
   const form = useForm({
@@ -95,7 +95,9 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     setValue,
     formState: { isDirty, isValid, errors },
   } = form;
- useEffect(() => {
+
+
+  useEffect(() => {
     if (!open || !rowData) return;
 
     const getResetData = () => {
@@ -116,7 +118,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           repeat: frequencies?.find(
             (item) =>
               item?.interval === rowData?.interval &&
-              item?.unit === rowData?.unit
+              item?.unit === rowData?.unit,
           ) ?? {
             id: 9,
             interval: rowData?.interval,
@@ -124,7 +126,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
             unit: rowData?.unit,
           },
           ...(rowData?.fromAssetId && { from: rowData?.fromAssetId }),
-          ...(rowData?.toAssetId && { to: rowData?.toAssetId }),
+          ...(rowData?.toAsset && { to: rowData?.toAsset }),
           auto: rowData?.auto,
         };
       }
@@ -208,7 +210,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           amount: rowData?.amount,
           category: rowData?.category,
           image: rowData?.image,
-          to: rowData?.asset,
+          to: rowData?.asset || rowData?.toAsset || null,
           balance: rowData?.remainingBalance ?? null,
           initialAmount: rowData?.amount,
         };
@@ -343,12 +345,12 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       categoryLimit?.some(
         (item) =>
           Number(watch("amount")) + Number(item?.total) > item?.value &&
-          watch("category")?.name === item?.category?.name
+          watch("category")?.name === item?.category?.name,
       )
         ? "This will go over the budget"
         : "";
 
-    console.log(formattedData)
+    console.log(formattedData);
 
     // Confirmation modal
     confirm({
@@ -356,16 +358,16 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         mode === "edit"
           ? "Update"
           : mode === "transact"
-          ? getTransactMode(type)
-          : "Add"
+            ? getTransactMode(type)
+            : "Add"
       } ${type}`,
       showLoadingOnConfirm: true,
       description: `Are you sure you want to ${
         mode === "edit"
           ? "update"
           : mode === "transact"
-          ? getTransactMode(type)?.toLowerCase()
-          : "add"
+            ? getTransactMode(type)?.toLowerCase()
+            : "add"
       } this ${
         watch("recurring") ? "recurring " : ""
       }${type.toLowerCase()}? ${warning}`,
@@ -384,13 +386,13 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
 
           if (type === "Expense") {
             dispatch(
-              expensesApi.util.invalidateTags(["Expenses", "Recurring"])
+              expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
             );
           } else if (type === "Income") {
             dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
           } else if (type === "Transfer") {
             dispatch(
-              transferApi.util.invalidateTags(["Transfer", "Recurring"])
+              transferApi.util.invalidateTags(["Transfer", "Recurring"]),
             );
           }
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
@@ -404,13 +406,13 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
               mode === "edit"
                 ? "updated"
                 : mode === "transact"
-                ? type === "Expense"
-                  ? "paid"
-                  : type === "Income"
-                  ? "received"
-                  : "transfered"
-                : "added"
-            } successfully`
+                  ? type === "Expense"
+                    ? "paid"
+                    : type === "Income"
+                      ? "received"
+                      : "transfered"
+                  : "added"
+            } successfully`,
           );
         } catch (err) {
           toast.error(err?.data?.error || "Something went wrong");
@@ -440,8 +442,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
               {mode === "add"
                 ? `Add ${type}`
                 : mode === "transact"
-                ? `${getTransactMode(type)} ${type}`
-                : `Edit ${type}`}
+                  ? `${getTransactMode(type)} ${type}`
+                  : `Edit ${type}`}
             </DialogTitle>
             <DialogDescription>
               {mode === "add"
@@ -449,12 +451,12 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
                     watch("recurring") ? "recurring " : ""
                   }${type.toLowerCase()}.`
                 : mode === "transact"
-                ? `Confirm and complete transaction for this ${
-                    watch("recurring") ? "recurring " : ""
-                  }${type.toLowerCase()}.`
-                : `Update the details of this ${
-                    watch("recurring") ? "recurring " : ""
-                  }${type.toLowerCase()}.`}
+                  ? `Confirm and complete transaction for this ${
+                      watch("recurring") ? "recurring " : ""
+                    }${type.toLowerCase()}.`
+                  : `Update the details of this ${
+                      watch("recurring") ? "recurring " : ""
+                    }${type.toLowerCase()}.`}
             </DialogDescription>
           </DialogHeader>
 
@@ -478,8 +480,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
               {mode === "edit"
                 ? "Update"
                 : mode === "transact"
-                ? getTransactMode(type)
-                : "Add"}
+                  ? getTransactMode(type)
+                  : "Add"}
             </Button>
             <DialogClose asChild>
               <Button

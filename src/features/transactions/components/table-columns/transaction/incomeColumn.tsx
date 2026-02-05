@@ -252,16 +252,16 @@ export const incomeColumns: ColumnDef<Income>[] = [
                   <span>
                     <DropdownMenuItem
                       onSelect={onPayment}
-                      disabled={income?.status === "Paid"}
+                      disabled={income?.status === "Received"}
                     >
                       <Banknote /> Receive
                     </DropdownMenuItem>
                   </span>
                 </TooltipTrigger>
                 <Portal>
-                  {income?.status === "Paid" && (
+                  {income?.status === "Received" && (
                     <TooltipContent side="right" sideOffset={10}>
-                      Already paid
+                      Already Received
                     </TooltipContent>
                   )}
                 </Portal>
@@ -280,7 +280,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
                         setDropdownOpen(false);
                       }}
                       disabled={
-                        income?.status === "Paid" ||
+                        income?.status === "Received" ||
                         income?.status === "Partial"
                       }
                     >
@@ -292,13 +292,13 @@ export const incomeColumns: ColumnDef<Income>[] = [
                   <>
                     {income?.status === "Partial" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this income is partially paid.
+                        Editing disabled — this income is partially received.
                         Changing the amount could cause balance conflicts.
                       </TooltipContent>
                     )}
-                    {income?.status === "Paid" && (
+                    {income?.status === "Received" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this income is already paid.
+                        Editing disabled — this income is already received.
                       </TooltipContent>
                     )}
                   </>

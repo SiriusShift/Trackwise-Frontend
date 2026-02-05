@@ -225,7 +225,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 id: expense.id,
               });
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              dispatch(assetsApi.util.invalidateTags(["Assets"]))
+              dispatch(assetsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
@@ -234,7 +234,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         });
       };
 
-      const onCancel = async () => {};
+      const onStopSeries = async () => {};
+
+      const onSkip = async () => {}
 
       const onPayment = async () => {
         console.log(expense?.recurringTemplate, "expense payment");
@@ -336,13 +338,12 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   <>
                     {expense?.status === "Partial" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this expense is partially paid.
-                        Changing the amount could cause balance conflicts.
+                        Editing disabled — partially paid.
                       </TooltipContent>
                     )}
                     {expense?.status === "Paid" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this expense is already paid.
+                        Editing disabled — already paid.
                       </TooltipContent>
                     )}
                   </>
@@ -354,12 +355,28 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 <Eye /> View
               </DropdownMenuItem>
 
-              {/* --- Cancel Recurring --- */}
+              {/* -------- Recurring Section -------- */}
               {expense?.recurringTemplate && (
-                <DropdownMenuItem onClick={oncancel}>
-                  <X /> Cancel
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuSeparator />
+
+                  {/* Skip this instance */}
+                  {expense.status !== "Cancelled" && (
+                    <DropdownMenuItem onClick={onSkip}>
+                      <Clock className="mr-2 h-4 w-4" />
+                      Skip This Payment
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Stop whole series */}
+                  <DropdownMenuItem onClick={onStopSeries}>
+                    <X className="mr-2 h-4 w-4 text-destructive" />
+                    Stop Recurring
+                  </DropdownMenuItem>
+                </>
               )}
+
+              <DropdownMenuSeparator />
 
               {/* --- Archive --- */}
               <DropdownMenuItem onClick={onArchive}>
@@ -367,11 +384,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               </DropdownMenuItem>
 
               {/* --- Payment History --- */}
-              {expense?.recurringId && (
+              {/* {expense?.recurringId && (
                 <DropdownMenuItem onClick={onHistory}>
                   <History /> Payment History
                 </DropdownMenuItem>
-              )}
+              )} */}
             </DropdownMenuContent>
           </DropdownMenu>
 

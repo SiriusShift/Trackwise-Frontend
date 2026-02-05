@@ -18,7 +18,7 @@ const WidgetLayout = ({children, title}: commonWidgetProps) => {
           {formatDateDisplay()}
         </CardDescription> */}
       </CardHeader>
-      <Separator className="my-2 mb-4 border-white"/>
+      <hr className="my-3 "/>
       {children}
     </Card>
   );

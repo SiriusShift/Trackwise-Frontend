@@ -19,6 +19,8 @@ const TransactionHistory = () => {
     pageIndex,
   });
 
+  console.log(data)
+
   const observer = useRef();
 
   const containerVariants = {
@@ -72,11 +74,12 @@ const TransactionHistory = () => {
   console.log(transactions);
 
   return (
-    <Card className="rounded-lg xl:h-[342px] col-span-full p-0 md:col-span-4  xl:col-span-1 border flex flex-col">
-      <div className="flex justify-between p-6 pb-4 border-b items-center">
+    <Card className="rounded-lg  col-span-full p-0 md:col-span-4  xl:col-span-1 border flex flex-col">
+      <div className="flex justify-between p-6 pb-4  items-center">
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/transactions"}>See All</Link>
       </div>
+      <hr className="mx-5"/>
 
       <div className="w-full flex-1">
         {isFetching && transactions.length === 0 ? (
@@ -91,25 +94,21 @@ const TransactionHistory = () => {
             <h1>No Data Found</h1>
           </div>
         ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="w-full"
-          >
+
             <VirtualizedInfiniteList
               items={transactions}
               itemSize={70}
               height={270}
               ref={lastPostRef}
               isFetching={isFetching}
+              dataLength={data?.data?.totalCount}
               renderRow={(item, index) => {
                 const LucidIcon = Icons[item.category?.icon];
                 return (
                   <motion.div
                     key={`${item.id}-${index}`}
                     variants={itemVariants}
-                    className="flex justify-between hover:bg-muted/50 p-3 transition-all duration-200 cursor-pointer border-r-2 border-r-transparent hover:border-r-primary"
+                    className="flex justify-between hover:bg-muted/50 p-3 px-5 transition-all duration-200 cursor-pointer border-r-2 border-r-transparent hover:border-r-primary"
                   >
                     <div className="flex w-full">
                       <div className="p-2 border rounded-md w-12 h-12 flex-shrink-0 flex justify-center items-center">
@@ -156,7 +155,6 @@ const TransactionHistory = () => {
                 );
               }}
             />
-          </motion.div>
         )}
       </div>
     </Card>

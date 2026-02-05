@@ -2,16 +2,16 @@ import React, { forwardRef } from "react";
 import { FixedSizeList } from "react-window";
 
 const VirtualizedInfiniteList = forwardRef(function VirtualizedInfiniteList(
-  { items = [], onSelect, renderRow, itemSize, height, isFetching },
+  { items = [], dataLength, renderRow, itemSize, height, isFetching },
   ref
 ) {
   const length = isFetching ? items.length + 1 : items.length
 
   const Row = ({ index, style }) => {
     // If we're at the "loading row"
-    if (index === items.length) {
+    if (index === items.length && index !== dataLength) {
       return (
-        <div style={style}>
+        <div className="p-2 px-4" style={style}>
           {isFetching ? <p>Loading more...</p> : null}
         </div>
       );

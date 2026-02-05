@@ -41,7 +41,7 @@ body {
 
 * {
   scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: hsl(var(--muted)) hsl(var(--background));
+  scrollbar-color: hsl(var(--muted)) hsl(var(--card));
 }
 
 ::-webkit-scrollbar {
