@@ -1,4 +1,4 @@
-import { formatString } from "@/shared/utils/CustomFunctions";
+import { formatCurrency, formatString } from "@/shared/utils/CustomFunctions";
 import moment from "moment";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
@@ -19,7 +19,7 @@ const TransactionHistory = () => {
     pageIndex,
   });
 
-  console.log(data)
+  console.log(data);
 
   const observer = useRef();
 
@@ -62,7 +62,7 @@ const TransactionHistory = () => {
       });
       if (node) observer.current.observe(node);
     },
-    [isFetching]
+    [isFetching],
   );
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const TransactionHistory = () => {
         <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/transactions"}>See All</Link>
       </div>
-      <hr className="mx-5"/>
+      <hr className="mx-5" />
 
       <div className="w-full flex-1">
         {isFetching && transactions.length === 0 ? (
@@ -94,67 +94,63 @@ const TransactionHistory = () => {
             <h1>No Data Found</h1>
           </div>
         ) : (
-
-            <VirtualizedInfiniteList
-              items={transactions}
-              itemSize={70}
-              height={270}
-              ref={lastPostRef}
-              isFetching={isFetching}
-              dataLength={data?.data?.totalCount}
-              renderRow={(item, index) => {
-                const LucidIcon = Icons[item.category?.icon];
-                return (
-                  <motion.div
-                    key={`${item.id}-${index}`}
-                    variants={itemVariants}
-                    className="flex justify-between hover:bg-muted/50 p-3 px-5 transition-all duration-200 cursor-pointer border-r-2 border-r-transparent hover:border-r-primary"
-                  >
-                    <div className="flex w-full">
-                      <div className="p-2 border rounded-md w-12 h-12 flex-shrink-0 flex justify-center items-center">
-                        <LucidIcon
-                          className="text-foreground"
-                          width={25}
-                          height={25}
-                        />
-                      </div>
-                      <div className="ml-3 w-full min-w-0">
-                        <div className="flex justify-between gap-2">
-                          <h1
-                            className="truncate flex-1"
-                            title={item?.description}
-                          >
-                            {item?.description}
-                          </h1>
-                          <h1
-                            className={`${
-                              item?.type === "Expense"
-                                ? "text-destructive"
-                                : item?.type === "Income"
+          <VirtualizedInfiniteList
+            items={transactions}
+            itemSize={70}
+            height={270}
+            ref={lastPostRef}
+            isFetching={isFetching}
+            dataLength={data?.data?.totalCount}
+            renderRow={(item, index) => {
+              const LucidIcon = Icons[item.category?.icon];
+              return (
+                <motion.div
+                  key={`${item.id}-${index}`}
+                  variants={itemVariants}
+                  className="flex justify-between hover:bg-muted/50 p-3 px-5 transition-all duration-200 cursor-pointer border-r-2 border-r-transparent hover:border-r-primary"
+                >
+                  <div className="flex w-full">
+                    <div className="p-2 border rounded-md w-12 h-12 flex-shrink-0 flex justify-center items-center">
+                      <LucidIcon
+                        className="text-foreground"
+                        width={25}
+                        height={25}
+                      />
+                    </div>
+                    <div className="ml-3 w-full min-w-0">
+                      <div className="flex justify-between gap-2">
+                        <h1
+                          className="truncate flex-1"
+                          title={item?.description}
+                        >
+                          {item?.description}
+                        </h1>
+                        <h1
+                          className={`${
+                            item?.type === "Expense"
+                              ? "text-destructive"
+                              : item?.type === "Income"
                                 ? "text-success"
                                 : "text-primary"
-                            } font-medium whitespace-nowrap`}
-                          >
-                            ₱
-                            {item?.amount.toLocaleString("en-PH", {
-                              minimumFractionDigits: 2,
-                            })}
-                          </h1>
-                        </div>
-                        <div className="flex justify-between gap-2">
-                          <p className="text-gray-400 text-xs truncate">
-                            {item?.category?.name}
-                          </p>
-                          <p className="text-gray-400 text-xs whitespace-nowrap">
-                            {moment(item?.date).format("MMM DD, h:mm A")}
-                          </p>
-                        </div>
+                          } font-medium whitespace-nowrap`}
+                        >
+                          {formatCurrency(item?.amount)}
+                        </h1>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <p className="text-gray-400 text-xs truncate">
+                          {item?.category?.name}
+                        </p>
+                        <p className="text-gray-400 text-xs whitespace-nowrap">
+                          {moment(item?.date).format("MMM DD, h:mm A")}
+                        </p>
                       </div>
                     </div>
-                  </motion.div>
-                );
-              }}
-            />
+                  </div>
+                </motion.div>
+              );
+            }}
+          />
         )}
       </div>
     </Card>

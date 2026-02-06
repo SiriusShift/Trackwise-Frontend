@@ -52,6 +52,7 @@ import {
 import { Separator } from "@/shared/components/ui/separator";
 import useFormatCurrency from "@/shared/hooks/useFormatCurrency";
 import { Field } from "@/shared/types";
+import { Textarea } from "@/shared/components/ui/textarea";
 
 const TransactionForm = ({
   assetData,
@@ -542,9 +543,8 @@ const TransactionForm = ({
                 Description <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   {...field}
-                  type="text"
                   placeholder="Enter description"
                   className="input-class text-sm"
                 />

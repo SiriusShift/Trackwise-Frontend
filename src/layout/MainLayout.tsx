@@ -6,7 +6,6 @@ import { SidebarProvider } from "@/shared/components/ui/sidebar";
 function MainLayout() {
   return (
     <SidebarProvider>
-      <div className="flex w-full h-full">
         <AppSidebar />
         <div className="flex-1 min-w-0">
           <Header />
@@ -14,7 +13,6 @@ function MainLayout() {
             <Outlet />
           </div>
         </div>
-      </div>
     </SidebarProvider>
   );
 }

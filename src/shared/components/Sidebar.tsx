@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/shared/components/ui/sidebar";
 import { WalletMinimal, LogOut } from "lucide-react";
 import { navigationData } from "../../routing/navigationData";
@@ -34,6 +35,7 @@ export function AppSidebar() {
   const [active, setActive] = useState(location?.location?.pathname);
   console.log(active);
   const router = useNavigate();
+  const { state } = useSidebar();
   const screenWidth = useScreenWidth();
 
   const [logoutTrigger] = useLazyGetSignoutQuery({});
@@ -50,24 +52,35 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`transition-all duration-300 ease-in-out w-20 overflow-hidden z-50`}
-      style={{ willChange: "width, opacity" }} // Optimize for smooth transitions
+      collapsible="icon"
+      className={`
+    transition-[width] duration-300 ease-in-out
+    w-[240px] data-[state=collapsed]:w-[64px]
+    z-50
+  `}
     >
       {/* Sidebar Header */}
-      <SidebarHeader className="mx-2 py-3 ">
+      <SidebarHeader className="p-4 flex">
         <div
-          className={`flex items-center ml-3 transition-opacity duration-300 ease-in-out opacity-100 lg:ms-3 mt-3 justify-start`}
+          className={`flex items-center  transition-opacity w-full duration-300 ease-in-out opacity-100 mt-2`}
         >
           <WalletMinimal className="text-primary" />
-            <h1 className="text-lg ml-4 inline md:hidden lg:inline font-bold">
-              Trackwise
-            </h1>
+          <h1
+            className={`
+              ml-2 font-bold text-lg
+              transition-all duration-300
+              overflow-hidden whitespace-nowrap
+              ${state === "collapsed" ? "opacity-0 w-0" : "opacity-100 w-full"}
+            `}
+          >
+            Trackwise
+          </h1>
         </div>
       </SidebarHeader>
 
       {/* Sidebar Content */}
       <SidebarContent>
-        <SidebarGroup className="px-4 mt-4">
+        <SidebarGroup className="p-3 mt-4">
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {navigationData.map((item) => {
@@ -118,10 +131,10 @@ export function AppSidebar() {
                         <Link
                           to={item.path}
                           onClick={() => setActive(item.path)}
-                          className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
+                          className="flex text-md items-center justify-start h-[35px] rounded "
                         >
                           <item.icon
-                            style={{ width: "24px", height: "24px" }}
+                            style={{ width: "17px", height: "17px" }}
                           />
                           <span className="inline md:hidden lg:inline">
                             {item.name}

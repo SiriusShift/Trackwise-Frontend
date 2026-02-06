@@ -29,6 +29,7 @@ import {
 import moment from "moment";
 import { Badge } from "@/shared/components/ui/badge";
 import {
+  useCancelRecurringExpenseMutation,
   useDeleteExpenseMutation,
   usePostAutoPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
@@ -207,6 +208,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       const [deleteExpense] = useDeleteExpenseMutation();
       const [payAuto] = usePostAutoPaymentMutation();
+      const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
       const onArchive = async () => {
         confirm({
@@ -223,7 +225,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   delete: true,
                 },
                 id: expense.id,
-              });
+              }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
@@ -234,9 +236,25 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         });
       };
 
-      const onStopSeries = async () => {};
-
-      const onSkip = async () => {}
+      const onStopSeries = async () => {
+        console.log(expense)
+        confirm({
+          description: `Are you sure you want to cancel this recurring expense?`,
+          title: `Cancel recurring expense`,
+          variant: "info",
+          confirmText: "Confirm",
+          showLoadingOnConfirm: true,
+          cancelText: "Cancel",
+          onConfirm: async () => {
+            try {
+              await cancelRecurring(expense?.recurringTemplate?.id).unwrap();
+            } catch (err) {
+              console.log(err);
+              toast.error(err?.data?.error);
+            }
+          },
+        });
+      };
 
       const onPayment = async () => {
         console.log(expense?.recurringTemplate, "expense payment");
@@ -354,34 +372,22 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               <DropdownMenuItem onClick={onView}>
                 <Eye /> View
               </DropdownMenuItem>
-
+              {/* --- Archive --- */}
+              <DropdownMenuItem onClick={onArchive}>
+                <Archive /> Archive
+              </DropdownMenuItem>
               {/* -------- Recurring Section -------- */}
               {expense?.recurringTemplate && (
                 <>
                   <DropdownMenuSeparator />
 
-                  {/* Skip this instance */}
-                  {expense.status !== "Cancelled" && (
-                    <DropdownMenuItem onClick={onSkip}>
-                      <Clock className="mr-2 h-4 w-4" />
-                      Skip This Payment
-                    </DropdownMenuItem>
-                  )}
-
                   {/* Stop whole series */}
                   <DropdownMenuItem onClick={onStopSeries}>
-                    <X className="mr-2 h-4 w-4 text-destructive" />
+                    <X className="h-4 w-4 text-destructive" />
                     Stop Recurring
                   </DropdownMenuItem>
                 </>
               )}
-
-              <DropdownMenuSeparator />
-
-              {/* --- Archive --- */}
-              <DropdownMenuItem onClick={onArchive}>
-                <Archive /> Archive
-              </DropdownMenuItem>
 
               {/* --- Payment History --- */}
               {/* {expense?.recurringId && (

@@ -77,11 +77,10 @@ export const expensesApi = api
         providesTags: ["Recurring"],
       }),
 
-      deleteRecurringExpense: builder.mutation({
-        query: ({ data, id }) => ({
+      cancelRecurringExpense: builder.mutation({
+        query: (id) => ({
           url: `/transaction/expense/recurring/${id}`,
           method: "PATCH",
-          body: data,
         }),
         invalidatesTags: ["Expenses"],
       }),
@@ -126,7 +125,7 @@ export const {
   useGetRecurringExpensesQuery,
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,
-  useDeleteRecurringExpenseMutation,
+  useCancelRecurringExpenseMutation,
   usePostPaymentMutation,
   usePostAutoPaymentMutation
 } = expensesApi;
