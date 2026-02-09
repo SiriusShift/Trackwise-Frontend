@@ -232,7 +232,7 @@ const TransactionForm = ({
                       <FormLabel>
                         From <span className="text-destructive">*</span>
                       </FormLabel>
-                      <Popover>
+                      <Popover modal={true}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button

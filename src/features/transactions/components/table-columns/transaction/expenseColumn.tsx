@@ -149,7 +149,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       <div className="flex items-center gap-2">
         {row.original?.recurringTemplate && (
           <span title="Recurring expense">
-            <RefreshCcw className="text-blue-500" size={15} />
+            <RefreshCcw className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`} size={15} />
           </span>
         )}
         <span> {getValue() || "-"}</span>
@@ -382,7 +382,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   <DropdownMenuSeparator />
 
                   {/* Stop whole series */}
-                  <DropdownMenuItem onClick={onStopSeries}>
+                  <DropdownMenuItem disabled={!expense?.recurringTemplate?.isActive} onClick={onStopSeries}>
                     <X className="h-4 w-4 text-destructive" />
                     Stop Recurring
                   </DropdownMenuItem>
