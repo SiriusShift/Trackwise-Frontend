@@ -52,26 +52,34 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      collapsible="icon"
-      className={`
-    transition-[width] duration-300 ease-in-out
-    w-[240px] data-[state=collapsed]:w-[64px]
+      collapsible={screenWidth < 1024 ? "offcanvas" : "icon"}
+      className="
+    transition-all duration-300 ease-in-out
+    w-[240px]
+    data-[state=collapsed]:w-[64px]
+    overflow-hidden
     z-50
-  `}
+  "
     >
       {/* Sidebar Header */}
       <SidebarHeader className="p-4 flex">
         <div
-          className={`flex items-center  transition-opacity w-full duration-300 ease-in-out opacity-100 mt-2`}
+          className={`flex justify-start md:justify-center lg:justify-start lg:date-[state=collapsed]:justify-center items-center gap-2 w-full lg:ms-1  mt-2`}
         >
-          <WalletMinimal className="text-primary" />
+          <WalletMinimal className="text-primary shrink-0 w-6 h-6" />
           <h1
-            className={`
-              ml-2 font-bold text-lg
-              transition-all duration-300
-              overflow-hidden whitespace-nowrap
-              ${state === "collapsed" ? "opacity-0 w-0" : "opacity-100 w-full"}
-            `}
+            className="
+    font-bold text-lg
+    transition-all duration-300
+    whitespace-nowrap
+    overflow-hidden
+    max-w-[160px]
+    data-[state=collapsed]:max-w-0
+    data-[state=collapsed]:opacity-0
+    inline
+    md:hidden
+    lg:inline
+  "
           >
             Trackwise
           </h1>
@@ -87,7 +95,7 @@ export function AppSidebar() {
                 console.log(item?.name);
                 return (
                   <SidebarMenuItem
-                    className="flex justify-center"
+                    className={`flex justify-center lg:justify-start lg:ms-1`}
                     key={item.name}
                   >
                     {screenWidth > 767 && screenWidth < 1024 ? (
@@ -131,12 +139,27 @@ export function AppSidebar() {
                         <Link
                           to={item.path}
                           onClick={() => setActive(item.path)}
-                          className="flex text-md items-center justify-start h-[35px] rounded "
+                          className="
+    flex items-center rounded
+    transition-all duration-300
+    justify-start
+    data-[state=collapsed]:justify-center
+  "
                         >
                           <item.icon
                             style={{ width: "17px", height: "17px" }}
                           />
-                          <span className="inline md:hidden lg:inline">
+                          <span
+                            className="
+    ml-2
+    transition-all duration-300
+    whitespace-nowrap
+    overflow-hidden
+    max-w-[160px]
+    data-[state=collapsed]:max-w-0
+    data-[state=collapsed]:opacity-0
+  "
+                          >
                             {item.name}
                           </span>
                         </Link>
@@ -151,20 +174,27 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* Sidebar Footer */}
-      <SidebarFooter>
-        <div className="mx-3 py-2">
-          <SidebarMenuButton
-            variant="ghost"
-            className="lg:flex text-md px-3 lg:p-3 justify-start lg:w-full h-[42px] rounded w-[100%]"
-            onClick={handleLogout}
+      <SidebarFooter className="p-3">
+        <SidebarMenuButton
+          variant="ghost"
+          className="lg:flex ms-1 justify-start lg:w-full rounded w-[100%]"
+          onClick={handleLogout}
+        >
+          <LogOut />
+          <span
+            className="
+                ml-2
+                transition-all duration-300
+                whitespace-nowrap
+                overflow-hidden
+                max-w-[120px]
+                data-[state=collapsed]:max-w-0
+                data-[state=collapsed]:opacity-0
+              "
           >
-            <LogOut
-              style={{ width: "24px", height: "24px" }}
-              className="lg:mr-3"
-            />
-            <span className="inline md:hidden lg:inline">Logout</span>
-          </SidebarMenuButton>
-        </div>
+            Logout
+          </span>
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );
