@@ -311,7 +311,7 @@ const TransactionForm = ({
                   render={({ field: { value, onChange } }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>To</FormLabel>
-                      <Popover>
+                      <Popover modal={true}>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button

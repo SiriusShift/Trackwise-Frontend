@@ -89,7 +89,7 @@ const SignInPage = () => {
           {" "}
           <LayoutAuth
             title="Welcome back"
-            desc="Let's get started to track your expenses"
+            desc="Let's get started to track your finances"
             submit={onSubmit}
           >
             <div className="mt-5 w-full gap-5 sm:w-96 flex-col flex">

@@ -47,6 +47,7 @@ import {
 } from "@/features/transactions/api/transaction/incomeApi";
 import { StatusIcon } from "../../statusIcon";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
+import { assetsApi } from "@/shared/api/assetsApi";
 export const incomeColumns: ColumnDef<Income>[] = [
   // {
   //   accessorKey: "id",
@@ -137,7 +138,20 @@ export const incomeColumns: ColumnDef<Income>[] = [
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    cell: ({ getValue, row }) => (
+      <div className="flex items-center w-40 gap-2">
+        {row.original?.recurringIncome && (
+          <span title="Recurring expense">
+            <RefreshCcw
+              className={`${row.original.recurringIncome?.isActive ? "text-blue-500" : "text-red-500"}`}
+              size={15}
+            />  
+          </span>
+        )}
+        <span className="truncate"> {getValue() || "-"}</span>
+      </div>
+    ),
+
     meta: {
       cellClassName: "border-b",
     },
@@ -226,8 +240,32 @@ export const incomeColumns: ColumnDef<Income>[] = [
         }
       };
 
-      const onArchive = () => {};
-      const onCancel = async () => {};
+      const onArchive = async () => {
+        confirm({
+          description: `Are you sure you want to archive this income?`,
+          title: `Archive income`,
+          variant: "info",
+          confirmText: "Confirm",
+          showLoadingOnConfirm: true,
+          cancelText: "Cancel",
+          onConfirm: async () => {
+            try {
+              await deleteIncome({
+                data: {
+                  delete: true,
+                },
+                id: income.id,
+              }).unwrap();
+              dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+              dispatch(assetsApi.util.invalidateTags(["Assets"]));
+            } catch (err) {
+              console.log(err);
+              toast.error(err?.data?.error);
+            }
+          },
+        });
+      };
+            const onCancel = async () => {};
 
       return (
         <>

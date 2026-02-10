@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { expenseSchema } from "@/schema/schema";
 import {
   categoryApi,
   useGetCategoryLimitQuery,

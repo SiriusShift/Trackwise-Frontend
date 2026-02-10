@@ -34,6 +34,7 @@ export const incomeApi = api
           method: "PATCH",
           body: data,
         }),
+        invalidatesTags: ["Income"]
       }),
       postRecurringIncome: builder.mutation({
         query: (body) => ({

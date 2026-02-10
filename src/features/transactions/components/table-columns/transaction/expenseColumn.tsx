@@ -146,13 +146,13 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ getValue, row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center w-40 gap-2">
         {row.original?.recurringTemplate && (
           <span title="Recurring expense">
             <RefreshCcw className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`} size={15} />
           </span>
         )}
-        <span> {getValue() || "-"}</span>
+        <span className="truncate"> {getValue() || "-"}</span>
       </div>
     ),
 
@@ -215,7 +215,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
           description: `Are you sure you want to archive this expense?`,
           title: `Archive expense`,
           variant: "info",
-          confirmText: "Delete",
+          confirmText: "Confirm",
           showLoadingOnConfirm: true,
           cancelText: "Cancel",
           onConfirm: async () => {

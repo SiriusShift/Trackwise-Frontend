@@ -83,13 +83,13 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
             <span className="text-muted-foreground font-medium">
               Date Paid:
             </span>
-            <span className="text-foreground font-medium">
+            <span className="text-foreground">
               {formatDate(history?.date)}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground font-medium">Source:</span>
-            <span className="text-foreground font-medium">
+            <span className="text-foreground">
               {history?.fromAsset?.name}
             </span>
           </div>
@@ -99,7 +99,7 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
               <span className="text-muted-foreground font-medium text-sm">
                 Description:
               </span>
-              <p className="text-sm text-foreground bg-muted/50 rounded-lg p-3 leading-relaxed">
+              <p className="text-sm text-foreground bg-muted/50 rounded-lg leading-relaxed">
                 {history?.description}
               </p>
             </div>
