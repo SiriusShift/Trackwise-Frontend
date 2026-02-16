@@ -98,6 +98,7 @@ export const incomeApi = api
           method: "PATCH",
           body: data,
         }),
+        invalidatesTags: ["Income", "Recurring"]
       }),
 
       postAutoReceive: builder.mutation({

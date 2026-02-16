@@ -37,8 +37,8 @@ import { incomeApi } from "../../api/transaction/incomeApi";
 import { transferApi } from "../../api/transaction/transferApi";
 
 export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
-  console.log(rowData, "data");
-  console.log(mode, "mode");
+  // console.log(rowData, "data");
+  // console.log(mode, "mode");
   const [openFrequency, setOpenFrequency] = useState(false);
   const [recurring, setRecurring] = useState(false);
   const startDate = useSelector(
@@ -174,6 +174,22 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       }
 
       if (type === "Income") {
+        
+        if (isTransact) {
+                  console.log("test1")
+
+          return {
+            date: moment(),
+            id: rowData?.id,
+            description: "",
+            amount: rowData?.remainingBalance,
+            category: rowData?.category,
+            image: rowData?.image,
+            balance: rowData?.remainingBalance ?? null,
+            initialAmount: 0,
+            to: rowData?.asset,
+          };
+        }
         if (isRecurringTemplate) {
           return {
             date: rowData?.date,
@@ -188,19 +204,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           };
         }
 
-        if (isTransact) {
-          return {
-            date: moment(),
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            image: rowData?.image,
-            balance: rowData?.remainingBalance ?? null,
-            initialAmount: 0,
-            to: rowData?.asset,
-          };
-        }
+        
+        console.log("test")
 
         return {
           date: rowData?.date,
@@ -383,17 +388,17 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
             await fetchData(formattedData).unwrap();
           }
 
-          if (type === "Expense") {
-            dispatch(
-              expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
-            );
-          } else if (type === "Income") {
-            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
-          } else if (type === "Transfer") {
-            dispatch(
-              transferApi.util.invalidateTags(["Transfer", "Recurring"]),
-            );
-          }
+          // if (type === "Expense") {
+          //   dispatch(
+          //     expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
+          //   );
+          // } else if (type === "Income") {
+          //   dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
+          // } else if (type === "Transfer") {
+          //   dispatch(
+          //     transferApi.util.invalidateTags(["Transfer", "Recurring"]),
+          //   );
+          // }
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
           dispatch(transactionApi.util.invalidateTags(["History"]));
