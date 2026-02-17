@@ -100,7 +100,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     if (!open || !rowData) return;
 
     const getResetData = () => {
-      const isRecurringTemplate = rowData?.recurringIncome;
+      const isRecurringTemplate = rowData?.recurringTemplate;
       const isRecurring = rowData?.interval;
       const isTransact = mode === "transact";
 

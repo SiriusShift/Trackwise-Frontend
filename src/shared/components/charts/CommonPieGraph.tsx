@@ -63,7 +63,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
 
   return (
     // return width > 1024 ? (
-    <Card className="flex flex-col h-full min-w-[250px] xl:w-[300px]">
+    <Card className="flex h-[375px] flex-col min-w-[250px] xl:w-[300px]">
       {/* Card Header */}
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-lg xl:text-xl text-center">

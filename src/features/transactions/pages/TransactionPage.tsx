@@ -37,6 +37,7 @@ import { Pencil } from "lucide-react";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
+import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
 const TransactionPage = () => {
   const type = useSelector((state: IRootState) => state.active.type);
   const active = useSelector((state: IRootState) => state.active.active);
@@ -51,10 +52,10 @@ const TransactionPage = () => {
   const [transaction, setTransactions] = useState([]);
   const [recurringTransaction, setRecurringTransaction] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(
-    moment(typeof active === "string" ? active : active?.from).toDate()
+    moment(typeof active === "string" ? active : active?.from).toDate(),
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    moment(typeof active !== "string" && active?.to).toDate()
+    moment(typeof active !== "string" && active?.to).toDate(),
   );
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
@@ -77,7 +78,6 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
     });
 
-
   const { columns, recurringColumns } = transactionConfig[type] || {};
   // Expense
   const { data: expenseData, isFetching: expenseFetching } =
@@ -91,13 +91,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Expense" && recurring === true,
-      }
+      },
     );
 
   const { data: recurringExpenseData, isFetching: recurringExpenseFetching } =
@@ -112,13 +112,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Expense" || !recurring,
-      }
+      },
     );
 
   const { data: expenseGraphData, isFetching: expenseGraphFetching } =
@@ -131,13 +131,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Expense",
-      }
+      },
     );
 
   // Income
@@ -151,13 +151,13 @@ const TransactionPage = () => {
       ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
       ...(selectedCategories.length > 0 && {
         Categories: JSON.stringify(
-          selectedCategories.map((category) => category.id)
+          selectedCategories.map((category) => category.id),
         ), // Add array of IDs
       }),
     },
     {
       skip: type !== "Income" || recurring === true,
-    }
+    },
   );
 
   const { data: recurringIncomeData, isFetching: recurringIncomeFetching } =
@@ -172,13 +172,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Income" || !recurring,
-      }
+      },
     );
 
   const { data: incomeGraphData, isFetching: incomeGraphFetching } =
@@ -191,13 +191,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Income",
-      }
+      },
     );
 
   //Transfer
@@ -212,13 +212,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Transfer" || recurring === true,
-      }
+      },
     );
 
   const { data: recurringTransferData, isFetching: recurringTransferFetching } =
@@ -233,13 +233,13 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Transfer" || !recurring,
-      }
+      },
     );
 
   const { data: transferGraphData, isFetching: transferGraphFetching } =
@@ -252,21 +252,21 @@ const TransactionPage = () => {
         ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
         ...(selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id)
+            selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
       {
         skip: type !== "Transfer",
-      }
+      },
     );
 
   const tableData =
     type === "Expense"
       ? expenseData
       : type === "Income"
-      ? incomeData
-      : transferData;
+        ? incomeData
+        : transferData;
 
   const tableColumn = recurring ? recurringColumns : columns;
 
@@ -274,11 +274,11 @@ const TransactionPage = () => {
     type === "Expense"
       ? recurringExpenseData
       : type === "Income"
-      ? recurringIncomeData
-      : recurringTransferData;
+        ? recurringIncomeData
+        : recurringTransferData;
 
   const currentPageName = navigationData.find(
-    (item) => item.path === location.pathname
+    (item) => item.path === location.pathname,
   );
   const totalPages = recurring
     ? recurringTableData?.totalPages
@@ -291,18 +291,16 @@ const TransactionPage = () => {
     recurringIncomeFetching ||
     recurringTransferFetching;
 
-  console.log(tableFetching, recurringFetching)
+  console.log(tableFetching, recurringFetching);
   const graphData =
     type === "Expense"
       ? expenseGraphData
       : type === "Income"
-      ? incomeGraphData
-      : transferGraphData;
+        ? incomeGraphData
+        : transferGraphData;
 
   const graphFetching =
     expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
-
-
 
   //UseEffect
   // useEffect(() => {
@@ -317,10 +315,10 @@ const TransactionPage = () => {
   useEffect(() => {
     if (active === null) return;
     setStartDate(
-      moment(typeof active === "string" ? active : active?.from).toDate()
+      moment(typeof active === "string" ? active : active?.from).toDate(),
     );
     setEndDate(
-      moment(typeof active === "string" ? active : active?.to).toDate()
+      moment(typeof active === "string" ? active : active?.to).toDate(),
     );
   }, [active]);
 
@@ -390,29 +388,41 @@ const TransactionPage = () => {
           setStatus={setStatus}
           setSelectedCategories={setSelectedCategories}
         />
+        <div className="flex w-full flex-col gap-5 lg:flex-row">
+          {/* Table */}
+          <div className="w-full overflow-hidden">
+            <DataTable
+              columns={tableColumn}
+              setPageIndex={setPageIndex}
+              setPageSize={setPageSize}
+              totalPages={totalPages}
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              isLoading={tableFetching || recurringFetching}
+              graphData={graphData}
+              data={
+                recurring
+                  ? width > 639
+                    ? recurringTableData?.data
+                    : recurringTransaction
+                  : width > 639
+                    ? tableData?.data
+                    : transaction || []
+              }
+            />
+          </div>
 
-        <DataTable
-          columns={tableColumn}
-          setPageIndex={setPageIndex}
-          setPageSize={setPageSize}
-          totalPages={totalPages}
-          graphLoading={graphFetching}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          // trend={tableData?.trend}
-          isLoading={tableFetching || recurringFetching}
-          type={type}
-          graphData={graphData}
-          data={
-            recurring
-              ? width > 639
-                ? recurringTableData?.data
-                : recurringTransaction
-              : width > 639
-              ? tableData?.data
-              : transaction || []
-          }
-        />
+          {/* Chart */}
+          <div>
+            <CommonPieGraph
+              total={graphData?.total}
+              trend={graphData?.trend}
+              type={type}
+              graphLoading={graphFetching}
+              data={graphData?.data}
+            />
+          </div>
+        </div>
 
         <ViewDetailed
           open={viewOpen}
@@ -446,6 +456,5 @@ const TransactionPage = () => {
     </>
   );
 };
-
 
 export default TransactionPage;

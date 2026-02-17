@@ -377,12 +377,12 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 <Archive /> Archive
               </DropdownMenuItem>
               {/* -------- Recurring Section -------- */}
-              {expense?.recurringTemplate && (
+              {expense?.recurringExpense && (
                 <>
                   <DropdownMenuSeparator />
 
                   {/* Stop whole series */}
-                  <DropdownMenuItem disabled={!expense?.recurringTemplate?.isActive} onClick={onStopSeries}>
+                  <DropdownMenuItem disabled={!expense?.recurringExpense?.isActive} onClick={onStopSeries}>
                     <X className="h-4 w-4 text-destructive" />
                     Stop Recurring
                   </DropdownMenuItem>

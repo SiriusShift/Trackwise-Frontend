@@ -42,6 +42,7 @@ import {
 import { Portal } from "@radix-ui/react-tooltip";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import {
+  useCancelRecurringIncomeMutation,
   useDeleteIncomeMutation,
   usePostAutoReceiveMutation,
 } from "@/features/transactions/api/transaction/incomeApi";
@@ -145,7 +146,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
             <RefreshCcw
               className={`${row.original.recurringIncome?.isActive ? "text-blue-500" : "text-red-500"}`}
               size={15}
-            />  
+            />
           </span>
         )}
         <span className="truncate"> {getValue() || "-"}</span>
@@ -157,14 +158,14 @@ export const incomeColumns: ColumnDef<Income>[] = [
     },
   },
 
-  {
-    accessorKey: "asset.name",
-    header: "Destination",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "asset.name",
+  //   header: "Destination",
+  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "status",
     header: "Status",
@@ -203,6 +204,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
 
       const [deleteIncome] = useDeleteIncomeMutation();
       const [receiveAuto] = usePostAutoReceiveMutation();
+      const [cancelRecurring] = useCancelRecurringIncomeMutation();
 
       const onView = () => {
         setDropdownOpen(false);
@@ -210,7 +212,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
       };
 
       const onPayment = async () => {
-        if (income?.recurringTemplate?.auto) {
+        if (income?.recurringIncome?.auto) {
           confirm({
             title: "Confirm Payment",
             description: "Do you want to proceed with paying this expense?",
@@ -265,7 +267,24 @@ export const incomeColumns: ColumnDef<Income>[] = [
           },
         });
       };
-            const onCancel = async () => {};
+      const onStopSeries = async () => {
+        confirm({
+          description: `Are you sure you want to cancel this recurring expense?`,
+          title: `Cancel recurring expense`,
+          variant: "info",
+          confirmText: "Confirm",
+          showLoadingOnConfirm: true,
+          cancelText: "Cancel",
+          onConfirm: async () => {
+            try {
+              await cancelRecurring(income?.recurringIncome?.id).unwrap();
+            } catch (err) {
+              console.log(err);
+              toast.error(err?.data?.error);
+            }
+          },
+        });
+      };
 
       return (
         <>
@@ -349,10 +368,19 @@ export const incomeColumns: ColumnDef<Income>[] = [
               </DropdownMenuItem>
 
               {/* --- Cancel Recurring --- */}
-              {income?.recurringTemplate && (
-                <DropdownMenuItem onClick={oncancel}>
-                  <X /> Cancel
-                </DropdownMenuItem>
+              {income?.recurringIncome && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  {/* Stop whole series */}
+                  <DropdownMenuItem
+                    disabled={!income?.recurringIncome?.isActive}
+                    onClick={onStopSeries}
+                  >
+                    <X className="h-4 w-4 text-destructive" />
+                    Stop Recurring
+                  </DropdownMenuItem>
+                </>
               )}
 
               {/* --- Archive --- */}

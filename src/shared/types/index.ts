@@ -5,22 +5,30 @@ export interface Expense {
   description?: string; // Optional description
   amount: number; // Expense amount
   source: Object;
-  status: "Paid" | "Partial" | "Pending" | "Overdue" ; // Status of the expense
+  status: "Paid" | "Partial" | "Pending" | "Overdue"; // Status of the expense
   image: string;
   recurringId: number;
-  recurringTemplate: {
-    amount: number;
-    fromAssetId: number;
-    // isVariable: Boolean;
-  }
+  recurringTemplate: RecurringTemplate;
+}
+
+export interface RecurringTemplate {
+  amount: string;
+  auto: boolean;
+  endDate: string;
+  fromAsset: Object;
+  id: number;
+  interval: number;
+  isActive: true;
+  type: string;
+  unit: string;
 }
 
 export interface Field {
-      onChange: (value: any) => void;
-      onBlur: () => void;
-      value: Date | string; // depends on your schema
-      ref: React.Ref<any>;
-      name: String;
+  onChange: (value: any) => void;
+  onBlur: () => void;
+  value: Date | string; // depends on your schema
+  ref: React.Ref<any>;
+  name: String;
 }
 
 export interface Income {

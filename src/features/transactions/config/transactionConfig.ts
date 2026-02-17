@@ -33,7 +33,14 @@ export const transactionConfig = {
     columns: incomeColumns,
     schema: incomeSchema,
   },
-  Transfer: {},
+  Transfer: {
+    postTrigger: usePostIncomeMutation,
+    transactTrigger: usePostReceiveMutation,
+    editTrigger: useUpdateIncomeMutation,
+    postRecurringTrigger: usePostRecurringIncomeMutation,
+    columns: incomeColumns,
+    schema: incomeSchema,
+  },
   // Installment: {
   //   postTrigger: usePostInstallmentMutation,
   //   getTrigger: useLazyGetInstallmentsQuery,
