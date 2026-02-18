@@ -105,7 +105,7 @@ const TransactionForm = ({
                 <Button
                   variant={"outline"}
                   type="button"
-                  disabled={watch("transactMode") === "transact"}
+                  disabled={watch("mode") === "transact"}
                   className={cn(
                     "text-left font-normal",
                     !field.value && "text-muted-foreground"
@@ -153,10 +153,10 @@ const TransactionForm = ({
                           setValue("to", null);
                         }
                         if (pressed) {
-                          setValue("mode", "fixed");
+                          // setValue("mode", "fixed");
                           setValue("date", moment().startOf("day"));
                         } else {
-                          setValue("mode", null);
+                          // setValue("mode", null);
                           setValue("date", moment());
                         }
                         setValue("image", null);
@@ -186,9 +186,9 @@ const TransactionForm = ({
                         checked={value}
                         onCheckedChange={(checked) => {
                           setValue("from", null);
-                          if (!checked) {
-                            setValue("mode", "fixed");
-                          }
+                          // if (!checked) {
+                          //   setValue("mode", "fixed");
+                          // }
                           onChange(checked);
                         }}
                       />

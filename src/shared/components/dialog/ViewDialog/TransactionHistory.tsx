@@ -99,7 +99,7 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
               <span className="text-muted-foreground font-medium text-sm">
                 Description:
               </span>
-              <p className="text-sm text-foreground bg-muted/50 rounded-lg leading-relaxed">
+              <p className="text-sm text-foreground bg-muted/50 p-4 rounded-lg leading-relaxed">
                 {history?.description}
               </p>
             </div>

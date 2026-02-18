@@ -34,6 +34,15 @@ export const transferApi = api
         }),
       }),
 
+      postTransferMoney: builder.mutation({
+        query: ({ data, id }) => ({
+          url: `/transaction/income/transfer/${id}`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Transfer", "Recurring"],
+      }),
+
       postRecurringTransfer: builder.mutation({
         query: (body) => ({
           url: "/transaction/transfer/recurring",
@@ -97,4 +106,5 @@ export const {
   useDeleteRecurringTransferMutation,
   usePostRecurringTransferMutation,
   useGetGraphTransferQuery,
+  usePostTransferMoneyMutation
 } = transferApi;

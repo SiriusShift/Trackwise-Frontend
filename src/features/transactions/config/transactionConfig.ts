@@ -15,6 +15,9 @@ import {
 import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
 import { expenseSchema } from "../schema/expense.schema";
 import { incomeSchema } from "../schema/income.schema";
+import { transferSchema } from "../schema/transfer.schema";
+import { transferColumns } from "../components/table-columns/transaction/transferColumn";
+import { usePostRecurringTransferMutation, usePostTransferMoneyMutation, usePostTransferMutation, useUpdateTransferMutation } from "../api/transaction/transferApi";
 
 export const transactionConfig = {
   Expense: {
@@ -34,12 +37,12 @@ export const transactionConfig = {
     schema: incomeSchema,
   },
   Transfer: {
-    postTrigger: usePostIncomeMutation,
-    transactTrigger: usePostReceiveMutation,
-    editTrigger: useUpdateIncomeMutation,
-    postRecurringTrigger: usePostRecurringIncomeMutation,
-    columns: incomeColumns,
-    schema: incomeSchema,
+    postTrigger: usePostTransferMutation,
+    transactTrigger: usePostTransferMoneyMutation,
+    editTrigger: useUpdateTransferMutation,
+    postRecurringTrigger: usePostRecurringTransferMutation,
+    columns: transferColumns,
+    schema: transferSchema,
   },
   // Installment: {
   //   postTrigger: usePostInstallmentMutation,

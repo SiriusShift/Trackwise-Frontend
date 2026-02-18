@@ -100,7 +100,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     if (!open || !rowData) return;
 
     const getResetData = () => {
-      const isRecurringTemplate = rowData?.recurringTemplate;
+      const isRecurringTemplate = rowData?.recurringIncome;
       const isRecurring = rowData?.interval;
       const isTransact = mode === "transact";
 
@@ -269,7 +269,10 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     };
 
     const resetData = getResetData();
-    reset(resetData);
+    reset({
+      ...resetData,
+      mode: mode
+    });
   }, [open, type, rowData, mode, reset]);
 
   const handleCustomOpen = () => {
