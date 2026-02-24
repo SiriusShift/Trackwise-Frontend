@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/shared/components/ui/chart";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import noChartData from "@/assets/images/empty-box.svg";
+import noChartData from "@/assets/images/file.png";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";

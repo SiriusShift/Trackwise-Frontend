@@ -299,6 +299,8 @@ const TransactionPage = () => {
         ? incomeGraphData
         : transferGraphData;
 
+  console.log(graphData, "graph data")
+
   const graphFetching =
     expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
 

@@ -54,6 +54,170 @@ import useFormatCurrency from "@/shared/hooks/useFormatCurrency";
 import { Field } from "@/shared/types";
 import { Textarea } from "@/shared/components/ui/textarea";
 
+const CategoryAmountSection = ({
+  control,
+  history,
+  categoryData,
+  watch,
+  type,
+  mode,
+  setValue
+}) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <FormField
+        control={control}
+        name="category"
+        render={({ field: { onChange, value } }) => {
+          return (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                Category <span className="text-destructive">*</span>
+              </FormLabel>
+              <Popover modal={true}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      disabled={history}
+                      className={cn(
+                        "justify-between",
+                        !value && "text-muted-foreground",
+                      )}
+                    >
+                      {value
+                        ? categoryData?.find(
+                            (category) => category.id === value?.id,
+                          )?.name
+                        : "Select category"}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent full className="w-[200px] h-52 p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search category..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No category found.</CommandEmpty>
+                      <CommandGroup>
+                        {categoryData?.map((category) => (
+                          <CommandItem
+                            value={category}
+                            key={category.id}
+                            onSelect={() => {
+                              if(type === "Transfer"){
+                                setValue("to", null)
+                              }
+                              onChange(category);
+                            }}
+                          >
+                            {category.name}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                category.id === value?.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
+      />
+
+      <FormField
+        name="amount"
+        control={control}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>
+              Amount <span className="text-destructive">*</span>
+            </FormLabel>
+            <FormControl>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  ₱
+                </span>
+                <Input
+                  {...field}
+                  min={0}
+                  type="number"
+                  step="0.01"
+                  placeholder="Enter amount"
+                  className="input-class text-sm pl-7"
+                  disabled={
+                    !watch("recurring")
+                      ? type === "Expense"
+                        ? !watch("from") && watch("date") <= moment()
+                        : type === "Income"
+                          ? !watch("to") && watch("date") <= moment()
+                          : !watch("from") &&
+                            !watch("to") &&
+                            watch("date") <= moment()
+                      : false
+                  }
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    const balance =
+                      type === "Income"
+                        ? watch("to")?.remainingBalance
+                        : watch("from")?.remainingBalance;
+                    const remainingBalance =
+                      Number(watch("balance") || 0) +
+                      Number(watch("initialAmount") || 0);
+
+                    console.log(watch());
+                    console.log(remainingBalance);
+                    console.log(mode);
+
+                    if (
+                      balance &&
+                      type !== "Income" &&
+                      !watch("recurring") &&
+                      value > balance
+                    ) {
+                      toast.error("Insufficient balance");
+                      e.target.value = balance; // Reset to the maximum allowed value
+                    } else if (
+                      value > remainingBalance &&
+                      (mode === "transact" || history)
+                    ) {
+                      toast.error(
+                        `Amount exceeds the total balance of ${remainingBalance}`,
+                      );
+                      e.target.value = balance; // Reset to the maximum allowed value
+                    } else {
+                      numberInput(e, field); // Proceed with normal input handling
+                    }
+                  }}
+                />
+              </div>
+            </FormControl>
+            {(mode === "transact" || history) && (
+              <p className="text-xs text-muted-foreground">
+                Balance: ₱{watch("balance")?.toFixed(2)}
+              </p>
+            )}
+
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  );
+};
 const TransactionForm = ({
   assetData,
   categoryData,
@@ -63,12 +227,10 @@ const TransactionForm = ({
   history,
   setRecurring,
 }) => {
-  console.log(history);
+  console.log(type);
   console.log(mode);
   const [open, setOpen] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const width = useScreenWidth();
-  const formatCurrency = useFormatCurrency();
   const {
     watch,
     control,
@@ -108,7 +270,7 @@ const TransactionForm = ({
                   disabled={watch("mode") === "transact"}
                   className={cn(
                     "text-left font-normal",
-                    !field.value && "text-muted-foreground"
+                    !field.value && "text-muted-foreground",
                   )}
                   onClick={() => setOpen(true)}
                 >
@@ -200,8 +362,8 @@ const TransactionForm = ({
                           {type === "Expense"
                             ? " paid "
                             : type === "Income"
-                            ? " received "
-                            : " transferred "}
+                              ? " received "
+                              : " transferred "}
                           when it's due.
                         </p>
                       </div>
@@ -240,7 +402,7 @@ const TransactionForm = ({
                               role="combobox"
                               className={cn(
                                 "justify-between w-full",
-                                !value && "text-muted-foreground"
+                                !value && "text-muted-foreground",
                               )}
                             >
                               {value ? (
@@ -248,7 +410,7 @@ const TransactionForm = ({
                                   <span>
                                     {
                                       assetData.find(
-                                        (asset) => asset.id === value?.id
+                                        (asset) => asset.id === value?.id,
                                       )?.name
                                     }
                                   </span>
@@ -288,7 +450,7 @@ const TransactionForm = ({
                                         "ml-auto",
                                         asset.id === value?.id
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                   </CommandItem>
@@ -304,7 +466,19 @@ const TransactionForm = ({
                 />
               )}
 
-              {(type === "Income" || type === "Transfer") && (
+              {type === "Transfer" && (
+                <CategoryAmountSection
+                  control={control}
+                  history={history}
+                  categoryData={categoryData}
+                  watch={watch}
+                  type={type}
+                  mode={mode}
+                  setValue={setValue}
+                />
+              )}
+
+              {(type === "Income" || type === "Transfer" && watch("category")?.name !== "External") && (
                 <FormField
                   name="to"
                   control={control}
@@ -317,9 +491,10 @@ const TransactionForm = ({
                             <Button
                               variant="outline"
                               role="combobox"
+                              disabled={type === "Transfer" && watch("category") === null}
                               className={cn(
                                 "justify-between w-full",
-                                !value && "text-muted-foreground"
+                                !value && "text-muted-foreground",
                               )}
                             >
                               {value ? (
@@ -327,7 +502,7 @@ const TransactionForm = ({
                                   <span>
                                     {
                                       assetData.find(
-                                        (asset) => asset.id === value?.id
+                                        (asset) => asset.id === value?.id,
                                       )?.name
                                     }
                                   </span>
@@ -367,7 +542,7 @@ const TransactionForm = ({
                                         "ml-auto",
                                         asset.id === value?.id
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                   </CommandItem>
@@ -385,155 +560,18 @@ const TransactionForm = ({
             </>
           )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField
+        {type !== "Transfer" && (
+          <CategoryAmountSection
             control={control}
-            name="category"
-            render={({ field: { onChange, value } }) => {
-              return (
-                <FormItem className="flex flex-col">
-                  <FormLabel>
-                    Category <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <Popover modal={true}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          disabled={history}
-                          className={cn(
-                            "justify-between",
-                            !value && "text-muted-foreground"
-                          )}
-                        >
-                          {value
-                            ? categoryData?.find(
-                                (category) => category.id === value?.id
-                              )?.name
-                            : "Select category"}
-                          <ChevronsUpDown className="opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent full className="w-[200px] h-52 p-0">
-                      <Command>
-                        <CommandInput
-                          placeholder="Search category..."
-                          className="h-9"
-                        />
-                        <CommandList>
-                          <CommandEmpty>No category found.</CommandEmpty>
-                          <CommandGroup>
-                            {categoryData?.map((category) => (
-                              <CommandItem
-                                value={category}
-                                key={category.id}
-                                onSelect={() => {
-                                  onChange(category);
-                                }}
-                              >
-                                {category.name}
-                                <Check
-                                  className={cn(
-                                    "ml-auto",
-                                    category.id === value?.id
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+            history={history}
+            categoryData={categoryData}
+            watch={watch}
+            type={type}
+            mode={mode}
+            setValue={setValue}
           />
+        )}
 
-          <FormField
-            name="amount"
-            control={control}
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>
-                  Amount <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                      ₱
-                    </span>
-                    <Input
-                      {...field}
-                      min={0}
-                      type="number"
-                      step="0.01"
-                      placeholder="Enter amount"
-                      className="input-class text-sm pl-7"
-                      disabled={
-                        !watch("recurring")
-                          ? type === "Expense"
-                            ? !watch("from") && watch("date") <= moment()
-                            : type === "Income"
-                            ? !watch("to") && watch("date") <= moment()
-                            : !watch("from") &&
-                              !watch("to") &&
-                              watch("date") <= moment()
-                          : false
-                      }
-                      onChange={(e) => {
-                        const value = Number(e.target.value);
-                        const balance =
-                          type === "Income"
-                            ? watch("to")?.remainingBalance
-                            : watch("from")?.remainingBalance;
-                        const remainingBalance =
-                          Number(watch("balance") || 0) +
-                          Number(watch("initialAmount") || 0);
-
-                        console.log(watch());
-                        console.log(remainingBalance);
-                        console.log(mode);
-
-                        if (
-                          balance &&
-                          type !== "Income" &&
-                          !watch("recurring") &&
-                          value > balance
-                        ) {
-                          toast.error("Insufficient balance");
-                          e.target.value = balance; // Reset to the maximum allowed value
-                        } else if (
-                          value > remainingBalance &&
-                          (mode === "transact" || history)
-                        ) {
-                          toast.error(
-                            `Amount exceeds the total balance of ${remainingBalance}`
-                          );
-                          e.target.value = balance; // Reset to the maximum allowed value
-                        } else {
-                          numberInput(e, field); // Proceed with normal input handling
-                        }
-                      }}
-                    />
-                  </div>
-                </FormControl>
-                {(mode === "transact" || history) && (
-                  <p className="text-xs text-muted-foreground">
-                    Balance: ₱{watch("balance")?.toFixed(2)}
-                  </p>
-                )}
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
         <FormField
           name="description"
           control={control}
@@ -578,8 +616,8 @@ const TransactionForm = ({
                         ? `Every ${field.value?.interval} ${field.value?.unit}`
                         : `Every ${field.value?.interval} ${field.value?.unit}s`
                       : field.value
-                      ? field.value?.name
-                      : "Repeat every.."}
+                        ? field.value?.name
+                        : "Repeat every.."}
                     <ArrowRight />
                   </Button>
                 </FormItem>
@@ -597,7 +635,7 @@ const TransactionForm = ({
                     type="button"
                     className={cn(
                       "text-left font-normal",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                     disabled={!watch("repeat")}
                     onClick={() => setOpenEndDate(true)}

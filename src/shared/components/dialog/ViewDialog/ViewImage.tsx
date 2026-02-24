@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog, DialogContent } from "../../ui/dialog";
-import NoData from "@/assets/images/empty-box.png";
+import NoData from "@/assets/images/file.png";
 
 const ViewImage = ({
   image,

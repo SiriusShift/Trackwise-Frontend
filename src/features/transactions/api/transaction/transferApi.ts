@@ -92,6 +92,7 @@ export const transferApi = api
           method: "GET",
           params,
         }),
+        transformResponse: (response) => response.data
       }),
     }),
   });
