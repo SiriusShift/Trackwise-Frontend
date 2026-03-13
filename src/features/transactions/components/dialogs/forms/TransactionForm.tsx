@@ -250,6 +250,7 @@ const TransactionForm = ({
     }
   };
 
+  const toAssetData = type === "Transfer" ? assetData?.filter((item) => watch("from")?.id !== item.id) : assetData
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
@@ -267,7 +268,7 @@ const TransactionForm = ({
                 <Button
                   variant={"outline"}
                   type="button"
-                  disabled={watch("mode") === "transact"}
+                  disabled={watch("mode") === "transact" || type === "Transfer"}
                   className={cn(
                     "text-left font-normal",
                     !field.value && "text-muted-foreground",
@@ -297,7 +298,7 @@ const TransactionForm = ({
               </FormItem>
             )}
           />
-          {mode !== "transact" && !history && (
+          {mode !== "transact" && !history  && type !== "Transfer" && (
             <FormField
               control={control}
               name="recurring"
@@ -501,14 +502,14 @@ const TransactionForm = ({
                                 <div className="space-x-2">
                                   <span>
                                     {
-                                      assetData.find(
+                                      toAssetData.find(
                                         (asset) => asset.id === value?.id,
                                       )?.name
                                     }
                                   </span>
                                   <span>
                                     ₱
-                                    {assetData
+                                    {toAssetData
                                       .find((asset) => asset.id === value?.id)
                                       ?.remainingBalance.toFixed(2)}
                                   </span>
@@ -527,7 +528,7 @@ const TransactionForm = ({
                               {" "}
                               <CommandEmpty>No assets found</CommandEmpty>
                               <CommandGroup>
-                                {assetData?.map((asset) => (
+                                {toAssetData?.map((asset) => (
                                   <CommandItem
                                     value={asset}
                                     key={asset.id}
@@ -658,49 +659,6 @@ const TransactionForm = ({
               )}
             />
           </div>
-          {/* {!watch("auto") && (
-            <FormField
-              control={control}
-              name="mode"
-              render={({ field: { onChange, value } }) => (
-                <FormItem className="flex items-end col-span-2">
-                  <FormControl className="flex sm:items-center space-y-5">
-                    <div className="w-full">
-                      <Tabs
-                        onValueChange={(value) => onChange(value)}
-                        value={value}
-                        className="flex flex-col w-full sm:flex-row sm:space-x-4 sm:items-center"
-                      >
-                        <TabsList>
-                          <TabsTrigger className="w-full" value="fixed">
-                            Fixed
-                          </TabsTrigger>
-                          <TabsTrigger className="w-full" value="variable">
-                            Variable
-                          </TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                          className="sm:mt-0 text-sm text-center sm:text-start"
-                          value="fixed"
-                        >
-                          Same amount every cycle. Amount cannot be changed.
-                        </TabsContent>
-                        <TabsContent
-                          className="sm:mt-0 text-sm text-center sm:text-start"
-                          value="variable"
-                        >
-                          Amount may vary each cycle. You can update it when
-                          needed.
-                        </TabsContent>
-                      </Tabs>
-                    </div>
-
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )} */}
         </>
       )}
 

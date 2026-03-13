@@ -15,8 +15,9 @@ import {
   Trash2,
   X,
   Archive,
+  Check,
 } from "lucide-react";
-import { Expense } from "@/shared/types";
+import { Expense, Transfer } from "@/shared/types";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -54,7 +55,7 @@ import { setOpenDialog } from "@/shared/slices/activeSlice";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
-export const transferColumns: ColumnDef<Expense>[] = [
+export const transferColumns: ColumnDef<Transfer>[] = [
   // {
   //   accessorKey: "id",
   //   header: "ID",
@@ -108,28 +109,28 @@ export const transferColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
   },
-  {
-    accessorKey: "remainingBalance",
-    header: "Balance",
-    // header: ({ column }) => {
-    //   return (
-    //     <Button
-    //       variant={"ghost"}
-    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //     >
-    //       Paid
-    //       <ArrowUpDown />
-    //     </Button>
-    //   );
-    // },
-    cell: ({ getValue }) => {
-      const amount = getValue() as number | undefined;
-      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "remainingBalance",
+  //   header: "Balance",
+  //   // header: ({ column }) => {
+  //   //   return (
+  //   //     <Button
+  //   //       variant={"ghost"}
+  //   //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //   //     >
+  //   //       Paid
+  //   //       <ArrowUpDown />
+  //   //     </Button>
+  //   //   );
+  //   // },
+  //   cell: ({ getValue }) => {
+  //     const amount = getValue() as number | undefined;
+  //     return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
+  //   },
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "category.name",
     header: "Category",
@@ -149,7 +150,10 @@ export const transferColumns: ColumnDef<Expense>[] = [
       <div className="flex items-center w-40 gap-2">
         {row.original?.recurringTemplate && (
           <span title="Recurring expense">
-            <RefreshCcw className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`} size={15} />
+            <RefreshCcw
+              className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`}
+              size={15}
+            />
           </span>
         )}
         <span className="truncate"> {getValue() || "-"}</span>
@@ -235,7 +239,7 @@ export const transferColumns: ColumnDef<Expense>[] = [
       };
 
       const onStopSeries = async () => {
-        console.log(expense)
+        console.log(expense);
         confirm({
           description: `Are you sure you want to cancel this recurring expense?`,
           title: `Cancel recurring expense`,
@@ -254,36 +258,29 @@ export const transferColumns: ColumnDef<Expense>[] = [
         });
       };
 
-      const onPayment = async () => {
-        console.log(expense?.recurringTemplate, "expense payment");
-        if (expense?.recurringTemplate?.auto) {
-          confirm({
-            title: "Confirm Payment",
-            description: "Do you want to proceed with paying this expense?",
-            variant: "info",
-            confirmText: "Pay",
-            cancelText: "Cancel",
-            showLoadingOnConfirm: true,
-            onConfirm: async () => {
-              try {
-                await payAuto({
-                  id: expense.id,
-                  data: {
-                    type: "Expense",
-                  },
-                }).unwrap();
-                dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              } catch (err) {
-                let errorMessage = handleCatchErrorMessage(err); // Default message
-                toast.error(errorMessage);
-              }
-            },
-          });
-        } else {
-          setMode("transact");
-          setDialogOpen(true); // open dialog
-          setDropdownOpen(false); // close dropdown manually
-        }
+      const onConfirm = async () => {
+        confirm({
+          title: "Confirm Payment",
+          description: "Do you want to proceed with paying this expense?",
+          variant: "info",
+          confirmText: "Pay",
+          cancelText: "Cancel",
+          showLoadingOnConfirm: true,
+          onConfirm: async () => {
+            try {
+              await payAuto({
+                id: expense.id,
+                data: {
+                  type: "Expense",
+                },
+              }).unwrap();
+              dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+            } catch (err) {
+              let errorMessage = handleCatchErrorMessage(err); // Default message
+              toast.error(errorMessage);
+            }
+          },
+        });
       };
 
       const onView = () => {
@@ -313,17 +310,17 @@ export const transferColumns: ColumnDef<Expense>[] = [
                 <TooltipTrigger asChild>
                   <span>
                     <DropdownMenuItem
-                      onSelect={onPayment}
-                      disabled={expense?.status === "Paid"}
+                      onSelect={onConfirm}
+                      disabled={expense?.status === "Completed"}
                     >
-                      <Banknote /> Pay
+                      <Check /> Confirm
                     </DropdownMenuItem>
                   </span>
                 </TooltipTrigger>
                 <Portal>
-                  {expense?.status === "Paid" && (
+                  {expense?.status === "Completed" && (
                     <TooltipContent side="right" sideOffset={10}>
-                      Already paid
+                      Already transfered
                     </TooltipContent>
                   )}
                 </Portal>
@@ -342,7 +339,7 @@ export const transferColumns: ColumnDef<Expense>[] = [
                         setDropdownOpen(false);
                       }}
                       disabled={
-                        expense?.status === "Paid" ||
+                        expense?.status === "Completed" ||
                         expense?.status === "Partial"
                       }
                     >
@@ -354,12 +351,12 @@ export const transferColumns: ColumnDef<Expense>[] = [
                   <>
                     {expense?.status === "Partial" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — partially paid.
+                        Editing disabled — partially transfered.
                       </TooltipContent>
                     )}
-                    {expense?.status === "Paid" && (
+                    {expense?.status === "Completed" && (
                       <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — already paid.
+                        Editing disabled — already transfered.
                       </TooltipContent>
                     )}
                   </>
@@ -380,7 +377,10 @@ export const transferColumns: ColumnDef<Expense>[] = [
                   <DropdownMenuSeparator />
 
                   {/* Stop whole series */}
-                  <DropdownMenuItem disabled={!expense?.recurringExpense?.isActive} onClick={onStopSeries}>
+                  <DropdownMenuItem
+                    disabled={!expense?.recurringExpense?.isActive}
+                    onClick={onStopSeries}
+                  >
                     <X className="h-4 w-4 text-destructive" />
                     Stop Recurring
                   </DropdownMenuItem>
@@ -408,194 +408,6 @@ export const transferColumns: ColumnDef<Expense>[] = [
             open={viewOpen}
             setOpen={setViewOpen}
             transaction={expense}
-          />
-        </>
-      );
-    },
-  },
-];
-
-export const recurringExpenseColumns: ColumnDef<any>[] = [
-  {
-    accessorKey: "nextDueDate",
-    header: "Next Due",
-    cell: ({ getValue }) => {
-      const dateValue = getValue();
-      return (
-        <span>
-          {dateValue ? moment(dateValue).format("MMMM DD, YYYY") : "-"}
-        </span>
-      );
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  {
-    accessorKey: "category.name",
-    header: "Category",
-    cell: ({ getValue }) => (
-      <Badge variant="outline">{getValue() || "-"}</Badge>
-    ),
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ getValue }) => {
-      const amount = getValue() as number | undefined;
-      return <span>₱{Number(amount)?.toFixed(2) || "0"}</span>;
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  {
-    accessorFn: (row) =>
-      `${row.interval} ${row.unit}${row.interval > 1 ? "s" : ""}`,
-    id: "repeat",
-    header: "Repeat Every",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  // {
-  //   accessorKey: "isActive",
-  //   header: "Active",
-  //   cell: ({ getValue }) => {
-  //     const active = getValue() as boolean;
-  //     return (
-  //       <Badge variant={active ? "success" : "destructive"}>
-  //         {active ? "Active" : "Inactive"}
-  //       </Badge>
-  //     );
-  //   },
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
-
-  // {
-  //   accessorKey: "isVariable",
-  //   header: "Mode",
-  //   cell: ({ getValue }) => {
-  //     const isVar = getValue() as boolean;
-  //     return <Badge variant="outline">{isVar ? "Variable" : "Static"}</Badge>;
-  //   },
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
-  {
-    accessorKey: "auto",
-    header: "Auto",
-    cell: ({ getValue }) => {
-      const auto = getValue() as boolean;
-      return (
-        <RefreshCcw
-          className={`mr-2 ${auto ? "text-success" : "text-muted-foreground"}`}
-          size={15}
-        />
-      );
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
-  {
-    id: "actions",
-    meta: {
-      headerClassName:
-        "sticky right-0 bg-background z-10 border-l border-b w-12",
-      cellClassName: "sticky right-0 bg-background z-10 border-l border-b w-12",
-    },
-    cell: ({ row }) => {
-      const [dialogOpen, setDialogOpen] = useState(false);
-      const [viewOpen, setViewOpen] = useState(false);
-      const [dropdownOpen, setDropdownOpen] = useState(false);
-      const recurring = row.original;
-      const dispatch = useDispatch();
-      // const activeTab = useSelector((state: any) => state.active.expenseTab);
-
-      const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
-
-      const onDelete = async () => {
-        await deleteExpense(recurring.id).then(() => {
-          dispatch(assetsApi.util.invalidateTags(["Assets"]));
-        });
-        toast.success("Recurring entry deleted successfully");
-      };
-
-      const onCancel = async () => {};
-
-      const onArchive = () => {};
-
-      const onView = () => {
-        setDropdownOpen(false);
-        setViewOpen(true);
-      };
-
-      return (
-        <>
-          <DropdownMenu
-            open={dropdownOpen}
-            onOpenChange={setDropdownOpen}
-            modal={false}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-              <DropdownMenuItem onClick={onView}>
-                <Eye className="h-4 w-4" /> View
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setDialogOpen(true); // open dialog
-                  setDropdownOpen(false); // close dropdown manually
-                }}
-              >
-                <Pencil className="h-4 w-4" /> Edit
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={onCancel}>
-                <X className="h-4 w-4" /> Cancel
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={onArchive}>
-                <Archive className="h-4 w-4" /> Archive
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <TransactionDialog
-            open={dialogOpen}
-            setOpen={setDialogOpen}
-            rowData={recurring}
-            mode={"edit"}
-          />
-          <ViewTransaction
-            open={viewOpen}
-            setOpen={setViewOpen}
-            transaction={recurring}
           />
         </>
       );

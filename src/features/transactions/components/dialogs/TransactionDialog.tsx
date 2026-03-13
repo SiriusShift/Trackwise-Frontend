@@ -37,6 +37,7 @@ import { incomeApi } from "../../api/transaction/incomeApi";
 import { transferApi } from "../../api/transaction/transferApi";
 
 export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
+  console.log(rowData);
   // console.log(rowData, "data");
   // console.log(mode, "mode");
   const [openFrequency, setOpenFrequency] = useState(false);
@@ -95,10 +96,18 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     formState: { isDirty, isValid, errors },
   } = form;
 
-
   useEffect(() => {
-    if (!open || !rowData) return;
+    if (!open) return;
 
+    // ADD MODE (no rowData)
+    if (!rowData) {
+      reset({
+        ...schema?.defaultValues,
+        mode,
+        date: moment(),
+      });
+      return;
+    }
     const getResetData = () => {
       const isRecurringTemplate = rowData?.recurringIncome;
       const isRecurring = rowData?.interval;
@@ -174,9 +183,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       }
 
       if (type === "Income") {
-        
         if (isTransact) {
-                  console.log("test1")
+          console.log("test1");
 
           return {
             date: moment(),
@@ -204,8 +212,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
           };
         }
 
-        
-        console.log("test")
+        console.log("test");
 
         return {
           date: rowData?.date,
@@ -269,12 +276,12 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     };
 
     const resetData = getResetData();
+    console.log(resetData, "test");
     reset({
       ...resetData,
-      mode: mode
+      mode: mode,
     });
   }, [open, type, rowData, mode, reset]);
-
   const handleCustomOpen = () => {
     setOpenFrequency(true);
     setOpen(false);
@@ -357,7 +364,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         ? "This will go over the budget"
         : "";
 
-    console.log(formattedData);
+    console.log(getTransactMode(type)?.toLowerCase());
 
     // Confirmation modal
     confirm({
@@ -379,7 +386,12 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         watch("recurring") ? "recurring " : ""
       }${type.toLowerCase()}? ${warning}`,
       variant: warning ? "warning" : "info",
-      confirmText: mode === "edit" ? "Update" : "Add",
+      confirmText:
+        mode === "edit"
+          ? "Update"
+          : mode === "transact"
+            ? getTransactMode(type)
+            : "Add",
       cancelText: "Cancel",
       onConfirm: async () => {
         try {

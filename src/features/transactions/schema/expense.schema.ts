@@ -40,9 +40,9 @@ export const expenseSchema = {
   defaultValues: {
     category: null,
     description: "",
-    amount: "",
+    amount: 0,
     recurring: false,
-    date: new Date(),
+    date: moment(),
     endDate: null,
     from: null,
     image: null,

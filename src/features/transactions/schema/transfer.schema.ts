@@ -15,12 +15,12 @@ export const transferSchema = {
       then: (schema) => schema.required("Source is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
-    to: yup.object().when("recurring", {
-      is: false,
+    to: yup.object().when(["recurring", "category"], {
+      is: (recurring: boolean, category: Object) => recurring === true || category.name === "Internal",
       then: (schema) => schema.required("Destination is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
-    auto: yup.boolean(),
+    // auto: yup.boolean(),
   }),
   defaultValues: {
     category: null,
@@ -32,6 +32,6 @@ export const transferSchema = {
     image: null,
     from: null,
     to: null,
-    auto: null,
+    // auto: null,
   },
 };

@@ -131,7 +131,7 @@ const TransactionHistory = () => {
                               ? "text-destructive"
                               : item?.type === "Income"
                                 ? "text-success"
-                                : "text-primary"
+                                : item?.type === "Transfer" ? item.category.name === "Internal" ? "text-primary" : "text-destructive" : ""
                           } font-medium whitespace-nowrap`}
                         >
                           {formatCurrency(item?.amount)}

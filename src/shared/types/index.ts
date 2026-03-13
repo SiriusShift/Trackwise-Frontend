@@ -11,6 +11,19 @@ export interface Expense {
   recurringTemplate: RecurringTemplate;
 }
 
+export interface Transfer {
+  id: number; // Unique identifier
+  date: string; // Date of the expense
+  category: string; // Category of the expense (e.g., "Food & Dining", "Transport")
+  description?: string; // Optional description
+  amount: number; // Expense amount
+  source: Object;
+  status: "Completed" | "Partial" | "Pending" | "Overdue"; // Status of the expense
+  image: string;
+  recurringId: number;
+  recurringTemplate: RecurringTemplate;
+}
+
 export interface RecurringTemplate {
   amount: string;
   auto: boolean;

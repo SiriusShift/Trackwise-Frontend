@@ -15,6 +15,7 @@ import {
   Trash2,
   X,
   Archive,
+  ArrowDownToLine,
 } from "lucide-react";
 import { Expense } from "@/shared/types";
 import { Button } from "@/shared/components/ui/button";
@@ -311,7 +312,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
                       onSelect={onPayment}
                       disabled={income?.status === "Received"}
                     >
-                      <Banknote /> Receive
+                      <ArrowDownToLine /> Receive
                     </DropdownMenuItem>
                   </span>
                 </TooltipTrigger>

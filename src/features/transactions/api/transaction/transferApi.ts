@@ -10,6 +10,7 @@ export const transferApi = api
           method: "GET",
           params,
         }),
+        providesTags: ["Transfer"],
       }),
       postTransfer: builder.mutation({
         query: (body) => ({
@@ -25,6 +26,7 @@ export const transferApi = api
           method: "PATCH",
           body: data,
         }),
+        invalidatesTags: ["Graph", "Transfer"],
       }),
       deleteTransfer: builder.mutation({
         query: ({ data, id }) => ({
@@ -32,6 +34,8 @@ export const transferApi = api
           method: "PATCH",
           body: data,
         }),
+                invalidatesTags: ["Graph", "Transfer"],
+
       }),
 
       postTransferMoney: builder.mutation({
@@ -92,7 +96,7 @@ export const transferApi = api
           method: "GET",
           params,
         }),
-        transformResponse: (response) => response.data
+        transformResponse: (response) => response.data,
       }),
     }),
   });
@@ -107,5 +111,5 @@ export const {
   useDeleteRecurringTransferMutation,
   usePostRecurringTransferMutation,
   useGetGraphTransferQuery,
-  usePostTransferMoneyMutation
+  usePostTransferMoneyMutation,
 } = transferApi;

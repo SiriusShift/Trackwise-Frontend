@@ -10,10 +10,16 @@ import { categoryApi } from "@/shared/api/categoryApi";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 
-const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
+const TransactionHistory = ({
+  history,
+  setImageOpen,
+  setOpen,
+  transaction,
+}) => {
   const { confirm } = useConfirm();
   const dispatch = useDispatch();
   console.log(history);
+  console.log(transaction);
 
   const [trigger, { isLoading }] = useDeleteTransactionHistoryMutation();
   const onDelete = () => {
@@ -32,7 +38,7 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
           if (history?.transactionType === "Expense") {
             dispatch(expensesApi.util.invalidateTags(["Expenses", "Expenses"]));
           } else if (history?.transactionType === "Income") {
-            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]))
+            dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
           } else if (history?.transactionType === "Transfer") {
           }
         } catch (err) {
@@ -68,10 +74,20 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
               className={`font-bold text-lg ${
                 history?.transactionType === "Expense"
                   ? "text-red-600 dark:text-red-400"
-                  : "text-green-600 dark:text-green-400"
+                  : history?.transactionType === "Transfer"
+                    ? transaction?.category?.name === "Internal"
+                      ? "text-primary"
+                      : "text-red-600 dark:text-red-400"
+                    : "text-green-600 dark:text-green-400"
               }`}
             >
-              {history?.transactionType === "Expense" ? "-" : "+"}
+              {history?.transactionType === "Expense"
+                ? "-"
+                : history?.transactionType === "Transfer"
+                  ? transaction?.category?.name === "Internal"
+                    ? ""
+                    : "-"
+                  : "+"}
               {formatCurrency(history?.amount)}
             </span>
           </div>
@@ -83,16 +99,25 @@ const TransactionHistory = ({ history, setImageOpen, setOpen }) => {
             <span className="text-muted-foreground font-medium">
               Date Paid:
             </span>
-            <span className="text-foreground">
-              {formatDate(history?.date)}
-            </span>
+            <span className="text-foreground">{formatDate(history?.date)}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground font-medium">Source:</span>
-            <span className="text-foreground">
-              {history?.fromAsset?.name}
-            </span>
-          </div>
+          {history?.fromAsset && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground font-medium">Source:</span>
+              <span className="text-foreground">
+                {history?.fromAsset?.name}
+              </span>
+            </div>
+          )}
+
+          {history?.toAsset && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground font-medium">
+                Destination:
+              </span>
+              <span className="text-foreground">{history?.toAsset?.name}</span>
+            </div>
+          )}
 
           {history?.description && (
             <div className="space-y-1">

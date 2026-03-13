@@ -242,24 +242,24 @@ const TransactionPage = () => {
       },
     );
 
-  const { data: transferGraphData, isFetching: transferGraphFetching } =
-    useGetGraphTransferQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        mode,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
-      },
-      {
-        skip: type !== "Transfer",
-      },
-    );
+  // const { data: transferGraphData, isFetching: transferGraphFetching } =
+  //   useGetGraphTransferQuery(
+  //     {
+  //       startDate: startDate?.toISOString(),
+  //       endDate: endDate?.toISOString(),
+  //       mode,
+  //       ...(status && { status: status }),
+  //       ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+  //       ...(selectedCategories.length > 0 && {
+  //         Categories: JSON.stringify(
+  //           selectedCategories.map((category) => category.id),
+  //         ), // Add array of IDs
+  //       }),
+  //     },
+  //     {
+  //       skip: type !== "Transfer",
+  //     },
+  //   );
 
   const tableData =
     type === "Expense"
@@ -297,12 +297,12 @@ const TransactionPage = () => {
       ? expenseGraphData
       : type === "Income"
         ? incomeGraphData
-        : transferGraphData;
+        : null;
 
   console.log(graphData, "graph data")
 
   const graphFetching =
-    expenseGraphFetching || incomeGraphFetching || transferGraphFetching;
+    expenseGraphFetching || incomeGraphFetching;
 
   //UseEffect
   // useEffect(() => {
@@ -415,7 +415,7 @@ const TransactionPage = () => {
           </div>
 
           {/* Chart */}
-          <div>
+          {type !== "Transfer" &&  <div>
             <CommonPieGraph
               total={graphData?.total}
               trend={graphData?.trend}
@@ -423,7 +423,8 @@ const TransactionPage = () => {
               graphLoading={graphFetching}
               data={graphData?.data}
             />
-          </div>
+          </div>}
+         
         </div>
 
         <ViewDetailed

@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import {
   ArrowDownToLine,
   ChevronDown,
+  Download,
   Filter,
   Plus,
   Repeat,
@@ -92,7 +93,7 @@ const TransactionToolbar = ({
               <span className="hidden md:inline">Add</span>
             </Button>
             <Button size="sm" variant="outline">
-              <ArrowDownToLine className="lg:mr-2" />
+              <Download className="lg:mr-2" />
               <span className="hidden md:inline">Export</span>
             </Button>
             <FilterSheet

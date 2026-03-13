@@ -19,7 +19,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
-  mix-blend-mode: normal;
+  mix-blend-mode: normal
 }
 /* 
 body {
