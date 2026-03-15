@@ -20,10 +20,10 @@ export const transferApi = api
         }),
         invalidatesTags: ["Graph", "Transfer"],
       }),
-      updateTransfer: builder.mutation({
+      putTransfer: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transaction/transfer/${id}`,
-          method: "PATCH",
+          method: "PUT",
           body: data,
         }),
         invalidatesTags: ["Graph", "Transfer"],
@@ -105,7 +105,7 @@ export const {
   useGetTransferQuery,
   usePostTransferMutation,
   useDeleteTransferMutation,
-  useUpdateTransferMutation,
+  usePutTransferMutation,
   useGetRecurringTransferQuery,
   useUpdateRecurringTransferMutation,
   useDeleteRecurringTransferMutation,

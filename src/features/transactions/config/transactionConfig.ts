@@ -1,29 +1,29 @@
 // transactionConfig.ts
 import {
   usePostExpenseMutation,
-  usePatchExpenseMutation,
   usePostPaymentMutation,
   usePostRecurringExpenseMutation,
+  usePutExpenseMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { expenseColumns } from "../components/table-columns/transaction/expenseColumn";
 import {
   usePostIncomeMutation,
   usePostReceiveMutation,
   usePostRecurringIncomeMutation,
-  useUpdateIncomeMutation,
+  usePutIncomeMutation,
 } from "../api/transaction/incomeApi";
 import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
 import { expenseSchema } from "../schema/expense.schema";
 import { incomeSchema } from "../schema/income.schema";
 import { transferSchema } from "../schema/transfer.schema";
 import { transferColumns } from "../components/table-columns/transaction/transferColumn";
-import { usePostRecurringTransferMutation, usePostTransferMoneyMutation, usePostTransferMutation, useUpdateTransferMutation } from "../api/transaction/transferApi";
+import { usePostRecurringTransferMutation, usePostTransferMoneyMutation, usePostTransferMutation, usePutTransferMutation } from "../api/transaction/transferApi";
 
 export const transactionConfig = {
   Expense: {
     transactTrigger: usePostPaymentMutation,
     postTrigger: usePostExpenseMutation,
-    editTrigger: usePatchExpenseMutation,
+    editTrigger: usePutExpenseMutation,
     postRecurringTrigger: usePostRecurringExpenseMutation,
     columns: expenseColumns,
     schema: expenseSchema,
@@ -31,7 +31,7 @@ export const transactionConfig = {
   Income: {
     postTrigger: usePostIncomeMutation,
     transactTrigger: usePostReceiveMutation,
-    editTrigger: useUpdateIncomeMutation,
+    editTrigger: usePutIncomeMutation,
     postRecurringTrigger: usePostRecurringIncomeMutation,
     columns: incomeColumns,
     schema: incomeSchema,
@@ -39,7 +39,7 @@ export const transactionConfig = {
   Transfer: {
     postTrigger: usePostTransferMutation,
     transactTrigger: usePostTransferMoneyMutation,
-    editTrigger: useUpdateTransferMutation,
+    editTrigger: usePutTransferMutation,
     postRecurringTrigger: usePostRecurringTransferMutation,
     columns: transferColumns,
     schema: transferSchema,

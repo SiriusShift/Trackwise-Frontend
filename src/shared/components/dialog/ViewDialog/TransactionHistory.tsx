@@ -144,7 +144,7 @@ const TransactionHistory = ({
               <span className="hidden sm:inline">View</span>
             </Button>
           )}
-          <Button
+          {history?.transactionType !== "Transfer" && <>          <Button
             onClick={() => setOpen(true)}
             variant="outline"
             size="sm"
@@ -161,7 +161,8 @@ const TransactionHistory = ({
           >
             <Trash className="h-4 w-4" />
             <span className="hidden sm:inline">Delete</span>
-          </Button>
+          </Button></>}
+
         </div>
       </div>
     </>

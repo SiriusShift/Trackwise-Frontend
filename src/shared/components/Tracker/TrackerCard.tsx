@@ -21,6 +21,7 @@ import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/store";
 import { useState } from "react";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 
 const TrackerCard = ({
   item,
@@ -41,6 +42,8 @@ const TrackerCard = ({
 }) => {
   const [open, setOpen] = useState(false)
   const mode = useSelector((state: IRootState) => state.active.mode);
+  const width = useScreenWidth()
+
   const limit = mode === "monthly" ? item?.value : item?.value * 12;
   console.log(limit);
   const percentage = limit > 0 ? (Number(item?.total) / limit) * 100 : 0;
@@ -85,7 +88,7 @@ const TrackerCard = ({
           <CardContent className="flex h-[100px] items-center p-3">
             <ChartContainer
               config={{ innerRadius: 27, outerRadius: 20 }}
-              className="h-[100px] w-[100px]"
+              className="h-[65px] w-[65px] mr-2 sm:h-[100px] sm:w-[100px]"
             >
               <RadialBarChart
                 width={100}

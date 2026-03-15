@@ -20,29 +20,29 @@ const TransactionList = forwardRef(function TransactionList(
   { transactions, isFetching },
   ref
 ) {
-  const dispatch = useDispatch();
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  };
+  // const dispatch = useDispatch();
+  // const containerVariants = {
+  //   hidden: { opacity: 0 },
+  //   visible: {
+  //     opacity: 1,
+  //     transition: {
+  //       staggerChildren: 0.1,
+  //       delayChildren: 0.1,
+  //     },
+  //   },
+  // };
 
-  const itemVariants = {
-    hidden: { x: -40, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        ease: [0.25, 0.1, 0.25, 1],
-        duration: 0.4,
-      },
-    },
-  };
+  // const itemVariants = {
+  //   hidden: { x: -40, opacity: 0 },
+  //   visible: {
+  //     x: 0,
+  //     opacity: 1,
+  //     transition: {
+  //       ease: [0.25, 0.1, 0.25, 1],
+  //       duration: 0.4,
+  //     },
+  //   },
+  // };
 
   return (
     <motion.div initial="hidden" animate="visible">

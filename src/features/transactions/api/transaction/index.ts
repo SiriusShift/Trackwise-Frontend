@@ -34,6 +34,13 @@ export const transactionApi = api
           params
         }),
       }),
+      archiveTransaction: builder.mutation({
+        query: ({id, data}) => ({
+          url: `/transaction/${id}`,
+          method: "PATCH",
+          params: data
+        })
+      })
     }),
   });
 
@@ -41,5 +48,6 @@ export const {
   useGetTransactionHistoryQuery,
   useUpdateTransactionHistoryMutation,
   useDeleteTransactionHistoryMutation,
-  useGetStatisticsQuery
+  useGetStatisticsQuery,
+  useArchiveTransactionMutation
 } = transactionApi;

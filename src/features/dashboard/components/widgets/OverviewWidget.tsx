@@ -40,13 +40,13 @@ const OverviewWidget = ({data, isLoading}) => {
             <div>
               <p className="text-foreground">Balance</p>
               {/* <p className="text-3xl">{balance}</p> */}
-              <div className="text-3xl flex gap-1">₱<AnimateNumber duration={2} value={balance} className="text-xl"/></div>
+              <div className="text-3xl flex gap-1">₱<AnimateNumber duration={2} value={balance}/></div>
             </div>
             <div className="w-12 h-12 rounded-md flex justify-center items-center border border-border">
               <Banknote />
             </div>
           </div>
-          <div className="flex gap-1 mt-5">
+          <div className="flex gap-1 mt-3 sm:mt-5">
             {isNaN(data?.balanceTrend) ? (
               <p>No data last {mode}</p>
             ) : (
@@ -63,7 +63,6 @@ const OverviewWidget = ({data, isLoading}) => {
               </>
             )}
           </div>
-          {/* <p className="text-gray-400">{date}</p> */}
         </>
       )}
     </Widget>

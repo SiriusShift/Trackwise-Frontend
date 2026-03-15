@@ -403,17 +403,20 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
             await fetchData(formattedData).unwrap();
           }
 
-          // if (type === "Expense") {
-          //   dispatch(
-          //     expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
-          //   );
-          // } else if (type === "Income") {
-          //   dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
-          // } else if (type === "Transfer") {
-          //   dispatch(
-          //     transferApi.util.invalidateTags(["Transfer", "Recurring"]),
-          //   );
-          // }
+          if (mode === "edit") {
+            if (type === "Expense") {
+              dispatch(
+                expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
+              );
+            } else if (type === "Income") {
+              dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
+            } else if (type === "Transfer") {
+              dispatch(
+                transferApi.util.invalidateTags(["Transfer", "Recurring"]),
+              );
+            }
+          }
+
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
           dispatch(transactionApi.util.invalidateTags(["History"]));
@@ -453,7 +456,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         }}
       >
         <DialogContent
-          onInteractOutside={(e) => isDirty && e.preventDefault()}
+          onInteractOutside={true}
           className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto px-0 sm:max-h-[90%] p sm:min-h-lg sm:w-md"
         >
           <DialogHeader className="px-6">

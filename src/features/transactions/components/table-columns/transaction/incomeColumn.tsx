@@ -15,7 +15,6 @@ import {
   Trash2,
   X,
   Archive,
-  ArrowDownToLine,
 } from "lucide-react";
 import { Expense } from "@/shared/types";
 import { Button } from "@/shared/components/ui/button";
@@ -142,10 +141,10 @@ export const incomeColumns: ColumnDef<Income>[] = [
     header: "Description",
     cell: ({ getValue, row }) => (
       <div className="flex items-center w-40 gap-2">
-        {row.original?.recurringIncome && (
+        {row.original?.recurringTemplate && (
           <span title="Recurring expense">
             <RefreshCcw
-              className={`${row.original.recurringIncome?.isActive ? "text-blue-500" : "text-red-500"}`}
+              className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`}
               size={15}
             />
           </span>
@@ -213,7 +212,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
       };
 
       const onPayment = async () => {
-        if (income?.recurringIncome?.auto) {
+        if (income?.recurringTemplate?.auto) {
           confirm({
             title: "Confirm Payment",
             description: "Do you want to proceed with paying this expense?",
@@ -278,7 +277,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
           cancelText: "Cancel",
           onConfirm: async () => {
             try {
-              await cancelRecurring(income?.recurringIncome?.id).unwrap();
+              await cancelRecurring(income?.recurringTemplate?.id).unwrap();
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
@@ -312,7 +311,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
                       onSelect={onPayment}
                       disabled={income?.status === "Received"}
                     >
-                      <ArrowDownToLine /> Receive
+                      <Banknote /> Receive
                     </DropdownMenuItem>
                   </span>
                 </TooltipTrigger>
@@ -369,13 +368,13 @@ export const incomeColumns: ColumnDef<Income>[] = [
               </DropdownMenuItem>
 
               {/* --- Cancel Recurring --- */}
-              {income?.recurringIncome && (
+              {income?.recurringTemplate && (
                 <>
                   <DropdownMenuSeparator />
 
                   {/* Stop whole series */}
                   <DropdownMenuItem
-                    disabled={!income?.recurringIncome?.isActive}
+                    disabled={!income?.recurringTemplate?.isActive}
                     onClick={onStopSeries}
                   >
                     <X className="h-4 w-4 text-destructive" />

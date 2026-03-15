@@ -12,10 +12,10 @@ export const incomeApi = api
         }),
         invalidatesTags: ["Income"],
       }),
-      updateIncome: builder.mutation({
+      putIncome: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transaction/income/${id}`,
-          method: "PATCH",
+          method: "PUT",
           body: data,
         }),
         invalidatesTags: ["Income"],
@@ -121,7 +121,7 @@ export const incomeApi = api
 
 export const {
   useLazyGetIncomeQuery,
-  useUpdateIncomeMutation,
+  usePutIncomeMutation,
   usePostIncomeMutation,
   useDeleteIncomeMutation,
   useGetGraphIncomeQuery,

@@ -38,7 +38,7 @@ export const expensesApi = api
         invalidatesTags: ["Expenses"],
       }),
 
-      patchExpense: builder.mutation({
+      putExpense: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transaction/expense/${id}`,
           method: "PATCH",
@@ -121,7 +121,7 @@ export const {
   useGetGraphExpenseQuery,
   useLazyGetGraphExpenseQuery,
   useDeleteExpenseMutation,
-  usePatchExpenseMutation,
+  usePutExpenseMutation,
   useGetRecurringExpensesQuery,
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,

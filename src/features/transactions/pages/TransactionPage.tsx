@@ -31,13 +31,12 @@ import {
 } from "../api/transaction/transferApi";
 import useDebounce from "@/shared/hooks/useDebounce";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { motion } from "motion/react";
-import { Button } from "@/shared/components/ui/button";
-import { Pencil } from "lucide-react";
+
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
+import CommonToolbar from "@/shared/components/CommonToolbar";
 const TransactionPage = () => {
   const type = useSelector((state: IRootState) => state.active.type);
   const active = useSelector((state: IRootState) => state.active.active);
@@ -62,6 +61,7 @@ const TransactionPage = () => {
 
   const location = useLocation();
   const dispatch = useDispatch();
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
   const { confirm } = useConfirm();
   const mode = formatMode();
   const width = useScreenWidth();
@@ -242,25 +242,6 @@ const TransactionPage = () => {
       },
     );
 
-  // const { data: transferGraphData, isFetching: transferGraphFetching } =
-  //   useGetGraphTransferQuery(
-  //     {
-  //       startDate: startDate?.toISOString(),
-  //       endDate: endDate?.toISOString(),
-  //       mode,
-  //       ...(status && { status: status }),
-  //       ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-  //       ...(selectedCategories.length > 0 && {
-  //         Categories: JSON.stringify(
-  //           selectedCategories.map((category) => category.id),
-  //         ), // Add array of IDs
-  //       }),
-  //     },
-  //     {
-  //       skip: type !== "Transfer",
-  //     },
-  //   );
-
   const tableData =
     type === "Expense"
       ? expenseData
@@ -299,20 +280,9 @@ const TransactionPage = () => {
         ? incomeGraphData
         : null;
 
-  console.log(graphData, "graph data")
+  console.log(graphData, "graph data");
 
-  const graphFetching =
-    expenseGraphFetching || incomeGraphFetching;
-
-  //UseEffect
-  // useEffect(() => {
-  //   trigger();
-  //   triggerChart({
-  //     startDate: startDate?.toISOString(),
-  //     endDate: endDate?.toISOString(),
-  //     mode,
-  //   });
-  // }, [pageSize, pageIndex, startDate, endDate, type]);
+  const graphFetching = expenseGraphFetching || incomeGraphFetching;
 
   useEffect(() => {
     if (active === null) return;
@@ -342,36 +312,28 @@ const TransactionPage = () => {
     }
   }, [JSON.stringify(tableData), tableFetching]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showActionTab &&
+        toolbarRef.current &&
+        !toolbarRef.current.contains(event.target as Node)
+      ) {
+        dispatch(setActionShow(false));
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showActionTab, dispatch]);
+
   return (
     <>
-      {showActionTab && width < 640 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }} // start invisible and slightly above
-          animate={{
-            opacity: 1, // fade in
-            y: 0, // move to normal position
-            transition: {
-              ease: "easeInOut",
-              duration: 0.25,
-            },
-          }}
-          exit={{
-            opacity: 0,
-            y: -10,
-            transition: { duration: 0.2 },
-          }}
-          className="w-full border-b px-5 py-2 flex justify-end gap-2"
-        >
-          <Button variant="outline">
-            <Pencil className="w-4 h-4" />
-          </Button>
-        </motion.div>
-      )}
-
-      <div
-        onClick={() => dispatch(setActionShow(false))}
-        className="flex p-5 flex-col gap-5"
-      >
+      <CommonToolbar />
+      <div className="flex p-5 flex-col gap-5">
         {/* Header */}
 
         <PageHeader
@@ -415,16 +377,17 @@ const TransactionPage = () => {
           </div>
 
           {/* Chart */}
-          {type !== "Transfer" &&  <div>
-            <CommonPieGraph
-              total={graphData?.total}
-              trend={graphData?.trend}
-              type={type}
-              graphLoading={graphFetching}
-              data={graphData?.data}
-            />
-          </div>}
-         
+          {type !== "Transfer" && (
+            <div>
+              <CommonPieGraph
+                total={graphData?.total}
+                trend={graphData?.trend}
+                type={type}
+                graphLoading={graphFetching}
+                data={graphData?.data}
+              />
+            </div>
+          )}
         </div>
 
         <ViewDetailed

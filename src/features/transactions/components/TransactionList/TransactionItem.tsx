@@ -1,17 +1,19 @@
 import React from "react";
 import * as Icons from "lucide-react";
-import {StatusIcon} from "@/features/transactions/components/statusIcon";
+import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { motion } from "motion/react";
 import { Badge } from "@/shared/components/ui/badge";
 import moment from "moment";
 import { useDispatch } from "react-redux";
-import { setActionShow, setActiveRow, setOpenDialog } from "@/shared/slices/activeSlice";
+import {
+  setActionShow,
+  setActiveRow,
+  setOpenDialog,
+} from "@/shared/slices/activeSlice";
 import useLongPress from "@/shared/hooks/useLongPress";
-const TransactionItem = React.memo(function TransactionItem({
-  item,
-  index,
-}) {
-  const dispatch = useDispatch()
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
+const TransactionItem = React.memo(function TransactionItem({ item, index }) {
+  const dispatch = useDispatch();
   const LucidIcon = Icons[item.category?.icon];
   const statusIcon = StatusIcon[item?.status];
 
@@ -21,8 +23,10 @@ const TransactionItem = React.memo(function TransactionItem({
   }, 1000); // hold 1.5 seconds
 
   const handleClick = () => {
+    console.log("test");
     dispatch(setActiveRow(item));
-    dispatch(setOpenDialog(true));
+    dispatch(setActionShow(true));
+    // dispatch(setOpenDialog(true));
   };
 
   return (
@@ -44,7 +48,7 @@ const TransactionItem = React.memo(function TransactionItem({
         <div className="ml-3 flex-1 min-w-0">
           <div className="flex justify-between items-start">
             <h1
-              className="truncate font-medium text-sm leading-tight"
+              className="truncate text-semibold text-base "
               title={item?.description}
             >
               {item?.description}
@@ -54,14 +58,11 @@ const TransactionItem = React.memo(function TransactionItem({
                 item?.type === "Expense"
                   ? "text-destructive"
                   : item?.type === "Income"
-                  ? "text-success"
-                  : "text-primary"
+                    ? "text-success"
+                    : "text-primary"
               } font-semibold text-base whitespace-nowrap ml-2`}
             >
-              ₱
-              {item?.amount.toLocaleString("en-PH", {
-                minimumFractionDigits: 2,
-              })}
+              {formatCurrency(item.amount)}
             </h1>
           </div>
 
@@ -78,14 +79,15 @@ const TransactionItem = React.memo(function TransactionItem({
 
       {/* Bottom row: status + recurring indicator */}
       <div className="flex justify-between items-center mt-3">
-        {item?.status &&         <Badge
-          variant="outline"
-          className="flex items-center gap-1 text-xs px-2 py-0.5"
-        >
-          {statusIcon}
-          {item?.status}
-        </Badge>}
-
+        {item?.status && (
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 text-xs px-2 py-0.5"
+          >
+            {statusIcon}
+            {item?.status}
+          </Badge>
+        )}
 
         {item?.recurringTemplate && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">

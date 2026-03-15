@@ -46,7 +46,7 @@ const IncomeWidget = ({data, isLoading}) => {
               <ArrowDownToLine />
             </div>
           </div>
-          <div className="flex gap-1 mt-5">
+          <div className="flex gap-1 mt-3 sm:mt-5">
             {data?.incomeTrend === 0 ? (
               <p>No data last {mode}</p>
             ) : (
@@ -63,7 +63,6 @@ const IncomeWidget = ({data, isLoading}) => {
               </>
             )}
           </div>
-          <p className="text-gray-400">{date}</p>
         </>
       )}
     </Widget>

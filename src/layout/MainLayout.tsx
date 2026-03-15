@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/shared/components/Sidebar";
 import Header from "../shared/components/Header";
 import { SidebarProvider } from "@/shared/components/ui/sidebar";
+import CommonToolbar from "@/shared/components/CommonToolbar";
 
 function MainLayout() {
   return (
@@ -9,6 +10,7 @@ function MainLayout() {
         <AppSidebar />
         <div className="flex-1 min-w-0">
           <Header />
+
           <div>
             <Outlet />
           </div>

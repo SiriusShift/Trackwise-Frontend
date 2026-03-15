@@ -76,7 +76,7 @@ const TransactionHistory = () => {
   return (
     <Card className="rounded-lg  col-span-full p-0 md:col-span-4  xl:col-span-1 border flex flex-col">
       <div className="flex justify-between p-6 pb-4  items-center">
-        <h1 className="gap-3 text-xl font-semibold">Recent Transactions</h1>
+        <h1 className="gap-3 text-lg sm:text-xl font-semibold">Recent Transactions</h1>
         <Link to={"/transactions"}>See All</Link>
       </div>
       <hr className="mx-5" />
