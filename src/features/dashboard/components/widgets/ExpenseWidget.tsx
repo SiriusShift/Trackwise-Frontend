@@ -11,7 +11,7 @@ import {
 import { ArrowUpFromLine, Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
-const ExpenseWidget = ({data, isLoading}) => {
+const ExpenseWidget = ({ data, isLoading }) => {
   const date = formatDateDisplay();
   const mode = formatMode();
   const balance = Number(data?.expense);
@@ -38,12 +38,24 @@ const ExpenseWidget = ({data, isLoading}) => {
         <>
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-foreground">Total</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
+                Total Expense
+              </p>
               {/* <p className="text-3xl">{balance}</p> */}
-              <div className="text-3xl flex gap-1">₱<AnimateNumber duration={2} value={balance} className="text-xl"/></div>
+              <div className="text-3xl flex gap-1">
+                ₱
+                <AnimateNumber
+                  duration={2}
+                  value={balance}
+                  className="text-xl"
+                />
+              </div>
             </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border border-border">
-              <ArrowUpFromLine />
+            <div className="w-11 h-11 rounded-xl flex justify-center items-center bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 shrink-0">
+              <ArrowUpFromLine
+                size={18}
+                className="text-red-600 dark:text-red-400"
+              />
             </div>
           </div>
           <div className="flex gap-1 mt-3 sm:mt-5">

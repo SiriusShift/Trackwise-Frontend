@@ -35,6 +35,7 @@ import { formatMode } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/store";
 import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
+import DueCalendar from "../components/widgets/DueCalendar";
 export const description = "Loan Payment Progress Chart";
 
 const chartData = [
@@ -106,53 +107,11 @@ const Dashboard = () => {
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
-            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5">
+            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5 ">
               <OverviewWidget data={data} isLoading={isFetching} />
               <ExpenseWidget data={data} isLoading={isFetching} />
               <IncomeWidget data={data} isLoading={isFetching} />
-              <Card className="rounded-lg col-span-2 lg:col-span-full 2xl:col-span-1 p-5 border">
-                <div className="flex justify-between items-center">
-                  <h1 className="gap-3 text-xl font-semibold">Payment Due</h1>
-                  <Link to={"/funds"}>See All</Link>
-                </div>
-                <hr className="w-full mt-3" />
-                <div className="flex mt-3 rounded-md flex-col gap-5 justify-between">
-                  <div className="flex w-full">
-                    <div className="p-2 border rounded-md w-14 flex flex-col items-center ">
-                      <p className="text-foreground text-sm">Nov</p>
-                      <p className="text-foreground text-sm">13</p>
-                    </div>
-                    <div className="ml-3 w-full flex flex-col justify-center">
-                      <div className="flex justify-between">
-                        <div>
-                          <h1 className="font-medium">Electric</h1>
-                        </div>
-                        <div>
-                          <h1 className="font-medium">₱ 3,540.21</h1>
-                        </div>
-                      </div>
-                      <p className="text-gray-400">Monthly expense</p>
-                    </div>
-                  </div>
-                  <div className="flex w-full">
-                    <div className="p-2 border rounded-md  w-14 flex flex-col items-center ">
-                      <p className="text-foreground text-sm">Sep</p>
-                      <p className="text-foreground text-sm">15</p>
-                    </div>
-                    <div className="ml-3 w-full flex flex-col justify-center">
-                      <div className="flex justify-between">
-                        <div>
-                          <h1 className="font-medium">Water</h1>
-                        </div>
-                        <div>
-                          <h1 className="font-medium">₱ 1,000.00</h1>
-                        </div>
-                      </div>
-                      <p className="text-gray-400">Monthly expense</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <DueCalendar />
               {/* <CalendarWidget
                 // activeDay={activeDay}
                 colorTheme={theme}

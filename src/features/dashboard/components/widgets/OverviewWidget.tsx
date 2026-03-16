@@ -11,7 +11,7 @@ import {
 import { Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
-const OverviewWidget = ({data, isLoading}) => {
+const OverviewWidget = ({ data, isLoading }) => {
   const date = formatDateDisplay();
   const mode = formatMode();
   const balance = data?.balance;
@@ -38,12 +38,19 @@ const OverviewWidget = ({data, isLoading}) => {
         <>
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-foreground">Balance</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
+                Balance
+              </p>
               {/* <p className="text-3xl">{balance}</p> */}
-              <div className="text-3xl flex gap-1">₱<AnimateNumber duration={2} value={balance}/></div>
+              <div className="text-3xl flex gap-1">
+                ₱<AnimateNumber duration={2} value={balance} />
+              </div>
             </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border border-border">
-              <Banknote />
+            <div className="w-11 h-11 rounded-xl flex justify-center items-center bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 shrink-0">
+              <Banknote
+                size={18}
+                className="text-blue-600 dark:text-blue-400"
+              />
             </div>
           </div>
           <div className="flex gap-1 mt-3 sm:mt-5">

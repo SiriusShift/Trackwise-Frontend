@@ -1,35 +1,40 @@
 import React from "react";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../../shared/components/ui/card";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import { commonWidgetProps } from "@/shared/types";
+import { Card, CardHeader, CardTitle } from "../../../../shared/components/ui/card";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
-import { IRootState } from "@/app/store";
-import { Separator } from "@/shared/components/ui/separator";
+import { commonWidgetProps } from "@/shared/types";
 
 const WidgetLayout = ({ children, title }: commonWidgetProps) => {
   const date = formatDateDisplay();
-  // const activeMonth = useSelector((state: IRootState) => state.active.active);
+  const isOverview = title === "Overview";
 
   return (
     <Card
-      className={`border p-5 flex flex-col rounded-lg col-span-full md:col-span-2 ${title === "Overview" ? "md:col-span-2" : "md:col-span-1"} xl:col-span-1 2xl:col-span-1 h-52 sm:h-60 `}
+      className={`
+        relative overflow-hidden border border-border/60 bg-card
+        p-5 flex flex-col rounded-2xl shadow-sm
+        col-span-full
+        md:col-span-${isOverview ? "2" : "1"}
+        xl:col-span-1 2xl:col-span-1
+        transition-shadow hover:shadow-md
+      `}
     >
-      <CardHeader className="flex p-0 flex-row justify-between items-center">
-        <CardTitle className="text-lg sm:text-xl">{title}</CardTitle>
-        <p className="text-gray-400">{date}</p>
+      {/* Subtle top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-        {/* <CardDescription className="text-sm text-gray-400">
-          {formatDateDisplay()}
-        </CardDescription> */}
+      <CardHeader className="p-0 flex flex-row justify-between items-center">
+        <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground">
+          {title}
+        </CardTitle>
+        <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border/50">
+          {date}
+        </span>
       </CardHeader>
-      <hr className="my-3 " />
-      {children}
+
+      {/* <hr className="h-px bg-gradient-to-r from-border via-border/40 to-transparent mt-3 mb-4" /> */}
+
+      <div className="flex-1 min-h-0 mt-4">
+        {children}
+      </div>
     </Card>
   );
 };
