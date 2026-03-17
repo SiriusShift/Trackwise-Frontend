@@ -110,6 +110,14 @@ export const expensesApi = api
           method: "POST",
           body: data
         })
+      }),
+      getBills: builder.query({
+        query: () => ({
+          url: "/transaction/expense/bills",
+          method: "GET"
+        }),
+                transformResponse: (response: any) => response.data,
+
       })
     }),
   });
@@ -127,5 +135,7 @@ export const {
   useUpdateRecurringExpenseMutation,
   useCancelRecurringExpenseMutation,
   usePostPaymentMutation,
-  usePostAutoPaymentMutation
+  usePostAutoPaymentMutation,
+  useGetBillsQuery,
+  useLazyGetBillsQuery
 } = expensesApi;
