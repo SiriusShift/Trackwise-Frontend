@@ -1,5 +1,9 @@
 import React from "react";
-import { Card, CardHeader, CardTitle } from "../../../../shared/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { commonWidgetProps } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -62,16 +66,19 @@ const WidgetLayout = ({
   const gradientColor =
     title === "Expense"
       ? {
-          container: "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
+          container:
+            "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
           text: "text-red-600 dark:text-red-400",
         }
       : title === "Income"
         ? {
-            container: "bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800",
+            container:
+              "bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800",
             text: "text-green-600 dark:text-green-400",
           }
         : {
-            container: "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800",
+            container:
+              "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800",
             text: "text-blue-600 dark:text-blue-400",
           };
 
@@ -107,9 +114,15 @@ const WidgetLayout = ({
       <CardHeader className="p-0">
         <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground flex flex-row gap-1 items-center">
           {title}
-          {title !== "Overview" && <>          <span>•</span>
-          <span className="text-[11px] font-medium text-muted-foreground">{date}</span></>}
-
+          {title !== "Overview" && (
+            <>
+              {" "}
+              <span>•</span>
+              <span className="text-[11px] font-medium text-muted-foreground">
+                {date}
+              </span>
+            </>
+          )}
         </CardTitle>
       </CardHeader>
 
@@ -135,7 +148,6 @@ const WidgetLayout = ({
         ) : (
           <div className="flex flex-col justify-between h-full gap-2">
             <div className="space-y-4">
-
               {/* Amount + icon row */}
               <div className="flex justify-between items-center">
                 <div>
@@ -149,7 +161,11 @@ const WidgetLayout = ({
                 <div
                   className={`w-11 h-11 rounded-xl flex justify-center items-center border shrink-0 ${gradientColor.container}`}
                 >
-                  <IconComponent width={18} height={18} className={gradientColor.text} />
+                  <IconComponent
+                    width={18}
+                    height={18}
+                    className={gradientColor.text}
+                  />
                 </div>
               </div>
 
@@ -170,11 +186,15 @@ const WidgetLayout = ({
             <div className="flex gap-2 flex-col">
               <hr className="border-border/60" />
               <div className="flex gap-1">
-                {isNaN(trend) || trend === 0 && !data ? (
-                  <p className="text-sm text-muted-foreground">No data last {mode}</p>
+                {isNaN(trend) || (trend === 0 && !data) ? (
+                  <p className="text-sm text-muted-foreground">
+                    No data last {mode}
+                  </p>
                 ) : (
                   <div className="flex justify-between w-full">
-                    <p className="text-sm text-muted-foreground">Compare to last {mode}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Compare to last {mode}
+                    </p>
                     <p className={`text-sm font-medium ${trendColor}`}>
                       {trend > 0 ? "↑ +" : "↓ "}
                       {trend ?? 0}%

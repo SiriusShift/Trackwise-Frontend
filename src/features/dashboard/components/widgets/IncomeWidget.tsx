@@ -1,13 +1,4 @@
 import Widget from "@/features/dashboard/components/widgets/Widget";
-import {
-  formatMode,
-} from "@/shared/utils/CustomFunctions";
-
-const segments: StackedBarSegment[] = [
-  { label: "Salary", value: 1670, color: "hsl(var(--chart-1))" },
-  { label: "Side Hustle ", value: 2000, color: "hsl(var(--chart-2))" },
-  { label: "Side Hustle ", value: 780, color: "hsl(var(--chart-3))" },
-];
 
 export interface StackedBarSegment {
   label: string;

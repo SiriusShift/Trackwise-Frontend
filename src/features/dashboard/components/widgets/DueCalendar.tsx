@@ -1,29 +1,8 @@
-import { Card } from "@/shared/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
 import * as Icons from "lucide-react";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-const payments = [
-  {
-    name: "Electric",
-    amount: 3540.21,
-    dueDate: "2026-01-13",
-    type: "Monthly expense",
-  },
-  {
-    name: "Water",
-    amount: 1000,
-    dueDate: "2026-09-15",
-    type: "Monthly expense",
-  },
-  {
-    name: "Rent",
-    amount: 1000,
-    dueDate: "2026-09-15",
-    type: "Monthly expense",
-  },
-];
 
 const getStatus = (date) => {
   const today = moment();
@@ -86,14 +65,20 @@ export default function DueCalendar() {
     ?.slice(1)
     ?.reduce((sum, p) => sum + Number(p.amount), 0);
   const featured = data?.[0];
+  console.log(featured);
   const featuredStatus = getStatus(featured?.date);
   const featuredDate = moment(featured?.date);
+  const IconComponent =
+    Icons[featured?.category?.icon as keyof typeof Icons] || Icons.Banknote;
+
   // console.log(featured)
 
   const remaining = data?.length - 1;
   return (
     <Card
-      className="rounded-2xl col-span-2 lg:col-span-full 2xl:col-span-1 p-5 border border-border/60 shadow-sm bg-card"
+      className="        relative overflow-hidden border border-border/60 bg-card
+        p-5 flex flex-col rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
+        transition-shadow hover:shadow-md"
       style={{
         backgroundImage: `
     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
@@ -101,9 +86,11 @@ export default function DueCalendar() {
   `,
       }}
     >
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+
       {/* Header */}
-      <div className="flex justify-between items-center mb-5">
-        <div>
+      <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
+        <CardTitle>
           <h1 className="text-sm font-semibold uppercase tracking-widest">
             Payment Due
           </h1>
@@ -111,14 +98,14 @@ export default function DueCalendar() {
             {data?.length} upcoming bill
             {data?.length !== 1 ? "s" : ""}
           </p>
-        </div>
+        </CardTitle>
         <Link
           to="/funds"
           className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
         >
           See All →
         </Link>
-      </div>
+      </CardHeader>
 
       {/* Featured item */}
       <div className="flex items-center gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
@@ -135,7 +122,7 @@ export default function DueCalendar() {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-sm">{categoryIcon(featured?.name)}</span>
+            <IconComponent width={13} className="text-muted-foreground" />
             <span className="font-semibold text-sm truncate">
               {featured?.description}
             </span>
