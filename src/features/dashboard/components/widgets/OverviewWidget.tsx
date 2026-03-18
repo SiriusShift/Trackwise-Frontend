@@ -1,78 +1,34 @@
 import Widget from "@/features/dashboard/components/widgets/Widget";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import AnimateNumber from "@/shared/components/AnimateNumber";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { overviewWidgetProps } from "@/shared/types";
-import {
-  formatCurrency,
-  formatDateDisplay,
-  formatMode,
-} from "@/shared/utils/CustomFunctions";
+import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { Banknote } from "lucide-react";
-import { useSelector } from "react-redux";
+import { StackedBar } from "@/shared/components/charts/CommonStackedBar";
+
+const segments: StackedBarSegment[] = [
+  { label: "Cash on hand", value: 2500, color: "hsl(var(--chart-1))" },
+  { label: "GCash", value: 2000, color: "hsl(var(--chart-2))" },
+  { label: "Maya", value: 1500, color: "hsl(var(--chart-3))" },
+  { label: "PayPal", value: 1025, color: "hsl(var(--chart-4))" },
+  { label: "Savings", value: 1500, color: "hsl(var(--chart-5))" },
+  { label: "Bank (BDO)", value: 1500, color: "hsl(var(--chart-6))" },
+    { label: "Others", value: 7000, color: "hsl(var(--chart-7))" },
+];
+
+export interface StackedBarSegment {
+  label: string;
+  value: number;
+  color: string;
+}
 
 const OverviewWidget = ({ data, isLoading }) => {
-  const date = formatDateDisplay();
-  const mode = formatMode();
-  const balance = data?.balance;
-  console.log(data);
+  const formattedData = data?.assetBreakdown?.map((item, index) => ({
+    label: item.name,
+    value: item.balance,
+    color: `hsl(var(--chart-${index+1}))`
+  }))
   return (
-    <Widget title="Overview">
-      {isLoading ? (
-        <>
-          <div className="flex justify-between items-center">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-8 w-32" />
-            </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-border">
-              <Banknote />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 mt-5">
-            <Skeleton className="w-56 h-4" />
-            <Skeleton className="w-40 h-4" />
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
-                Balance
-              </p>
-              {/* <p className="text-3xl">{balance}</p> */}
-              <div className="text-3xl flex gap-1">
-                ₱<AnimateNumber duration={2} value={balance} />
-              </div>
-            </div>
-            <div className="w-11 h-11 rounded-xl flex justify-center items-center bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 shrink-0">
-              <Banknote
-                size={18}
-                className="text-blue-600 dark:text-blue-400"
-              />
-            </div>
-          </div>
-          <div className="flex gap-1 mt-3 sm:mt-5">
-            {isNaN(data?.balanceTrend) ? (
-              <p>No data last {mode}</p>
-            ) : (
-              <>
-                <p>Compare to last {mode}</p>
-                <p
-                  className={
-                    data?.balanceTrend > 0 ? "text-green-500" : "text-red-500"
-                  }
-                >
-                  {data?.balanceTrend > 0 ? "+" : ""}
-                  {data?.balanceTrend ? data?.balanceTrend : 0}%
-                </p>
-              </>
-            )}
-          </div>
-        </>
-      )}
-    </Widget>
+    <Widget title="Overview" data={data} isLoading={isLoading} segments={formattedData} icon="Banknote"/>
   );
 };
 

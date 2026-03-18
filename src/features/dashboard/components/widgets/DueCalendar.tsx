@@ -93,7 +93,7 @@ export default function DueCalendar() {
   const remaining = data?.length - 1;
   return (
     <Card
-      className="rounded-2xl col-span-2 lg:col-span-full 2xl:col-span-1 p-6 border border-border/60 shadow-sm bg-card"
+      className="rounded-2xl col-span-2 lg:col-span-full 2xl:col-span-1 p-5 border border-border/60 shadow-sm bg-card"
       style={{
         backgroundImage: `
     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),

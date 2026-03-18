@@ -103,7 +103,8 @@ export interface payRecurringForm {
 }
 
 export interface commonWidgetProps {
-  children: React.ReactNode;
+  data: Array;
+  isLoading: boolean;
   title: string;
 }
 

@@ -11,73 +11,26 @@ import {
 import { ArrowUpFromLine, Banknote } from "lucide-react";
 import { useSelector } from "react-redux";
 
+const segments: StackedBarSegment[] = [
+  { label: "Salary", value: 1670, color: "hsl(var(--chart-1))" },
+  { label: "Side Hustle ", value: 2000, color: "hsl(var(--chart-2))" },
+  { label: "Side Hustle ", value: 780, color: "hsl(var(--chart-3))" },
+];
+
+export interface StackedBarSegment {
+  label: string;
+  value: number;
+  color: string;
+}
+
 const ExpenseWidget = ({ data, isLoading }) => {
-  const date = formatDateDisplay();
-  const mode = formatMode();
-  const balance = Number(data?.expense);
-  console.log(data);
+      const formattedData = data?.expenseBreakdown?.map((item, index) => ({
+    label: item.name,
+    value: item.amount,
+    color: `hsl(var(--chart-${index+1}))`
+  }))
   return (
-    <Widget title="Expense">
-      {isLoading ? (
-        <>
-          <div className="flex justify-between items-center">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-8 w-32" />
-            </div>
-            <div className="w-12 h-12 rounded-md flex justify-center items-center border-2 border-border">
-              <ArrowUpFromLine />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 mt-5">
-            <Skeleton className="w-56 h-4" />
-            <Skeleton className="w-40 h-4" />
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
-                Total Expense
-              </p>
-              {/* <p className="text-3xl">{balance}</p> */}
-              <div className="text-3xl flex gap-1">
-                ₱
-                <AnimateNumber
-                  duration={2}
-                  value={balance}
-                  className="text-xl"
-                />
-              </div>
-            </div>
-            <div className="w-11 h-11 rounded-xl flex justify-center items-center bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 shrink-0">
-              <ArrowUpFromLine
-                size={18}
-                className="text-red-600 dark:text-red-400"
-              />
-            </div>
-          </div>
-          <div className="flex gap-1 mt-3 sm:mt-5">
-            {isNaN(data?.expenseTrend) ? (
-              <p>No data last {mode}</p>
-            ) : (
-              <>
-                <p>Compare to last {mode}</p>
-                <p
-                  className={
-                    data?.expenseTrend > 0 ? "text-red-500" : "text-green-500"
-                  }
-                >
-                  {data?.expenseTrend > 0 ? "+" : ""}
-                  {data?.expenseTrend ? data?.expenseTrend : 0}%
-                </p>
-              </>
-            )}
-          </div>
-        </>
-      )}
-    </Widget>
+    <Widget title="Expense" data={data} isLoading={isLoading} segments={formattedData} icon={"ArrowDownToLine"}/>
   );
 };
 

@@ -26,17 +26,25 @@ body {
   @apply font-sans antialiased bg-background text-foreground;
 } */
 
-.card {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--muted)) hsl(var(--card));
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
 }
 
-.card::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--muted));
+/* track */
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.card::-webkit-scrollbar-track {
-  background-color: hsl(var(--card));
+/* thumb */
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
 
 * {
@@ -108,11 +116,17 @@ body {
     --destructive-foreground: 0 0% 100%;
     --input: 220 13.0435% 90.9804%;
     --ring: 217.2193 91.2195% 59.8039%;
-    --chart-1: 217.2193 91.2195% 59.8039%;
-    --chart-2: 221.2121 83.1933% 53.3333%;
-    --chart-3: 224.2781 76.3265% 48.0392%;
-    --chart-4: 225.931 70.7317% 40.1961%;
-    --chart-5: 224.4444 64.2857% 32.9412%;
+  /* Light mode — pale to deep */
+  --chart-1:  213 94% 90%;   /* #DBEAFE — lightest */
+  --chart-2:  213 94% 83%;   /* #BFDBFE */
+  --chart-3:  213 97% 75%;   /* #93C5FD */
+  --chart-4:  217 91% 68%;   /* #60A5FA */
+  --chart-5:  217 91% 60%;   /* #3B82F6 — primary */
+  --chart-6:  221 83% 53%;   /* #2563EB */
+  --chart-7:  224 76% 48%;   /* #1D4ED8 */
+  --chart-8:  226 71% 40%;   /* #1E40AF */
+  --chart-9:  227 64% 33%;   /* #1E3A8A */
+  --chart-10: 228 57% 26%;   /* #172554 — darkest */
     --sidebar: 210 20% 98.0392%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -169,11 +183,16 @@ body {
     --border: 0 0% 25.098%;
     --input: 0 0% 25.098%;
     --ring: 217.2193 91.2195% 59.8039%;
-    --chart-1: 213.1169 93.9024% 67.8431%;
-    --chart-2: 217.2193 91.2195% 59.8039%;
-    --chart-3: 221.2121 83.1933% 53.3333%;
-    --chart-4: 224.2781 76.3265% 48.0392%;
-    --chart-5: 225.931 70.7317% 40.1961%;
+  --chart-1:  228 57% 26%;   /* #172554 — darkest */
+  --chart-2:  227 64% 33%;   /* #1E3A8A */
+  --chart-3:  226 71% 40%;   /* #1E40AF */
+  --chart-4:  224 76% 48%;   /* #1D4ED8 */
+  --chart-5:  221 83% 53%;   /* #2563EB */
+  --chart-6:  217 91% 60%;   /* #3B82F6 — primary */
+  --chart-7:  217 91% 68%;   /* #60A5FA */
+  --chart-8:  213 97% 75%;   /* #93C5FD */
+  --chart-9:  213 94% 83%;   /* #BFDBFE */
+  --chart-10: 213 94% 90%;   /* #DBEAFE — lightest */
     --sidebar: 0 0% 9.0196%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
