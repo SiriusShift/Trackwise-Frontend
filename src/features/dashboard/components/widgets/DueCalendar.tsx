@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
 import * as Icons from "lucide-react";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const getStatus = (date) => {
   const today = moment();
@@ -94,10 +95,14 @@ export default function DueCalendar() {
           <h1 className="text-sm font-semibold uppercase tracking-widest">
             Payment Due
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {data?.length} upcoming bill
-            {data?.length !== 1 ? "s" : ""}
-          </p>
+          {isLoading ? (
+            <Skeleton className="w-20 h-3 mt-1" />
+          ) : (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {data?.length} upcoming bill
+              {data?.length !== 1 ? "s" : ""}
+            </p>
+          )}
         </CardTitle>
         <Link
           to="/funds"
@@ -110,26 +115,40 @@ export default function DueCalendar() {
       {/* Featured item */}
       <div className="flex items-center gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
         {/* Date badge */}
-        <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
-            {featuredDate.format("MMM")}
-          </span>
-          <span className="text-lg font-bold leading-tight tabular-nums">
-            {featuredDate.format("DD")}
-          </span>
-        </div>
+        {isLoading ? (
+          <Skeleton className="w-12 h-12" />
+        ) : (
+          <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
+              {featuredDate.format("MMM")}
+            </span>
+            <span className="text-lg font-bold leading-tight tabular-nums">
+              {featuredDate.format("DD")}
+            </span>
+          </div>
+        )}
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <IconComponent width={13} className="text-muted-foreground" />
-            <span className="font-semibold text-sm truncate">
-              {featured?.description}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {featured?.category?.name}
-          </p>
+          {isLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="w-16 h-4" />
+              <Skeleton className="w-9 h-3" />
+            </div>
+          ) : (
+            <>
+              {" "}
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <IconComponent width={13} className="text-muted-foreground" />
+                <span className="font-semibold text-sm truncate">
+                  {featured?.description}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {featured?.category?.name}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Amount + status */}
