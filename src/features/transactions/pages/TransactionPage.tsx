@@ -6,6 +6,7 @@ import {
   useGetExpensesQuery,
   useGetGraphExpenseQuery,
   useGetRecurringExpensesQuery,
+  useLazyGetExpensesQuery,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -37,6 +38,7 @@ import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
 import CommonToolbar from "@/shared/components/CommonToolbar";
+import { categoryType } from "@/shared/types";
 const TransactionPage = () => {
   const type = useSelector((state: IRootState) => state.active.type);
   const active = useSelector((state: IRootState) => state.active.active);
@@ -44,12 +46,7 @@ const TransactionPage = () => {
   const activeRow = useSelector((state: IRootState) => state.active.activeRow);
   const viewOpen = useSelector((state: IRootState) => state.active.openDialog);
 
-  const [search, setSearch] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
-  const [recurring, setRecurring] = useState<Boolean>(false);
-  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   const [transaction, setTransactions] = useState([]);
-  const [recurringTransaction, setRecurringTransaction] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(
     moment(typeof active === "string" ? active : active?.from).toDate(),
   );
@@ -58,6 +55,7 @@ const TransactionPage = () => {
   );
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageIndex, setPageIndex] = useState<number>(0);
+  const [filter, setFilter] = useState();
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -65,7 +63,6 @@ const TransactionPage = () => {
   const { confirm } = useConfirm();
   const mode = formatMode();
   const width = useScreenWidth();
-  const debouncedSeach = useDebounce(search, 500);
 
   // Queries
   const { data: categoryData } = useGetCategoryQuery({
@@ -78,7 +75,7 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
     });
 
-  const { columns, recurringColumns } = transactionConfig[type] || {};
+  const { columns } = transactionConfig[type] || {};
   // Expense
   const { data: expenseData, isFetching: expenseFetching } =
     useGetExpensesQuery(
@@ -87,38 +84,17 @@ const TransactionPage = () => {
         endDate: endDate?.toISOString(),
         pageSize,
         pageIndex,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
+        ...(filter?.status && { status: filter?.status }),
+        ...(filter?.search?.length > 0 && { search: filter?.search }), // Add `Search` only if truthy
+        ...(filter?.selectedCategories.length > 0 && {
           Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
+            filter?.selectedCategories.map((category) => category.id),
           ), // Add array of IDs
         }),
       },
-      {
-        skip: type !== "Expense" && recurring === true,
-      },
-    );
-
-  const { data: recurringExpenseData, isFetching: recurringExpenseFetching } =
-    useGetRecurringExpensesQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        pageSize,
-        pageIndex,
-        type: type,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
-      },
-      {
-        skip: type !== "Expense" || !recurring,
-      },
+      // {
+      //   skip: type !== "Expense" && recurring === true,
+      // },
     );
 
   const { data: expenseGraphData, isFetching: expenseGraphFetching } =
@@ -127,13 +103,13 @@ const TransactionPage = () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         mode,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
+        // ...(status && { status: status }),
+        // ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        // ...(selectedCategories.length > 0 && {
+        //   Categories: JSON.stringify(
+        //     selectedCategories.map((category) => category.id),
+        //   ), // Add array of IDs
+        // }),
       },
       {
         skip: type !== "Expense",
@@ -147,39 +123,18 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
       pageSize,
       pageIndex,
-      ...(status && { status: status }),
-      ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-      ...(selectedCategories.length > 0 && {
-        Categories: JSON.stringify(
-          selectedCategories.map((category) => category.id),
-        ), // Add array of IDs
-      }),
+      // ...(status && { status: status }),
+      // ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+      // ...(selectedCategories.length > 0 && {
+      //   Categories: JSON.stringify(
+      //     selectedCategories.map((category) => category.id),
+      //   ), // Add array of IDs
+      // }),
     },
     {
-      skip: type !== "Income" || recurring === true,
+      skip: type !== "Income",
     },
   );
-
-  const { data: recurringIncomeData, isFetching: recurringIncomeFetching } =
-    useGetRecurringIncomeQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        pageSize,
-        pageIndex,
-        type: type,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
-      },
-      {
-        skip: type !== "Income" || !recurring,
-      },
-    );
 
   const { data: incomeGraphData, isFetching: incomeGraphFetching } =
     useGetGraphIncomeQuery(
@@ -187,13 +142,13 @@ const TransactionPage = () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         mode,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
+        // ...(status && { status: status }),
+        // ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        // ...(selectedCategories.length > 0 && {
+        //   Categories: JSON.stringify(
+        //     selectedCategories.map((category) => category.id),
+        //   ), // Add array of IDs
+        // }),
       },
       {
         skip: type !== "Income",
@@ -208,39 +163,42 @@ const TransactionPage = () => {
         endDate: endDate?.toISOString(),
         pageSize,
         pageIndex,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
+        // ...(status && { status: status }),
+        // ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
+        // ...(selectedCategories.length > 0 && {
+        //   Categories: JSON.stringify(
+        //     selectedCategories.map((category) => category.id),
+        //   ), // Add array of IDs
+        // }),
       },
       {
-        skip: type !== "Transfer" || recurring === true,
+        skip: type !== "Transfer",
       },
     );
 
-  const { data: recurringTransferData, isFetching: recurringTransferFetching } =
-    useGetRecurringTransferQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        pageSize,
-        pageIndex,
-        type: type,
-        ...(status && { status: status }),
-        ...(search && { search: debouncedSeach }), // Add `Search` only if truthy
-        ...(selectedCategories.length > 0 && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ), // Add array of IDs
-        }),
-      },
-      {
-        skip: type !== "Transfer" || !recurring,
-      },
-    );
+  const handleFilter = ({
+    search,
+    selectedCategories,
+    status,
+  }: {
+    search: string;
+    selectedCategories: categoryType;
+    status: string;
+  }) => {
+    setFilter({
+      search,
+      selectedCategories,
+      status,
+    });
+  };
+
+  const clearFilter = () => {
+    setFilter({
+      search: "",
+      status: [],
+      selectedCategories: [],
+    });
+  };
 
   const tableData =
     type === "Expense"
@@ -249,30 +207,16 @@ const TransactionPage = () => {
         ? incomeData
         : transferData;
 
-  const tableColumn = recurring ? recurringColumns : columns;
-
-  const recurringTableData =
-    type === "Expense"
-      ? recurringExpenseData
-      : type === "Income"
-        ? recurringIncomeData
-        : recurringTransferData;
+  const tableColumn = columns;
 
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname,
   );
-  const totalPages = recurring
-    ? recurringTableData?.totalPages
-    : tableData?.totalPages;
+  const totalPages = tableData?.totalPages;
 
   const tableFetching = expenseFetching || incomeFetching || transferFetching;
 
-  const recurringFetching =
-    recurringExpenseFetching ||
-    recurringIncomeFetching ||
-    recurringTransferFetching;
-
-  console.log(tableFetching, recurringFetching);
+  console.log(tableFetching);
   const graphData =
     type === "Expense"
       ? expenseGraphData
@@ -295,15 +239,8 @@ const TransactionPage = () => {
   }, [active]);
 
   useEffect(() => {
-    setRecurringTransaction([]);
     setTransactions([]);
   }, [type]);
-
-  useEffect(() => {
-    if (recurringTableData?.data?.length) {
-      setRecurringTransaction((prev) => [...prev, ...recurringTableData?.data]);
-    }
-  }, [JSON.stringify(recurringTableData), recurringFetching]);
 
   useEffect(() => {
     console.log("add");
@@ -343,14 +280,14 @@ const TransactionPage = () => {
         {/* Toolbar */}
         <TransactionToolbar
           categoryData={categoryData}
-          search={search}
-          status={status}
-          recurring={recurring}
-          selectedCategories={selectedCategories}
-          setRecurring={setRecurring}
-          setSearch={setSearch}
-          setStatus={setStatus}
-          setSelectedCategories={setSelectedCategories}
+          onSubmit={handleFilter}
+          onClear={clearFilter}
+          // search={search}
+          // status={status}
+          // selectedCategories={selectedCategories}
+          // setSearch={setSearch}
+          // setStatus={setStatus}
+          // setSelectedCategories={setSelectedCategories}
         />
         <div className="flex w-full flex-col gap-5 lg:flex-row">
           {/* Table */}
@@ -362,17 +299,9 @@ const TransactionPage = () => {
               totalPages={totalPages}
               pageIndex={pageIndex}
               pageSize={pageSize}
-              isLoading={tableFetching || recurringFetching}
+              isLoading={tableFetching}
               graphData={graphData}
-              data={
-                recurring
-                  ? width > 639
-                    ? recurringTableData?.data
-                    : recurringTransaction
-                  : width > 639
-                    ? tableData?.data
-                    : transaction || []
-              }
+              data={width > 639 ? tableData?.data : transaction || []}
             />
           </div>
 

@@ -419,7 +419,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
 
           dispatch(assetsApi.util.invalidateTags(["Assets"]));
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          dispatch(transactionApi.util.invalidateTags(["History"]));
+          dispatch(transactionApi.util.invalidateTags(["History", "Stats"]));
 
           reset();
           setOpen(false);

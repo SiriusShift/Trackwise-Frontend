@@ -19,35 +19,52 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { TransactionDialog } from "./dialogs/TransactionDialog";
+import useDebounce from "@/shared/hooks/useDebounce";
+import { categoryType } from "@/shared/types";
 const TransactionToolbar = ({
-  setSelectedCategories,
+  // setSelectedCategories,
   categoryData,
-  selectedCategories,
-  setSearch,
-  search,
-  status,
-  recurring,
-  setRecurring,
-  setStatus,
+  onSubmit,
+  onClear
+  // selectedCategories,
+  // setSearch,
+  // search,
+  // status,
+  // recurring,
+  // setRecurring,
+  // setStatus,
 }: {
   categoryData: Object;
-  search: String;
-  status: String;
-  recurring: Boolean;
-  setRecurring: (recurring: Boolean) => void;
-  setStatus: (search: String) => void;
-  setSearch: (search: String) => void;
-  selectedCategories: Array<any>;
-  setSelectedCategories: (selectedCategories: any) => void;
+  onSubmit: ({ search, status }: { search: string; status: String[], selectedCategories: categoryType[] }) => void;
+  onClear: () => void;
+
+  // search: String;
+  // status: String;
+  // recurring: Boolean;
+  // setRecurring: (recurring: Boolean) => void;
+  // setStatus: (search: String) => void;
+  // setSearch: (search: String) => void;
+  // selectedCategories: Array<any>;
+  // setSelectedCategories: (selectedCategories: any) => void;
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [status, setStatus] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+  const [search, setSearch] = useState<string>("");
 
-  const handleFilter = () => {};
+  const handleFilter = () => {
+    onSubmit({
+      search: search,
+      status: status,
+      selectedCategories: selectedCategories
+    });
+  };
 
   const clearFilter = () => {
     setSearch("");
     setSelectedCategories([]);
     setStatus("");
+    onClear()
   };
 
   const handleCheckboxChange = (category: any) => {
@@ -117,14 +134,6 @@ const TransactionToolbar = ({
                 <hr />
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Category</h1>
-                  {/* <a
-                            href="#"
-                            className="text-gray-400 hover:text-primary text-sm"
-                            onClick={() => setSelectedCategories([])}
-                          >
-                            Reset
-                          </a> */}
-                  {/* Collapsible Filter */}
                   <Collapsible>
                     {/* Trigger */}
                     <CollapsibleTrigger asChild>
@@ -148,7 +157,7 @@ const TransactionToolbar = ({
 
                     {/* Content */}
                     <CollapsibleContent>
-                      <div className="flex flex-col gap-2 p-2 max-h-[200px] overflow-y-auto">
+                      <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
                         {categoryData?.map((category, index) => (
                           <div
                             key={category.id}
@@ -157,7 +166,7 @@ const TransactionToolbar = ({
                             <Checkbox
                               id={category.name}
                               checked={selectedCategories.some(
-                                (selected) => selected.id === category.id
+                                (selected) => selected.id === category.id,
                               )}
                               onCheckedChange={() =>
                                 handleCheckboxChange(category)
@@ -176,6 +185,59 @@ const TransactionToolbar = ({
                   </Collapsible>
                 </div>
                 <hr />
+
+                <div className="flex flex-col gap-2">
+                  <h1 className="text-sm font-semibold">Status</h1>
+                  <Collapsible>
+                    {/* Trigger */}
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full relative flex justify-between overflow-hidden items-center"
+                      >
+                        <div className="overflow-x-hidden flex w-4/5">
+                          <span>
+                            {/* Display selected categories or default text */}
+                            {selectedCategories.length > 0
+                              ? `${selectedCategories
+                                  .map((category) => category.name)
+                                  .join(", ")}`
+                              : "Filter by Status"}
+                          </span>
+                        </div>
+                        <ChevronDown className="absolute right-5 h-5 w-5" />
+                      </Button>
+                    </CollapsibleTrigger>
+
+                    {/* Content */}
+                    <CollapsibleContent>
+                      <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
+                        {categoryData?.map((category, index) => (
+                          <div
+                            key={category.id}
+                            className="flex items-center gap-2"
+                          >
+                            <Checkbox
+                              id={category.name}
+                              checked={selectedCategories.some(
+                                (selected) => selected.id === category.id,
+                              )}
+                              onCheckedChange={() =>
+                                handleCheckboxChange(category)
+                              }
+                            />
+                            <label
+                              htmlFor={category.name}
+                              className="text-sm font-medium capitalize cursor-pointer"
+                            >
+                              {category.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
 
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Category</h1>

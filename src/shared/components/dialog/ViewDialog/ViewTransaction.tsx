@@ -20,6 +20,7 @@ import ViewImage from "./ViewImage";
 import Expense from "@/assets/images/expense.svg";
 import Income from "@/assets/images/income.svg";
 import Transfer from "@/assets/images/transfer.svg";
+import { Button } from "../../ui/button";
 
 const ViewTransaction = ({ transaction, open, setOpen }) => {
   console.log(transaction);
@@ -68,7 +69,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
             <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
               {getTypeIcon(transaction?.category?.type)}
               {transaction?.interval ? "Recurring " : "Transaction "}
-               Details
+              Details
             </DialogTitle>
           </DialogHeader>
 
@@ -162,7 +163,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 )} */}
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center  gap-3">
               <Icon.FileText className="h-5 w-5 text-muted-foreground mt-1" />
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">Description</p>
@@ -171,6 +172,21 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 </p>
               </div>
             </div>
+            {(transaction?.status !== "Paid" && transaction?.category?.type === "Expense") &&             <div className="flex flex-col gap-3">
+              <hr />
+              <div className="flex justify-end gap-3">
+                <Button size="sm" variant={"outline"} className="text-xs">
+                  Edit
+                </Button>
+
+                <Button size="sm" className="text-xs">
+                  Pay
+                </Button>
+              </div>
+              <hr />
+            </div>
+}
+
             {/* Transaction History */}
             <DialogAccordion
               transaction={transaction}

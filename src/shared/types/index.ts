@@ -130,3 +130,10 @@ export interface frequencyProps {
   interval: number | null;
   unit: string | null;
 }
+
+
+export interface categoryType {
+  id: number;
+  name: string;
+  icon: string;
+}

@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const transactionApi = api
-  .enhanceEndpoints({ addTagTypes: ["History"] })
+  .enhanceEndpoints({ addTagTypes: ["History", "Stats"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getTransactionHistory: builder.query({
@@ -18,14 +18,14 @@ export const transactionApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["History"],
+        invalidatesTags: ["History", "Stats"],
       }),
       deleteTransactionHistory: builder.mutation({
         query: (id) => ({
           url: `/transaction/delete/${id}`,
           method: "PATCH",
         }),
-        invalidatesTags: ["History"],
+        invalidatesTags: ["History", "Stats"],
       }),
       getStatistics: builder.query({
         query: (params) => ({
@@ -33,13 +33,15 @@ export const transactionApi = api
           method: "GET",
           params
         }),
+        providesTags: ["Stats"]
       }),
       archiveTransaction: builder.mutation({
         query: ({id, data}) => ({
           url: `/transaction/${id}`,
           method: "PATCH",
           params: data
-        })
+        }),
+        invalidatesTags: ["Stats", "History"]
       })
     }),
   });

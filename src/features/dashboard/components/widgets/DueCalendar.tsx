@@ -4,6 +4,7 @@ import moment from "moment";
 import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
 import * as Icons from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Button } from "@/shared/components/ui/button";
 
 const getStatus = (date) => {
   const today = moment();
@@ -78,7 +79,7 @@ export default function DueCalendar() {
   return (
     <Card
       className="        relative overflow-hidden border border-border/60 bg-card
-        p-5 flex flex-col rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
+        p-5 flex flex-col gap-2 rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
         transition-shadow hover:shadow-md"
       style={{
         backgroundImage: `
@@ -90,7 +91,7 @@ export default function DueCalendar() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Header */}
-      <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
+      <CardHeader className="flex flex-row w-full justify-between p-0 ">
         <CardTitle>
           <h1 className="text-sm font-semibold uppercase tracking-widest">
             Payment Due
@@ -113,7 +114,7 @@ export default function DueCalendar() {
       </CardHeader>
 
       {/* Featured item */}
-      <div className="flex items-center gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
+      <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
         {/* Date badge */}
         {isLoading ? (
           <Skeleton className="w-12 h-12" />
@@ -167,10 +168,27 @@ export default function DueCalendar() {
         </div>
       </div>
 
+      {/* <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant={"ghost"}
+          size={"sm"}
+          className="h-7 hover:bg-muted/60 border border-border hover:text-foreground"
+        >
+          Pay now
+        </Button>
+        <Button
+          variant={"ghost"}
+          size={"sm"}
+          className="h-7 hover:bg-muted/60 border border-border hover:text-foreground"
+        >
+          View
+        </Button>
+      </div> */}
+
       {/* Remaining summary badge */}
       {remaining > 0 && (
-        <Link to="/funds">
-          <div className="mt-3 flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-dashed border-border hover:bg-muted/60 transition-colors group">
+        <Link to="/transactions">
+          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-dashed border-border hover:bg-muted/60 transition-colors group">
             <div className="flex items-center gap-2">
               <div className="flex -space-x-1.5">
                 {data.slice(1, 4).map((p, i) => {
