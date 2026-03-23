@@ -29,6 +29,7 @@ import {
 import moment from "moment";
 import { Badge } from "@/shared/components/ui/badge";
 import {
+  expensesApi,
   useCancelRecurringExpenseMutation,
   useDeleteExpenseMutation,
   usePostAutoPaymentMutation,
@@ -275,6 +276,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   },
                 }).unwrap();
                 dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+                dispatch(expensesApi.util.invalidateTags(["Expenses"]))
               } catch (err) {
                 let errorMessage = handleCatchErrorMessage(err); // Default message
                 toast.error(errorMessage);

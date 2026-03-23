@@ -82,6 +82,10 @@ const TrackerCard = ({
                 <Icons.Trash2 />
                 Delete
               </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(item)}>
+                <Icons.Eye />
+                View
+              </DropdownMenuItem>
 
             </DropdownMenuContent>
           </DropdownMenu>

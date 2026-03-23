@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import { Construction } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const loans = [
@@ -46,14 +47,14 @@ function LoanBalance() {
       <CardHeader className="space-y-0 p-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base font-semibold uppercase tracking-widesttracking-widest">Loan Balance</CardTitle>
-          <Link to="/loans" className="text-sm text-blue-400 hover:underline">
+          {/* <Link to="/loans" className="text-sm text-blue-400 hover:underline">
             See All
-          </Link>
+          </Link> */}
         </div>
-        <p className="text-sm text-muted-foreground mt-1">3 active loans</p>
+        {/* <p className="text-sm text-muted-foreground mt-1">3 active loans</p> */}
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-0 p-0">
+      <CardContent className="flex-col gap-0 p-0 hidden">
         {/* Master progress */}
         <div className="mb-4">
           <div className="flex items-baseline gap-2 mb-1">
@@ -142,6 +143,41 @@ function LoanBalance() {
               </div>
             );
           })}
+        </div>
+      </CardContent>
+
+       <CardContent className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 text-center h-full">
+        {/* Background */}
+        <div className="absolute inset-0 opacity-20 animate-[moveBg_6s_linear_infinite]">
+          <div
+            className="absolute inset-0 blur-[2px]"
+            style={{
+              backgroundImage: `
+          repeating-linear-gradient(
+            135deg,
+            rgba(252, 255, 0, 0.15) 0px,
+            rgba(252, 255, 0, 0.15) 12px,
+            transparent 12px,
+            transparent 24px
+          )
+        `,
+            }}
+          />
+        </div>
+
+        {/* Icon */}
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm">
+          <Construction className="w-5 h-5 text-yellow-500" />
+        </div>
+
+        {/* Text */}
+        <div className="space-y-1">
+          <p className="text-sm font-semibold tracking-tight">
+            Under development
+          </p>
+          <p className="text-xs text-muted-foreground">
+            This feature is coming soon
+          </p>
         </div>
       </CardContent>
     </Card>

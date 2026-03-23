@@ -105,20 +105,20 @@ export const expensesApi = api
       }),
 
       postAutoPayment: builder.mutation({
-        query: ({data, id}) => ({
+        query: ({ data, id }) => ({
           url: `/transaction/expense/pay/auto/${id}`,
           method: "POST",
-          body: data
-        })
+          body: data,
+        }),
       }),
       getBills: builder.query({
         query: () => ({
           url: "/transaction/expense/bills",
-          method: "GET"
+          method: "GET",
         }),
-                transformResponse: (response: any) => response.data,
-
-      })
+        transformResponse: (response: any) => response.data,
+        providesTags: ["Expenses"],
+      }),
     }),
   });
 
@@ -137,5 +137,5 @@ export const {
   usePostPaymentMutation,
   usePostAutoPaymentMutation,
   useGetBillsQuery,
-  useLazyGetBillsQuery
+  useLazyGetBillsQuery,
 } = expensesApi;

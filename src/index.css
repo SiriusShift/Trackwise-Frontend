@@ -87,6 +87,15 @@ body {
   }
 }
 
+@keyframes moveBg {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 60px 60px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

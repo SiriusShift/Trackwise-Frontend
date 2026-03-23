@@ -1,7 +1,7 @@
 import React from "react";
 import MonthPicker from "./datePicker";
 
-function PageHeader({pageName, description}) {
+function PageHeader({pageName, description, monthPicker}) {
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -11,7 +11,8 @@ function PageHeader({pageName, description}) {
             {description}
           </p>
         </div>
-        <MonthPicker />
+        {monthPicker &&         <MonthPicker />
+}
       </div>
     </div>
   );

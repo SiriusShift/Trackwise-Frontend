@@ -74,22 +74,24 @@ const TransactionHistory = () => {
     pageIndex,
   });
 
-  const lastPostRef = useCallback(
-    (node: HTMLElement | null) => {
-      if (isFetching) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (
-          entries[0].isIntersecting &&
-          pageIndex !== data?.data?.totalPages - 1
-        ) {
-          setPageIndex((prev) => prev + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [isFetching, data, pageIndex],
-  );
+  console.log(transactions)
+
+  // const lastPostRef = useCallback(
+  //   (node: HTMLElement | null) => {
+  //     if (isFetching) return;
+  //     if (observer.current) observer.current.disconnect();
+  //     observer.current = new IntersectionObserver((entries) => {
+  //       if (
+  //         entries[0].isIntersecting &&
+  //         pageIndex !== data?.data?.totalPages - 1
+  //       ) {
+  //         setPageIndex((prev) => prev + 1);
+  //       }
+  //     });
+  //     if (node) observer.current.observe(node);
+  //   },
+  //   [isFetching, data, pageIndex],
+  // );
 
   useEffect(() => {
     if (data?.data?.filter?.length) {
@@ -119,7 +121,7 @@ const TransactionHistory = () => {
             Recent Transactions
           </CardTitle>
           <Link
-            to="/funds"
+            to="/transactions"
             className="text-xs text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-70"
           >
             See All →

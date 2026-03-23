@@ -29,7 +29,6 @@ function Tracker({
   isLoading,
   type,
 }: commonTrackerProps) {
-  const [open, setOpen] = useState(false);
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const length =

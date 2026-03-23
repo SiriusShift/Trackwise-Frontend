@@ -67,7 +67,7 @@ export default function DueCalendar() {
     ?.slice(1)
     ?.reduce((sum, p) => sum + Number(p.amount), 0);
   const featured = data?.[0];
-  console.log(featured);
+  console.log(data);
   const featuredStatus = getStatus(featured?.date);
   const featuredDate = moment(featured?.date);
   const IconComponent =
@@ -114,11 +114,22 @@ export default function DueCalendar() {
       </CardHeader>
 
       {/* Featured item */}
-      <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
-        {/* Date badge */}
-        {isLoading ? (
-          <Skeleton className="w-12 h-12" />
-        ) : (
+      {isLoading ? (
+        <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
+          <Skeleton className="h-12 w-12" />
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <Skeleton className="w-16 h-4" />
+            <Skeleton className="w-10 h-3" />
+          </div>
+          <div className="shrink-0 flex flex-col items-end gap-1.5">
+            <Skeleton className="w-16 h-4" />
+            <Skeleton className="w-10 h-3" />
+          </div>
+        </div>
+      ) : data?.length > 0 ? (
+        <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
+          {/* Date badge */}
+
           <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
               {featuredDate.format("MMM")}
@@ -127,16 +138,9 @@ export default function DueCalendar() {
               {featuredDate.format("DD")}
             </span>
           </div>
-        )}
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="w-16 h-4" />
-              <Skeleton className="w-9 h-3" />
-            </div>
-          ) : (
+          {/* Info */}
+          <div className="flex-1 min-w-0">
             <>
               {" "}
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -149,24 +153,36 @@ export default function DueCalendar() {
                 {featured?.category?.name}
               </p>
             </>
-          )}
-        </div>
+          </div>
 
-        {/* Amount + status */}
-        <div className="shrink-0 flex flex-col items-end gap-1.5">
-          <span className="text-sm font-bold tabular-nums">
-            ₱{featured?.amount.toLocaleString()}
-          </span>
-          <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${featuredStatus.bg} ${featuredStatus.color} ${featuredStatus.border}`}
-          >
+          {/* Amount + status */}
+          <div className="shrink-0 flex flex-col items-end gap-1.5">
+            <span className="text-sm font-bold tabular-nums">
+              ₱{featured?.amount.toLocaleString()}
+            </span>
             <span
-              className={`w-1.5 h-1.5 rounded-full ${featuredStatus.dot} shrink-0`}
-            />
-            {featuredStatus.label}
-          </span>
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${featuredStatus.bg} ${featuredStatus.color} ${featuredStatus.border}`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${featuredStatus.dot} shrink-0`}
+              />
+              {featuredStatus.label}
+            </span>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 bg-muted/30 text-center">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10">
+           <Icons.Check  className="text-success" size={22}/>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-foreground">All caught up</p>
+            <p className="text-xs text-muted-foreground">
+              No pending bills at the moment.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* <div className="grid grid-cols-2 gap-2">
         <Button

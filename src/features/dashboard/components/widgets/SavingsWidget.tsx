@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import { Construction } from "lucide-react";
 import { Link } from "react-router-dom";
 const savingsPlans = [
   {
@@ -58,20 +59,20 @@ function SavingsPlan() {
             Savings Plan
           </h1>
 
-            <p className="text-xs text-muted-foreground mt-0.5">
+          {/* <p className="text-xs text-muted-foreground mt-0.5">
               {savingsPlans?.length} active plan
               {savingsPlans?.length !== 1 ? "s" : ""}
-            </p>
+            </p> */}
         </CardTitle>
-        <Link
+        {/* <Link
           to="/funds"
           className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
         >
           See All →
-        </Link>
+        </Link> */}
       </CardHeader>
 
-      <CardContent className="p-0 flex flex-col gap-0">
+      <CardContent className="p-0 flex-col hidden gap-0">
         {/* Summary chips */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
@@ -108,12 +109,10 @@ function SavingsPlan() {
             const pct = ((plan.saved / plan.goal) * 100).toFixed(1);
             return (
               <div key={plan.name} className="py-3 flex items-center gap-3">
-                {/* Icon */}
                 <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-base flex-shrink-0">
                   {plan.icon}
                 </div>
 
-                {/* Meta */}
                 <div className="flex-1 min-w-0 flex flex-col gap-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{plan.name}</span>
@@ -141,6 +140,41 @@ function SavingsPlan() {
               </div>
             );
           })}
+        </div>
+      </CardContent>
+
+      <CardContent className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 text-center h-full">
+        {/* Background */}
+        <div className="absolute inset-0 opacity-20 animate-[moveBg_6s_linear_infinite]">
+          <div
+            className="absolute inset-0 blur-[2px]"
+            style={{
+              backgroundImage: `
+          repeating-linear-gradient(
+            135deg,
+            rgba(252, 255, 0, 0.15) 0px,
+            rgba(252, 255, 0, 0.15) 12px,
+            transparent 12px,
+            transparent 24px
+          )
+        `,
+            }}
+          />
+        </div>
+
+        {/* Icon */}
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm">
+          <Construction className="w-5 h-5 text-yellow-500" />
+        </div>
+
+        {/* Text */}
+        <div className="space-y-1">
+          <p className="text-sm font-semibold tracking-tight">
+            Under development
+          </p>
+          <p className="text-xs text-muted-foreground">
+            This feature is coming soon
+          </p>
         </div>
       </CardContent>
     </Card>
