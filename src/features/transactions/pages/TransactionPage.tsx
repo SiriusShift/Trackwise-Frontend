@@ -276,6 +276,8 @@ const TransactionPage = () => {
         <PageHeader
           pageName={currentPageName?.name}
           description={`Overview of ${type.toLocaleLowerCase()} for this ${formatMode()}`}
+                  monthPicker={true}
+
         />
         {/* Toolbar */}
         <TransactionToolbar

@@ -63,6 +63,7 @@ const Dashboard = () => {
       <PageHeader
         pageName={currentPageName?.name}
         description={`Overview of Dashboard for this ${formatMode()}`}
+        monthPicker={true}
       />
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
