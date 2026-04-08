@@ -1,7 +1,7 @@
 import { navigationData } from "@/routing/navigationData";
 import { useLocation } from "react-router-dom";
 import { DataTable } from "@/shared/components/Table/CommonTable";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   useGetExpensesQuery,
   useGetGraphExpenseQuery,
@@ -176,7 +176,7 @@ const TransactionPage = () => {
       },
     );
 
-  const handleFilter = ({
+  const handleFilter = useCallback(({
     search,
     selectedCategories,
     status,
@@ -190,15 +190,15 @@ const TransactionPage = () => {
       selectedCategories,
       status,
     });
-  };
+  }, []);
 
-  const clearFilter = () => {
+  const clearFilter = useCallback(() => {
     setFilter({
       search: "",
       status: [],
       selectedCategories: [],
     });
-  };
+  }, []);
 
   const tableData =
     type === "Expense"
@@ -207,8 +207,7 @@ const TransactionPage = () => {
         ? incomeData
         : transferData;
 
-  const tableColumn = columns;
-
+const tableColumn = useMemo(() => columns, [columns]);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname,
   );

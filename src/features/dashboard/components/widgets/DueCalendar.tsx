@@ -77,162 +77,143 @@ export default function DueCalendar() {
 
   const remaining = data?.length - 1;
   return (
-    <Card
-      className="        relative overflow-hidden border border-border/60 bg-card
-        p-5 flex flex-col gap-2 rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
-        transition-shadow hover:shadow-md"
-      style={{
-        backgroundImage: `
-    radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-    radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-  `,
-      }}
-    >
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+<Card
+  className="relative overflow-hidden border border-border/60 bg-card
+    p-5 flex flex-col gap-2 rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
+    transition-shadow hover:shadow-md"
+  style={{
+    backgroundImage: `
+      radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
+      radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
+    `,
+  }}
+>
+  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      {/* Header */}
-      <CardHeader className="flex flex-row w-full justify-between p-0 ">
-        <CardTitle>
-          <h1 className="text-sm font-semibold uppercase tracking-widest">
-            Payment Due
-          </h1>
-          {isLoading ? (
-            <Skeleton className="w-20 h-3 mt-1" />
-          ) : (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {data?.length} upcoming bill
-              {data?.length !== 1 ? "s" : ""}
-            </p>
-          )}
-        </CardTitle>
-        <Link
-          to="/funds"
-          className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
-        >
-          See All →
-        </Link>
-      </CardHeader>
-
-      {/* Featured item */}
+  {/* Header */}
+  <CardHeader className="flex flex-row w-full justify-between p-0">
+    <CardTitle>
+      <h1 className="text-sm font-semibold uppercase tracking-widest">
+        Payment Due
+      </h1>
       {isLoading ? (
-        <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
-          <Skeleton className="h-12 w-12" />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <Skeleton className="w-16 h-4" />
-            <Skeleton className="w-10 h-3" />
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-1.5">
-            <Skeleton className="w-16 h-4" />
-            <Skeleton className="w-10 h-3" />
-          </div>
-        </div>
-      ) : data?.length > 0 ? (
-        <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
-          {/* Date badge */}
-
-          <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
-              {featuredDate.format("MMM")}
-            </span>
-            <span className="text-lg font-bold leading-tight tabular-nums">
-              {featuredDate.format("DD")}
-            </span>
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <>
-              {" "}
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <IconComponent width={13} className="text-muted-foreground" />
-                <span className="font-semibold text-sm truncate">
-                  {featured?.description}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {featured?.category?.name}
-              </p>
-            </>
-          </div>
-
-          {/* Amount + status */}
-          <div className="shrink-0 flex flex-col items-end gap-1.5">
-            <span className="text-sm font-bold tabular-nums">
-              ₱{featured?.amount.toLocaleString()}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${featuredStatus.bg} ${featuredStatus.color} ${featuredStatus.border}`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${featuredStatus.dot} shrink-0`}
-              />
-              {featuredStatus.label}
-            </span>
-          </div>
-        </div>
+        <Skeleton className="w-20 h-3 mt-1" />
       ) : (
-        <div className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 bg-muted/30 text-center">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10">
-           <Icons.Check  className="text-success" size={22}/>
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-foreground">All caught up</p>
-            <p className="text-xs text-muted-foreground">
-              No pending bills at the moment.
-            </p>
-          </div>
-        </div>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {data?.length} upcoming bill{data?.length !== 1 ? "s" : ""}
+        </p>
       )}
+    </CardTitle>
+    <Link
+      to="/funds"
+      className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
+    >
+      See All →
+    </Link>
+  </CardHeader>
 
-      {/* <div className="grid grid-cols-2 gap-2">
-        <Button
-          variant={"ghost"}
-          size={"sm"}
-          className="h-7 hover:bg-muted/60 border border-border hover:text-foreground"
-        >
-          Pay now
-        </Button>
-        <Button
-          variant={"ghost"}
-          size={"sm"}
-          className="h-7 hover:bg-muted/60 border border-border hover:text-foreground"
-        >
-          View
-        </Button>
-      </div> */}
+  {/* Body — centers content vertically when only 1 bill */}
+  <div className="flex-1 flex flex-col justify-center gap-2">
 
-      {/* Remaining summary badge */}
-      {remaining > 0 && (
-        <Link to="/transactions">
-          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-dashed border-border hover:bg-muted/60 transition-colors group">
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-1.5">
-                {data.slice(1, 4).map((p, i) => {
-                  const LucidIcon = Icons[p.category.icon];
-                  return (
-                    <span
-                      key={i}
-                      className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center text-[9px]"
-                    >
-                      <LucidIcon
-                        className="text-foreground"
-                        width={10}
-                        height={10}
-                      />{" "}
-                    </span>
-                  );
-                })}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                +{remaining} more bill{remaining !== 1 ? "s" : ""}
-              </span>
-            </div>
-            <span className="text-xs font-semibold tabular-nums text-muted-foreground group-hover:text-foreground transition-colors">
-              ₱{totalRemaining.toLocaleString()}
+    {/* Featured item */}
+    {isLoading ? (
+      <div className="flex items-center gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30">
+        <Skeleton className="h-12 w-12 rounded-xl" />
+        <div className="flex-1 min-w-0 space-y-1.5">
+          <Skeleton className="w-16 h-4" />
+          <Skeleton className="w-10 h-3" />
+        </div>
+        <div className="shrink-0 flex flex-col items-end gap-1.5">
+          <Skeleton className="w-16 h-4" />
+          <Skeleton className="w-10 h-3" />
+        </div>
+      </div>
+    ) : data?.length > 0 ? (
+      <div className="flex items-center cursor-pointer gap-4 p-3.5 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors">
+        {/* Date badge */}
+        <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
+            {featuredDate.format("MMM")}
+          </span>
+          <span className="text-lg font-bold leading-tight tabular-nums">
+            {featuredDate.format("DD")}
+          </span>
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <IconComponent width={13} className="text-muted-foreground" />
+            <span className="font-semibold text-sm truncate">
+              {featured?.description}
             </span>
           </div>
-        </Link>
-      )}
-    </Card>
+          <p className="text-xs text-muted-foreground">
+            {featured?.category?.name}
+          </p>
+        </div>
+
+        {/* Amount + status */}
+        <div className="shrink-0 flex flex-col items-end gap-1.5">
+          <span className="text-sm font-bold tabular-nums">
+            ₱{featured?.amount.toLocaleString()}
+          </span>
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${featuredStatus.bg} ${featuredStatus.color} ${featuredStatus.border}`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${featuredStatus.dot} shrink-0`} />
+            {featuredStatus.label}
+          </span>
+        </div>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 bg-muted/30 text-center">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10">
+          <Icons.Check className="text-success" size={22} />
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-foreground">All caught up</p>
+          <p className="text-xs text-muted-foreground">No pending bills at the moment.</p>
+        </div>
+      </div>
+    )}
+
+    {/* Remaining summary badge */}
+    {remaining > 0 ? (
+      <Link to="/transactions">
+        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-dashed border-border hover:bg-muted/60 transition-colors group">
+          <div className="flex items-center gap-2">
+            <div className="flex -space-x-1.5">
+              {data.slice(1, 4).map((p, i) => {
+                const LucidIcon = Icons[p.category.icon];
+                return (
+                  <span key={i} className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center text-[9px]">
+                    <LucidIcon className="text-foreground" width={10} height={10} />
+                  </span>
+                );
+              })}
+            </div>
+            <span className="text-xs text-muted-foreground">
+              +{remaining} more bill{remaining !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span className="text-xs font-semibold tabular-nums text-muted-foreground group-hover:text-foreground transition-colors">
+            ₱{totalRemaining.toLocaleString()}
+          </span>
+        </div>
+      </Link>
+    ) : (
+      // Only show when there's exactly 1 bill and card has extra space
+      data?.length === 1 && (
+        <div className="flex items-center justify-center gap-2 py-1">
+          <div className="h-px flex-1 bg-border/40" />
+          <span className="text-[11px] text-muted-foreground/40">No other bills</span>
+          <div className="h-px flex-1 bg-border/40" />
+        </div>
+      )
+    )}
+
+  </div>
+</Card>
   );
 }

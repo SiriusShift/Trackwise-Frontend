@@ -31,7 +31,6 @@ import { Badge } from "@/shared/components/ui/badge";
 import {
   expensesApi,
   useCancelRecurringExpenseMutation,
-  useDeleteExpenseMutation,
   usePostAutoPaymentMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
@@ -53,6 +52,7 @@ import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransacti
 import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { setOpenDialog } from "@/shared/slices/activeSlice";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -207,7 +207,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dispatch = useDispatch();
       console.log(expense);
 
-      const [deleteExpense] = useDeleteExpenseMutation();
+      const [deleteExpense] = useArchiveTransactionMutation();
       const [payAuto] = usePostAutoPaymentMutation();
       const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
@@ -222,12 +222,13 @@ export const expenseColumns: ColumnDef<Expense>[] = [
           onConfirm: async () => {
             try {
               await deleteExpense({
-                data: {
-                  delete: true,
-                },
+              data: {
+                type: "expense",
+              },
                 id: expense.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+              dispatch(expensesApi.util.invalidateTags(["Expenses"]));
               dispatch(assetsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
