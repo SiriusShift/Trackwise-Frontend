@@ -457,7 +457,7 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
       >
         <DialogContent
           onInteractOutside={true}
-          className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto px-0 sm:max-h-[90%] p sm:min-h-lg sm:w-md"
+          className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto px-0 sm:max-h-[90%] sm:min-h-lg sm:w-md"
         >
           <DialogHeader className="px-6">
             <DialogTitle>

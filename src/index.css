@@ -166,6 +166,8 @@ body {
     --warning: 39 100% 50%; /* Yellow for warning */
     --warning-foreground: 0 0% 10%;
     --sidebar-background: 0 0% 98%;
+      --info: 199 89% 48%; /* Bright blue */
+  --info-foreground: 0 0% 100%;
   }
 
   .dark {
@@ -221,11 +223,14 @@ body {
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --sidebar-background: 0 0% 0%;
 
-    --success-dark: 144 40% 40%; /* Darker, muted green */
-    --success-foreground-dark: 0 0% 98%; /* Keep bright text for readability */
+    --success: 144 40% 40%; /* Darker, muted green */
+    --success-foreground: 0 0% 98%; /* Keep bright text for readability */
 
-    --warning-dark: 39 70% 45%; /* Darker golden yellow */
-    --warning-foreground-dark: 0 0% 98%; /* Keep light text */
+    --warning: 39 70% 45%; /* Darker golden yellow */
+    --warning-foreground: 0 0% 98%; /* Keep light text */
+
+      --info: 199 80% 55%; /* Slightly softer for dark mode */
+  --info-foreground: 0 0% 100%;
   }
 }
 
