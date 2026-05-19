@@ -46,11 +46,23 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
   const getTypeIcon = (type) => {
     switch (type?.toLowerCase()) {
       case "expense":
-        return <Icon.TrendingDown className="h-5 w-5 text-red-500" />;
+        return (
+          <div className="p-3 bg-red-100 rounded-xl">
+            <Icon.ArrowUp className="h-5 w-5 text-red-500" />
+          </div>
+        );
       case "income":
-        return <Icon.TrendingUp className="h-5 w-5 text-green-500" />;
+        return (
+          <div className="p-3 bg-green-100 rounded-xl">
+            <Icon.ArrowDown className="h-5 w-5 text-green-500" />
+          </div>
+        );
       case "transfer":
-        return <Icon.ArrowRightLeft className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className="p-3 bg-blue-100 rounded-xl">
+            <Icon.ArrowRightLeft className="h-5 w-5 text-blue-500" />
+          </div>
+        );
       default:
         return <Icon.DollarSign className="h-5 w-5 text-muted-foreground" />;
     }
@@ -64,44 +76,33 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl flex flex-col h-dvh sm:max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
-              {getTypeIcon(transaction?.category?.type)}
+        <DialogContent
+          className="max-w-2xl flex flex-col h-dvh sm:max-h-[90vh] overflow-y-auto p-0"
+          removeClose
+        >
+          <DialogHeader className="p-4 border-b flex flex-row justify-between">
+            <DialogTitle className="font-bold flex items-center gap-3">
+              <Icon.ReceiptText />
               {transaction?.interval ? "Recurring " : "Transaction "}
-              Details
+              details
             </DialogTitle>
+            <Button variant={"outline"} size={"sm"}>
+              <Icon.X />
+            </Button>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-6 p-4">
             {/* Main Transaction Info */}
-            <div className="bg-secondary rounded-lg p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-white rounded-full shadow-sm">
-                    {getCategoryIcon(transaction.category?.icon)}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold">
-                      {transaction.category?.name}
-                    </h3>
-                    <p className="text-secondary-foreground">
-                      {transaction.category?.type}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl sm:text-3xl font-bold text-foreground">
-                    {/* {transaction.category?.type === "Expense" ? "-" : "+"} */}
-                    {formatCurrency(transaction.amount)}
-                  </div>
-                  {transaction?.status && (
-                    <Badge variant={getStatusColor(transaction?.status)}>
-                      {transaction.status}
-                    </Badge>
-                  )}
-                </div>
-              </div>
+            <div className="p-6 flex flex-col items-center justify-center border-b">
+              {getTypeIcon(transaction.type)}
+              <h1>
+                {transaction.type === "Expense"
+                  ? "-"
+                  : transaction.type === "Income"
+                    ? "+"
+                    : ""}
+                {formatCurrency(transaction.amount)}
+              </h1>
             </div>
 
             {/* Basic Information */}
@@ -172,26 +173,28 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 </p>
               </div>
             </div>
-            {(transaction?.status !== "Paid" && transaction?.category?.type === "Expense") &&             <div className="flex flex-col gap-3">
-              <hr />
-              <div className="flex justify-end gap-3">
-                <Button size="sm" variant={"outline"} className="text-xs">
-                  Edit
-                </Button>
+            {transaction?.status !== "Paid" &&
+              transaction?.category?.type === "Expense" && (
+                <div className="flex flex-col gap-3">
+                  <hr />
+                  <div className="flex justify-end gap-3">
+                    <Button size="sm" variant={"outline"} className="text-xs">
+                      Edit
+                    </Button>
 
-                <Button size="sm" className="text-xs">
-                  Pay
-                </Button>
-              </div>
-              <hr />
-            </div>
-}
+                    <Button size="sm" className="text-xs">
+                      Pay
+                    </Button>
+                  </div>
+                  <hr />
+                </div>
+              )}
 
             {/* Transaction History */}
-            <DialogAccordion
+            {/* <DialogAccordion
               transaction={transaction}
               getTypeIcon={getTypeIcon}
-            />
+            /> */}
 
             {/* Additional Details */}
           </div>

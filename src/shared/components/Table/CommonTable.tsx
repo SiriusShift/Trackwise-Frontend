@@ -11,6 +11,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  FileX,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
@@ -119,7 +120,7 @@ export function DataTable<TData, TValue>({
       {/* Filter */}
       {/* Table container with responsive and overflow behavior */}
       {width > 639 ? (
-        <div className="relative h-[375px] max-h-[400px] rounded-md border overflow-x-auto">
+        <div className="relative min-h-[376px] max-h-[400px] rounded-md border overflow-x-auto">
           <Table className="table-auto">
             <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -180,18 +181,25 @@ export function DataTable<TData, TValue>({
                 ))
               ) : (
                 // Fallback for no data
-                <TableRow>
+                <TableRow >
                   <TableCell
                     colSpan={columns?.length}
-                    className="h-24 text-center"
+                    className="text-center"
                   >
-                    <img
-                      src={NoData}
-                      className="mx-auto"
-                      width={350}
-                      alt="No Data"
-                    />
-                    <p>No data found</p>
+                  <div className="flex flex-col min-h-[293px] items-center justify-center gap-3 rounded-xl  p-8 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                      <FileX className="text-muted-foreground" size={22} />
+                    </div>
+                  
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">
+                        No data available
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        There’s nothing to display right now.
+                      </p>
+                    </div>
+                  </div>
                   </TableCell>
                 </TableRow>
               )}

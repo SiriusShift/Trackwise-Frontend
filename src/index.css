@@ -169,10 +169,10 @@ body {
   }
 
   .dark {
-    --background: 0 0% 9.0196%;
-    --foreground: 0 0% 89.8039%;
-    --card: 0 0% 14.902%;
-    --card-foreground: 0 0% 89.8039%;
+--background: 223.8136 0.0000% 3.9388%;
+    --foreground: 223.8136 0.0004% 98.0256%;
+    --card: 223.8136 0.0000% 9.0527%;
+    --card-foreground: 223.8136 0.0004% 98.0256%;
     --popover: 0 0% 14.902%;
     --popover-foreground: 0 0% 89.8039%;
     --primary: 217.2193 91.2195% 59.8039%;
@@ -219,13 +219,13 @@ body {
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
       0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-    /* --sidebar-background: 0 0% 0%; */
+    --sidebar-background: 0 0% 0%;
 
     --success-dark: 144 40% 40%; /* Darker, muted green */
     --success-foreground-dark: 0 0% 98%; /* Keep bright text for readability */
 
     --warning-dark: 39 70% 45%; /* Darker golden yellow */
-    --warning-foreground-dark: 0 0% 98%; /* Keep light text */ --sidebar-background: 240 5.9% 10%;
+    --warning-foreground-dark: 0 0% 98%; /* Keep light text */
   }
 }
 

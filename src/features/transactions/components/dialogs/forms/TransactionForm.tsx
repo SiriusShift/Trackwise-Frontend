@@ -16,12 +16,14 @@ import {
 } from "@/shared/components/ui/popover";
 import {
   ArrowRight,
+  Bell,
   Calendar as CalendarIcon,
   Check,
   ChevronsUpDown,
   CreditCard,
   Repeat,
   Upload,
+  Zap,
 } from "lucide-react";
 import {
   Command,
@@ -61,7 +63,7 @@ const CategoryAmountSection = ({
   watch,
   type,
   mode,
-  setValue
+  setValue,
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -109,8 +111,8 @@ const CategoryAmountSection = ({
                             value={category}
                             key={category.id}
                             onSelect={() => {
-                              if(type === "Transfer"){
-                                setValue("to", null)
+                              if (type === "Transfer") {
+                                setValue("to", null);
                               }
                               onChange(category);
                             }}
@@ -237,8 +239,7 @@ const TransactionForm = ({
     setValue,
     formState: { errors },
   } = useFormContext();
-  console.log(watch());
-  console.log("Has errors", errors);
+
 
   const onDateChange = (field, date) => {
     field.onChange(date);
@@ -250,11 +251,33 @@ const TransactionForm = ({
     }
   };
 
-  const toAssetData = type === "Transfer" ? assetData?.filter((item) => watch("from")?.id !== item.id) : assetData
+  // const toAssetData =
+  //   type === "Transfer"
+  //     ? assetData?.filter((item) => watch("from")?.id !== item.id)
+  //     : assetData;
   const imageRef = useRef();
   return (
     <div className="flex gap-4 flex-col">
       <div className="space-y-4">
+        <FormField
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                Description <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Enter description"
+                  className="input-class text-sm"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="flex flex-row gap-4">
           <FormField
             control={control}
@@ -262,7 +285,7 @@ const TransactionForm = ({
             render={({ field }: { field: Field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>
-                  {watch("recurring") ? "Due date" : "Date & Time"}{" "}
+                  {watch("recurring") ? "Start Date" : "Date & Time"}{" "}
                   <span className="text-destructive">*</span>
                 </FormLabel>
                 <Button
@@ -290,6 +313,7 @@ const TransactionForm = ({
                   setDate={onDateChange}
                   disablePast={watch("recurring")}
                   removeTime={watch("recurring") || watch("date") > moment()}
+                  disableFuture
                   open={open}
                   setOpen={setOpen}
                   field={field}
@@ -298,7 +322,7 @@ const TransactionForm = ({
               </FormItem>
             )}
           />
-          {mode !== "transact" && !history  && type !== "Transfer" && (
+          {mode !== "transact" && !history && type !== "Transfer" && (
             <FormField
               control={control}
               name="recurring"
@@ -336,230 +360,178 @@ const TransactionForm = ({
             />
           )}
         </div>
-        {watch("recurring") && (
-          <>
-            <FormField
-              control={control}
-              name="auto"
-              render={({ field: { onChange, value } }) => (
-                <FormItem className="flex items-end">
-                  <FormControl className="flex items-center space-x-4">
-                    <div>
-                      <Checkbox
-                        checked={value}
-                        onCheckedChange={(checked) => {
-                          setValue("from", null);
-                          // if (!checked) {
-                          //   setValue("mode", "fixed");
-                          // }
-                          onChange(checked);
-                        }}
-                      />
-                      <div>
-                        {" "}
-                        <p className="text-sm">Enable automatic processing</p>
-                        <p className="text-xs text-muted-foreground">
-                          This {type.toLowerCase()} will be automatically
-                          {type === "Expense"
-                            ? " paid "
-                            : type === "Income"
-                              ? " received "
-                              : " transferred "}
-                          when it's due.
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* <Toggle
-                  checked={value?.includes()}
-                  onPressedChange={(pressed) => onChange(pressed)}
-                >
-                  <CreditCard />
-                </Toggle> */}
+        <FormField
+          name="account"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                Account <span className="text-destructive">*</span>
+              </FormLabel>
+              <Popover modal={true}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "justify-between w-full",
+                        !value && "text-muted-foreground",
+                      )}
+                    >
+                      {value ? (
+                        <div className="space-x-2">
+                          <span>
+                            {
+                              assetData.find((asset) => asset.id === value?.id)
+                                ?.name
+                            }
+                          </span>
+                          <span>
+                            ₱
+                            {assetData
+                              .find((asset) => asset.id === value?.id)
+                              ?.remainingBalance.toFixed(2)}
+                          </span>
+                        </div>
+                      ) : (
+                        "Select asset..."
+                      )}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-        {(!watch("recurring") || watch("auto")) &&
-          (watch("date") <= moment() || mode) && (
-            <>
-              {(type === "Expense" || type === "Transfer") && (
-                <FormField
-                  name="from"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>
-                        From <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <Popover modal={true}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
+                </PopoverTrigger>
+                <PopoverContent full className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Search asset" />
+                    <CommandList>
+                      {" "}
+                      <CommandEmpty>No assets found</CommandEmpty>
+                      <CommandGroup>
+                        {assetData?.map((asset) => (
+                          <CommandItem
+                            value={asset}
+                            key={asset.id}
+                            onSelect={() => {
+                              onChange(asset);
+                            }}
+                          >
+                            {asset.name} - ₱{asset?.remainingBalance.toFixed(2)}
+                            <Check
                               className={cn(
-                                "justify-between w-full",
-                                !value && "text-muted-foreground",
+                                "ml-auto",
+                                asset.id === value?.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
                               )}
-                            >
-                              {value ? (
-                                <div className="space-x-2">
-                                  <span>
-                                    {
-                                      assetData.find(
-                                        (asset) => asset.id === value?.id,
-                                      )?.name
-                                    }
-                                  </span>
-                                  <span>
-                                    ₱
-                                    {assetData
-                                      .find((asset) => asset.id === value?.id)
-                                      ?.remainingBalance.toFixed(2)}
-                                  </span>
-                                </div>
-                              ) : (
-                                "Select asset..."
-                              )}
-                              <ChevronsUpDown className="opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent full className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Search asset" />
-                            <CommandList>
-                              {" "}
-                              <CommandEmpty>No assets found</CommandEmpty>
-                              <CommandGroup>
-                                {assetData?.map((asset) => (
-                                  <CommandItem
-                                    value={asset}
-                                    key={asset.id}
-                                    onSelect={() => {
-                                      onChange(asset);
-                                    }}
-                                  >
-                                    {asset.name} - ₱
-                                    {asset?.remainingBalance.toFixed(2)}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        asset.id === value?.id
-                                          ? "opacity-100"
-                                          : "opacity-0",
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {type === "Transfer" && (
-                <CategoryAmountSection
-                  control={control}
-                  history={history}
-                  categoryData={categoryData}
-                  watch={watch}
-                  type={type}
-                  mode={mode}
-                  setValue={setValue}
-                />
-              )}
-
-              {(type === "Income" || type === "Transfer" && watch("category")?.name !== "External") && (
-                <FormField
-                  name="to"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>To</FormLabel>
-                      <Popover modal={true}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              disabled={type === "Transfer" && watch("category") === null}
-                              className={cn(
-                                "justify-between w-full",
-                                !value && "text-muted-foreground",
-                              )}
-                            >
-                              {value ? (
-                                <div className="space-x-2">
-                                  <span>
-                                    {
-                                      toAssetData.find(
-                                        (asset) => asset.id === value?.id,
-                                      )?.name
-                                    }
-                                  </span>
-                                  <span>
-                                    ₱
-                                    {toAssetData
-                                      .find((asset) => asset.id === value?.id)
-                                      ?.remainingBalance.toFixed(2)}
-                                  </span>
-                                </div>
-                              ) : (
-                                "Select asset..."
-                              )}
-                              <ChevronsUpDown className="opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent full className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Search asset" />
-                            <CommandList>
-                              {" "}
-                              <CommandEmpty>No assets found</CommandEmpty>
-                              <CommandGroup>
-                                {toAssetData?.map((asset) => (
-                                  <CommandItem
-                                    value={asset}
-                                    key={asset.id}
-                                    onSelect={() => {
-                                      onChange(asset);
-                                    }}
-                                  >
-                                    {asset.name} - ₱
-                                    {asset?.remainingBalance.toFixed(2)}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        asset.id === value?.id
-                                          ? "opacity-100"
-                                          : "opacity-0",
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </>
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
           )}
+        />
+
+        {type === "Transfer" && (
+          <CategoryAmountSection
+            control={control}
+            history={history}
+            categoryData={categoryData}
+            watch={watch}
+            type={type}
+            mode={mode}
+            setValue={setValue}
+          />
+        )}
+
+        {/* {(type === "Income" ||
+          (type === "Transfer" && watch("category")?.name !== "External")) && (
+          <FormField
+            name="to"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>To</FormLabel>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        disabled={
+                          type === "Transfer" && watch("category") === null
+                        }
+                        className={cn(
+                          "justify-between w-full",
+                          !value && "text-muted-foreground",
+                        )}
+                      >
+                        {value ? (
+                          <div className="space-x-2">
+                            <span>
+                              {
+                                toAssetData.find(
+                                  (asset) => asset.id === value?.id,
+                                )?.name
+                              }
+                            </span>
+                            <span>
+                              ₱
+                              {toAssetData
+                                .find((asset) => asset.id === value?.id)
+                                ?.remainingBalance.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          "Select asset..."
+                        )}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent full className="p-0">
+                    <Command>
+                      <CommandInput placeholder="Search asset" />
+                      <CommandList>
+                        {" "}
+                        <CommandEmpty>No assets found</CommandEmpty>
+                        <CommandGroup>
+                          {toAssetData?.map((asset) => (
+                            <CommandItem
+                              value={asset}
+                              key={asset.id}
+                              onSelect={() => {
+                                onChange(asset);
+                              }}
+                            >
+                              {asset.name} - ₱
+                              {asset?.remainingBalance.toFixed(2)}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  asset.id === value?.id
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )} */}
 
         {type !== "Transfer" && (
           <CategoryAmountSection
@@ -572,26 +544,6 @@ const TransactionForm = ({
             setValue={setValue}
           />
         )}
-
-        <FormField
-          name="description"
-          control={control}
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                Description <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Enter description"
-                  className="input-class text-sm"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
 
       {watch("recurring") && (
@@ -661,7 +613,7 @@ const TransactionForm = ({
           </div>
         </>
       )}
-
+      <Separator />
       {!watch("recurring") &&
         ((watch("date") < moment() && mode === "add") ||
           mode === "transact" ||
@@ -779,6 +731,99 @@ const TransactionForm = ({
             }}
           />
         )}
+
+      {watch("recurring") && (
+        <>
+          <FormField
+            control={control}
+            name="behaviour"
+            render={({ field: { onChange, value } }) => (
+              <FormItem>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Behaviour when due
+                    </p>
+
+                    <p className="text-xs text-muted-foreground">
+                      Choose what happens automatically once the due date is
+                      reached.
+                    </p>
+                  </div>
+
+                  <FormControl>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() => onChange("AUTO_LOG")}
+                        className={`group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-200 ${
+                          value === "AUTO_LOG"
+                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                            : "border-border bg-background hover:border-primary/40 hover:bg-muted/40"
+                        }`}
+                      >
+                        <div
+                          className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${
+                            value === "AUTO_LOG"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-primary/10 text-primary"
+                          }`}
+                        >
+                          <Zap size={18} />
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-foreground">
+                            Auto-log
+                          </p>
+
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            Automatically create and log the transaction once
+                            the due date arrives.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onChange("REMINDER")}
+                        className={`group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-200 ${
+                          value === "REMINDER"
+                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                            : "border-border bg-background hover:border-primary/40 hover:bg-muted/40"
+                        }`}
+                      >
+                        <div
+                          className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${
+                            value === "REMINDER"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          <Bell size={18} />
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-foreground">
+                            Reminder only
+                          </p>
+
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            Send a reminder notification without automatically
+                            logging the transaction.
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  </FormControl>
+
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+        </>
+      )}
     </div>
   );
 };

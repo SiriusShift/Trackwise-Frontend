@@ -96,15 +96,13 @@ function TrackerDialog({
   const [triggerUpdate, { isLoading: updateLoading }] =
     usePatchCategoryLimitMutation();
 
-  const isLoading = createLoading || updateLoading
-  console.log(categoryData);
+  const isLoading = createLoading || updateLoading;
   const filteredCategory =
     Array.isArray(data) && data?.length > 0
       ? categoryData?.filter((item) =>
-          data?.some((category) => item?.id !== category?.category?.id)
+          data?.some((category) => item?.id !== category?.category?.id),
         )
       : categoryData;
-  console.log(filteredCategory);
 
   const form = useForm<trackerFormType>({
     resolver: yupResolver(trackerSchema.schema),
@@ -134,51 +132,50 @@ function TrackerDialog({
         reset();
       },
       onCancel: () => {
-        console.log("Test")
-      }
+        console.log("Test");
+      },
     });
   };
 
-  
-    const onSubmit = async (data: any) => {
-      console.log(data);
-      try {
-        if (data?.id) {
-          await confirm({
-            title: "Confirm Update",
-            description: "Update this budget limit with your new amount?",
-            variant: "info",
-            showLoadingOnConfirm: true,
-            onConfirm: async () => {
-              await triggerUpdate({
-                id: data?.id,
-                amount: { amount: data?.amount },
-              }).unwrap();
-              setOpen(false);
-              return;
-            },
-          });
-        } else {
-          await confirm({
-            title: "Create Budget Limit",
-            description:
-              "Would you like to create a new budget limit for this category?",
-            variant: "info",
-            showLoadingOnConfirm: true,
-            onConfirm: async () => {
-              await triggerPost({
-                categoryId: data?.category?.id,
-                amount: data?.amount,
-              }).unwrap();
-              setOpen(false);
-              return;
-            },
-          });
-        }
-      } catch (err) {
-        toast.error("An unexpected error occurred. Please try again.");
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    try {
+      if (data?.id) {
+        await confirm({
+          title: "Confirm Update",
+          description: "Update this budget limit with your new amount?",
+          variant: "info",
+          showLoadingOnConfirm: true,
+          onConfirm: async () => {
+            await triggerUpdate({
+              id: data?.id,
+              amount: { amount: data?.amount },
+            }).unwrap();
+            setOpen(false);
+            return;
+          },
+        });
+      } else {
+        await confirm({
+          title: "Create Budget Limit",
+          description:
+            "Would you like to create a new budget limit for this category?",
+          variant: "info",
+          showLoadingOnConfirm: true,
+          onConfirm: async () => {
+            await triggerPost({
+              categoryId: data?.category?.id,
+              amount: data?.amount,
+            }).unwrap();
+            setOpen(false);
+            return;
+          },
+        });
       }
-    };
+    } catch (err) {
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  };
 
   useEffect(() => {
     if (Array.isArray(data)) return;
@@ -242,12 +239,12 @@ function TrackerDialog({
                                 role="combobox"
                                 className={cn(
                                   "justify-between",
-                                  !value && "text-muted-foreground"
+                                  !value && "text-muted-foreground",
                                 )}
                               >
                                 {value
                                   ? categoryData?.find(
-                                      (category) => category.id === value?.id
+                                      (category) => category.id === value?.id,
                                     )?.name
                                   : "Select category"}
                                 <ChevronsUpDown className="opacity-50" />
@@ -278,7 +275,7 @@ function TrackerDialog({
                                           "ml-auto",
                                           category.id === value?.id
                                             ? "opacity-100"
-                                            : "opacity-0"
+                                            : "opacity-0",
                                         )}
                                       />
                                     </CommandItem>
@@ -340,7 +337,7 @@ function TrackerDialog({
                   {/* {isLoading ? (
                     <Loader2 className="animate-spin" />
                   ) : ( */}
-                    {mode === "edit" ? "Update" : "Set"} budget
+                  {mode === "edit" ? "Update" : "Set"} budget
                   {/* )} */}
                 </Button>
               </DialogFooter>

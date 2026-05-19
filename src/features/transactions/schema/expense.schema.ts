@@ -11,18 +11,10 @@ export const expenseSchema = {
     date: yup.date().required("Date is required"),
     image: yup.mixed().notRequired().nullable(),
     // recurring: yup.boolean(),
-    from: yup
-      .object()
-      .when(["recurring", "auto", "date", "mode"], {
-        is: (recurring: boolean, auto: boolean, date: Date, mode: string) =>
-          (recurring && auto) ||
-          (!recurring && moment(date).isSameOrBefore(moment())) || mode === "transact",
-        then: (schema) => schema.required("Source is required"),
-        otherwise: (schema) => schema.notRequired(),
-      })
-      .nullable(),
+    account: yup
+      .object().required("Account is required"),
     endDate: yup.date().nullable().notRequired(),
-    auto: yup.boolean().when("recurring", {
+    behaviour: yup.string().when("recurring", {
       is: true,
       then: (schema) => schema.required("Mode is required"),
       otherwise: (schema) => schema.notRequired(),
@@ -44,9 +36,9 @@ export const expenseSchema = {
     recurring: false,
     date: moment(),
     endDate: null,
-    from: null,
+    account: null,
     image: null,
-    auto: false,
+    behaviour: false,
   },
 };
 

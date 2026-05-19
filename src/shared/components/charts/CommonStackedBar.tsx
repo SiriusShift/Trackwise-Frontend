@@ -34,7 +34,7 @@ export function StackedBar({
       <TooltipProvider delayDuration={100}>
 
         {/* Track — blends with card bg using muted */}
-        <div className="relative flex h-2 w-full rounded-full bg-muted/40 overflow-hidden gap-px">
+        <div className="relative flex h-2 w-full rounded-full bg-muted overflow-hidden gap-px">
           {segments?.map((seg, i) => {
             const pct = total > 0 ? (seg.value / total) * 100 : 0;
             const isFirst = i === 0;

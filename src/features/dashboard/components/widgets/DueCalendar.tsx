@@ -81,14 +81,14 @@ export default function DueCalendar() {
   className="relative overflow-hidden border border-border/60 bg-card
     p-5 flex flex-col gap-2 rounded-2xl shadow-sm col-span-2 lg:col-span-full 2xl:col-span-1
     transition-shadow hover:shadow-md"
-  style={{
-    backgroundImage: `
-      radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-      radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-    `,
-  }}
+  // style={{
+  //   backgroundImage: `
+  //     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
+  //     radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
+  //   `,
+  // }}
 >
-  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+  {/* <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" /> */}
 
   {/* Header */}
   <CardHeader className="flex flex-row w-full justify-between p-0">

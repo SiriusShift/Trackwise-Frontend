@@ -1,5 +1,7 @@
-import { commonTrackerProps } from "@/shared/types";
 import * as Icons from "lucide-react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+
 import { ChartContainer } from "../ui/chart";
 import {
   Label,
@@ -18,10 +20,23 @@ import {
 import { CarouselItem } from "../ui/carousel";
 import { Card, CardContent } from "../ui/card";
 import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
-import { useSelector } from "react-redux";
+
 import { IRootState } from "@/app/store";
-import { useState } from "react";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { commonTrackerProps } from "@/shared/types";
+
+interface TrackerCardProps extends commonTrackerProps {
+  item: any;
+  title: string;
+  editDescription: string;
+  onDelete: (item: any) => void;
+  onSubmit?: () => void;
+  type: string;
+}
+
+// Derive end angle from a 0–100 percentage for a top-starting radial chart
+function percentageToEndAngle(percentage: number): number {
+  return 90 - (percentage / 100) * 360;
+}
 
 const TrackerCard = ({
   item,
@@ -30,69 +45,57 @@ const TrackerCard = ({
   onDelete,
   type,
   onSubmit,
-  key,
-}: commonTrackerProps & {
-  item: object;
-  title: string;
-  editDescription: string;
-  onDelete: () => void;
-  onSubmit: () => void;
-  type: string;
-  key: number
-}) => {
-  const [open, setOpen] = useState(false)
+}: TrackerCardProps) => {
+  const [open, setOpen] = useState(false);
   const mode = useSelector((state: IRootState) => state.active.mode);
-  const width = useScreenWidth()
 
   const limit = mode === "monthly" ? item?.value : item?.value * 12;
-  console.log(limit);
   const percentage = limit > 0 ? (Number(item?.total) / limit) * 100 : 0;
-  const endAngle = 90 - (percentage / 100) * 360;
-  const iconKey = (item?.category?.icon as keyof typeof Icons) || "BusFront";
-  const Icon = Icons[iconKey];
+  const isOverBudget = item?.total > limit;
+  const endAngle = percentageToEndAngle(percentage);
+
+  const iconKey = (item?.category?.icon as keyof typeof Icons) ?? "BusFront";
+  const Icon = Icons[iconKey] as React.ElementType;
 
   return (
     <>
-      <CarouselItem
-        key={key}
-        className="basis-[80%] md:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
-      >
-        <Card className="h-full relative">
+      <CarouselItem className="basis-[80%] xl:basis-1/2 2xl:basis-1/3">
+        <Card className="relative bg-muted/30">
+
+          {/* Actions menu */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
-                className="absolute top-2 w-5 right-2"
+                className="absolute top-2 right-2 w-5"
                 variant="ghost"
                 type="button"
+                aria-label="Card options"
               >
                 <Icons.EllipsisVertical />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setOpen(true);
-                }}
-              >
-                <Icons.Pencil />
-                Edit
+              <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setOpen(true); }}>
+                <Icons.Pencil className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDelete(item)}>
-                <Icons.Trash2 />
-                Delete
+                <Icons.Trash2 className="mr-2 h-4 w-4" /> Delete
               </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(item)}>
-                <Icons.Eye />
-                View
+              {/* 
+                NOTE: "View" was wired to onDelete in the original — 
+                replace with the correct handler when ready.
+              */}
+              <DropdownMenuItem disabled>
+                <Icons.Eye className="mr-2 h-4 w-4" /> View
               </DropdownMenuItem>
-
             </DropdownMenuContent>
           </DropdownMenu>
-          <CardContent className="flex h-[100px] items-center p-3">
+
+          {/* Card body */}
+          <CardContent className="flex h-[80px] items-center p-1">
             <ChartContainer
               config={{ innerRadius: 27, outerRadius: 20 }}
-              className="h-[65px] w-[65px] mr-2 sm:h-[100px] sm:w-[100px]"
+              className="h-[65px] w-[65px] sm:h-[80px] sm:w-[80px] mr-2 shrink-0"
             >
               <RadialBarChart
                 width={100}
@@ -109,7 +112,7 @@ const TrackerCard = ({
                   background
                   cornerRadius={10}
                   fill={
-                    item?.total > limit
+                    isOverBudget
                       ? "hsl(var(--destructive))"
                       : "hsl(var(--chart-1))"
                   }
@@ -118,8 +121,8 @@ const TrackerCard = ({
                   <Label
                     content={({ viewBox }) => (
                       <svg
-                        x={viewBox.cx - 12}
-                        y={viewBox.cy - 12}
+                        x={(viewBox as any).cx - 12}
+                        y={(viewBox as any).cy - 12}
                         width={24}
                         height={24}
                         viewBox="0 0 24 24"
@@ -133,15 +136,22 @@ const TrackerCard = ({
                 </PolarRadiusAxis>
               </RadialBarChart>
             </ChartContainer>
-            <div className="flex flex-col">
-              <h1>{item.category.name}</h1>
-              <p>
-                ₱ {Number(item.total)?.toFixed(2)} / {Number(limit)?.toFixed(2)}
+
+            <div className="flex flex-col min-w-0">
+              <p className="font-medium text-sm truncate">{item.category.name}</p>
+              <p className={`text-xs ${isOverBudget ? "text-destructive" : "text-muted-foreground"}`}>
+                ₱{Number(item.total).toFixed(2)}{" "}
+                <span className="text-muted-foreground">/ {Number(limit).toFixed(2)}</span>
               </p>
+              {/* Over-budget indicator */}
+              {isOverBudget && (
+                <p className="text-xs text-destructive font-medium mt-0.5">Over budget</p>
+              )}
             </div>
           </CardContent>
         </Card>
       </CarouselItem>
+
       <TrackerDialog
         title={`Edit ${title}`}
         description={editDescription}

@@ -46,12 +46,12 @@ function SavingsPlan() {
       className=" relative overflow-hidden border border-border/60 bg-card
         flex flex-col p-5 rounded-2xl shadow-sm col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
         transition-shadow hover:shadow-md"
-      style={{
-        backgroundImage: `
-    radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-    radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-  `,
-      }}
+  //     style={{
+  //       backgroundImage: `
+  //   radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
+  //   radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
+  // `,
+  //     }}
     >
       <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
         <CardTitle>

@@ -11,7 +11,7 @@ export const TrackerAddCard = ({
   onSubmit,
   isLoading,
   type,
-  data
+  data,
 }: {
   title: string;
   onSubmit: (data: any) => void;
@@ -19,21 +19,24 @@ export const TrackerAddCard = ({
   type: string;
   addDescription: string;
 }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   return (
     <>
-      <CarouselItem className="basis-[90%] md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
-        <Card className="h-full">
-          <CardContent className="flex h-[100px] items-center p-9">
-            <Button
-              variant={"outline"}
-              size={"icon"}
-              onClick={() => setOpen(true)}
-              className="h-11 bg-card w-11 rounded-full border-primary border-2"
-            >
-              <Plus className="text-primary" size={30} />
-            </Button>
-            <span className="ml-5">Add New Budget</span>
+      <CarouselItem className="basis-[80%] md:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+        <Card className="relative bg-muted/30">
+          <CardContent className="flex h-[80px] items-center p-1">
+            <div className="h-full w-[70px] flex items-center justify-center">
+              <Button
+                variant={"outline"}
+                size={"icon"}
+                onClick={() => setOpen(true)}
+                className="h-11 bg-card w-11 rounded-full border-primary border-2 bg-muted/30"
+              >
+                <Plus className="text-primary" size={30} />
+              </Button>
+            </div>
+
+            <span>Add Budget</span>
           </CardContent>
         </Card>
       </CarouselItem>

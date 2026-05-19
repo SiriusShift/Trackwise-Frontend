@@ -5,11 +5,11 @@ import { Card, CardContent } from "../ui/card";
 
 const TrackerSkeleton = () => {
   return (
-    <CarouselItem className="basis-full md:basis-1/2 xl:basis-1/3 2xl:basis-1/4">
+    <CarouselItem className="basis-full md:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
       <Card className="h-full relative">
         {" "}
         <Skeleton className="absolute top-4 right-4 h-6 w-3" />
-        <CardContent className="flex h-[100px] items-center p-3 gap-3">
+        <CardContent className="flex h-[80px] items-center p-3 gap-3">
           {/* Circle placeholder for radial chart */}
           <Skeleton className="h-12 w-12 rounded-full ml-5" />
           {/* Text placeholders */}

@@ -17,16 +17,15 @@ const DatePicker = ({
   open,
   removeTime,
   disablePast,
+  disableFuture,
 }: {
-  field: Field
-  setDate?: (
-    field: Field,
-    date: Date
-  ) => void;
+  field: Field;
+  setDate?: (field: Field, date: Date) => void;
   setOpen: (open: boolean) => void;
   open: boolean;
   removeTime?: boolean;
   disablePast?: boolean;
+  disableFuture?: boolean;
 }) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
   console.log(disablePast, open);
@@ -47,20 +46,24 @@ const DatePicker = ({
                 const newDate = new Date(
                   date.setHours(
                     field.value ? new Date(field.value).getHours() : 0,
-                    field.value ? new Date(field.value).getMinutes() : 0
-                  )
+                    field.value ? new Date(field.value).getMinutes() : 0,
+                  ),
                 );
                 console.log("Selected Date:", newDate);
-                if(setDate){
-                setDate(field, newDate);
+                if (setDate) {
+                  setDate(field, newDate);
                 }
-                field.onChange(newDate)
+                field.onChange(newDate);
               }}
               initialFocus
               disabled={(date) => {
                 if (disablePast) {
                   const today = moment().startOf("day").toDate();
                   return date < today;
+                }
+                if (disableFuture) {
+                  const today = moment().startOf("day").toDate();
+                  return date > today;
                 }
                 const minDate = new Date("2000-01-01"); // Minimum date
                 return date < minDate;
@@ -93,8 +96,8 @@ const DatePicker = ({
                     const newDate = new Date(
                       date.setHours(
                         field.value ? new Date(field.value).getHours() : 0,
-                        field.value ? new Date(field.value).getMinutes() : 0
-                      )
+                        field.value ? new Date(field.value).getMinutes() : 0,
+                      ),
                     );
                     console.log("Selected Date:", newDate);
                     field.onChange(newDate); // Update date with time preserved

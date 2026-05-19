@@ -176,21 +176,24 @@ const TransactionPage = () => {
       },
     );
 
-  const handleFilter = useCallback(({
-    search,
-    selectedCategories,
-    status,
-  }: {
-    search: string;
-    selectedCategories: categoryType;
-    status: string;
-  }) => {
-    setFilter({
+  const handleFilter = useCallback(
+    ({
       search,
       selectedCategories,
       status,
-    });
-  }, []);
+    }: {
+      search: string;
+      selectedCategories: categoryType;
+      status: string;
+    }) => {
+      setFilter({
+        search,
+        selectedCategories,
+        status,
+      });
+    },
+    [],
+  );
 
   const clearFilter = useCallback(() => {
     setFilter({
@@ -207,7 +210,7 @@ const TransactionPage = () => {
         ? incomeData
         : transferData;
 
-const tableColumn = useMemo(() => columns, [columns]);
+  const tableColumn = useMemo(() => columns, [columns]);
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname,
   );
@@ -271,12 +274,29 @@ const tableColumn = useMemo(() => columns, [columns]);
       <CommonToolbar />
       <div className="flex p-5 flex-col gap-5">
         {/* Header */}
+        <div className="grid grid-cols-2 gap-5">
+          <CommonTracker
+            data={categoryLimit}
+            isLoading={categoryLimitLoading}
+            editDescription="Adjust and update your budget limit to match your needs."
+            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
+            title="Budget Limit"
+            type="Expense"
+          />{" "}
+          <CommonTracker
+            data={categoryLimit}
+            isLoading={categoryLimitLoading}
+            editDescription="Adjust and update your budget limit to match your needs."
+            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
+            title="Budget Limit"
+            type="Expense"
+          />
+        </div>
 
         <PageHeader
           pageName={currentPageName?.name}
           description={`Overview of ${type.toLocaleLowerCase()} for this ${formatMode()}`}
-                  monthPicker={true}
-
+          monthPicker={true}
         />
         {/* Toolbar */}
         <TransactionToolbar
@@ -324,29 +344,6 @@ const tableColumn = useMemo(() => columns, [columns]);
           open={viewOpen}
           setOpen={(val) => dispatch(setOpenDialog(val))}
           transaction={activeRow}
-        />
-
-        {/* <DataTable
-          columns={tableColumn}
-          setPageIndex={setPageIndex}
-          setPageSize={setPageSize}
-          totalPages={totalPages}
-          graphLoading={graphFetching}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          // trend={tableData?.trend}
-          isLoading={tableFetching}
-          type={type}
-          graphData={graphData}
-          data={recurring ? recurringTableData?.data : tableData?.data || []}
-        /> */}
-        <CommonTracker
-          data={categoryLimit}
-          isLoading={categoryLimitLoading}
-          editDescription="Adjust and update your budget limit to match your needs."
-          addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
-          title="Budget Limit"
-          type="Expense"
         />
       </div>
     </>

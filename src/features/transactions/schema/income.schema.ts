@@ -1,5 +1,5 @@
 import moment from "moment";
-import * as yup from "yup"
+import * as yup from "yup";
 export const incomeSchema = {
   schema: yup.object().shape({
     category: yup.object().required("Category is required"),
@@ -11,21 +11,21 @@ export const incomeSchema = {
     date: yup.date().required("Date is required"),
     image: yup.mixed().nullable(),
     endDate: yup.date().nullable().notRequired(),
-    auto: yup.boolean().when("recurring", {
+    behaviour: yup.boolean().when("recurring", {
       is: true,
       then: (schema) => schema.required("Mode is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
-     to: yup
-          .object()
-          .when(["recurring", "auto", "date"], {
-            is: (recurring: boolean, auto: boolean, date: Date) =>
-              (recurring && auto) ||
-              (!recurring && moment(date).isSameOrBefore(moment())),
-            then: (schema) => schema.required("Destination is required"),
-            otherwise: (schema) => schema.notRequired(),
-          })
-          .nullable(),
+    account: yup
+      .object()
+      .when(["recurring", "auto", "date"], {
+        is: (recurring: boolean, auto: boolean, date: Date) =>
+          (recurring && auto) ||
+          (!recurring && moment(date).isSameOrBefore(moment())),
+        then: (schema) => schema.required("Destination is required"),
+        otherwise: (schema) => schema.notRequired(),
+      })
+      .nullable(),
     mode: yup.string().when("recurring", {
       is: true,
       then: (schema) => schema.required("Mode is required"),
@@ -46,8 +46,8 @@ export const incomeSchema = {
     amount: "",
     recurring: false,
     date: new Date(),
-    source: null,
+    account: null,
     image: null,
-    auto: null,
+    behaviour: null,
   },
 };
