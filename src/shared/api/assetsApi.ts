@@ -4,7 +4,7 @@ export const assetsApi = api.enhanceEndpoints({ addTagTypes: ["Assets"] }).injec
     endpoints: (builder) => ({
         getAsset: builder.query<any, void>({
             query: (params) => ({
-                url: "/asset/get",
+                url: "/assets",
                 method: "GET",
                 headers: { 
                     Accept: "application/json" 

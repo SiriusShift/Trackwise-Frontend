@@ -6,7 +6,7 @@ export const transactionApi = api
     endpoints: (builder) => ({
       getTransactionHistory: builder.query({
         query: (params) => ({
-          url: "/transaction/history",
+          url: "/transactions/history",
           method: "GET",
           params,
         }),
@@ -14,7 +14,7 @@ export const transactionApi = api
       }),
       updateTransactionHistory: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/edit/${id}`,
+          url: `/transactions/edit/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -22,27 +22,34 @@ export const transactionApi = api
       }),
       deleteTransactionHistory: builder.mutation({
         query: (id) => ({
-          url: `/transaction/delete/${id}`,
+          url: `/transactions/delete/${id}`,
           method: "PATCH",
         }),
         invalidatesTags: ["History", "Stats"],
       }),
       getStatistics: builder.query({
         query: (params) => ({
-          url: `/transaction/statistics`,
+          url: `/transactions/statistics`,
           method: "GET",
-          params
+          params,
         }),
-        providesTags: ["Stats"]
+        providesTags: ["Stats"],
       }),
       archiveTransaction: builder.mutation({
-        query: ({id, data}) => ({
-          url: `/transaction/${id}`,
+        query: ({ id, data }) => ({
+          url: `/transactions/${id}`,
           method: "PATCH",
-          params: data
+          params: data,
         }),
-        invalidatesTags: ["Stats", "History"]
-      })
+        invalidatesTags: ["Stats", "History"],
+      }),
+      dueTransactions: builder.query({
+        query: () => ({
+          url: "/transactions/due",
+          method: "GET",
+        }),
+        transformResponse: (response: any) => response.data,
+      }),
     }),
   });
 
@@ -51,5 +58,6 @@ export const {
   useUpdateTransactionHistoryMutation,
   useDeleteTransactionHistoryMutation,
   useGetStatisticsQuery,
-  useArchiveTransactionMutation
+  useArchiveTransactionMutation,
+  useDueTransactionsQuery
 } = transactionApi;

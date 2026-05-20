@@ -44,7 +44,7 @@ const WidgetLayout = ({
 }: commonWidgetProps) => {
   const date = formatDateDisplay();
   const mode = formatMode();
-
+console.log(segments)
   const balance =
     title === "Expense"
       ? data?.expense
@@ -86,11 +86,11 @@ const WidgetLayout = ({
   const trendColor =
     trend > 0
       ? trendPositiveIsGood
-        ? "text-green-500"
-        : "text-red-500"
-      : trendPositiveIsGood
-        ? "text-red-500"
-        : "text-green-500";
+        ? "text-success-500"
+        : "text-destructive-500"
+      : trend < 0 ? trendPositiveIsGood
+        ? "text-destructive-500"
+        : "text-success-500" : "text-muted-foreground";
 
   return (
     <Card
@@ -196,7 +196,7 @@ const WidgetLayout = ({
                       Compare to last {mode}
                     </p>
                     <p className={`text-sm font-medium ${trendColor}`}>
-                      {trend > 0 ? "↑ +" : "↓ "}
+                      {trend > 0 ? "↑ +" : trend < 0 ?  "↓ " : ""}
                       {trend ?? 0}%
                     </p>
                   </div>

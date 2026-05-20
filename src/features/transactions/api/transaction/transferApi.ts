@@ -6,7 +6,7 @@ export const transferApi = api
     endpoints: (builder) => ({
       getTransfer: builder.query({
         query: (params) => ({
-          url: "/transaction/transfer",
+          url: "/transactions/transfer",
           method: "GET",
           params,
         }),
@@ -14,7 +14,7 @@ export const transferApi = api
       }),
       postTransfer: builder.mutation({
         query: (body) => ({
-          url: "/transaction/transfer",
+          url: "/transactions/transfer",
           method: "POST",
           body,
         }),
@@ -22,7 +22,7 @@ export const transferApi = api
       }),
       putTransfer: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/transfer/${id}`,
+          url: `/transactions/transfer/${id}`,
           method: "PUT",
           body: data,
         }),
@@ -30,7 +30,7 @@ export const transferApi = api
       }),
       deleteTransfer: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/transfer/${id}`,
+          url: `/transactions/transfer/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -40,7 +40,7 @@ export const transferApi = api
 
       postTransferMoney: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/income/transfer/${id}`,
+          url: `/transactions/income/transfer/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -49,7 +49,7 @@ export const transferApi = api
 
       postRecurringTransfer: builder.mutation({
         query: (body) => ({
-          url: "/transaction/transfer/recurring",
+          url: "/transactions/transfer/recurring",
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -60,7 +60,7 @@ export const transferApi = api
       }),
       updateRecurringTransfer: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/transfer/recurring/${id}`,
+          url: `/transactions/transfer/recurring/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -73,7 +73,7 @@ export const transferApi = api
       getRecurringTransfer: builder.query({
         query: (params) => ({
           params,
-          url: "/transaction/transfer/recurring",
+          url: "/transactions/transfer/recurring",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -84,7 +84,7 @@ export const transferApi = api
 
       deleteRecurringTransfer: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/transfer/recurring/${id}`,
+          url: `/transactions/transfer/recurring/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -92,7 +92,7 @@ export const transferApi = api
       }),
       getGraphTransfer: builder.query({
         query: (params) => ({
-          url: "/transaction/transfer/graph",
+          url: "/transactions/transfer/graph",
           method: "GET",
           params,
         }),

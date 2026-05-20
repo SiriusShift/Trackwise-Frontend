@@ -4,7 +4,7 @@ export const installmentApi = api.enhanceEndpoints({addTagTypes: ["Installment"]
     endpoints: (builder) => ({
         getInstallments: builder.query({
             query: (params) => ({
-                url: "/transaction/getInstallment",
+                url: "/transactions/getInstallment",
                 method: "GET",
                 params
             }),
@@ -12,14 +12,14 @@ export const installmentApi = api.enhanceEndpoints({addTagTypes: ["Installment"]
         }),
         postInstallment: builder.mutation({
             query: (body) => ({
-                url: "/transaction/createInstallment",
+                url: "/transactions/createInstallment",
                 method: "POST",
                 body
             })
         }),
         patchInstallment: builder.mutation({
             query: (body) => ({
-                url: "/transaction/updateInstallment",
+                url: "/transactions/updateInstallment",
                 method: "POST",
                 body
             })

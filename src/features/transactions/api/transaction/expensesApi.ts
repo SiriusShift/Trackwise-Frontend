@@ -8,7 +8,7 @@ export const expensesApi = api
       getExpenses: builder.query({
         query: (params) => ({
           params,
-          url: "/transaction/expense",
+          url: "/transactions/expense",
           method: "GET",
         }),
         // transformResponse: (response) => response.data,
@@ -16,7 +16,7 @@ export const expensesApi = api
       }),
       postExpense: builder.mutation({
         query: (body) => ({
-          url: "/transaction/expense",
+          url: "/transactions/expense",
           method: "POST",
           // headers: {
           //   "Content-type": "multipart/form-data",
@@ -28,7 +28,7 @@ export const expensesApi = api
 
       deleteExpense: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/expense/${id}`,
+          url: `/transactions/expense/${id}`,
           method: "PATCH",
           body: data,
           // headers: {
@@ -40,7 +40,7 @@ export const expensesApi = api
 
       putExpense: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/expense/${id}`,
+          url: `/transactions/expense/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -49,7 +49,7 @@ export const expensesApi = api
 
       postRecurringExpense: builder.mutation({
         query: (body) => ({
-          url: "/transaction/expense/recurring",
+          url: "/transactions/expense/recurring",
           method: "POST",
           body,
         }),
@@ -58,7 +58,7 @@ export const expensesApi = api
 
       updateRecurringExpense: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/expense/recurring/${id}`,
+          url: `/transactions/expense/recurring/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -71,7 +71,7 @@ export const expensesApi = api
       getRecurringExpenses: builder.query({
         query: (params) => ({
           params,
-          url: "/transaction/expense/recurring",
+          url: "/transactions/expense/recurring",
           method: "GET",
         }),
         providesTags: ["Recurring"],
@@ -79,7 +79,7 @@ export const expensesApi = api
 
       cancelRecurringExpense: builder.mutation({
         query: (id) => ({
-          url: `/transaction/expense/recurring/${id}`,
+          url: `/transactions/expense/recurring/${id}`,
           method: "PATCH",
         }),
         invalidatesTags: ["Expenses"],
@@ -87,7 +87,7 @@ export const expensesApi = api
 
       postPayment: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/expense/pay/${id}`,
+          url: `/transactions/expense/pay/${id}`,
           method: "PATCH",
           body: data,
         }),
@@ -97,7 +97,7 @@ export const expensesApi = api
       getGraphExpense: builder.query({
         query: (params) => ({
           params,
-          url: "/transaction/expense/graph",
+          url: "/transactions/expense/graph",
           method: "GET",
         }),
         transformResponse: (response: any) => response.data,
@@ -106,19 +106,12 @@ export const expensesApi = api
 
       postAutoPayment: builder.mutation({
         query: ({ data, id }) => ({
-          url: `/transaction/expense/pay/auto/${id}`,
+          url: `/transactions/expense/pay/auto/${id}`,
           method: "POST",
           body: data,
         }),
       }),
-      getBills: builder.query({
-        query: () => ({
-          url: "/transaction/expense/bills",
-          method: "GET",
-        }),
-        transformResponse: (response: any) => response.data,
-        providesTags: ["Expenses"],
-      }),
+    
     }),
   });
 
@@ -136,6 +129,4 @@ export const {
   useCancelRecurringExpenseMutation,
   usePostPaymentMutation,
   usePostAutoPaymentMutation,
-  useGetBillsQuery,
-  useLazyGetBillsQuery,
 } = expensesApi;

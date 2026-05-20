@@ -1,10 +1,10 @@
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Link } from "react-router-dom";
 import moment from "moment";
-import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
 import * as Icons from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Button } from "@/shared/components/ui/button";
+import { useDueTransactionsQuery } from "@/features/transactions/api/transaction";
 
 const getStatus = (date) => {
   const today = moment();
@@ -62,7 +62,7 @@ const categoryIcon = (name: string) => {
 // });
 
 export default function DueCalendar() {
-  const { data, isLoading } = useGetBillsQuery({});
+  const { data, isLoading } = useDueTransactionsQuery({});
   const totalRemaining = data
     ?.slice(1)
     ?.reduce((sum, p) => sum + Number(p.amount), 0);
