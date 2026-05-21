@@ -5,7 +5,7 @@ import { Card, CardContent } from "../ui/card";
 
 const TrackerSkeleton = () => {
   return (
-    <CarouselItem className="basis-full md:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+    <CarouselItem className="basis-full md:basis-1/2 xl:basis-1/2">
       <Card className="h-full relative">
         {" "}
         <Skeleton className="absolute top-4 right-4 h-6 w-3" />

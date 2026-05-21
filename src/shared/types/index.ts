@@ -5,7 +5,7 @@ export interface Expense {
   description?: string; // Optional description
   amount: number; // Expense amount
   source: Object;
-  status: "Paid" | "Partial" | "Pending" | "Overdue"; // Status of the expense
+  status: "Completed" | "Pending" | "Overdue"; // Status of the expense
   image: string;
   recurringId: number;
   recurringTemplate: RecurringTemplate;
@@ -18,7 +18,7 @@ export interface Transfer {
   description?: string; // Optional description
   amount: number; // Expense amount
   source: Object;
-  status: "Completed" | "Partial" | "Pending" | "Overdue"; // Status of the expense
+  status: "Completed" | "Pending" | "Overdue"; // Status of the expense
   image: string;
   recurringId: number;
   recurringTemplate: RecurringTemplate;

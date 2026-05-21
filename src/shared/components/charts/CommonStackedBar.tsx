@@ -43,7 +43,7 @@ export function StackedBar({
               <Tooltip key={seg.label}>
                 <TooltipTrigger asChild>
                   <div
-                    className={`h-full cursor-pointer bg-${seg.color}-500 transition-all duration-500 ease-out hover:brightness-110 hover:scale-y-125 origin-bottom`}
+                    className={`h-full cursor-pointer bg-[${seg.color}] transition-all duration-500 ease-out hover:brightness-110 hover:scale-y-125 origin-bottom`}
                     style={{
                       width: animated ? `${pct}%` : "0%",
                       borderRadius: isFirst

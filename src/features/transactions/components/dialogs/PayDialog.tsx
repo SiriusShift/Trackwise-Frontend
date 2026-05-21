@@ -47,6 +47,7 @@ import {
 import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import { useDispatch } from "react-redux";
 import { usePostRecurringPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
+import { Separator } from "@/shared/components/ui/separator";
 
 function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
   const width = useScreenWidth();
@@ -274,7 +275,7 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
                   {mode === "add" ? "Add" : "Edit"} Payment
                 </SheetTitle>
               </div>
-              <hr />
+        <Separator />
             </SheetHeader>
             {formContent}
           </SheetContent>

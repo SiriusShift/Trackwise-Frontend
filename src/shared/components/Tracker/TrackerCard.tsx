@@ -59,7 +59,7 @@ const TrackerCard = ({
 
   return (
     <>
-      <CarouselItem className="basis-[80%] xl:basis-1/2 2xl:basis-1/3">
+      <CarouselItem className="basis-[80%] xl:basis-1/2">
         <Card className="relative bg-muted/30">
 
           {/* Actions menu */}
@@ -95,7 +95,7 @@ const TrackerCard = ({
           <CardContent className="flex h-[80px] items-center p-1">
             <ChartContainer
               config={{ innerRadius: 27, outerRadius: 20 }}
-              className="h-[65px] w-[65px] sm:h-[80px] sm:w-[80px] mr-2 shrink-0"
+              className="h-[65px] w-[65px] sm:h-[65px] sm:w-[65px] mr-2 shrink-0"
             >
               <RadialBarChart
                 width={100}

@@ -88,32 +88,17 @@ const DatePicker = ({
                 <Clock />
               </Button> */}
 
-                <Input
-                  type="time"
-                  className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  value={field.value ? moment(field.value).format("HH:mm") : ""}
-                  onSelect={(date) => {
-                    const newDate = new Date(
-                      date.setHours(
-                        field.value ? new Date(field.value).getHours() : 0,
-                        field.value ? new Date(field.value).getMinutes() : 0,
-                      ),
-                    );
-                    console.log("Selected Date:", newDate);
-                    field.onChange(newDate); // Update date with time preserved
-                  }}
-                  onChange={(e) => {
-                    const [hours, minutes] = e.target.value
-                      .split(":")
-                      .map(Number);
-                    const updatedDate = field.value
-                      ? new Date(field.value)
-                      : new Date(); // Use the selected date or default to now
-                    updatedDate.setHours(hours, minutes);
-                    console.log("Updated Time:", updatedDate);
-                    field.onChange(updatedDate); // Update time with the correct date preserved
-                  }}
-                />
+<Input
+  type="time"
+  className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+  value={field.value ? moment(field.value).format("HH:mm") : ""}
+  onChange={(e) => {
+    const [hours, minutes] = e.target.value.split(":").map(Number);
+    const updatedDate = field.value ? new Date(field.value) : new Date();
+    updatedDate.setHours(hours, minutes, 0, 0);
+    field.onChange(updatedDate);
+  }}
+/>
               </div>
             )}
           </div>

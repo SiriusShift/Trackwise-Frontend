@@ -162,11 +162,11 @@ const CategoryAmountSection = ({
                   disabled={
                     !watch("recurring")
                       ? type === "Expense"
-                        ? !watch("from") && watch("date") <= moment()
+                        ? !watch("account") && watch("date") <= moment()
                         : type === "Income"
-                          ? !watch("to") && watch("date") <= moment()
-                          : !watch("from") &&
-                            !watch("to") &&
+                          ? !watch("account") && watch("date") <= moment()
+                          : !watch("account") &&
+                            !watch("account") &&
                             watch("date") <= moment()
                       : false
                   }
@@ -312,7 +312,7 @@ const TransactionForm = ({
                 <DatePicker
                   setDate={onDateChange}
                   disablePast={watch("recurring")}
-                  removeTime={watch("recurring") || watch("date") > moment()}
+                  // removeTime={watch("recurring") || watch("date") > moment()}
                   disableFuture
                   open={open}
                   setOpen={setOpen}

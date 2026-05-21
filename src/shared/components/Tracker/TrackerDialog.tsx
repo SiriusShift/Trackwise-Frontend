@@ -78,7 +78,6 @@ function TrackerDialog({
   description: string;
   setOpen: (open: boolean) => void;
   open: boolean;
-  onSubmit: (data: any) => void;
   data?: Object;
 }) {
   //STATE

@@ -10,6 +10,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import AnimateNumber from "@/shared/components/AnimateNumber";
 import { StackedBar } from "@/shared/components/charts/CommonStackedBar";
 import * as Icons from "lucide-react";
+import { Separator } from "@/shared/components/ui/separator";
 
 // ─── Empty state for the stacked bar ────────────────────────────────────────
 function BarEmptyState({ title }: { title: string }) {
@@ -184,7 +185,7 @@ console.log(segments)
 
             {/* Trend row */}
             <div className="flex gap-2 flex-col">
-              <hr className="border-border/60" />
+        <Separator />
               <div className="flex gap-1">
                 {isNaN(trend) || (trend === 0 && !data) ? (
                   <p className="text-sm text-muted-foreground">

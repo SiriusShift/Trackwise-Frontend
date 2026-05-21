@@ -53,6 +53,7 @@ import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { setOpenDialog } from "@/shared/slices/activeSlice";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import ConfirmDialog from "../../dialogs/ConfirmDialog";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
@@ -199,6 +200,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       // const activeType = useSelector((state: any) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
+      const [confirmOpen, setConfirmOpen] = useState(false);
       const [mode, setMode] = useState<string>();
       const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
@@ -260,35 +262,32 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       const onPayment = async () => {
         console.log(expense?.recurringTemplate, "expense payment");
-        if (expense?.recurringTemplate?.auto) {
-          confirm({
-            title: "Confirm Payment",
-            description: "Do you want to proceed with paying this expense?",
-            variant: "info",
-            confirmText: "Pay",
-            cancelText: "Cancel",
-            showLoadingOnConfirm: true,
-            onConfirm: async () => {
-              try {
-                await payAuto({
-                  id: expense.id,
-                  data: {
-                    type: "Expense",
-                  },
-                }).unwrap();
-                dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-                dispatch(expensesApi.util.invalidateTags(["Expenses"]))
-              } catch (err) {
-                let errorMessage = handleCatchErrorMessage(err); // Default message
-                toast.error(errorMessage);
-              }
-            },
-          });
-        } else {
-          setMode("transact");
-          setDialogOpen(true); // open dialog
-          setDropdownOpen(false); // close dropdown manually
-        }
+          // confirm({
+          //   title: "Confirm Payment",
+          //   description: "Do you want to proceed with paying this expense?",
+          //   variant: "info",
+          //   confirmText: "Pay",
+          //   cancelText: "Cancel",
+          //   showLoadingOnConfirm: true,
+          //   onConfirm: async () => {
+          //     try {
+          //       await payAuto({
+          //         id: expense.id,
+          //         data: {
+          //           type: "Expense",
+          //         },
+          //       }).unwrap();
+          //       dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+          //       dispatch(expensesApi.util.invalidateTags(["Expenses"]))
+          //     } catch (err) {
+          //       let errorMessage = handleCatchErrorMessage(err); // Default message
+          //       toast.error(errorMessage);
+          //     }
+          //   },
+          // });
+          // setMode("transact");
+          // setDialogOpen(true); // open dialog
+          // setDropdownOpen(false); // close dropdown manually
       };
 
       const onView = () => {
@@ -318,15 +317,15 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                 <TooltipTrigger asChild>
                   <span>
                     <DropdownMenuItem
-                      onSelect={onPayment}
-                      disabled={expense?.status === "Paid"}
+                      onSelect={() => setConfirmOpen(true)}
+                      // disabled={expense?.status === "Completed"}
                     >
-                      <Banknote /> Pay
+                      <Banknote /> Confirm
                     </DropdownMenuItem>
                   </span>
                 </TooltipTrigger>
                 <Portal>
-                  {expense?.status === "Paid" && (
+                  {expense?.status === "Completed" && (
                     <TooltipContent side="right" sideOffset={10}>
                       Already paid
                     </TooltipContent>
@@ -347,8 +346,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                         setDropdownOpen(false);
                       }}
                       disabled={
-                        expense?.status === "Paid" ||
-                        expense?.status === "Partial"
+                        expense?.status === "Completed" 
                       }
                     >
                       <Pencil /> Edit
@@ -414,6 +412,8 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             setOpen={setViewOpen}
             transaction={expense}
           />
+
+          <ConfirmDialog open={confirmOpen} setOpen={setConfirmOpen} data={expense}/>
         </>
       );
     },

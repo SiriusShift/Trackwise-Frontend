@@ -326,11 +326,8 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
         case "category":
           formData.append("category", value?.id);
           break;
-        case "from":
-          if (type !== "Income") formData.append("from", value?.id);
-          break;
-        case "to":
-          if (type !== "Expense") formData.append("to", value?.id);
+        case "account":
+          formData.append("account", value?.id);
           break;
         default:
           formData.append(key, value);

@@ -21,6 +21,7 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { TransactionDialog } from "./dialogs/TransactionDialog";
 import useDebounce from "@/shared/hooks/useDebounce";
 import { categoryType } from "@/shared/types";
+import { Separator } from "@/shared/components/ui/separator";
 const TransactionToolbar = ({
   // setSelectedCategories,
   categoryData,
@@ -131,7 +132,7 @@ const TransactionToolbar = ({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
-                <hr />
+        <Separator />
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Category</h1>
                   <Collapsible>
@@ -184,7 +185,7 @@ const TransactionToolbar = ({
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-                <hr />
+        <Separator />
 
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Status</h1>
@@ -269,7 +270,7 @@ const TransactionToolbar = ({
                     </div>
                   </RadioGroup>
                 </div>
-                <hr />
+        <Separator />
               </div>
             </FilterSheet>
           </div>

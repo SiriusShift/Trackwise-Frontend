@@ -16,12 +16,14 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
+import TrackerDialog from "./TrackerDialog";
+import { useState } from "react";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
   { minWidth: 1536, count: 3 },
   { minWidth: 1280, count: 2 },
-  { minWidth: 768, count: 1 },
+  { minWidth: 768, count: 2 },
   { minWidth: 0, count: 1 },
 ];
 
@@ -37,6 +39,9 @@ function Tracker({
   isLoading,
   type,
 }: commonTrackerProps) {
+  const [open, setOpen] = useState(false);
+
+  console.log(open, "open");
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
@@ -89,9 +94,7 @@ function Tracker({
             </p>
           </div>
 
-          <Button
-            className="shadow-sm h-9 transition-all hover:scale-[1.02]"
-          >
+          <Button className="shadow-sm h-9 transition-all hover:scale-[1.02]" onClick={() => setOpen(true)} >
             <Plus className="w-4 h-4" />
             Add
           </Button>
@@ -137,6 +140,14 @@ function Tracker({
             )}
           </Carousel>
         </div>
+        <TrackerDialog
+          title={`Add ${title}`}
+          open={open}
+          setOpen={setOpen}
+          description={addDescription}
+          mode="add"
+          // data={data}
+        />
       </div>
     </Card>
   );

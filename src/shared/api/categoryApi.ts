@@ -6,7 +6,7 @@ export const categoryApi = api
     endpoints: (builder) => ({
       postCategory: builder.mutation({
         query: (payload) => ({
-          url: "/category/create",
+          url: "/categories",
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -17,7 +17,7 @@ export const categoryApi = api
       }),
       getCategory: builder.query({
         query: (params) => ({
-          url: "/category/get",
+          url: "/categories",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -28,7 +28,7 @@ export const categoryApi = api
       }),
       getCategoryLimit: builder.query({
         query: (params) => ({
-          url: "/category/getAllExpenseCategoryLimit",
+          url: "/categories/limits",
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -40,7 +40,7 @@ export const categoryApi = api
       }),
       postCategoryLimit: builder.mutation({
         query: (payload) => ({
-          url: "/category/postLimit",
+          url: "/categories/limits",
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -51,7 +51,7 @@ export const categoryApi = api
       }),
       patchCategoryLimit: builder.mutation({
         query: ({ amount, id }) => ({
-          url: `/category/patchLimit/${id}`,
+          url: `/categories/limits/${id}`,
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -63,7 +63,7 @@ export const categoryApi = api
 
       deleteCategoryLimit: builder.mutation({
         query: (id) => ({
-          url: `/category/deleteLimit/${id}`,
+          url: `/categories/limits/${id}`,
           method: "PUT",
           headers: {
             Accept: "application/json",

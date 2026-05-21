@@ -12,6 +12,9 @@ import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 
 import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
+import ViewImage from "./ViewImage";
+import { Separator } from "../../ui/separator";
+import { Card } from "../../ui/card";
 
 const transactionTypeConfig = {
   expense: {
@@ -91,20 +94,51 @@ const statusConfig = {
   },
 };
 
-const InfoRow = ({ icon: IconComponent, label, value }) => (
-  <div className="flex  flex-1  items-start justify-between gap-3">
+const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
+  <div
+    className={`flex flex-1 items-start justify-between gap-3 ${
+      label === "Image" && "flex-col"
+    }`}
+  >
     <div className="flex flex-row gap-1">
-      <IconComponent className="mt-0.5 text-muted-foreground" size={15}/>
+      <IconComponent className="mt-0.5 text-muted-foreground" size={15} />
       <p className="text-sm text-muted-foreground">{label}</p>
     </div>
 
-    <p className="font-medium break-words text-sm">{value || "N/A"}</p>
+    {label === "Image" ? (
+      value ? (
+        <button
+          type="button"
+          onClick={() => onPreview(value)}
+          className="group relative h-52 w-full overflow-hidden rounded-xl"
+        >
+          <img
+            src={value}
+            alt="Transaction attachment"
+            className="h-full w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
+            <span className="opacity-0 group-hover:opacity-100 text-white text-sm font-medium">
+              View Image
+            </span>
+          </div>
+        </button>
+      ) : (
+        <Card className="text-sm text-muted-foreground w-full h-52 flex flex-col items-center justify-center">
+          <Icon.ImageOff />
+          <h1>No image</h1>
+        </Card>
+      )
+    ) : (
+      <p className="font-medium break-words text-sm">{value || "N/A"}</p>
+    )}
   </div>
 );
 
 const ViewTransaction = ({ transaction, open, setOpen }) => {
   if (!transaction) return null;
-
+  const [previewImage, setPreviewImage] = React.useState(false);
   const type =
     transactionTypeConfig[transaction?.type?.toLowerCase()] ||
     transactionTypeConfig.default;
@@ -115,102 +149,118 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
   const StatusIcon = status?.icon;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent
-        removeClose
-        className="max-w-lg h-dvh sm:max-h-[90vh] overflow-y-auto p-0 flex flex-col"
-      >
-        {/* Header */}
-        <DialogHeader className="border-b px-5 py-4">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <Icon.ReceiptText className="h-5 w-5" />
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent
+          removeClose
+          className="max-w-lg sm:max-h-[75%] overflow-y-auto p-0 flex flex-col"
+        >
+          {/* Header */}
+          <DialogHeader className="border-b px-5 py-4">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+                <Icon.ReceiptText className="h-5 w-5" />
 
-              {transaction?.interval
-                ? "Recurring Transaction"
-                : "Transaction Details"}
-            </DialogTitle>
+                {transaction?.interval
+                  ? "Recurring Transaction"
+                  : "Transaction Details"}
+              </DialogTitle>
 
-            <Button size="icon" variant="ghost" onClick={() => setOpen(false)}>
-              <Icon.X className="h-4 w-4" />
-            </Button>
-          </div>
-        </DialogHeader>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setOpen(false)}
+              >
+                <Icon.X className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogHeader>
 
-        {/* Content */}
-        <div className="p-5">
-          {/* Amount Section */}
-          <div className="flex flex-col items-center justify-center gap-3 pb-6">
-            <div className={`rounded-2xl p-4 ${type.bg}`}>
-              <TypeIcon className={`h-6 w-6 ${type.iconColor}`} />
+          {/* Content */}
+          <div className="p-5">
+            {/* Amount Section */}
+            <div className="flex flex-col items-center justify-center gap-3 pb-6">
+              <div className={`rounded-2xl p-4 ${type.bg}`}>
+                <TypeIcon className={`h-6 w-6 ${type.iconColor}`} />
+              </div>
+
+              <div className="text-center">
+                <h1 className={`text-3xl font-bold ${type.text}`}>
+                  {type.prefix}
+                  {formatCurrency(transaction.amount)}
+                </h1>
+
+                {status && (
+                  <Badge
+                    variant="outline"
+                    className={`mt-3 gap-1.5 rounded-full px-3 py-1 ${status.className}`}
+                  >
+                    <StatusIcon className="h-3.5 w-3.5" />
+
+                    {transaction.status}
+                  </Badge>
+                )}
+              </div>
             </div>
 
-            <div className="text-center">
-              <h1 className={`text-3xl font-bold ${type.text}`}>
-                {type.prefix}
-                {formatCurrency(transaction.amount)}
-              </h1>
-
-              {status && (
-                <Badge
-                  variant="outline"
-                  className={`mt-3 gap-1.5 rounded-full px-3 py-1 ${status.className}`}
-                >
-                  <StatusIcon className="h-3.5 w-3.5" />
-
-                  {transaction.status}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Details */}
-          <div className="flex flex-col  gap-3">
-            {/* <hr/>
+            {/* Details */}
+            <div className="flex flex-col gap-3">
+              {/* <hr/>
             <InfoRow
               icon={Icon.Hash}
               label="Transaction ID"
               value={`#${transaction.id}`}
             /> */}
 
-            <hr />
-            <InfoRow
-              icon={Icon.Calendar}
-              label="Date"
-              value={formatDate(transaction.date || transaction.startDate)}
-            />
+              <InfoRow
+                icon={Icon.Calendar}
+                label="Date"
+                value={formatDate(transaction.date || transaction.startDate)}
+              />
 
-              <hr />
+              <Separator />
 
-            <InfoRow
-              icon={Icon.Tag}
-              label="Category"
-              value={transaction.category?.name}
-            />
-            <hr />
+              <InfoRow
+                icon={Icon.Tag}
+                label="Category"
+                value={transaction.category?.name}
+              />
+              <Separator />
 
-            <InfoRow
-              icon={Icon.FileText}
-              label="Description"
-              value={transaction.description}
-            />
-          
-          </div>
+              <InfoRow
+                icon={Icon.FileText}
+                label="Description"
+                value={transaction.description}
+              />
+              <Separator />
+              <InfoRow
+                icon={Icon.FileText}
+                label="Image"
+                value={transaction.image}
+                onPreview={setPreviewImage}
+              />
+            </div>
 
-          {/* Actions */}
-          {transaction?.status !== "Paid" &&
+            {/* Actions */}
+            {/* {transaction?.status !== "Paid" &&
             transaction?.category?.type === "Expense" && (
-              <div className="flex justify-end gap-2 border-t pt-5">
+              <div className="flex justify-end gap-2 pt-5">
                 <Button size="sm" variant="outline">
                   Edit
                 </Button>
 
                 <Button size="sm">Pay</Button>
               </div>
-            )}
-        </div>
-      </DialogContent>
-    </Dialog>
+            )} */}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <ViewImage
+        image={transaction.image}
+        open={previewImage}
+        setOpen={setPreviewImage}
+      />
+    </>
   );
 };
 

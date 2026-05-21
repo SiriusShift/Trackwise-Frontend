@@ -8,6 +8,7 @@ import {
   SheetTrigger,
 } from "@/shared/components/ui/sheet";
 import { Filter } from "lucide-react";
+import { Separator } from "./ui/separator";
 
 export function FilterSheet({
   title,
@@ -42,7 +43,7 @@ export function FilterSheet({
             {icon}
             <SheetTitle>{title}</SheetTitle>
           </div>
-          <hr />
+        <Separator />
         </SheetHeader>
 
         {/* Scrollable content area */}
