@@ -65,8 +65,9 @@ const TransactionHistory = () => {
     pageIndex: 0,
   });
 
-  const transactions = data?.data?.filter ?? [];
+  const transactions = data?.data  ?? [];
 
+  console.log(data) 
   const isEmpty = !isFetching && transactions.length === 0;
 
   return (

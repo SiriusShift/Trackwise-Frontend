@@ -51,7 +51,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
   const dateDisplay = formatDateDisplay();
   const modeDisplay = formatMode();
 
-  console.log(trend, "trend")
+  console.log(data, "trend")
 
   // Delay chart rendering for smooth animation
   useEffect(() => {
@@ -110,7 +110,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
                       <Cell
                         key={`cell-${index}`}
                         fill={
-                          chartConfig.colors[index % chartConfig.colors.length]
+                          entry.color
                         }
                       />
                     ))}

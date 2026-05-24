@@ -10,6 +10,7 @@ export const transactionApi = api
           method: "GET",
           params,
         }),
+        transformResponse: (response) => response.data,
         providesTags: ["History"],
       }),
       updateTransactionHistory: builder.mutation({

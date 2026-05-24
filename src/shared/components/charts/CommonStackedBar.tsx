@@ -43,7 +43,7 @@ export function StackedBar({
               <Tooltip key={seg.label}>
                 <TooltipTrigger asChild>
                   <div
-                    className={`h-full cursor-pointer bg-[${seg.color}] transition-all duration-500 ease-out hover:brightness-110 hover:scale-y-125 origin-bottom`}
+                    className={`h-full cursor-pointer transition-all duration-500 ease-out hover:brightness-110 hover:scale-y-125 origin-bottom`}
                     style={{
                       width: animated ? `${pct}%` : "0%",
                       borderRadius: isFirst
@@ -53,6 +53,8 @@ export function StackedBar({
                           : "0",
                       minWidth: pct > 0 ? "3px" : "0",
                       transition: "width 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.15s, transform 0.15s",
+                      backgroundColor: seg.color  
+                
                     }}
                   />
                 </TooltipTrigger>

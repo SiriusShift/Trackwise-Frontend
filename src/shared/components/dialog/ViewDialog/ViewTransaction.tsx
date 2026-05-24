@@ -152,7 +152,6 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          removeClose
           className="max-w-lg sm:max-h-[75%] overflow-y-auto p-0 flex flex-col"
         >
           {/* Header */}
@@ -165,14 +164,6 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                   ? "Recurring Transaction"
                   : "Transaction Details"}
               </DialogTitle>
-
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setOpen(false)}
-              >
-                <Icon.X className="h-4 w-4" />
-              </Button>
             </div>
           </DialogHeader>
 
@@ -233,8 +224,16 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 value={transaction.description}
               />
               <Separator />
+              
               <InfoRow
-                icon={Icon.FileText}
+                icon={Icon.Wallet}
+                label="Account"
+                value={transaction.asset.name}
+              />
+              <Separator />
+
+              <InfoRow
+                icon={Icon.Image}
                 label="Image"
                 value={transaction.image}
                 onPreview={setPreviewImage}

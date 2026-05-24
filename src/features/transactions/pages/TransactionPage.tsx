@@ -274,7 +274,7 @@ const TransactionPage = () => {
       <CommonToolbar />
       <div className="flex p-5 flex-col gap-5">
         {/* Header */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid sm:grid-cols-2 gap-5">
           <CommonTracker
             data={categoryLimit}
             isLoading={categoryLimitLoading}

@@ -23,6 +23,7 @@ import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 
 import { IRootState } from "@/app/store";
 import { commonTrackerProps } from "@/shared/types";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 
 interface TrackerCardProps extends commonTrackerProps {
   item: any;
@@ -31,6 +32,7 @@ interface TrackerCardProps extends commonTrackerProps {
   onDelete: (item: any) => void;
   onSubmit?: () => void;
   type: string;
+  count: number;
 }
 
 // Derive end angle from a 0–100 percentage for a top-starting radial chart
@@ -45,9 +47,11 @@ const TrackerCard = ({
   onDelete,
   type,
   onSubmit,
+  count,
 }: TrackerCardProps) => {
   const [open, setOpen] = useState(false);
   const mode = useSelector((state: IRootState) => state.active.mode);
+  const width = useScreenWidth();
 
   const limit = mode === "monthly" ? item?.value : item?.value * 12;
   const percentage = limit > 0 ? (Number(item?.total) / limit) * 100 : 0;
@@ -59,9 +63,10 @@ const TrackerCard = ({
 
   return (
     <>
-      <CarouselItem className="basis-[80%] xl:basis-1/2">
+      <CarouselItem
+        className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2`}
+      >
         <Card className="relative bg-muted/30">
-
           {/* Actions menu */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -75,7 +80,12 @@ const TrackerCard = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setOpen(true); }}>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setOpen(true);
+                }}
+              >
                 <Icons.Pencil className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDelete(item)}>
@@ -138,14 +148,22 @@ const TrackerCard = ({
             </ChartContainer>
 
             <div className="flex flex-col min-w-0">
-              <p className="font-medium text-sm truncate">{item.category.name}</p>
-              <p className={`text-xs ${isOverBudget ? "text-destructive" : "text-muted-foreground"}`}>
+              <p className="font-medium text-sm truncate">
+                {item.category.name}
+              </p>
+              <p
+                className={`text-xs ${isOverBudget ? "text-destructive" : "text-muted-foreground"}`}
+              >
                 ₱{Number(item.total).toFixed(2)}{" "}
-                <span className="text-muted-foreground">/ {Number(limit).toFixed(2)}</span>
+                <span className="text-muted-foreground">
+                  / {Number(limit).toFixed(2)}
+                </span>
               </p>
               {/* Over-budget indicator */}
               {isOverBudget && (
-                <p className="text-xs text-destructive font-medium mt-0.5">Over budget</p>
+                <p className="text-xs text-destructive font-medium mt-0.5">
+                  Over budget
+                </p>
               )}
             </div>
           </CardContent>

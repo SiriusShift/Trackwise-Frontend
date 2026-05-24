@@ -163,14 +163,14 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     },
   },
 
-  // {
-  //   accessorKey: "asset.name",
-  //   header: "Source",
-  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
+  {
+    accessorKey: "asset.name",
+    header: "Source",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -313,7 +313,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
               {/* --- Pay --- */}
-              <Tooltip>
+              {expense.recurringTemplate &&               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
                     <DropdownMenuItem
@@ -331,7 +331,8 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                     </TooltipContent>
                   )}
                 </Portal>
-              </Tooltip>
+              </Tooltip>}
+
 
               {/* --- Edit --- */}
               <Tooltip>

@@ -11,8 +11,7 @@ export const expenseSchema = {
     date: yup.date().required("Date is required"),
     image: yup.mixed().notRequired().nullable(),
     // recurring: yup.boolean(),
-    account: yup
-      .object().required("Account is required"),
+    account: yup.object().required("Account is required"),
     endDate: yup.date().nullable().notRequired(),
     behaviour: yup.string().when("recurring", {
       is: true,
@@ -20,12 +19,20 @@ export const expenseSchema = {
       otherwise: (schema) => schema.notRequired(),
     }),
     mode: yup.string(),
-    repeat: yup
-      .object()
+    frequency: yup
+      .string()
       .nullable()
       .when("recurring", {
         is: true,
         then: (schema) => schema.required("Repeat is required"),
+        otherwise: (schema) => schema.notRequired(),
+      }),
+    every: yup
+      .string()
+      .nullable()
+      .when("recurring", {
+        is: true,
+        then: (schema) => schema.required("Unit is required"),
         otherwise: (schema) => schema.notRequired(),
       }),
   }),
@@ -38,7 +45,7 @@ export const expenseSchema = {
     endDate: null,
     account: null,
     image: null,
-    behaviour: false,
+    behaviour: null,
   },
 };
 

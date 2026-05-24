@@ -6,7 +6,6 @@ import {
 } from "../ui/carousel";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { commonTrackerProps } from "@/shared/types";
-import { TrackerAddCard } from "@/shared/components/Tracker/TrackerAddCard";
 import TrackerCard from "@/shared/components/Tracker/TrackerCard";
 import TrackerSkeleton from "./TrackerSkeleton";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
@@ -21,9 +20,8 @@ import { useState } from "react";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
-  { minWidth: 1536, count: 3 },
   { minWidth: 1280, count: 2 },
-  { minWidth: 768, count: 2 },
+  { minWidth: 768, count: 1 },
   { minWidth: 0, count: 1 },
 ];
 
@@ -49,6 +47,7 @@ function Tracker({
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;
 
+  console.log(visibleCount)
   // Show nav arrows only when there are more items than visible slots
   const shouldShowNav = itemCount > visibleCount;
 
@@ -112,7 +111,7 @@ function Tracker({
             <CarouselContent className="-ml-2">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
-                    <TrackerSkeleton key={i} />
+                    <TrackerSkeleton key={i} count={itemCount}/>
                   ))
                 : data?.map((item, index) => (
                     <TrackerCard
@@ -122,6 +121,7 @@ function Tracker({
                       type={type}
                       onDelete={handleDelete}
                       editDescription={editDescription}
+                      count={itemCount}
                     />
                   ))}
 

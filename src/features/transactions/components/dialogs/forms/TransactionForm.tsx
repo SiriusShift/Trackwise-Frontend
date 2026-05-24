@@ -1,829 +1,379 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import moment from "moment";
 import {
-  Form,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CalendarIcon,
+  Repeat,
+} from "lucide-react";
+
+import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { formatCurrency, numberInput } from "@/shared/utils/CustomFunctions";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import {
-  ArrowRight,
-  Bell,
-  Calendar as CalendarIcon,
-  Check,
-  ChevronsUpDown,
-  CreditCard,
-  Repeat,
-  Upload,
-  Zap,
-} from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
-
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/shared/components/ui/calendar";
-import { Input } from "../../../../../shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import moment from "moment";
-import { Controller, useFormContext } from "react-hook-form";
-import { toast } from "sonner";
-import { Toggle } from "@/shared/components/ui/toggle";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import DatePicker from "@/shared/components/dialog/DatePicker";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/shared/components/ui/tabs";
+import { Input } from "@/shared/components/ui/input";
 import { Separator } from "@/shared/components/ui/separator";
-import useFormatCurrency from "@/shared/hooks/useFormatCurrency";
-import { Field } from "@/shared/types";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { Toggle } from "@/shared/components/ui/toggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import DatePicker from "@/shared/components/dialog/DatePicker";
+import { cn } from "@/lib/utils";
+import { frequencyList } from "@/shared/constants/dateConstants";
+import { Field } from "@/shared/types";
 
-const CategoryAmountSection = ({
-  control,
-  history,
-  categoryData,
-  watch,
-  type,
-  mode,
-  setValue,
-}) => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <FormField
-        control={control}
-        name="category"
-        render={({ field: { onChange, value } }) => {
-          return (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                Category <span className="text-destructive">*</span>
-              </FormLabel>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      disabled={history}
-                      className={cn(
-                        "justify-between",
-                        !value && "text-muted-foreground",
-                      )}
-                    >
-                      {value
-                        ? categoryData?.find(
-                            (category) => category.id === value?.id,
-                          )?.name
-                        : "Select category"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent full className="w-[200px] h-52 p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search category..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>No category found.</CommandEmpty>
-                      <CommandGroup>
-                        {categoryData?.map((category) => (
-                          <CommandItem
-                            value={category}
-                            key={category.id}
-                            onSelect={() => {
-                              if (type === "Transfer") {
-                                setValue("to", null);
-                              }
-                              onChange(category);
-                            }}
-                          >
-                            {category.name}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                category.id === value?.id
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          );
-        }}
-      />
+import { CategoryAmountSection } from "./section/CategoryAmountSection";
+import { BehaviourSelector } from "./section/BehaviourSelector";
+import { ImageAttachment } from "./section/ImageAttachment";
+import { AccountSelect } from "./section/AccountSelect";
 
-      <FormField
-        name="amount"
-        control={control}
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>
-              Amount <span className="text-destructive">*</span>
-            </FormLabel>
-            <FormControl>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                  ₱
-                </span>
-                <Input
-                  {...field}
-                  min={0}
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter amount"
-                  className="input-class text-sm pl-7"
-                  disabled={
-                    !watch("recurring")
-                      ? type === "Expense"
-                        ? !watch("account") && watch("date") <= moment()
-                        : type === "Income"
-                          ? !watch("account") && watch("date") <= moment()
-                          : !watch("account") &&
-                            !watch("account") &&
-                            watch("date") <= moment()
-                      : false
-                  }
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    const balance =
-                      type === "Income"
-                        ? watch("to")?.remainingBalance
-                        : watch("from")?.remainingBalance;
-                    const remainingBalance =
-                      Number(watch("balance") || 0) +
-                      Number(watch("initialAmount") || 0);
+interface Asset {
+  id: string;
+  name: string;
+  remainingBalance: number;
+}
 
-                    console.log(watch());
-                    console.log(remainingBalance);
-                    console.log(mode);
+interface Category {
+  id: string;
+  name: string;
+}
 
-                    if (
-                      balance &&
-                      type !== "Income" &&
-                      !watch("recurring") &&
-                      value > balance
-                    ) {
-                      toast.error("Insufficient balance");
-                      e.target.value = balance; // Reset to the maximum allowed value
-                    } else if (
-                      value > remainingBalance &&
-                      (mode === "transact" || history)
-                    ) {
-                      toast.error(
-                        `Amount exceeds the total balance of ${remainingBalance}`,
-                      );
-                      e.target.value = balance; // Reset to the maximum allowed value
-                    } else {
-                      numberInput(e, field); // Proceed with normal input handling
-                    }
-                  }}
-                />
-              </div>
-            </FormControl>
-            {(mode === "transact" || history) && (
-              <p className="text-xs text-muted-foreground">
-                Balance: ₱{watch("balance")?.toFixed(2)}
-              </p>
-            )}
+interface TransactionFormProps {
+  assetData: Asset[];
+  categoryData: Category[];
+  type: "Income" | "Expense" | "Transfer";
+  mode: string;
+  history?: boolean;
+  setRecurring: (fn: (prev: boolean) => boolean) => void;
+}
 
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-  );
-};
 const TransactionForm = ({
   assetData,
   categoryData,
-  setOpenFrequency,
   type,
   mode,
   history,
   setRecurring,
-}) => {
-  console.log(type);
-  console.log(mode);
-  const [open, setOpen] = useState(false);
+}: TransactionFormProps) => {
+  const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const {
-    watch,
-    control,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
 
+  const { watch, control, setValue, getValues } = useFormContext();
 
-  const onDateChange = (field, date) => {
+  const isRecurring = watch("recurring");
+  const isTransfer = type === "Transfer";
+
+  // Recurring toggle is only available for add/edit of non-transfer, non-history
+  const canToggleRecurring = mode !== "transact" && !history && !isTransfer;
+
+  // Show attachment for past transactions being added/edited
+  const showAttachment =
+    !isRecurring &&
+    ((watch("date") < moment() && mode === "add") ||
+      mode === "transact" ||
+      mode === "edit");
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+
+  const handleDateChange = (field: Field, date: Date) => {
     field.onChange(date);
-    if (watch("date") > moment()) {
+    // Normalize: future → strip time, past/now → keep exact moment
+    if (moment(date).isAfter(moment())) {
       setValue("image", null);
-      setValue("date", moment(watch("date")).startOf("day").toDate());
-    } else if (watch("date") <= moment()) {
-      setValue("date", moment());
+      setValue("date", moment(date).startOf("day").toDate());
+    } else {
+      setValue("date", moment().toDate());
     }
   };
 
-  // const toAssetData =
-  //   type === "Transfer"
-  //     ? assetData?.filter((item) => watch("from")?.id !== item.id)
-  //     : assetData;
-  const imageRef = useRef();
+  const handleRecurringToggle = (pressed: boolean) => {
+    setValue("frequency", null);
+    setValue("every", null);
+    setValue("endDate", null);
+    setValue("account", null);
+    setValue("image", null);
+    if (type !== "Expense") setValue("to", null);
+    setValue(
+      "date",
+      pressed ? moment().startOf("day").toDate() : moment().toDate(),
+    );
+    setRecurring((prev) => !prev);
+  };
+
+  // Swap the From / To accounts (Transfer only)
+  const handleSwapAccounts = () => {
+    const from = getValues("account");
+    const to = getValues("to");
+    setValue("account", to ?? null);
+    setValue("to", from ?? null);
+  };
+
+  // ── Derived ──────────────────────────────────────────────────────────────────
+
+  const fromAccountId = watch("account")?.id;
+
+  const fromLabel = isTransfer
+    ? "From"
+    : type === "Income"
+      ? "Account"
+      : "Account";
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
   return (
-    <div className="flex gap-4 flex-col">
-      <div className="space-y-4">
-        <FormField
-          name="description"
-          control={control}
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                Description <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Enter description"
-                  className="input-class text-sm"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex flex-row gap-4">
-          <FormField
-            control={control}
-            name="date"
-            render={({ field }: { field: Field }) => (
-              <FormItem className="flex flex-col w-full">
-                <FormLabel>
-                  {watch("recurring") ? "Start Date" : "Date & Time"}{" "}
-                  <span className="text-destructive">*</span>
-                </FormLabel>
-                <Button
-                  variant={"outline"}
-                  type="button"
-                  disabled={watch("mode") === "transact" || type === "Transfer"}
-                  className={cn(
-                    "text-left font-normal",
-                    !field.value && "text-muted-foreground",
-                  )}
-                  onClick={() => setOpen(true)}
-                >
-                  {field.value ? (
-                    watch("recurring") || watch("date") > moment() ? (
-                      `${moment(field.value).format("MMM DD, YYYY")}` // Format date & time
-                    ) : (
-                      `${moment(field.value).format("MMM DD, YYYY hh:mm A")}` // Format date & time
-                    )
-                  ) : (
-                    <span>Pick a date & time</span>
-                  )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-                <DatePicker
-                  setDate={onDateChange}
-                  disablePast={watch("recurring")}
-                  // removeTime={watch("recurring") || watch("date") > moment()}
-                  disableFuture
-                  open={open}
-                  setOpen={setOpen}
-                  field={field}
-                />
-                {/* <FormMessage>{errors.date?.message}</FormMessage> */}
-              </FormItem>
-            )}
-          />
-          {mode !== "transact" && !history && type !== "Transfer" && (
-            <FormField
-              control={control}
-              name="recurring"
-              render={({ field: { onChange, value } }) => (
-                <FormItem className="flex items-end">
-                  <FormControl>
-                    <Toggle
-                      pressed={value}
-                      onPressedChange={(pressed) => {
-                        setValue("repeat", null);
-                        setValue("auto", false);
-                        setValue("endDate", null);
-                        setValue("from", null);
-                        if (type !== "Expense") {
-                          setValue("to", null);
-                        }
-                        if (pressed) {
-                          // setValue("mode", "fixed");
-                          setValue("date", moment().startOf("day"));
-                        } else {
-                          // setValue("mode", null);
-                          setValue("date", moment());
-                        }
-                        setValue("image", null);
-                        onChange(pressed);
-                        setRecurring((prev) => !prev);
-                      }}
-                    >
-                      <Repeat />
-                    </Toggle>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-        </div>
-
-        <FormField
-          name="account"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                Account <span className="text-destructive">*</span>
-              </FormLabel>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "justify-between w-full",
-                        !value && "text-muted-foreground",
-                      )}
-                    >
-                      {value ? (
-                        <div className="space-x-2">
-                          <span>
-                            {
-                              assetData.find((asset) => asset.id === value?.id)
-                                ?.name
-                            }
-                          </span>
-                          <span>
-                            ₱
-                            {assetData
-                              .find((asset) => asset.id === value?.id)
-                              ?.remainingBalance.toFixed(2)}
-                          </span>
-                        </div>
-                      ) : (
-                        "Select asset..."
-                      )}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent full className="p-0">
-                  <Command>
-                    <CommandInput placeholder="Search asset" />
-                    <CommandList>
-                      {" "}
-                      <CommandEmpty>No assets found</CommandEmpty>
-                      <CommandGroup>
-                        {assetData?.map((asset) => (
-                          <CommandItem
-                            value={asset}
-                            key={asset.id}
-                            onSelect={() => {
-                              onChange(asset);
-                            }}
-                          >
-                            {asset.name} - ₱{asset?.remainingBalance.toFixed(2)}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                asset.id === value?.id
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {type === "Transfer" && (
-          <CategoryAmountSection
-            control={control}
-            history={history}
-            categoryData={categoryData}
-            watch={watch}
-            type={type}
-            mode={mode}
-            setValue={setValue}
-          />
+    <div className="flex flex-col gap-5">
+      {/* Description */}
+      <FormField
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              Description <span className="text-destructive">*</span>
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                {...field}
+                placeholder="Enter description"
+                className="text-sm resize-none"
+                rows={2}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
+      />
 
-        {/* {(type === "Income" ||
-          (type === "Transfer" && watch("category")?.name !== "External")) && (
+      {/* Date + Recurring toggle */}
+      <div className="flex gap-3 items-end">
+        <FormField
+          control={control}
+          name="date"
+          render={({ field }: { field: Field }) => (
+            <FormItem className="flex flex-col flex-1">
+              <FormLabel>
+                {isRecurring ? "Start date" : "Date & time"}{" "}
+                <span className="text-destructive">*</span>
+              </FormLabel>
+              <Button
+                variant="outline"
+                type="button"
+                disabled={mode === "transact" || isTransfer}
+                className={cn(
+                  "justify-start text-left font-normal",
+                  !field.value && "text-muted-foreground",
+                )}
+                onClick={() => setOpenDate(true)}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                {field.value
+                  ? isRecurring || moment(field.value).isAfter(moment())
+                    ? moment(field.value).format("MMM DD, YYYY")
+                    : moment(field.value).format("MMM DD, YYYY hh:mm A")
+                  : "Pick a date"}
+              </Button>
+              <DatePicker
+                setDate={handleDateChange}
+                disablePast={isRecurring}
+                disableFuture={!isRecurring}
+                open={openDate}
+                setOpen={setOpenDate}
+                field={field}
+              />
+            </FormItem>
+          )}
+        />
+
+        {/* Only render when the user is allowed to toggle recurring */}
+        {canToggleRecurring && (
           <FormField
-            name="to"
             control={control}
-            render={({ field: { value, onChange } }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>To</FormLabel>
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        disabled={
-                          type === "Transfer" && watch("category") === null
-                        }
-                        className={cn(
-                          "justify-between w-full",
-                          !value && "text-muted-foreground",
-                        )}
-                      >
-                        {value ? (
-                          <div className="space-x-2">
-                            <span>
-                              {
-                                toAssetData.find(
-                                  (asset) => asset.id === value?.id,
-                                )?.name
-                              }
-                            </span>
-                            <span>
-                              ₱
-                              {toAssetData
-                                .find((asset) => asset.id === value?.id)
-                                ?.remainingBalance.toFixed(2)}
-                            </span>
-                          </div>
-                        ) : (
-                          "Select asset..."
-                        )}
-                        <ChevronsUpDown className="opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent full className="p-0">
-                    <Command>
-                      <CommandInput placeholder="Search asset" />
-                      <CommandList>
-                        {" "}
-                        <CommandEmpty>No assets found</CommandEmpty>
-                        <CommandGroup>
-                          {toAssetData?.map((asset) => (
-                            <CommandItem
-                              value={asset}
-                              key={asset.id}
-                              onSelect={() => {
-                                onChange(asset);
-                              }}
-                            >
-                              {asset.name} - ₱
-                              {asset?.remainingBalance.toFixed(2)}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  asset.id === value?.id
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
+            name="recurring"
+            render={({ field: { onChange, value } }) => (
+              <FormItem className="flex items-end pb-0.5">
+                <FormControl>
+                  <Toggle
+                    pressed={!!value}
+                    onPressedChange={(pressed) => {
+                      onChange(pressed);
+                      handleRecurringToggle(pressed);
+                    }}
+                    aria-label="Toggle recurring"
+                  >
+                    <Repeat className="h-4 w-4" />
+                  </Toggle>
+                </FormControl>
               </FormItem>
             )}
-          />
-        )} */}
-
-        {type !== "Transfer" && (
-          <CategoryAmountSection
-            control={control}
-            history={history}
-            categoryData={categoryData}
-            watch={watch}
-            type={type}
-            mode={mode}
-            setValue={setValue}
           />
         )}
       </div>
 
-      {watch("recurring") && (
+      {/* From / Account */}
+      <AccountSelect
+        name="account"
+        label={fromLabel}
+        assets={assetData ?? []}
+        control={control}
+      />
+
+      {/* Swap button + To account — Transfer only */}
+      {isTransfer && (
         <>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex items-center gap-3">
+            <Separator className="flex-1" />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="shrink-0 h-8 w-8 rounded-full"
+              onClick={handleSwapAccounts}
+              aria-label="Swap from and to accounts"
+            >
+              <ArrowUpDown className="h-3 w-3" />
+            </Button>
+            <Separator className="flex-1" />
+          </div>
+
+          <AccountSelect
+            name="to"
+            label="To"
+            assets={assetData ?? []}
+            control={control}
+            excludeId={fromAccountId} // prevents selecting the same account
+          />
+        </>
+      )}
+
+      {/* Category + Amount */}
+      <CategoryAmountSection
+        categoryData={categoryData}
+        type={type}
+        mode={mode}
+        history={history}
+      />
+
+      {/* Recurring schedule fields */}
+      {isRecurring && (
+        <>
+          <Separator />
+          <p className="text-sm font-semibold">Schedule</p>
+
+          <div className="grid grid-cols-2 gap-3">
             <Controller
-              name="repeat"
+              name="every"
               control={control}
               render={({ field }) => (
-                <FormItem className="flex flex-col w-full">
-                  <FormLabel>
-                    Repeat <span className="text-destructive">*</span>
-                  </FormLabel>
-
-                  <Button
-                    className="mt-2 justify-between"
-                    variant="outline"
-                    type="button"
-                    onClick={() => setOpenFrequency(true)}
-                  >
-                    {field.value?.name === "Custom"
-                      ? field.value?.interval === 1
-                        ? `Every ${field.value?.interval} ${field.value?.unit}`
-                        : `Every ${field.value?.interval} ${field.value?.unit}s`
-                      : field.value
-                        ? field.value?.name
-                        : "Repeat every.."}
-                    <ArrowRight />
-                  </Button>
+                <FormItem>
+                  <FormLabel>Every</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      min={1}
+                      placeholder="1"
+                      className="text-sm"
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? null : Number(e.target.value),
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-
-            <FormField
+            <Controller
+              name="frequency"
               control={control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col w-full">
-                  <FormLabel>End Date</FormLabel>
-                  <Button
-                    variant={"outline"}
-                    type="button"
-                    className={cn(
-                      "text-left font-normal",
-                      !field.value && "text-muted-foreground",
-                    )}
-                    disabled={!watch("repeat")}
-                    onClick={() => setOpenEndDate(true)}
-                  >
-                    {field.value ? (
-                      moment(field.value).format("MMM DD, YYYY")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                  <DatePicker
-                    open={openEndDate}
-                    setOpen={setOpenEndDate}
-                    disablePast={true}
-                    field={field}
-                    removeTime={true}
-                  />
+              render={({ field: { value, onChange } }) => (
+                <FormItem>
+                  <FormLabel>Frequency</FormLabel>
+                  <FormControl>
+                    <Select value={value ?? ""} onValueChange={onChange}>
+                      <SelectTrigger className="h-10 text-sm">
+                        <SelectValue placeholder="Select..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {frequencyList.map((freq) => (
+                          <SelectItem key={freq} value={freq}>
+                            {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-        </>
-      )}
-      <Separator />
-      {!watch("recurring") &&
-        ((watch("date") < moment() && mode === "add") ||
-          mode === "transact" ||
-          mode === "edit") && (
-          <FormField
-            name="image"
-            control={control}
-            render={({ field: { onChange, value } }) => {
-              // Determine if this is an existing image (URL) or new upload (data URL)
-              const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-              const isExistingImage =
-                value &&
-                typeof value === "string" &&
-                !value.startsWith("data:");
-
-              useEffect(() => {
-                if (value instanceof File) {
-                  const url = URL.createObjectURL(value);
-                  setPreviewUrl(url);
-
-                  // Cleanup to avoid memory leak
-                  return () => URL.revokeObjectURL(url);
-                } else if (typeof value === "string") {
-                  setPreviewUrl(value); // use existing image url
-                } else {
-                  setPreviewUrl(null);
-                }
-              }, [value]);
-
-              // const isNewUpload =
-              //   value && typeof value === "string" && value.startsWith("data:");
-
-              return (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Attachment</FormLabel>
-                  <FormControl>
-                    <div className="space-y-3">
-                      {/* Preview section */}
-                      <div className="relative border rounded p-3 bg-card">
-                        <div className="flex items-start gap-3">
-                          {previewUrl ? (
-                            <img
-                              src={previewUrl}
-                              alt="Attachment preview"
-                              className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded"
-                            />
-                          ) : (
-                            <div className="w-[85px] h-[85px] flex items-center p-5 justify-center border rounded text-center text-xs text-muted-foreground">
-                              No image selected
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {isExistingImage
-                                ? "Current Image"
-                                : "Upload Image"}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {isExistingImage
-                                ? "This image is stored in the database."
-                                : "Upload an image or attachment to store."}
-                            </p>
-                            <input
-                              type="file"
-                              ref={imageRef}
-                              accept="image/*"
-                              hidden
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  onChange(file);
-                                } else {
-                                  // If no file selected and there was an existing image, keep it
-                                  // If no existing image, set to null
-                                  if (!isExistingImage) {
-                                    onChange(null);
-                                  }
-                                }
-                              }}
-                              id="imageUploader"
-                              className={value ? "mt-2" : ""}
-                            />
-                            <div className="flex items-end pt-2 gap-2">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => imageRef.current?.click()}
-                                className="flex items-center gap-2"
-                              >
-                                Upload
-                              </Button>
-                              {watch("image") && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    onChange("");
-                                  }}
-                                >
-                                  Remove
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
-          />
-        )}
-
-      {watch("recurring") && (
-        <>
           <FormField
             control={control}
-            name="behaviour"
-            render={({ field: { onChange, value } }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Behaviour when due
-                    </p>
-
-                    <p className="text-xs text-muted-foreground">
-                      Choose what happens automatically once the due date is
-                      reached.
-                    </p>
-                  </div>
-
-                  <FormControl>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <button
-                        type="button"
-                        onClick={() => onChange("AUTO_LOG")}
-                        className={`group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-200 ${
-                          value === "AUTO_LOG"
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                            : "border-border bg-background hover:border-primary/40 hover:bg-muted/40"
-                        }`}
-                      >
-                        <div
-                          className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${
-                            value === "AUTO_LOG"
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-primary/10 text-primary"
-                          }`}
-                        >
-                          <Zap size={18} />
-                        </div>
-
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium text-foreground">
-                            Auto-log
-                          </p>
-
-                          <p className="text-xs leading-relaxed text-muted-foreground">
-                            Automatically create and log the transaction once
-                            the due date arrives.
-                          </p>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => onChange("REMINDER")}
-                        className={`group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-200 ${
-                          value === "REMINDER"
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                            : "border-border bg-background hover:border-primary/40 hover:bg-muted/40"
-                        }`}
-                      >
-                        <div
-                          className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${
-                            value === "REMINDER"
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          <Bell size={18} />
-                        </div>
-
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium text-foreground">
-                            Reminder only
-                          </p>
-
-                          <p className="text-xs leading-relaxed text-muted-foreground">
-                            Send a reminder notification without automatically
-                            logging the transaction.
-                          </p>
-                        </div>
-                      </button>
-                    </div>
-                  </FormControl>
-
-                  <FormMessage />
-                </div>
+            name="endDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>
+                  End date{" "}
+                  <span className="font-normal text-muted-foreground">
+                    (optional)
+                  </span>
+                </FormLabel>
+                <Button
+                  variant="outline"
+                  type="button"
+                  className={cn(
+                    "justify-start text-left font-normal",
+                    !field.value && "text-muted-foreground",
+                  )}
+                  onClick={() => setOpenEndDate(true)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                  {field.value
+                    ? moment(field.value).format("MMM DD, YYYY")
+                    : "No end date"}
+                </Button>
+                <DatePicker
+                  open={openEndDate}
+                  setOpen={setOpenEndDate}
+                  disablePast
+                  removeTime
+                  field={field}
+                />
               </FormItem>
             )}
           />
         </>
       )}
+
+      <Separator />
+
+      {/* Attachment — non-recurring past/edit/transact only */}
+      {showAttachment && (
+        <FormField
+          name="image"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <ImageAttachment value={value} onChange={onChange} />
+          )}
+        />
+      )}
+
+      {/* Behaviour selector — recurring only */}
+      {isRecurring && <BehaviourSelector control={control} />}
     </div>
   );
 };

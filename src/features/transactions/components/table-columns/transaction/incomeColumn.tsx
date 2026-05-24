@@ -158,14 +158,14 @@ export const incomeColumns: ColumnDef<Income>[] = [
     },
   },
 
-  // {
-  //   accessorKey: "asset.name",
-  //   header: "Destination",
-  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
+  {
+    accessorKey: "asset.name",
+    header: "Destination",
+    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    meta: {
+      cellClassName: "border-b",
+    },
+  },
   {
     accessorKey: "status",
     header: "Status",

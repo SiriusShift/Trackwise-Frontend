@@ -1,22 +1,10 @@
-import { transactionConfig } from "../../config/transactionConfig";
-import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
-import { toast } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import moment from "moment";
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  categoryApi,
-  useGetCategoryLimitQuery,
-  useGetCategoryQuery,
-} from "@/shared/api/categoryApi";
-import { assetsApi, useGetAssetQuery } from "@/shared/api/assetsApi";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Button } from "@/shared/components/ui/button";
+import { useState } from "react";
+import { FormProvider } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { ReceiptText } from "lucide-react";
+
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -24,45 +12,55 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/shared/components/ui/dialog";
-import Repeat from "@/shared/components/dialog/DateRepeat/Repeat";
-import TransactionForm from "./forms/TransactionForm";
-import { IRootState } from "@/app/store";
+import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import {
-  transactionApi,
-  useUpdateTransactionHistoryMutation,
-} from "../../api/transaction";
-import { frequencies } from "@/shared/constants/dateConstants";
-import { expensesApi } from "../../api/transaction/expensesApi";
-import { incomeApi } from "../../api/transaction/incomeApi";
-import { transferApi } from "../../api/transaction/transferApi";
+  useGetCategoryLimitQuery,
+  useGetCategoryQuery,
+} from "@/shared/api/categoryApi";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import { useUpdateTransactionHistoryMutation } from "../../api/transaction";
+import { transactionConfig } from "../../config/transactionConfig";
+import { IRootState } from "@/app/store";
+import TransactionForm from "./forms/TransactionForm";
 
-export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
-  console.log(rowData);
-  // console.log(rowData, "data");
-  // console.log(mode, "mode");
-  const [openFrequency, setOpenFrequency] = useState(false);
+import { useTransactionForm } from "./hooks/useTransactionForm";
+import { useTransactionSubmit } from "./hooks/UseTransactionSubmit";
+
+interface TransactionDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  mode: "add" | "edit" | "transact";
+  rowData?: any;
+  history?: boolean;
+}
+
+export function TransactionDialog({
+  open,
+  setOpen,
+  mode,
+  rowData,
+  history,
+}: TransactionDialogProps) {
   const [recurring, setRecurring] = useState(false);
+
+  const type = useSelector((state: IRootState) => state.active.type);
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
   );
   const endDate = useSelector((state: IRootState) => state.active.active.to);
-  const dispatch = useDispatch();
   const { confirm } = useConfirm();
-  const type = useSelector((state: IRootState) => state.active.type);
 
-  const [editHistory, { isLoading }] = useUpdateTransactionHistoryMutation();
   const { data: categoryData } = useGetCategoryQuery({ type });
-  let { data: assetData } = useGetAssetQuery();
-  const { data: categoryLimit, isLoading: categoryLimitLoading } =
-    useGetCategoryLimitQuery({
-      startDate: startDate,
-      endDate: endDate,
-    });
+  const { data: rawAssetData } = useGetAssetQuery();
+  const { data: categoryLimit } = useGetCategoryLimitQuery({
+    startDate,
+    endDate,
+  });
+  const [editHistory] = useUpdateTransactionHistoryMutation();
 
-  console.log(rowData);
-
-  assetData = assetData?.data;
-  console.log(assetData);
+  const assetData = rawAssetData?.data ?? [];
 
   const {
     postTrigger,
@@ -72,454 +70,133 @@ export function TransactionDialog({ open, history, mode, rowData, setOpen }) {
     postRecurringTrigger,
   } = transactionConfig[type] || {};
 
-  const { fetchData, isFetching } = useTriggerFetch(
+  const trigger =
     mode === "edit"
       ? editTrigger
       : mode === "transact"
         ? transactTrigger
-        : recurring === true
+        : recurring
           ? postRecurringTrigger
-          : postTrigger,
-  );
+          : postTrigger;
 
-  const form = useForm({
-    resolver: yupResolver(schema?.schema),
-    mode: "onChange",
-    defaultValues: schema?.defaultValues,
+  const { fetchData } = useTriggerFetch(trigger);
+
+  // ── Form state ──────────────────────────────────────────────────────────────
+  const form = useTransactionForm({
+    open,
+    type,
+    mode,
+    history,
+    rowData,
+    schema,
   });
-
   const {
     handleSubmit,
     reset,
     watch,
-    setValue,
-    formState: { isDirty, isValid, errors },
+    formState: { isDirty, isValid },
   } = form;
 
-  useEffect(() => {
-    if (!open) return;
+  // ── Submit logic ─────────────────────────────────────────────────────────────
+  const { onSubmit, getActionLabel } = useTransactionSubmit({
+    type,
+    mode,
+    history,
+    categoryLimit: categoryLimit ?? [],
+    fetchData,
+    editHistory,
+    watch,
+    reset,
+    setOpen,
+  });
 
-    // ADD MODE (no rowData)
-    if (!rowData) {
-      reset({
-        ...schema?.defaultValues,
-        mode,
-        date: moment(),
-      });
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  const isRecurring = watch("recurring");
+
+  const dialogTitle =
+    mode === "add"
+      ? `Add ${isRecurring ? "Scheduled" : ""} ${type}`
+      : mode === "transact"
+        ? `${getActionLabel()} ${type}`
+        : `Edit ${isRecurring ? "Scheduled" : ""} ${type}`;
+        
+  const recurringLabel = isRecurring && mode !== "transact" ? "recurring " : "";
+
+  const dialogDescription =
+    mode === "add"
+      ? `Fill in the details to create a new ${recurringLabel}${type.toLowerCase()}.`
+      : mode === "transact"
+        ? `Confirm and complete this ${recurringLabel}${type.toLowerCase()}.`
+        : `Update the details of this ${recurringLabel}${type.toLowerCase()}.`;
+
+  function handleCloseIntent() {
+    if (!isDirty) {
+      setOpen(false);
       return;
     }
-    const getResetData = () => {
-      const isRecurringTemplate = rowData?.recurringIncome;
-      const isRecurring = rowData?.interval;
-      const isTransact = mode === "transact";
-
-      // Common data for recurring
-      if (isRecurring) {
-        return {
-          date: rowData?.startDate,
-          id: rowData?.id,
-          description: rowData?.description,
-          amount: rowData?.amount,
-          endDate: rowData?.endDate,
-          recurring: true,
-          category: rowData?.category,
-          repeat: frequencies?.find(
-            (item) =>
-              item?.interval === rowData?.interval &&
-              item?.unit === rowData?.unit,
-          ) ?? {
-            id: 9,
-            interval: rowData?.interval,
-            name: "Custom",
-            unit: rowData?.unit,
-          },
-          ...(rowData?.fromAssetId && { from: rowData?.fromAssetId }),
-          ...(rowData?.toAsset && { to: rowData?.toAsset }),
-          auto: rowData?.auto,
-        };
-      }
-
-      // Type-specific logic
-      if (type === "Expense") {
-        if (isRecurringTemplate) {
-          return {
-            date: rowData?.date,
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            balance: rowData?.remainingBalance ?? null,
-            recurring: false,
-            image: rowData?.image,
-            from: rowData?.asset,
-          };
-        }
-
-        if (isTransact) {
-          return {
-            date: moment(),
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            image: rowData?.image,
-            balance: rowData?.remainingBalance ?? null,
-            initialAmount: 0,
-            from: rowData?.asset,
-          };
-        }
-
-        return {
-          date: rowData?.date,
-          id: rowData?.id,
-          description: rowData?.description,
-          amount: rowData?.amount,
-          category: rowData?.category,
-          image: rowData?.image,
-          from: rowData?.asset || rowData?.fromAsset || null,
-          balance: rowData?.remainingBalance ?? null,
-          initialAmount: rowData?.amount,
-        };
-      }
-
-      if (type === "Income") {
-        if (isTransact) {
-          console.log("test1");
-
-          return {
-            date: moment(),
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            image: rowData?.image,
-            balance: rowData?.remainingBalance ?? null,
-            initialAmount: 0,
-            to: rowData?.asset,
-          };
-        }
-        if (isRecurringTemplate) {
-          return {
-            date: rowData?.date,
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            balance: rowData?.remainingBalance ?? null,
-            recurring: false,
-            image: rowData?.image,
-            to: rowData?.asset,
-          };
-        }
-
-        console.log("test");
-
-        return {
-          date: rowData?.date,
-          id: rowData?.id,
-          description: rowData?.description,
-          amount: rowData?.amount,
-          category: rowData?.category,
-          image: rowData?.image,
-          to: rowData?.asset || rowData?.toAsset || null,
-          balance: rowData?.remainingBalance ?? null,
-          initialAmount: rowData?.amount,
-        };
-      }
-
-      if (type === "Transfer") {
-        if (isRecurringTemplate) {
-          return {
-            date: rowData?.date,
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            balance: rowData?.remainingBalance ?? null,
-            recurring: false,
-            image: rowData?.image,
-            from: rowData?.fromAsset,
-            to: rowData?.toAsset,
-          };
-        }
-
-        if (isTransact) {
-          return {
-            date: moment(),
-            id: rowData?.id,
-            description: "",
-            amount: rowData?.remainingBalance,
-            category: rowData?.category,
-            image: rowData?.image,
-            balance: rowData?.remainingBalance ?? null,
-            initialAmount: 0,
-            from: rowData?.fromAsset,
-            to: rowData?.toAsset,
-          };
-        }
-
-        return {
-          date: rowData?.date,
-          id: rowData?.id,
-          description: rowData?.description,
-          amount: rowData?.amount,
-          category: rowData?.category,
-          image: rowData?.image,
-          from: rowData?.fromAsset,
-          to: rowData?.toAsset,
-          balance: rowData?.remainingBalance ?? null,
-          initialAmount: rowData?.amount,
-        };
-      }
-
-      return {};
-    };
-
-    const resetData = getResetData();
-    console.log(resetData, "test");
-    reset({
-      ...resetData,
-      mode: mode,
-    });
-  }, [open, type, rowData, mode, reset]);
-  const handleCustomOpen = () => {
-    setOpenFrequency(true);
-    setOpen(false);
-  };
-
-  const getTransactMode = (type) => {
-    switch (type?.toLowerCase()) {
-      case "expense":
-        return "Pay";
-      case "income":
-        return "Receive";
-      case "transfer":
-        return "Transfer";
-    }
-  };
-
-  const handleClose = () => {
     confirm({
-      description:
-        "Are you sure you want to close this dialog? All unsaved input will be lost.",
-      title: "Close Dialog",
+      title: "Discard changes?",
+      description: "All unsaved changes will be lost.",
       variant: "destructive",
-      confirmText: "Close",
-      cancelText: "Cancel",
+      confirmText: "Discard",
+      cancelText: "Keep editing",
       onConfirm: () => {
         setOpen(false);
         reset();
       },
     });
-  };
-
-  const onSubmit = async (data) => {
-    // Build formData
-    const formData = new FormData();
-    const formatDate = (date) => moment(date).utc().format();
-
-    Object.entries(data).forEach(([key, value]) => {
-      switch (key) {
-        case "date":
-          formData.append("date", formatDate(value));
-          break;
-        case "category":
-          formData.append("category", value?.id);
-          break;
-        case "account":
-          formData.append("account", value?.id);
-          break;
-        default:
-          formData.append(key, value);
-      }
-    });
-
-    if (watch("recurring")) {
-      formData.append("type", type);
-    }
-
-    // Prepare formattedData (for recurring)
-    const formattedData = watch("recurring")
-      ? {
-          ...data,
-          category: data?.category?.id,
-          ...(data?.from && { from: data?.from?.id }),
-          ...(data?.to && { to: data?.to?.id }),
-          // isVariable: data?.mode === "variable",
-          type,
-        }
-      : formData;
-
-    // Budget warning
-    const warning =
-      (type === "Expense" || type === "Transfer") &&
-      categoryLimit?.some(
-        (item) =>
-          Number(watch("amount")) + Number(item?.total) > item?.value &&
-          watch("category")?.name === item?.category?.name,
-      )
-        ? "This will go over the budget"
-        : "";
-
-    console.log(getTransactMode(type)?.toLowerCase());
-
-    // Confirmation modal
-    confirm({
-      title: `${
-        mode === "edit"
-          ? "Update"
-          : mode === "transact"
-            ? getTransactMode(type)
-            : "Add"
-      } ${type}`,
-      showLoadingOnConfirm: true,
-      description: `Are you sure you want to ${
-        mode === "edit"
-          ? "update"
-          : mode === "transact"
-            ? getTransactMode(type)?.toLowerCase()
-            : "add"
-      } this ${
-        watch("recurring") ? "recurring " : ""
-      }${type.toLowerCase()}? ${warning}`,
-      variant: warning ? "warning" : "info",
-      confirmText:
-        mode === "edit"
-          ? "Update"
-          : mode === "transact"
-            ? getTransactMode(type)
-            : "Add",
-      cancelText: "Cancel",
-      onConfirm: async () => {
-        try {
-          if (history) {
-            await editHistory({ data: formattedData, id: data?.id }).unwrap();
-          } else if (["edit", "transact"].includes(mode)) {
-            await fetchData({ data: formattedData, id: data?.id }).unwrap();
-          } else {
-            await fetchData(formattedData).unwrap();
-          }
-
-          if (mode === "edit") {
-            if (type === "Expense") {
-              dispatch(
-                expensesApi.util.invalidateTags(["Expenses", "Recurring"]),
-              );
-            } else if (type === "Income") {
-              dispatch(incomeApi.util.invalidateTags(["Income", "Recurring"]));
-            } else if (type === "Transfer") {
-              dispatch(
-                transferApi.util.invalidateTags(["Transfer", "Recurring"]),
-              );
-            }
-          }
-
-          dispatch(assetsApi.util.invalidateTags(["Assets"]));
-          dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          dispatch(transactionApi.util.invalidateTags(["History", "Stats"]));
-
-          reset();
-          setOpen(false);
-          toast.success(
-            `${type} ${
-              mode === "edit"
-                ? "updated"
-                : mode === "transact"
-                  ? type === "Expense"
-                    ? "paid"
-                    : type === "Income"
-                      ? "received"
-                      : "transfered"
-                  : "added"
-            } successfully`,
-          );
-        } catch (err) {
-          toast.error(err?.data?.error || "Something went wrong");
-        }
-      },
-    });
-  };
+  }
 
   return (
     <FormProvider {...form}>
       <Dialog
         open={open}
         onOpenChange={(o) => {
-          if (!o && isDirty) {
-            handleClose();
-          } else {
-            setOpen(o);
-          }
+          if (!o) handleCloseIntent();
+          else setOpen(o);
         }}
       >
-        <DialogContent
-          onInteractOutside={true}
-          className="w-full flex flex-col max-w-full h-dvh sm:max-w-lg sm:h-auto px-0 sm:max-h-[90%] sm:min-h-lg sm:w-md"
-        >
-          <DialogHeader className="px-6">
-            <DialogTitle>
-              {mode === "add"
-                ? `Add ${type}`
-                : mode === "transact"
-                  ? `${getTransactMode(type)} ${type}`
-                  : `Edit ${type}`}
-            </DialogTitle>
-            <DialogDescription>
-              {mode === "add"
-                ? `Fill in the details to create a new ${
-                    watch("recurring") ? "recurring " : ""
-                  }${type.toLowerCase()}.`
-                : mode === "transact"
-                  ? `Confirm and complete transaction for this ${
-                      watch("recurring") ? "recurring " : ""
-                    }${type.toLowerCase()}.`
-                  : `Update the details of this ${
-                      watch("recurring") ? "recurring " : ""
-                    }${type.toLowerCase()}.`}
-            </DialogDescription>
+        <DialogContent className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0">
+          <DialogHeader className="flex flex-row items-center gap-3 px-6 py-4 border-b">
+            <ReceiptText className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <div className="min-w-0">
+              <DialogTitle>{dialogTitle}</DialogTitle>
+              <DialogDescription className="mt-0.5">
+                {dialogDescription}
+              </DialogDescription>
+            </div>
           </DialogHeader>
 
-          <form className="space-y-4 px-6 overflow-auto p-1">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
             <TransactionForm
               type={type}
               assetData={assetData}
-              setRecurring={setRecurring}
+              categoryData={categoryData}
               mode={mode}
               history={history}
-              setOpenFrequency={handleCustomOpen}
-              categoryData={categoryData}
+              setRecurring={setRecurring}
             />
-          </form>
+          </div>
 
-          <DialogFooter className="flex flex-col px-6 sm:flex-row gap-2">
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCloseIntent}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={(!isDirty && mode !== "transact") || !isValid}
             >
-              {mode === "edit"
-                ? "Update"
-                : mode === "transact"
-                  ? getTransactMode(type)
-                  : "Add"}
+              {getActionLabel()}
             </Button>
-            <DialogClose asChild>
-              <Button
-                type="button"
-                onClick={() => (isDirty ? handleClose() : setOpen(false))}
-                variant="secondary"
-              >
-                Close
-              </Button>
-            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <Repeat
-        open={openFrequency}
-        setParentDialogOpen={setOpen}
-        setOpen={setOpenFrequency}
-      />
     </FormProvider>
   );
 }
