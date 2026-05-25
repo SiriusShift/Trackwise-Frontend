@@ -2,14 +2,12 @@
 import {
   usePostExpenseMutation,
   usePostPaymentMutation,
-  usePostRecurringExpenseMutation,
   usePutExpenseMutation,
 } from "@/features/transactions/api/transaction/expensesApi";
 import { expenseColumns } from "../components/table-columns/transaction/expenseColumn";
 import {
   usePostIncomeMutation,
   usePostReceiveMutation,
-  usePostRecurringIncomeMutation,
   usePutIncomeMutation,
 } from "../api/transaction/incomeApi";
 import { incomeColumns } from "../components/table-columns/transaction/incomeColumn";
@@ -17,14 +15,15 @@ import { expenseSchema } from "../schema/expense.schema";
 import { incomeSchema } from "../schema/income.schema";
 import { transferSchema } from "../schema/transfer.schema";
 import { transferColumns } from "../components/table-columns/transaction/transferColumn";
-import { usePostRecurringTransferMutation, usePostTransferMoneyMutation, usePostTransferMutation, usePutTransferMutation } from "../api/transaction/transferApi";
+import { usePostTransferMoneyMutation, usePostTransferMutation, usePutTransferMutation } from "../api/transaction/transferApi";
+import { usePostRecurringMutation } from "../api/transaction/recurringApi";
 
 export const transactionConfig = {
   Expense: {
     transactTrigger: usePostPaymentMutation,
     postTrigger: usePostExpenseMutation,
     editTrigger: usePutExpenseMutation,
-    postRecurringTrigger: usePostRecurringExpenseMutation,
+    postRecurringTrigger: usePostRecurringMutation,
     columns: expenseColumns,
     schema: expenseSchema,
   },
@@ -32,7 +31,7 @@ export const transactionConfig = {
     postTrigger: usePostIncomeMutation,
     transactTrigger: usePostReceiveMutation,
     editTrigger: usePutIncomeMutation,
-    postRecurringTrigger: usePostRecurringIncomeMutation,
+    postRecurringTrigger: usePostRecurringMutation,
     columns: incomeColumns,
     schema: incomeSchema,
   },
@@ -40,7 +39,7 @@ export const transactionConfig = {
     postTrigger: usePostTransferMutation,
     transactTrigger: usePostTransferMoneyMutation,
     editTrigger: usePutTransferMutation,
-    postRecurringTrigger: usePostRecurringTransferMutation,
+    postRecurringTrigger: usePostRecurringMutation,
     columns: transferColumns,
     schema: transferSchema,
   },

@@ -23,14 +23,11 @@ import { IRootState } from "@/app/store";
 import {
   useGetGraphIncomeQuery,
   useGetIncomeQuery,
-  useGetRecurringIncomeQuery,
 } from "../api/transaction/incomeApi";
 import {
-  useGetGraphTransferQuery,
-  useGetRecurringTransferQuery,
+
   useGetTransferQuery,
 } from "../api/transaction/transferApi";
-import useDebounce from "@/shared/hooks/useDebounce";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
@@ -39,6 +36,8 @@ import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction"
 import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
 import CommonToolbar from "@/shared/components/CommonToolbar";
 import { categoryType } from "@/shared/types";
+import ScheduledWidget from "@/shared/components/ScheduledWidget/ScheduledWidget";
+import { useGetRecurringQuery } from "../api/transaction/recurringApi";
 const TransactionPage = () => {
   const type = useSelector((state: IRootState) => state.active.type);
   const active = useSelector((state: IRootState) => state.active.active);
@@ -115,6 +114,8 @@ const TransactionPage = () => {
         skip: type !== "Expense",
       },
     );
+
+  const {data: recurringData, isFetching: recurringFetching} = useGetRecurringQuery()
 
   // Income
   const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
@@ -283,7 +284,7 @@ const TransactionPage = () => {
             title="Budget Limit"
             type="Expense"
           />{" "}
-          <CommonTracker
+          <ScheduledWidget
             data={categoryLimit}
             isLoading={categoryLimitLoading}
             editDescription="Adjust and update your budget limit to match your needs."

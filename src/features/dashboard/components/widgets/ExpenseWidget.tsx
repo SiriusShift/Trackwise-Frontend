@@ -10,7 +10,7 @@ const ExpenseWidget = ({ data, isLoading }) => {
       const formattedData = data?.expenseBreakdown?.map((item, index) => ({
     label: item.name,
     value: item.amount,
-    color: item.color ? item.color : `hsl(var(--chart-${index+1}))`
+    color: item.color
   }))
   return (
     <Widget title="Expense" data={data} isLoading={isLoading} segments={formattedData} icon={"ArrowDownToLine"}/>

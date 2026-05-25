@@ -7,7 +7,7 @@ import {
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { commonTrackerProps } from "@/shared/types";
 import TrackerCard from "@/shared/components/Tracker/TrackerCard";
-import TrackerSkeleton from "./TrackerSkeleton";
+import ScheduleSkeleton from "./ScheduleSkeleton";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import { useDeleteCategoryLimitMutation } from "@/shared/api/categoryApi";
 import { toast } from "sonner";
@@ -15,7 +15,6 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
-import TrackerDialog from "./TrackerDialog";
 import { useState } from "react";
 
 // Number of fully visible cards at each breakpoint
@@ -29,11 +28,10 @@ function getVisibleCount(width: number): number {
   return VISIBLE_CARDS.find((b) => width >= b.minWidth)?.count ?? 1;
 }
 
-function Tracker({
+function ScheduledWidget({
   title,
   data,
   editDescription,
-  addDescription,
   isLoading,
   type,
 }: commonTrackerProps) {
@@ -85,18 +83,9 @@ function Tracker({
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-sm font-semibold tracking-wide text-foreground">
-              {title}
+              Scheduled {type}
             </h1>
-
-            <p className="text-xs text-muted-foreground">
-              Track and manage your active entries
-            </p>
           </div>
-
-          <Button className="shadow-sm h-9 transition-all hover:scale-[1.02]" onClick={() => setOpen(true)} >
-            <Plus className="w-4 h-4" />
-            Add
-          </Button>
         </div>
 
         {/* carousel */}
@@ -111,7 +100,7 @@ function Tracker({
             <CarouselContent className="-ml-2">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
-                    <TrackerSkeleton key={i} count={itemCount}/>
+                    <ScheduleSkeleton key={i} count={itemCount}/>
                   ))
                 : data?.map((item, index) => (
                     <TrackerCard
@@ -139,17 +128,9 @@ function Tracker({
             )}
           </Carousel>
         </div>
-        <TrackerDialog
-          title={`Add ${title}`}
-          open={open}
-          setOpen={setOpen}
-          description={addDescription}
-          mode="add"
-          // data={data}
-        />
       </div>
     </Card>
   );
 }
 
-export default Tracker;
+export default ScheduledWidget;
