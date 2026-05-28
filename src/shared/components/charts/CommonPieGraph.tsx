@@ -48,6 +48,7 @@ const chartConfig = {
 function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
   const [showChart, setShowChart] = useState(false);
 
+  console.log(total)
   const dateDisplay = formatDateDisplay();
   const modeDisplay = formatMode();
 

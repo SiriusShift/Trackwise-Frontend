@@ -10,7 +10,7 @@ export const transferSchema = {
     date: yup.date().required("Date is required"),
     image: yup.mixed().nullable(),
     recurring: yup.boolean(),
-    from: yup.object().when("recurring", {
+    account: yup.object().when("recurring", {
       is: false,
       then: (schema) => schema.required("Source is required"),
       otherwise: (schema) => schema.notRequired(),

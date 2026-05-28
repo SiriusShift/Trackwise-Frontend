@@ -10,7 +10,7 @@ const IncomeWidget = ({ data, isLoading }) => {
     const formattedData = data?.incomeBreakdown?.map((item, index) => ({
     label: item.name,
     value: item.amount,
-    color: `hsl(var(--chart-${index+1}))`
+    color: item.color
   }))
   return (
     <Widget title="Income" isLoading={isLoading} data={data} segments={formattedData} icon={"ArrowUpFromLine"}/>
