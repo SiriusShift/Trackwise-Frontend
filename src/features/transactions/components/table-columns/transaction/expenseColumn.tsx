@@ -75,7 +75,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, YYYY") : "-"}
+          {dateValue ? moment(dateValue).format("MMM DD, YYYY h:mm A ") : "-"}
         </span>
       );
     },
@@ -151,7 +151,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       <div className="flex items-center w-40 gap-2">
         {row.original?.recurringTemplate && (
           <span title="Recurring expense">
-            <RefreshCcw className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`} size={15} />
+            <RefreshCcw
+              className={`${row.original.recurringTemplate?.isActive ? "text-blue-500" : "text-red-500"}`}
+              size={15}
+            />
           </span>
         )}
         <span className="truncate"> {getValue() || "-"}</span>
@@ -224,9 +227,9 @@ export const expenseColumns: ColumnDef<Expense>[] = [
           onConfirm: async () => {
             try {
               await deleteExpense({
-              data: {
-                type: "expense",
-              },
+                data: {
+                  type: "expense",
+                },
                 id: expense.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
@@ -241,7 +244,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       };
 
       const onStopSeries = async () => {
-        console.log(expense)
+        console.log(expense);
         confirm({
           description: `Are you sure you want to cancel this recurring expense?`,
           title: `Cancel recurring expense`,
@@ -262,32 +265,32 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
       const onPayment = async () => {
         console.log(expense?.recurringTemplate, "expense payment");
-          // confirm({
-          //   title: "Confirm Payment",
-          //   description: "Do you want to proceed with paying this expense?",
-          //   variant: "info",
-          //   confirmText: "Pay",
-          //   cancelText: "Cancel",
-          //   showLoadingOnConfirm: true,
-          //   onConfirm: async () => {
-          //     try {
-          //       await payAuto({
-          //         id: expense.id,
-          //         data: {
-          //           type: "Expense",
-          //         },
-          //       }).unwrap();
-          //       dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          //       dispatch(expensesApi.util.invalidateTags(["Expenses"]))
-          //     } catch (err) {
-          //       let errorMessage = handleCatchErrorMessage(err); // Default message
-          //       toast.error(errorMessage);
-          //     }
-          //   },
-          // });
-          // setMode("transact");
-          // setDialogOpen(true); // open dialog
-          // setDropdownOpen(false); // close dropdown manually
+        // confirm({
+        //   title: "Confirm Payment",
+        //   description: "Do you want to proceed with paying this expense?",
+        //   variant: "info",
+        //   confirmText: "Pay",
+        //   cancelText: "Cancel",
+        //   showLoadingOnConfirm: true,
+        //   onConfirm: async () => {
+        //     try {
+        //       await payAuto({
+        //         id: expense.id,
+        //         data: {
+        //           type: "Expense",
+        //         },
+        //       }).unwrap();
+        //       dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
+        //       dispatch(expensesApi.util.invalidateTags(["Expenses"]))
+        //     } catch (err) {
+        //       let errorMessage = handleCatchErrorMessage(err); // Default message
+        //       toast.error(errorMessage);
+        //     }
+        //   },
+        // });
+        // setMode("transact");
+        // setDialogOpen(true); // open dialog
+        // setDropdownOpen(false); // close dropdown manually
       };
 
       const onView = () => {
@@ -313,26 +316,27 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
               {/* --- Pay --- */}
-              {expense.recurringTemplate &&               <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <DropdownMenuItem
-                      onSelect={() => setConfirmOpen(true)}
-                      // disabled={expense?.status === "Completed"}
-                    >
-                      <Banknote /> Confirm
-                    </DropdownMenuItem>
-                  </span>
-                </TooltipTrigger>
-                <Portal>
-                  {expense?.status === "Completed" && (
-                    <TooltipContent side="right" sideOffset={10}>
-                      Already paid
-                    </TooltipContent>
-                  )}
-                </Portal>
-              </Tooltip>}
-
+              {expense.recurringTemplate && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <DropdownMenuItem
+                        onSelect={() => setConfirmOpen(true)}
+                        // disabled={expense?.status === "Completed"}
+                      >
+                        <Banknote /> Confirm
+                      </DropdownMenuItem>
+                    </span>
+                  </TooltipTrigger>
+                  <Portal>
+                    {expense?.status === "Completed" && (
+                      <TooltipContent side="right" sideOffset={10}>
+                        Already paid
+                      </TooltipContent>
+                    )}
+                  </Portal>
+                </Tooltip>
+              )}
 
               {/* --- Edit --- */}
               <Tooltip>
@@ -346,9 +350,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                         setDialogOpen(true);
                         setDropdownOpen(false);
                       }}
-                      disabled={
-                        expense?.status === "Completed" 
-                      }
+                      disabled={expense?.status === "Completed"}
                     >
                       <Pencil /> Edit
                     </DropdownMenuItem>
@@ -384,7 +386,10 @@ export const expenseColumns: ColumnDef<Expense>[] = [
                   <DropdownMenuSeparator />
 
                   {/* Stop whole series */}
-                  <DropdownMenuItem disabled={!expense?.recurringTemplate?.isActive} onClick={onStopSeries}>
+                  <DropdownMenuItem
+                    disabled={!expense?.recurringTemplate?.isActive}
+                    onClick={onStopSeries}
+                  >
                     <X className="h-4 w-4 text-destructive" />
                     Stop Recurring
                   </DropdownMenuItem>
@@ -414,7 +419,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             transaction={expense}
           />
 
-          <ConfirmDialog open={confirmOpen} setOpen={setConfirmOpen} data={expense}/>
+          <ConfirmDialog
+            open={confirmOpen}
+            setOpen={setConfirmOpen}
+            data={expense}
+          />
         </>
       );
     },

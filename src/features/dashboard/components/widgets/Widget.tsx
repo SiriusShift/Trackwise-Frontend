@@ -1,9 +1,5 @@
-import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { commonWidgetProps } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -11,6 +7,8 @@ import AnimateNumber from "@/shared/components/AnimateNumber";
 import { StackedBar } from "@/shared/components/charts/CommonStackedBar";
 import * as Icons from "lucide-react";
 import { Separator } from "@/shared/components/ui/separator";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // ─── Empty state for the stacked bar ────────────────────────────────────────
 function BarEmptyState({ title }: { title: string }) {
@@ -43,9 +41,13 @@ const WidgetLayout = ({
   segments,
   icon,
 }: commonWidgetProps) => {
+  const [showBalance, setShowBalance] = useState(() => {
+    const saved = localStorage.getItem("showBalance");
+    return saved ? JSON.parse(saved) : true;
+  });
   const date = formatDateDisplay();
   const mode = formatMode();
-console.log(segments)
+  console.log(segments);
   const balance =
     title === "Expense"
       ? data?.expense
@@ -89,9 +91,18 @@ console.log(segments)
       ? trendPositiveIsGood
         ? "text-success-500"
         : "text-destructive-500"
-      : trend < 0 ? trendPositiveIsGood
-        ? "text-destructive-500"
-        : "text-success-500" : "text-muted-foreground";
+      : trend < 0
+        ? trendPositiveIsGood
+          ? "text-destructive-500"
+          : "text-success-500"
+        : "text-muted-foreground";
+
+  const toggleBalanceVisibility = () => {
+    setShowBalance((prev) => {
+      localStorage.setItem("showBalance", JSON.stringify(!prev));
+      return !prev;
+    });
+  };
 
   return (
     <Card
@@ -155,9 +166,31 @@ console.log(segments)
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
                     {title === "Overview" ? "Balance" : `Total ${title}`}
                   </p>
-                  <div className="text-3xl flex gap-1">
-                    ₱<AnimateNumber duration={2} value={balance} />
-                  </div>
+               <div className="flex items-center gap-2.5">
+  <div className="text-3xl font-semibold tracking-tight flex items-center gap-2">
+    <span className="text-muted-foreground font-normal">₱</span>
+    <span
+      className={cn(
+        "transition-all duration-400",
+        showBalance
+          ? "blur-none opacity-100"
+          : "blur-[8px] opacity-50 select-none"
+      )}
+    >
+      <AnimateNumber duration={2} value={balance} />
+    </span>
+  </div>
+
+  <Button
+    size="icon"
+    variant="ghost"
+    onClick={toggleBalanceVisibility}
+    className="rounded-full"
+    aria-label={showBalance ? "Hide balance" : "Show balance"}
+  >
+    {showBalance ? <Icons.Eye /> : <Icons.EyeClosed />}
+  </Button>
+</div>
                 </div>
                 <div
                   className={`w-11 h-11 rounded-xl flex justify-center items-center border shrink-0 ${gradientColor.container}`}
@@ -185,7 +218,7 @@ console.log(segments)
 
             {/* Trend row */}
             <div className="flex gap-2 flex-col">
-        <Separator />
+              <Separator />
               <div className="flex gap-1">
                 {isNaN(trend) || (trend === 0 && !data) ? (
                   <p className="text-sm text-muted-foreground">
@@ -197,7 +230,7 @@ console.log(segments)
                       Compare to last {mode}
                     </p>
                     <p className={`text-sm font-medium ${trendColor}`}>
-                      {trend > 0 ? "↑ +" : trend < 0 ?  "↓ " : ""}
+                      {trend > 0 ? "↑ +" : trend < 0 ? "↓ " : ""}
                       {trend ?? 0}%
                     </p>
                   </div>
