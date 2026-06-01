@@ -169,7 +169,7 @@ const TransactionForm = ({
               <Button
                 variant="outline"
                 type="button"
-                disabled={mode === "transact" || isTransfer}
+                disabled={mode === "transact"}
                 className={cn(
                   "justify-start text-left font-normal",
                   !field.value && "text-muted-foreground",

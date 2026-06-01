@@ -6,7 +6,7 @@ import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { transactionApi } from "@/features/transactions/api/transaction";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
-import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";  
+import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { transferApi } from "@/features/transactions/api/transaction/transferApi";
 import { IRootState } from "@/app/store";
 
@@ -65,13 +65,21 @@ export function useTransactionSubmit({
     Object.entries(data).forEach(([key, value]) => {
       switch (key) {
         case "date":
-          formData.append("date", moment(value as any).utc().format());
+          formData.append(
+            "date",
+            moment(value as any)
+              .utc()
+              .format(),
+          );
           break;
         case "category":
           formData.append("category", (value as any)?.id);
           break;
         case "account":
           formData.append("account", (value as any)?.id);
+          break;
+        case "to":
+          formData.append("to", (value as any)?.id);
           break;
         default:
           if (value !== null && value !== undefined) {
@@ -87,7 +95,7 @@ export function useTransactionSubmit({
     return {
       ...data,
       category: data.category?.id,
-      ...(data.from && { from: data.from.id }),
+      ...(data.account && { account: data.account.id }),
       ...(data.to && { to: data.to.id }),
       type,
     };
@@ -126,7 +134,9 @@ export function useTransactionSubmit({
 
   async function onSubmit(data: any) {
     const isRecurring = watch("recurring");
-    const formattedData = isRecurring ? buildJsonData(data) : buildFormData(data);
+    const formattedData = isRecurring
+      ? buildJsonData(data)
+      : buildFormData(data);
     const warning = getBudgetWarning();
     const actionLabel = getActionLabel();
 
@@ -143,8 +153,8 @@ export function useTransactionSubmit({
         try {
           // if (history) {
           //   await editHistory({ data: formattedData, id: data.id }).unwrap();
-          // } else 
-            if (mode === "edit" || mode === "transact") {
+          // } else
+          if (mode === "edit" || mode === "transact") {
             await fetchData({ data: formattedData, id: data.id }).unwrap();
           } else {
             await fetchData(formattedData).unwrap();

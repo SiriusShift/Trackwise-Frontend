@@ -24,10 +24,7 @@ import {
   useGetGraphIncomeQuery,
   useGetIncomeQuery,
 } from "../api/transaction/incomeApi";
-import {
-
-  useGetTransferQuery,
-} from "../api/transaction/transferApi";
+import { useGetTransferQuery } from "../api/transaction/transferApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
@@ -68,6 +65,8 @@ const TransactionPage = () => {
     type,
   });
 
+  console.log(filter, "FILTER")
+
   const { data: categoryLimit, isFetching: categoryLimitLoading } =
     useGetCategoryLimitQuery({
       startDate: startDate?.toISOString(),
@@ -85,9 +84,14 @@ const TransactionPage = () => {
         pageIndex,
         ...(filter?.status && { status: filter?.status }),
         ...(filter?.search?.length > 0 && { search: filter?.search }), // Add `Search` only if truthy
-        ...(filter?.selectedCategories.length > 0 && {
+        ...(filter?.selectedCategories?.length > 0 && {
           Categories: JSON.stringify(
             filter?.selectedCategories.map((category) => category.id),
+          ), // Add array of IDs
+        }),
+        ...(filter?.selectedAssets?.length > 0 && {
+          Assets: JSON.stringify(
+            filter?.selectedAssets?.map((asset) => asset.id),
           ), // Add array of IDs
         }),
       },
@@ -115,7 +119,8 @@ const TransactionPage = () => {
       },
     );
 
-  const {data: recurringData, isFetching: recurringFetching} = useGetRecurringQuery()
+  const { data: recurringData, isFetching: recurringFetching } =
+    useGetRecurringQuery();
 
   // Income
   const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
@@ -181,15 +186,18 @@ const TransactionPage = () => {
     ({
       search,
       selectedCategories,
+      selectedAssets,
       status,
     }: {
       search: string;
       selectedCategories: categoryType;
+      selectedAssets: any;
       status: string;
     }) => {
       setFilter({
         search,
         selectedCategories,
+        selectedAssets,
         status,
       });
     },
@@ -201,6 +209,7 @@ const TransactionPage = () => {
       search: "",
       status: [],
       selectedCategories: [],
+      selectedAssets: []
     });
   }, []);
 

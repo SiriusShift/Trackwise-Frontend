@@ -22,11 +22,12 @@ import { TransactionDialog } from "./dialogs/TransactionDialog";
 import useDebounce from "@/shared/hooks/useDebounce";
 import { categoryType } from "@/shared/types";
 import { Separator } from "@/shared/components/ui/separator";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
 const TransactionToolbar = ({
   // setSelectedCategories,
   categoryData,
   onSubmit,
-  onClear
+  onClear,
   // selectedCategories,
   // setSearch,
   // search,
@@ -36,7 +37,15 @@ const TransactionToolbar = ({
   // setStatus,
 }: {
   categoryData: Object;
-  onSubmit: ({ search, status }: { search: string; status: String[], selectedCategories: categoryType[] }) => void;
+  onSubmit: ({
+    search,
+    status,
+  }: {
+    search: string;
+    status: String[];
+    selectedCategories: categoryType[];
+    selectedAssets: Array[]
+  }) => void;
   onClear: () => void;
 
   // search: String;
@@ -51,13 +60,19 @@ const TransactionToolbar = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [status, setStatus] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+const [selectedAssets, setSelectedAssets] = useState<any[]>([]);
   const [search, setSearch] = useState<string>("");
 
+
+    const { data: rawAssetData } = useGetAssetQuery();
+
+    console.log(rawAssetData)
   const handleFilter = () => {
     onSubmit({
       search: search,
       status: status,
-      selectedCategories: selectedCategories
+      selectedCategories: selectedCategories,
+      selectedAssets: selectedAssets
     });
   };
 
@@ -65,7 +80,7 @@ const TransactionToolbar = ({
     setSearch("");
     setSelectedCategories([]);
     setStatus("");
-    onClear()
+    onClear();
   };
 
   const handleCheckboxChange = (category: any) => {
@@ -78,6 +93,16 @@ const TransactionToolbar = ({
       return [...prevSelected, category];
     });
   };
+
+  const handleAssetChange = (asset: any) => {
+  setSelectedAssets((prevSelected) => {
+    if (prevSelected.some((selected) => selected.id === asset.id)) {
+      return prevSelected.filter((selected) => selected.id !== asset.id);
+    }
+
+    return [...prevSelected, asset];
+  });
+};
 
   return (
     <>
@@ -132,7 +157,7 @@ const TransactionToolbar = ({
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
-        <Separator />
+                <Separator />
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Category</h1>
                   <Collapsible>
@@ -185,63 +210,59 @@ const TransactionToolbar = ({
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-        <Separator />
+                <Separator />
+
+<div className="flex flex-col gap-2">
+  <h1 className="text-sm font-semibold">Asset</h1>
+
+  <Collapsible>
+    <CollapsibleTrigger asChild>
+      <Button
+        variant="outline"
+        className="w-full relative flex justify-between overflow-hidden items-center"
+      >
+        <div className="overflow-x-hidden flex w-4/5">
+          <span>
+            {selectedAssets.length > 0
+              ? selectedAssets.map((asset) => asset.name).join(", ")
+              : "Filter by Asset"}
+          </span>
+        </div>
+
+        <ChevronDown className="absolute right-5 h-5 w-5" />
+      </Button>
+    </CollapsibleTrigger>
+
+    <CollapsibleContent>
+      <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
+        {rawAssetData?.data?.map((asset: any) => (
+          <div
+            key={asset.id}
+            className="flex items-center gap-2"
+          >
+            <Checkbox
+              id={`asset-${asset.id}`}
+              checked={selectedAssets.some(
+                (selected) => selected.id === asset.id
+              )}
+              onCheckedChange={() => handleAssetChange(asset)}
+            />
+
+            <label
+              htmlFor={`asset-${asset.id}`}
+              className="text-sm font-medium capitalize cursor-pointer"
+            >
+              {asset.name}
+            </label>
+          </div>
+        ))}
+      </div>
+    </CollapsibleContent>
+  </Collapsible>
+</div>
 
                 <div className="flex flex-col gap-2">
                   <h1 className="text-sm font-semibold">Status</h1>
-                  <Collapsible>
-                    {/* Trigger */}
-                    <CollapsibleTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full relative flex justify-between overflow-hidden items-center"
-                      >
-                        <div className="overflow-x-hidden flex w-4/5">
-                          <span>
-                            {/* Display selected categories or default text */}
-                            {selectedCategories.length > 0
-                              ? `${selectedCategories
-                                  .map((category) => category.name)
-                                  .join(", ")}`
-                              : "Filter by Status"}
-                          </span>
-                        </div>
-                        <ChevronDown className="absolute right-5 h-5 w-5" />
-                      </Button>
-                    </CollapsibleTrigger>
-
-                    {/* Content */}
-                    <CollapsibleContent>
-                      <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
-                        {categoryData?.map((category, index) => (
-                          <div
-                            key={category.id}
-                            className="flex items-center gap-2"
-                          >
-                            <Checkbox
-                              id={category.name}
-                              checked={selectedCategories.some(
-                                (selected) => selected.id === category.id,
-                              )}
-                              onCheckedChange={() =>
-                                handleCheckboxChange(category)
-                              }
-                            />
-                            <label
-                              htmlFor={category.name}
-                              className="text-sm font-medium capitalize cursor-pointer"
-                            >
-                              {category.name}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <h1 className="text-sm font-semibold">Category</h1>
                   <RadioGroup
                     value={status}
                     onValueChange={(value) => setStatus(value)} // Ensure value is updated
@@ -258,7 +279,7 @@ const TransactionToolbar = ({
                     <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
                       <RadioGroupItem id="Paid" value="Paid" />
                       <label htmlFor="Paid" className="text-sm font-medium">
-                        Paid
+                        Completed
                       </label>
                     </div>
                     {/* Option 3 */}
@@ -270,7 +291,7 @@ const TransactionToolbar = ({
                     </div>
                   </RadioGroup>
                 </div>
-        <Separator />
+                <Separator />
               </div>
             </FilterSheet>
           </div>
