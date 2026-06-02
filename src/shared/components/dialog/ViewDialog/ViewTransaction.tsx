@@ -151,9 +151,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent
-          className="max-w-lg sm:max-h-[75%] overflow-y-auto p-0 flex flex-col"
-        >
+        <DialogContent className="max-w-lg sm:max-h-[75%] overflow-y-auto p-0 flex flex-col">
           {/* Header */}
           <DialogHeader className="border-b px-5 py-4">
             <div className="flex items-center justify-between">
@@ -224,13 +222,33 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 value={transaction.description}
               />
               <Separator />
-              
-              <InfoRow
-                icon={Icon.Wallet}
-                label="Account"
-                value={transaction.asset.name}
-              />
-              <Separator />
+
+              {transaction.type !== "Transfer" ? (
+                <>
+                  <InfoRow
+                    icon={Icon.Wallet}
+                    label="Account"
+                    value={transaction?.asset?.name}
+                  />
+                  <Separator />
+                </>
+              ) : (
+                <>
+                  {" "}
+                  <InfoRow
+                    icon={Icon.Wallet}
+                    label="Source"
+                    value={transaction?.fromAsset?.name}
+                  />
+                  <Separator />
+                  <InfoRow
+                    icon={Icon.Wallet}
+                    label="Destination"
+                    value={transaction?.toAsset?.name}
+                  />
+                  <Separator />
+                </>
+              )}
 
               <InfoRow
                 icon={Icon.Image}
