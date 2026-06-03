@@ -15,6 +15,8 @@ import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
 import ViewImage from "./ViewImage";
 import { Separator } from "../../ui/separator";
 import { Card } from "../../ui/card";
+import { IRootState } from "@/app/store";
+import { useSelector } from "react-redux";
 
 const transactionTypeConfig = {
   expense: {
@@ -138,6 +140,7 @@ const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
 
 const ViewTransaction = ({ transaction, open, setOpen }) => {
   if (!transaction) return null;
+  const mode = useSelector((state: IRootState) => state.active.type)
   const [previewImage, setPreviewImage] = React.useState(false);
   const type =
     transactionTypeConfig[transaction?.type?.toLowerCase()] ||
@@ -148,6 +151,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
   const TypeIcon = type.icon;
   const StatusIcon = status?.icon;
 
+  console.log(mode)
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -223,7 +227,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
               />
               <Separator />
 
-              {transaction.type !== "Transfer" ? (
+              {mode !== "Transfer" ? (
                 <>
                   <InfoRow
                     icon={Icon.Wallet}
