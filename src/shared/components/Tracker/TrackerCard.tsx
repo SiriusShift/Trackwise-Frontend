@@ -66,7 +66,7 @@ const TrackerCard = ({
       <CarouselItem
         className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2`}
       >
-        <Card className="relative bg-muted/30">
+        <Card className="relative bg-muted/30 h-24 flex">
           {/* Actions menu */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -102,7 +102,7 @@ const TrackerCard = ({
           </DropdownMenu>
 
           {/* Card body */}
-          <CardContent className="flex h-[80px] items-center p-1">
+          <CardContent className="flex  items-center p-1 ">
             <ChartContainer
               config={{ innerRadius: 27, outerRadius: 20 }}
               className="h-[65px] w-[65px] sm:h-[65px] sm:w-[65px] mr-2 shrink-0"

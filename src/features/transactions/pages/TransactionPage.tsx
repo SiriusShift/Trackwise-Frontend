@@ -122,6 +122,7 @@ const TransactionPage = () => {
   const { data: recurringData, isFetching: recurringFetching } =
     useGetRecurringQuery();
 
+    console.log(recurringData, "recurring data")
   // Income
   const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
     {
@@ -294,7 +295,7 @@ const TransactionPage = () => {
             type="Expense"
           />{" "}
           <ScheduledWidget
-            data={categoryLimit}
+            data={recurringData}
             isLoading={categoryLimitLoading}
             editDescription="Adjust and update your budget limit to match your needs."
             addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."

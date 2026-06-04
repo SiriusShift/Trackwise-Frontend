@@ -16,10 +16,11 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import ScheduleCard from "./ScheduleCard";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
-  { minWidth: 1280, count: 2 },
+  { minWidth: 1536, count: 2 },
   { minWidth: 768, count: 1 },
   { minWidth: 0, count: 1 },
 ];
@@ -37,7 +38,7 @@ function ScheduledWidget({
 }: commonTrackerProps) {
   const [open, setOpen] = useState(false);
 
-  console.log(open, "open");
+  console.log(data);
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
@@ -45,7 +46,7 @@ function ScheduledWidget({
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;
 
-  console.log(visibleCount)
+  console.log(visibleCount);
   // Show nav arrows only when there are more items than visible slots
   const shouldShowNav = itemCount > visibleCount;
 
@@ -85,6 +86,9 @@ function ScheduledWidget({
             <h1 className="text-sm font-semibold tracking-wide text-foreground">
               Scheduled {type}
             </h1>
+            <p className="text-xs text-muted-foreground">
+              Track your active schedules
+            </p>
           </div>
         </div>
 
@@ -100,12 +104,12 @@ function ScheduledWidget({
             <CarouselContent className="-ml-2">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
-                    <ScheduleSkeleton key={i} count={itemCount}/>
+                    <ScheduleSkeleton key={i} count={itemCount} />
                   ))
-                : data?.map((item, index) => (
-                    <TrackerCard
-                      key={item.id ?? index}
-                      item={item}
+                : data?.map((schedule, index) => (
+                    <ScheduleCard
+                      key={schedule.id ?? index}
+                      schedule={schedule}
                       title={title}
                       type={type}
                       editDescription={editDescription}

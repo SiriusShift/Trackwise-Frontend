@@ -166,31 +166,33 @@ const WidgetLayout = ({
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
                     {title === "Overview" ? "Balance" : `Total ${title}`}
                   </p>
-               <div className="flex items-center gap-2.5">
-  <div className="text-3xl font-semibold tracking-tight flex items-center gap-2">
-    <span className="text-muted-foreground font-normal">₱</span>
-    <span
-      className={cn(
-        "transition-all duration-400",
-        showBalance
-          ? "blur-none opacity-100"
-          : "blur-[8px] opacity-50 select-none"
-      )}
-    >
-      <AnimateNumber duration={2} value={balance} />
-    </span>
-  </div>
+                  <div className="flex items-center gap-2.5">
+                    <div className="text-3xl font-semibold tracking-tight flex items-center gap-2">
+                      <span className="text-muted-foreground font-normal">
+                        ₱
+                      </span>
+                      <span
+                        className={cn(
+                          "transition-all duration-400",
+                          showBalance
+                            ? "blur-none opacity-100"
+                            : "blur-[8px] opacity-50 select-none",
+                        )}
+                      >
+                        <AnimateNumber duration={2} value={balance} />
+                      </span>
+                    </div>
 
-  <Button
-    size="icon"
-    variant="ghost"
-    onClick={toggleBalanceVisibility}
-    className="rounded-full"
-    aria-label={showBalance ? "Hide balance" : "Show balance"}
-  >
-    {showBalance ? <Icons.Eye /> : <Icons.EyeClosed />}
-  </Button>
-</div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={toggleBalanceVisibility}
+                      className="rounded-full"
+                      aria-label={showBalance ? "Hide balance" : "Show balance"}
+                    >
+                      {showBalance ? <Icons.Eye /> : <Icons.EyeClosed />}
+                    </Button>
+                  </div>
                 </div>
                 <div
                   className={`w-11 h-11 rounded-xl flex justify-center items-center border shrink-0 ${gradientColor.container}`}

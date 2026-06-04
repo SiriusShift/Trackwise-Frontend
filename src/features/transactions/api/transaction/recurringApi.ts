@@ -32,6 +32,7 @@ export const expensesApi = api
           url: "/transactions/recurring",
           method: "GET",
         }),
+        transformResponse: (response) => response.data,
         providesTags: ["Recurring"],
       }),
 
