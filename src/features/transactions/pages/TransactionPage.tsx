@@ -283,26 +283,7 @@ const TransactionPage = () => {
   return (
     <>
       <CommonToolbar />
-      <div className="flex p-5 flex-col gap-5">
-        {/* Header */}
-        <div className="grid sm:grid-cols-2 gap-5">
-          <CommonTracker
-            data={categoryLimit}
-            isLoading={categoryLimitLoading}
-            editDescription="Adjust and update your budget limit to match your needs."
-            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
-            title="Budget Limit"
-            type="Expense"
-          />{" "}
-          <ScheduledWidget
-            data={recurringData}
-            isLoading={categoryLimitLoading}
-            editDescription="Adjust and update your budget limit to match your needs."
-            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
-            title="Budget Limit"
-            type="Expense"
-          />
-        </div>
+      <div className="flex p-5 flex-col gap-2">
 
         <PageHeader
           pageName={currentPageName?.name}
@@ -350,6 +331,27 @@ const TransactionPage = () => {
             </div>
           )}
         </div>
+
+                {/* Header */}
+        <div className="grid sm:grid-cols-2 gap-5">
+          <CommonTracker
+            data={categoryLimit}
+            isLoading={categoryLimitLoading}
+            editDescription="Adjust and update your budget limit to match your needs."
+            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
+            title="Budget Limit"
+            type="Expense"
+          />{" "}
+          <ScheduledWidget
+            data={recurringData}
+            isLoading={categoryLimitLoading}
+            editDescription="Adjust and update your budget limit to match your needs."
+            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
+            title="Budget Limit"
+            type="Expense"
+          />
+        </div>
+
 
         <ViewDetailed
           open={viewOpen}

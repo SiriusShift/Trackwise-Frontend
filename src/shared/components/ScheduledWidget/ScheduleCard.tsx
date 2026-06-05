@@ -61,7 +61,7 @@ const TYPE_CONFIG: Record<
   Expense: {
     container:
       "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
-    text: "text-red-600 dark:text-red-400",
+    text: "text-destructive",
     badge:
       "bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 border-0",
     accent: "bg-red-500",
@@ -269,8 +269,8 @@ const TrackerCard = memo(
                     <Badge
                       className={cn(
                         "shrink-0 text-xs font-semibold capitalize tracking-wide",
-                        badge,
                       )}
+                      variant={"outline"}
                     >
                       {frequency.name}
                     </Badge>
@@ -278,9 +278,10 @@ const TrackerCard = memo(
                   {behaviour && (
                     <Badge
                       className={cn(
-                        "shrink-0 text-xs font-semibold capitalize tracking-wide",
-                        badge,
+                        "shrink-0 text-xs font-semibold capitalize tracking-wide"
                       )}
+                                            variant={"outline"}
+
                     >
                       {behaviour}
                     </Badge>

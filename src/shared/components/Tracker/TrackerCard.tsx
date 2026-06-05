@@ -24,6 +24,8 @@ import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { IRootState } from "@/app/store";
 import { commonTrackerProps } from "@/shared/types";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { cn } from "@/lib/utils";
+import { StackedBar } from "../charts/CommonBar";
 
 interface TrackerCardProps extends commonTrackerProps {
   item: any;
@@ -53,18 +55,19 @@ const TrackerCard = ({
   const mode = useSelector((state: IRootState) => state.active.mode);
   const width = useScreenWidth();
 
-  const limit = mode === "monthly" ? item?.value : item?.value * 12;
+  const limit = item?.value;
   const percentage = limit > 0 ? (Number(item?.total) / limit) * 100 : 0;
   const isOverBudget = item?.total > limit;
-  const endAngle = percentageToEndAngle(percentage);
+  // const endAngle = percentageToEndAngle(percentage);
 
   const iconKey = (item?.category?.icon as keyof typeof Icons) ?? "BusFront";
   const Icon = Icons[iconKey] as React.ElementType;
 
+  console.log(item)
   return (
     <>
       <CarouselItem
-        className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2`}
+        className={`${count > 1 ? "basis-[90%]" : "basis-[100%]"} 2xl:basis-1/2`}
       >
         <Card className="relative bg-muted/30 h-24 flex">
           {/* Actions menu */}
@@ -102,8 +105,8 @@ const TrackerCard = ({
           </DropdownMenu>
 
           {/* Card body */}
-          <CardContent className="flex  items-center p-1 ">
-            <ChartContainer
+          <CardContent className="flex flex-col gap-2.5 p-3 pl-5 pr-9 w-full">
+            {/* <ChartContainer
               config={{ innerRadius: 27, outerRadius: 20 }}
               className="h-[65px] w-[65px] sm:h-[65px] sm:w-[65px] mr-2 shrink-0"
             >
@@ -145,27 +148,45 @@ const TrackerCard = ({
                   />
                 </PolarRadiusAxis>
               </RadialBarChart>
-            </ChartContainer>
-
-            <div className="flex flex-col min-w-0">
-              <p className="font-medium text-sm truncate">
-                {item.category.name}
-              </p>
-              <p
-                className={`text-xs ${isOverBudget ? "text-destructive" : "text-muted-foreground"}`}
+            </ChartContainer> */}
+            <div className="flex items-center gap-2.5">
+              <div
+                className={cn(
+                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                )}
+                aria-hidden="true"
               >
-                ₱{Number(item.total).toFixed(2)}{" "}
-                <span className="text-muted-foreground">
-                  / {Number(limit).toFixed(2)}
-                </span>
-              </p>
-              {/* Over-budget indicator */}
-              {isOverBudget && (
-                <p className="text-xs text-destructive font-medium mt-0.5">
-                  Over budget
+                <Icon className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <p className="font-medium text-sm truncate">
+                  {item.category.name}
                 </p>
-              )}
+                <p className="text-xs capitalize">{item.period} budget</p>
+                <p
+                  className={`text-xs ${isOverBudget ? "text-destructive" : "text-muted-foreground"}`}
+                >
+                  ₱{Number(item.total).toFixed(2)}{" "}
+                  <span className="text-muted-foreground">
+                    / {Number(limit).toFixed(2)}
+                  </span>
+                </p>
+                {/* Over-budget indicator */}
+                {/* {isOverBudget && (
+                  <p className="text-xs text-destructive font-medium mt-0.5">
+                    Over budget
+                  </p>
+                )} */}
+              </div>
             </div>
+            <StackedBar
+              mode="progress"
+              maxValue={item.value}
+              segments={[
+                { label: "Spent", value: item.total, color: "#f97316" },
+              ]}
+              formatValue={(v) => `₱${v.toLocaleString()}`}
+            />{" "}
           </CardContent>
         </Card>
       </CarouselItem>

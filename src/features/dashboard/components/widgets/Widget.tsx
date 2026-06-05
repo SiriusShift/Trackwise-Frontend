@@ -4,7 +4,7 @@ import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { commonWidgetProps } from "@/shared/types";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import AnimateNumber from "@/shared/components/AnimateNumber";
-import { StackedBar } from "@/shared/components/charts/CommonStackedBar";
+import { StackedBar } from "@/shared/components/charts/CommonBar";
 import * as Icons from "lucide-react";
 import { Separator } from "@/shared/components/ui/separator";
 import { Button } from "@/shared/components/ui/button";
