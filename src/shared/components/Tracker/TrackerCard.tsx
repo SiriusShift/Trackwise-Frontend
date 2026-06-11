@@ -149,7 +149,7 @@ const TrackerCard = ({
                 </PolarRadiusAxis>
               </RadialBarChart>
             </ChartContainer> */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex gap-2.5">
               <div
                 className={cn(
                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",

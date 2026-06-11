@@ -3,10 +3,11 @@ import { CarouselItem } from "../ui/carousel";
 import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent } from "../ui/card";
 
-const TrackerSkeleton = ({count}) => {
+const TrackerSkeleton = ({ count }) => {
   return (
-    <CarouselItem         className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2`}
->
+    <CarouselItem
+      className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2 flex-1`}
+    >
       <Card className="h-full relative">
         {" "}
         <Skeleton className="absolute top-4 right-4 h-6 w-3" />

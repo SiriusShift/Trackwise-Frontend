@@ -75,7 +75,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, YYYY h:mm A ") : "-"}
+          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
         </span>
       );
     },

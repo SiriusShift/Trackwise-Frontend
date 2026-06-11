@@ -20,7 +20,7 @@ import { useState } from "react";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
-  { minWidth: 1280, count: 2 },
+  { minWidth: 1536, count: 2 },
   { minWidth: 768, count: 1 },
   { minWidth: 0, count: 1 },
 ];

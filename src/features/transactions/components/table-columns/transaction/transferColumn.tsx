@@ -74,7 +74,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, YYYY") : "-"}
+          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
         </span>
       );
     },
