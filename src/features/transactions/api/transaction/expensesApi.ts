@@ -1,5 +1,4 @@
 import { api } from "@/shared/services/api";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring"] })
@@ -111,7 +110,15 @@ export const expensesApi = api
           body: data,
         }),
       }),
-    
+
+      getBills: builder.query({
+        query: () => ({
+          url: "/transactions/expense/bills",
+          method: "GET",
+        }),
+        transformResponse: (response: any) => response.data,
+        providesTags: ["Expenses"],
+      }),
     }),
   });
 
@@ -129,4 +136,5 @@ export const {
   useCancelRecurringExpenseMutation,
   usePostPaymentMutation,
   usePostAutoPaymentMutation,
+  useGetBillsQuery,
 } = expensesApi;

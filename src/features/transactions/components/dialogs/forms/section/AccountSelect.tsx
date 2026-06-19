@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
   Command,
@@ -20,7 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 interface Asset {
   id: string;
@@ -45,7 +45,9 @@ export const AccountSelect = ({
   disabled,
   excludeId,
 }: AccountSelectProps) => {
-  const filtered = excludeId ? assets.filter((a) => a.id !== excludeId) : assets;
+  const filtered = excludeId
+    ? assets.filter((a) => a.id !== excludeId)
+    : assets;
 
   return (
     <FormField
@@ -100,17 +102,22 @@ export const AccountSelect = ({
                         value={asset}
                         key={asset.id}
                         onSelect={() => onChange(asset)}
+                        className="flex justify-between flex-row items-center"
                       >
-                        <span className="flex-1">{asset.name}</span>
-                        <span className="text-muted-foreground text-xs mr-2">
-                          ₱{asset.remainingBalance.toFixed(2)}
-                        </span>
-                        <Check
-                          className={cn(
-                            "h-4 w-4",
-                            asset.id === value?.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
+                        <span>{asset.name}</span>
+                        <div className="flex flex-row">
+                          <span className="text-muted-foreground text-xs mr-2">
+                            ₱{asset.remainingBalance.toFixed(2)}
+                          </span>
+                          <Check
+                            className={cn(
+                              "h-4 w-4",
+                              asset.id === value?.id
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                        </div>
                       </CommandItem>
                     ))}
                   </CommandGroup>

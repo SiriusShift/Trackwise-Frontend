@@ -29,15 +29,9 @@ function getVisibleCount(width: number): number {
   return VISIBLE_CARDS.find((b) => width >= b.minWidth)?.count ?? 1;
 }
 
-function Tracker({
-  title,
-  data,
-  editDescription,
-  addDescription,
-  isLoading,
-  type,
-}: commonTrackerProps) {
+function Tracker({ title, data, isLoading, type }: commonTrackerProps) {
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState("");
 
   console.log(open, "open");
   const width = useScreenWidth();
@@ -47,7 +41,7 @@ function Tracker({
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;
 
-  console.log(visibleCount)
+  console.log(visibleCount);
   // Show nav arrows only when there are more items than visible slots
   const shouldShowNav = itemCount > visibleCount;
 
@@ -85,7 +79,7 @@ function Tracker({
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-sm font-semibold tracking-wide text-foreground">
-              {title}
+              Budget limit
             </h1>
 
             <p className="text-xs text-muted-foreground">
@@ -93,7 +87,10 @@ function Tracker({
             </p>
           </div>
 
-          <Button className="shadow-sm h-9 transition-all hover:scale-[1.02]" onClick={() => setOpen(true)} >
+          <Button
+            className="shadow-sm h-9 transition-all hover:scale-[1.02]"
+            onClick={() => setOpen(true)}
+          >
             <Plus className="w-4 h-4" />
             Add
           </Button>
@@ -111,16 +108,15 @@ function Tracker({
             <CarouselContent className="-ml-2">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
-                    <TrackerSkeleton key={i} count={itemCount}/>
+                    <TrackerSkeleton key={i} count={itemCount} />
                   ))
                 : data?.map((item, index) => (
                     <TrackerCard
                       key={item.id ?? index}
                       item={item}
-                      title={title}
                       type={type}
-                      editDescription={editDescription}
                       count={itemCount}
+                      onDelete={handleDelete}
                     />
                   ))}
 
@@ -140,11 +136,10 @@ function Tracker({
           </Carousel>
         </div>
         <TrackerDialog
-          title={`Add ${title}`}
+          title="Add budget"
           open={open}
           setOpen={setOpen}
-          description={addDescription}
-          mode="add"
+          description="Set a spending limit for a category"
           // data={data}
         />
       </div>

@@ -1,43 +1,18 @@
-import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
-
-import { useEffect, useState } from "react";
-import { Plane } from "lucide-react";
-import * as Icons from "lucide-react";
-
-import CalendarWidget from "@/components/page-components/dashboard/CalendarWidget";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/shared/components/ui/chart";
-import { useTheme } from "@/shared/provider/ThemeProvider";
-import { Progress } from "@/shared/components/ui/progress";
-import { Link, useLocation } from "react-router-dom";
-import { navigationData } from "@/routing/navigationData";
-import MonthPicker from "@/shared/components/datePicker";
+import { IRootState } from "@/app/store";
 import OverviewWidget from "@/features/dashboard/components/widgets/OverviewWidget";
-import LimitWidget from "@/features/dashboard/components/widgets/LimitWidget";
 import TransactionHistory from "@/features/dashboard/components/widgets/TransactionHistory";
-import ExpenseWidget from "../components/widgets/ExpenseWidget";
-import IncomeWidget from "../components/widgets/IncomeWidget";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
+import { navigationData } from "@/routing/navigationData";
 import PageHeader from "@/shared/components/PageHeader";
+import { useTheme } from "@/shared/provider/ThemeProvider";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
-import { IRootState } from "@/app/store";
-import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
+import { useLocation } from "react-router-dom";
 import DueCalendar from "../components/widgets/DueCalendar";
-import SavingsPlan from "../components/widgets/SavingsWidget";
+import ExpenseWidget from "../components/widgets/ExpenseWidget";
+import IncomeWidget from "../components/widgets/IncomeWidget";
 import LoanBalance from "../components/widgets/LoanWidget";
+import SavingsPlan from "../components/widgets/SavingsWidget";
 export const description = "Loan Payment Progress Chart";
 
 const Dashboard = () => {

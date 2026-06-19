@@ -17,6 +17,7 @@ import { frequencies } from "@/shared/constants/dateConstants";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import moment from "moment";
+import { Separator } from "../ui/separator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -149,12 +150,12 @@ const TrackerCard = memo(
         <CarouselItem
           className={`${count > 1 ? "basis-[90%]" : "basis-[100%]"} 2xl:basis-1/2`}
         >
-          <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-24">
+          <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-[120px]">
             {/* ── Left accent bar ───────────────────────────────────── */}
-            <span
+            {/* <span
               className={cn("absolute inset-y-0 left-0 w-1", accent)}
               aria-hidden="true"
-            />
+            /> */}
 
             {/* ── Actions menu ──────────────────────────────────────── */}
             <DropdownMenu modal={false}>
@@ -203,7 +204,7 @@ const TrackerCard = memo(
               pr-9  reserves space for the absolutely-positioned ⋮ button.
               pl-5  offsets the left accent bar.
             */}
-            <CardContent className="flex flex-col gap-2.5 p-3 pl-5 pr-9">
+            <CardContent className="flex flex-col gap-2 p-3 pl-5 pr-9 justify-center h-full">
               {/* ── Row 1: type icon · text block · amount ─────────── */}
               <div className="flex items-center gap-2.5">
                 {/* Type icon — fixed size, never shrinks */}
@@ -217,11 +218,6 @@ const TrackerCard = memo(
                 >
                   <TypeIcon className="h-4 w-4" />
                 </div>
-
-                {/*
-                  Text block: min-w-0 + flex-1 lets it shrink freely
-                  so the amount never gets squeezed off.
-                */}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium leading-tight">
                     {schedule.description}
@@ -257,6 +253,7 @@ const TrackerCard = memo(
                   {prefix}₱{formattedAmount}
                 </p>
               </div>
+              <Separator />
 
               {/* ── Row 2: badges (left) · next-due (right) ────────── */}
               <div className="flex items-center justify-between gap-2">
@@ -278,10 +275,9 @@ const TrackerCard = memo(
                   {behaviour && (
                     <Badge
                       className={cn(
-                        "shrink-0 text-xs font-semibold capitalize tracking-wide"
+                        "shrink-0 text-xs font-semibold capitalize tracking-wide",
                       )}
-                                            variant={"outline"}
-
+                      variant={"outline"}
                     >
                       {behaviour}
                     </Badge>

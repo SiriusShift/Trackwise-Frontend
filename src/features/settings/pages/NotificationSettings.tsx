@@ -74,14 +74,16 @@ const NotificationSettings = () => {
         </div> */}
 
         {/* Expense / Income / Loan Notifications */}
+        {/* Scheduled Transaction Notifications */}
         <div className="flex flex-row justify-between items-center border-border last:border-0">
           <div className="space-y-1">
-            <h1 className="font-medium">Notifications</h1>
+            <h1 className="font-medium">Scheduled transactions</h1>
             <p className="text-sm text-muted-foreground hidden sm:block">
-              Set how many days in advance you’d like to be notified before an
-              expense is due.
+              Set how many days in advance you'd like to receive a reminder
+              before a scheduled transaction occurs.
             </p>
           </div>
+
           <FormField
             name="notifyDays"
             control={control}
@@ -90,7 +92,7 @@ const NotificationSettings = () => {
                 <Input
                   {...field}
                   type="number"
-                  min="0"
+                  min={0}
                   className="w-36 text-start"
                   placeholder="Days"
                 />

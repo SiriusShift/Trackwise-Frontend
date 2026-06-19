@@ -119,7 +119,7 @@ export function TransactionDialog({
       : mode === "transact"
         ? `${getActionLabel()} ${type}`
         : `Edit ${isRecurring ? "Scheduled" : ""} ${type}`;
-        
+
   const recurringLabel = isRecurring && mode !== "transact" ? "recurring " : "";
 
   const dialogDescription =
@@ -156,7 +156,10 @@ export function TransactionDialog({
           else setOpen(o);
         }}
       >
-        <DialogContent className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0">
+        <DialogContent
+          className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0"
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader className="flex flex-row items-center gap-3 px-6 py-4 border-b">
             <ReceiptText className="h-5 w-5 shrink-0 text-muted-foreground" />
             <div className="min-w-0">

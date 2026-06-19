@@ -7,22 +7,30 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/shared/components/ui/sheet";
-import { Filter } from "lucide-react";
+import * as LucideIcon from "lucide-react";
+import { Filter, type LucideProps } from "lucide-react";
+import type { ComponentType } from "react";
 import { Separator } from "./ui/separator";
-
 export function FilterSheet({
   title,
   children,
   onSubmit,
   setClear,
+  open,
+  setOpen,
   icon,
 }: {
   title: string;
   children: React.ReactNode;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  setClear: React.Dispatch<React.SetStateAction<string[]>>;
-  icon?: React.ComponentType;
+  setClear: React.MouseEventHandler<HTMLButtonElement>;
+  icon?: keyof typeof LucideIcon;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }) {
+  const Icon = icon
+    ? (LucideIcon[icon] as ComponentType<LucideProps>)
+    : undefined;
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -40,10 +48,10 @@ export function FilterSheet({
       >
         <SheetHeader>
           <div className="flex items-center gap-2">
-            {icon}
+            {Icon && <Icon className="w-4 h-4" />}
             <SheetTitle>{title}</SheetTitle>
           </div>
-        <Separator />
+          <Separator />
         </SheetHeader>
 
         {/* Scrollable content area */}

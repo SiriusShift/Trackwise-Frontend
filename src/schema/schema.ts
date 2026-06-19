@@ -1,7 +1,5 @@
 import * as yup from "yup";
 
-
-
 export const installmentSchema = {
   schema: yup.object().shape({
     category: yup.object().required("Category is required"),
@@ -32,10 +30,12 @@ export const trackerSchema = {
       .number()
       .required("Amount is required")
       .positive("Amount must be greater than 0"),
+    period: yup.string().required("Period is required"),
   }),
   defaultValues: {
     category: "",
     amount: 0,
+    period: "",
   },
 };
 
@@ -56,7 +56,9 @@ export const notificationSettings = {
   schema: yup.object().shape({
     notifyDays: yup.number().required("Notify expense days is required"),
     emailNotification: yup.boolean().required("Email Notification is required"),
-    mobileNotification: yup.boolean().required("Mobile Notification is required"),
+    mobileNotification: yup
+      .boolean()
+      .required("Mobile Notification is required"),
     // budgetNotification: yup.boolean().required("Budget is required"),
   }),
   defaultValues: {

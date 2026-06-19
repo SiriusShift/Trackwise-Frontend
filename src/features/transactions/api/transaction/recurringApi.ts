@@ -1,5 +1,4 @@
 import { api } from "@/shared/services/api";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Recurring"] })
@@ -26,9 +25,8 @@ export const expensesApi = api
         invalidatesTags: ["Recurring"],
       }),
 
-      getRecurring: builder.query({
-        query: (params) => ({
-          params,
+      getRecurring: builder.query<void, void>({
+        query: () => ({
           url: "/transactions/recurring",
           method: "GET",
         }),

@@ -2,7 +2,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment";
 
 // Define the initial state as an object
-const initialState: { active: Object; type: string; mode: string, action: boolean, activeRow?: Object, openDialog: boolean } = {
+const initialState: {
+  active: {
+    from: string;
+    to: string;
+  };
+  type: string;
+  mode: string;
+  action: boolean;
+  activeRow?: Object;
+  openDialog: boolean;
+} = {
   active: {
     from: moment().startOf("month").toISOString(),
     to: moment().endOf("month").toISOString(),
@@ -11,7 +21,7 @@ const initialState: { active: Object; type: string; mode: string, action: boolea
   mode: "monthly",
   type: "Expense",
   activeRow: null,
-  openDialog: false
+  openDialog: false,
 };
 
 export const active = createSlice({
@@ -25,7 +35,7 @@ export const active = createSlice({
       state.mode = action.payload;
     },
     setActionShow: (state, action: PayloadAction<boolean>) => {
-      console.log(action, "testing")
+      console.log(action, "testing");
       state.action = action.payload;
     },
     setType: (state, action: PayloadAction<string>) => {
@@ -35,10 +45,17 @@ export const active = createSlice({
       state.activeRow = action.payload;
     },
     setOpenDialog: (state, action: PayloadAction<boolean>) => {
-      state.openDialog = action.payload
-    }
+      state.openDialog = action.payload;
+    },
   },
 });
 
 // Export actions
-export const { setActive, setType, setMode, setActionShow, setActiveRow, setOpenDialog } = active.actions;
+export const {
+  setActive,
+  setType,
+  setMode,
+  setActionShow,
+  setActiveRow,
+  setOpenDialog,
+} = active.actions;

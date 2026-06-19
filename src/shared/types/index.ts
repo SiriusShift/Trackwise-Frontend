@@ -24,6 +24,37 @@ export interface Transfer {
   recurringTemplate: RecurringTemplate;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  type: "Expense" | "Income" | "Transfer";
+  icon: string;
+  color: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  userId: number | null;
+  hasTracker: boolean;
+}
+
+export interface AssetTemplate {
+  balance: number;
+  data: AssetData[];
+  message: string;
+  success: true;
+  trend: number;
+}
+
+export interface AssetData {
+  id: number;
+  name: string;
+  remainingBalance: number;
+  totalExpenses: number;
+  totalIncomes: number;
+  totalTransferIn: number;
+  totalTransferOut: number;
+}
+
 export interface RecurringTemplate {
   amount: string;
   auto: boolean;
@@ -131,9 +162,15 @@ export interface frequencyProps {
   unit: string | null;
 }
 
-
 export interface categoryType {
   id: number;
   name: string;
   icon: string;
+}
+
+export interface filterProps {
+  status?: string;
+  search?: string;
+  selectedCategories?: Number[];
+  selectedAssets?: Category[];
 }

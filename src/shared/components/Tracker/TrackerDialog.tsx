@@ -1,5 +1,5 @@
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { Check, ChevronsUpDown, Loader2, Pencil, Plus } from "lucide-react";
+import * as Icons from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -64,6 +64,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { Command, CommandEmpty, CommandInput } from "../ui/command";
 import { CommandGroup, CommandItem, CommandList } from "../ui/command";
+import { Badge } from "../ui/badge";
+import { Card } from "../ui/card";
 
 function TrackerDialog({
   title,
@@ -118,23 +120,23 @@ function TrackerDialog({
     formState: { errors, isValid, isDirty },
   } = form;
 
-  const handleClose = () => {
+  function handleCloseIntent() {
+    if (!isDirty) {
+      setOpen(false);
+      return;
+    }
     confirm({
-      description:
-        "Are you sure you want to close this dialog? All unsaved input will be lost.",
-      title: "Close Dialog",
+      title: "Discard changes?",
+      description: "All unsaved changes will be lost.",
       variant: "destructive",
-      confirmText: "Close",
-      cancelText: "Cancel",
+      confirmText: "Discard",
+      cancelText: "Keep editing",
       onConfirm: () => {
         setOpen(false);
         reset();
       },
-      onCancel: () => {
-        console.log("Test");
-      },
     });
-  };
+  }
 
   const onSubmit = async (data: any) => {
     console.log(data);
@@ -199,27 +201,30 @@ function TrackerDialog({
           open={open}
           onOpenChange={(o) => {
             if (!o && isDirty) {
-              handleClose();
+              handleCloseIntent();
             } else {
               setOpen(o);
             }
           }}
         >
           <DialogContent
-            onInteractOutside={(e) =>
-              (isDirty || isLoading) && e.preventDefault()
-            }
-            className="sm:min-w-[550px]"
+            onInteractOutside={(e) => e.preventDefault()}
+            className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0"
           >
-            <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
-              <DialogDescription>{description}</DialogDescription>
+            <DialogHeader className="flex flex-row items-center gap-3 px-6 py-4 border-b">
+              <Icons.Target className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <DialogTitle>{title}</DialogTitle>
+                <DialogDescription className="mt-0.5">
+                  {description}
+                </DialogDescription>
+              </div>
             </DialogHeader>
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="h-full flex flex-col justify-between p-1 gap-2 overflow-auto"
+              className="h-full flex flex-col justify-between  gap-2 overflow-auto "
             >
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-5 px-6 py-4">
                 {/* Category Field */}
                 <FormField
                   control={control}
@@ -230,7 +235,7 @@ function TrackerDialog({
                         <FormLabel>
                           Category <span className="text-destructive">*</span>
                         </FormLabel>
-                        <Popover modal={true}>
+                        <Popover modal>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
@@ -246,7 +251,7 @@ function TrackerDialog({
                                       (category) => category.id === value?.id,
                                     )?.name
                                   : "Select category"}
-                                <ChevronsUpDown className="opacity-50" />
+                                <Icons.ChevronsUpDown className="opacity-50" />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
@@ -259,31 +264,61 @@ function TrackerDialog({
                               <CommandList>
                                 <CommandEmpty>No category found.</CommandEmpty>
                                 <CommandGroup>
-                                  {categoryData?.map((category) => (
-                                    <CommandItem
-                                      value={category}
-                                      key={category.id}
-                                      onSelect={() => {
-                                        onChange(category);
-                                      }}
-                                      className="flex p-2"
-                                    >
-                                      {category.name}
-                                      <Check
-                                        className={cn(
-                                          "ml-auto",
-                                          category.id === value?.id
-                                            ? "opacity-100"
-                                            : "opacity-0",
-                                        )}
-                                      />
-                                    </CommandItem>
-                                  ))}
+                                  {categoryData?.map((category) => {
+                                    const LucidIcon = Icons[category?.icon];
+
+                                    return (
+                                      <CommandItem
+                                        value={category}
+                                        key={category.id}
+                                        onSelect={() => {
+                                          onChange(category);
+                                        }}
+                                        className="flex p-2 justify-between"
+                                        disabled={category?.hasTracker}
+                                      >
+                                        <div className="flex flex-row items-center gap-3">
+                                          <Card
+                                            className={`p-2 rounded-lg border`}
+                                            style={{
+                                              backgroundColor: `${category?.color}33`,
+                                              color: category?.color,
+                                            }}
+                                          >
+                                            <LucidIcon />
+                                          </Card>
+                                          <p> {category.name}</p>
+                                        </div>
+                                        <div className="flex flex-row items-center">
+                                          {category?.hasTracker && (
+                                            <Badge
+                                              variant={"outline"}
+                                              className="bg-red-200 text-red-500"
+                                            >
+                                              Existing
+                                            </Badge>
+                                          )}
+                                          <Icons.Check
+                                            className={cn(
+                                              "ml-auto",
+                                              category.id === value?.id
+                                                ? "opacity-100"
+                                                : "opacity-0",
+                                            )}
+                                          />
+                                        </div>
+                                      </CommandItem>
+                                    );
+                                  })}
                                 </CommandGroup>
                               </CommandList>
                             </Command>
                           </PopoverContent>
                         </Popover>
+                        <p className="text-xs text-muted-foreground">
+                          Each category can only have one active budget at a
+                          time.
+                        </p>
                         <FormMessage />
                       </FormItem>
                     );
@@ -296,7 +331,7 @@ function TrackerDialog({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Monthly limit</FormLabel>
+                      <FormLabel>Limit amount</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
@@ -318,11 +353,13 @@ function TrackerDialog({
                   )}
                 />
               </div>
-              <DialogFooter className="px-0">
+              <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">
                 <DialogClose asChild>
                   <Button
                     type="button"
-                    onClick={() => (isDirty ? handleClose() : setOpen(false))}
+                    onClick={() =>
+                      isDirty ? handleCloseIntent() : setOpen(false)
+                    }
                     variant="secondary"
                     disabled={isLoading}
                   >
@@ -336,7 +373,7 @@ function TrackerDialog({
                   {/* {isLoading ? (
                     <Loader2 className="animate-spin" />
                   ) : ( */}
-                  {mode === "edit" ? "Update" : "Set"} budget
+                  {mode === "edit" ? "Update" : "Submit"}
                   {/* )} */}
                 </Button>
               </DialogFooter>
