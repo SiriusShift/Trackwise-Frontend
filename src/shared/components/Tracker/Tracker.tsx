@@ -1,22 +1,27 @@
+import { IRootState } from "@/app/store";
+import {
+  useDeleteCategoryLimitMutation,
+  useGetCategoryLimitQuery,
+} from "@/shared/api/categoryApi";
+import TrackerCard from "@/shared/components/Tracker/TrackerCard";
+import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { Plus } from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { commonTrackerProps } from "@/shared/types";
-import TrackerCard from "@/shared/components/Tracker/TrackerCard";
-import TrackerSkeleton from "./TrackerSkeleton";
-import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
-import { useDeleteCategoryLimitMutation } from "@/shared/api/categoryApi";
-import { toast } from "sonner";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
 import TrackerDialog from "./TrackerDialog";
-import { useState } from "react";
+import TrackerSkeleton from "./TrackerSkeleton";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
@@ -29,14 +34,18 @@ function getVisibleCount(width: number): number {
   return VISIBLE_CARDS.find((b) => width >= b.minWidth)?.count ?? 1;
 }
 
-function Tracker({ title, data, isLoading, type }: commonTrackerProps) {
+function Tracker() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState("");
 
-  console.log(open, "open");
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
+  const { type, active } = useSelector((state: IRootState) => state.active);
+  const { data, isLoading } = useGetCategoryLimitQuery({
+    startDate: moment(active?.from).toDate()?.toISOString(),
+    endDate: moment(active?.to).toDate()?.toISOString(),
+  });
 
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;

@@ -1,39 +1,37 @@
+import { ReceiptText } from "lucide-react";
 import { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ReceiptText } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
+import { IRootState } from "@/app/store";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import {
   useGetCategoryLimitQuery,
   useGetCategoryQuery,
 } from "@/shared/api/categoryApi";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useUpdateTransactionHistoryMutation } from "../../api/transaction";
 import { transactionConfig } from "../../config/transactionConfig";
-import { IRootState } from "@/app/store";
-import TransactionForm from "./forms/TransactionForm";
+import TransactionForm from "../forms/TransactionForm";
 
-import { useTransactionForm } from "./hooks/useTransactionForm";
-import { useTransactionSubmit } from "./hooks/UseTransactionSubmit";
+import { commonDialogProps } from "@/shared/types";
+import { useTransactionForm } from "../hooks/useTransactionForm";
+import { useTransactionSubmit } from "../hooks/UseTransactionSubmit";
 
-interface TransactionDialogProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+interface TransactionDialogProps extends commonDialogProps {
   mode: "add" | "edit" | "transact";
   rowData?: any;
-  history?: boolean;
 }
 
 export function TransactionDialog({
@@ -41,7 +39,6 @@ export function TransactionDialog({
   setOpen,
   mode,
   rowData,
-  history,
 }: TransactionDialogProps) {
   const [recurring, setRecurring] = useState(false);
 
@@ -86,7 +83,6 @@ export function TransactionDialog({
     open,
     type,
     mode,
-    history,
     rowData,
     schema,
   });
@@ -159,6 +155,7 @@ export function TransactionDialog({
         <DialogContent
           className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0"
           onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="flex flex-row items-center gap-3 px-6 py-4 border-b">
             <ReceiptText className="h-5 w-5 shrink-0 text-muted-foreground" />
@@ -176,7 +173,6 @@ export function TransactionDialog({
               assetData={assetData}
               categoryData={categoryData}
               mode={mode}
-              history={history}
               setRecurring={setRecurring}
             />
           </div>

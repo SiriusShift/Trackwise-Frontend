@@ -1,30 +1,42 @@
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import * as Icons from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogDescription,
-} from "../ui/alert-dialog";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetClose,
-} from "@/shared/components/ui/sheet";
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { IRootState } from "@/app/store";
+import { cn } from "@/lib/utils";
 import { trackerSchema } from "@/schema/schema";
+import {
+  useGetCategoryQuery,
+  usePatchCategoryLimitMutation,
+  usePostCategoryLimitMutation,
+} from "@/shared/api/categoryApi";
+import { budgetFrequency } from "@/shared/constants/dateConstants";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { trackerFormType } from "@/shared/types";
+import { numberInput } from "@/shared/utils/CustomFunctions";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Icons from "lucide-react";
+import { useEffect } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import {
   FormControl,
   FormField,
@@ -32,40 +44,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "../ui/select";
-import {
-  useGetCategoryQuery,
-  usePatchCategoryLimitMutation,
-  usePostCategoryLimitMutation,
-} from "@/shared/api/categoryApi";
 import { Input } from "../ui/input";
-import { numberInput } from "@/shared/utils/CustomFunctions";
-import { toast } from "sonner";
-import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
-import { useSelector } from "react-redux";
-import { IRootState } from "@/app/store";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "../ui/dialog";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "@/lib/utils";
-import { Command, CommandEmpty, CommandInput } from "../ui/command";
-import { CommandGroup, CommandItem, CommandList } from "../ui/command";
-import { Badge } from "../ui/badge";
-import { Card } from "../ui/card";
 
 function TrackerDialog({
   title,
@@ -167,6 +147,7 @@ function TrackerDialog({
             await triggerPost({
               categoryId: data?.category?.id,
               amount: data?.amount,
+              period: data?.period,
             }).unwrap();
             setOpen(false);
             return;
@@ -324,7 +305,6 @@ function TrackerDialog({
                     );
                   }}
                 />
-
                 {/* Amount Field */}
                 <FormField
                   name="amount"
@@ -349,6 +329,45 @@ function TrackerDialog({
                         </div>
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={control}
+                  name="period"
+                  render={({ field: { onChange, value } }) => (
+                    <FormItem>
+                      <div className="space-y-2">
+                        <FormLabel>
+                          Period <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            {budgetFrequency.map(
+                              ({ value: opt, name, icon: Icon }) => {
+                                const selected = value === opt;
+                                return (
+                                  <button
+                                    key={opt}
+                                    type="button"
+                                    onClick={() => onChange(opt)}
+                                    className={cn(
+                                      "flex flex-col items-center rounded-xl border p-3 text-left transition-all duration-200",
+                                      selected
+                                        ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                                        : "border-border bg-background hover:border-primary/40 hover:bg-muted/40",
+                                    )}
+                                  >
+                                    <Icon size={18} />
+                                    <p className="text-sm">{name}</p>
+                                  </button>
+                                );
+                              },
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />

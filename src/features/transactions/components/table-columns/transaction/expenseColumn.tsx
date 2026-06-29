@@ -1,22 +1,9 @@
-import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
-  Banknote,
-  CheckCircle,
-  CircleAlert,
-  Clock,
-  CreditCard,
-  Eye,
-  Loader,
-  MoreHorizontal,
-  Pencil,
-  RefreshCcw,
-  History,
-  Trash2,
-  X,
-  Archive,
-} from "lucide-react";
-import { Expense } from "@/shared/types";
+  expensesApi,
+  useCancelRecurringExpenseMutation,
+} from "@/features/transactions/api/transaction/expensesApi";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -26,44 +13,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import moment from "moment";
-import { Badge } from "@/shared/components/ui/badge";
+import { Expense } from "@/shared/types";
+import { ColumnDef } from "@tanstack/react-table";
 import {
-  expensesApi,
-  useCancelRecurringExpenseMutation,
-  usePostAutoPaymentMutation,
-} from "@/features/transactions/api/transaction/expensesApi";
-import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
-import { useDispatch, useSelector } from "react-redux";
+  Archive,
+  ArrowUpDown,
+  Banknote,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  RefreshCcw,
+  X,
+} from "lucide-react";
+import moment from "moment";
+import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
+import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import { StatusIcon } from "@/features/transactions/components/StatusIcon";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { useState } from "react";
-import ViewImage from "@/shared/components/dialog/ViewDialog/ViewImage";
+import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Portal } from "@radix-ui/react-tooltip";
-import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import { StatusIcon } from "@/features/transactions/components/statusIcon";
-import { setOpenDialog } from "@/shared/slices/activeSlice";
-import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
-import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import { useState } from "react";
 import ConfirmDialog from "../../dialogs/ConfirmDialog";
-// import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
-  // {
-  //   accessorKey: "id",
-  //   header: "ID",
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
   {
     accessorKey: "date",
     header: "Date and Time",
@@ -80,14 +61,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "recipient",
-  //   header: "Recipient",
-  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
-  //   meta: {
-  //     cellClassName: "border-b",
-  //   },
-  // },
   {
     accessorKey: "amount",
     header: ({ column }) => {
@@ -113,17 +86,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "remainingBalance",
     header: "Balance",
-    // header: ({ column }) => {
-    //   return (
-    //     <Button
-    //       variant={"ghost"}
-    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //     >
-    //       Paid
-    //       <ArrowUpDown />
-    //     </Button>
-    //   );
-    // },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
       return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
@@ -213,7 +175,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       console.log(expense);
 
       const [deleteExpense] = useArchiveTransactionMutation();
-      const [payAuto] = usePostAutoPaymentMutation();
       const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
       const onArchive = async () => {
@@ -263,36 +224,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
         });
       };
 
-      const onPayment = async () => {
-        console.log(expense?.recurringTemplate, "expense payment");
-        // confirm({
-        //   title: "Confirm Payment",
-        //   description: "Do you want to proceed with paying this expense?",
-        //   variant: "info",
-        //   confirmText: "Pay",
-        //   cancelText: "Cancel",
-        //   showLoadingOnConfirm: true,
-        //   onConfirm: async () => {
-        //     try {
-        //       await payAuto({
-        //         id: expense.id,
-        //         data: {
-        //           type: "Expense",
-        //         },
-        //       }).unwrap();
-        //       dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-        //       dispatch(expensesApi.util.invalidateTags(["Expenses"]))
-        //     } catch (err) {
-        //       let errorMessage = handleCatchErrorMessage(err); // Default message
-        //       toast.error(errorMessage);
-        //     }
-        //   },
-        // });
-        // setMode("transact");
-        // setDialogOpen(true); // open dialog
-        // setDropdownOpen(false); // close dropdown manually
-      };
-
       const onView = () => {
         setDropdownOpen(false);
         setViewOpen(true);
@@ -339,38 +270,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               )}
 
               {/* --- Edit --- */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setMode("edit");
-                        setDialogOpen(true);
-                        setDropdownOpen(false);
-                      }}
-                      disabled={expense?.status === "Completed"}
-                    >
-                      <Pencil /> Edit
-                    </DropdownMenuItem>
-                  </span>
-                </TooltipTrigger>
-                <Portal>
-                  <>
-                    {expense?.status === "Partial" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — partially paid.
-                      </TooltipContent>
-                    )}
-                    {expense?.status === "Paid" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — already paid.
-                      </TooltipContent>
-                    )}
-                  </>
-                </Portal>
-              </Tooltip>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMode("edit");
+                  setDialogOpen(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                <Pencil /> Edit
+              </DropdownMenuItem>
 
               {/* --- View --- */}
               <DropdownMenuItem onClick={onView}>

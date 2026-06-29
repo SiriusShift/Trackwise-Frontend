@@ -2,21 +2,21 @@ import * as Icons from "lucide-react";
 import { memo, useMemo, useState } from "react";
 
 import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { CarouselItem } from "../ui/carousel";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { CarouselItem } from "../ui/carousel";
-import { Card, CardContent } from "../ui/card";
-import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 
-import { commonTrackerProps } from "@/shared/types";
-import { frequencies } from "@/shared/constants/dateConstants";
-import { Badge } from "../ui/badge";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { cn } from "@/lib/utils";
+import { frequencies } from "@/shared/constants/dateConstants";
+import { commonTrackerProps } from "@/shared/types";
 import moment from "moment";
+import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -300,15 +300,11 @@ const TrackerCard = memo(
         </CarouselItem>
 
         {/* ── Edit dialog ───────────────────────────────────────────── */}
-        <TrackerDialog
-          title={`Edit ${title}`}
-          description={editDescription}
-          mode="edit"
+        <TransactionDialog
           open={open}
           setOpen={setOpen}
-          onSubmit={onSubmit}
-          data={schedule}
-          type={type}
+          mode="edit"
+          rowData={schedule}
         />
       </>
     );

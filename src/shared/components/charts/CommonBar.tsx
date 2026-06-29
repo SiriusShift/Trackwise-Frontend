@@ -1,10 +1,10 @@
+import { StackedBarSegment } from "@/features/dashboard/components/widgets/OverviewWidget";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { StackedBarSegment } from "@/features/dashboard/components/widgets/OverviewWidget";
 import { useEffect, useState } from "react";
 
 interface StackedBarProps {
@@ -31,6 +31,8 @@ export function StackedBar({
     const t = setTimeout(() => setAnimated(true), 50);
     return () => clearTimeout(t);
   }, [segments]);
+
+  console.log(segments, "animated");
 
   const total = segments?.reduce((sum, s) => sum + s.value, 0) ?? 0;
   const denominator = mode === "progress" ? (maxValue ?? total) : total;
@@ -68,7 +70,10 @@ export function StackedBar({
                           : isLast
                             ? "0 999px 999px 0"
                             : "0",
-                        backgroundColor: total > denominator ? "hsl(var(--destructive))" : "hsl(var(--primary))",
+                        backgroundColor:
+                          total > denominator
+                            ? "hsl(var(--destructive))"
+                            : "hsl(var(--primary))",
                       }}
                     />
                   );

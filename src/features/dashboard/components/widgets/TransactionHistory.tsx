@@ -1,14 +1,11 @@
-import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import moment from "moment";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import * as Icons from "lucide-react";
-import { Link } from "react-router-dom";
-import NoData from "@/assets/images/file.png";
-import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { motion } from "motion/react";
-import VirtualizedInfiniteList from "@/shared/components/VirtualizedInfiniteList";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import * as Icons from "lucide-react";
+import moment from "moment";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const itemVariants = {
   hidden: { x: -20, opacity: 0 },
@@ -43,8 +40,8 @@ function AmountLabel({
   const colorClass =
     type === "Income"
       ? "text-emerald-500"
-      : type === "Transfer" && categoryName === "Internal"
-        ? "text-primary"
+      : type === "Transfer"
+        ? "text-foreground"
         : "text-destructive";
 
   const prefix = type === "Income" ? "+" : type === "Transfer" ? "" : "-";
@@ -65,9 +62,9 @@ const TransactionHistory = () => {
     pageIndex: 0,
   });
 
-  const transactions = data?.data  ?? [];
+  const transactions = data?.data ?? [];
 
-  console.log(data) 
+  console.log(data);
   const isEmpty = !isFetching && transactions.length === 0;
 
   return (

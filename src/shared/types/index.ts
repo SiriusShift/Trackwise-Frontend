@@ -133,10 +133,15 @@ export interface payRecurringForm {
   source: object;
 }
 
-export interface commonWidgetProps {
-  data: Array;
+export interface commonWidgetProps<T = any> {
+  data: Array<T>;
   isLoading: boolean;
   title: string;
+}
+
+export interface commonDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }
 
 export interface overviewWidgetProps {

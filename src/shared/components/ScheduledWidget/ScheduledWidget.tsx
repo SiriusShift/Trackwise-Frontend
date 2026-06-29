@@ -1,22 +1,20 @@
+import { useGetRecurringQuery } from "@/features/transactions/api/transaction/recurringApi";
+import { useDeleteCategoryLimitMutation } from "@/shared/api/categoryApi";
+import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { commonTrackerProps } from "@/shared/types";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Card } from "../ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { commonTrackerProps } from "@/shared/types";
-import TrackerCard from "@/shared/components/Tracker/TrackerCard";
-import ScheduleSkeleton from "./ScheduleSkeleton";
-import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
-import { useDeleteCategoryLimitMutation } from "@/shared/api/categoryApi";
-import { toast } from "sonner";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
-import { useState } from "react";
 import ScheduleCard from "./ScheduleCard";
+import ScheduleSkeleton from "./ScheduleSkeleton";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
@@ -29,19 +27,14 @@ function getVisibleCount(width: number): number {
   return VISIBLE_CARDS.find((b) => width >= b.minWidth)?.count ?? 1;
 }
 
-function ScheduledWidget({
-  title,
-  data,
-  editDescription,
-  isLoading,
-  type,
-}: commonTrackerProps) {
+function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
   const [open, setOpen] = useState(false);
 
-  console.log(data);
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
+
+  const { data, isLoading } = useGetRecurringQuery();
 
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;

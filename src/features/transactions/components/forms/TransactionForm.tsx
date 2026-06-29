@@ -1,14 +1,11 @@
+import { ArrowUpDown, CalendarIcon, Repeat } from "lucide-react";
+import moment from "moment";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import moment from "moment";
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  CalendarIcon,
-  Repeat,
-} from "lucide-react";
 
+import { cn } from "@/lib/utils";
+import DatePicker from "@/shared/components/dialog/DatePicker";
+import { Button } from "@/shared/components/ui/button";
 import {
   FormControl,
   FormField,
@@ -16,11 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Separator } from "@/shared/components/ui/separator";
-import { Textarea } from "@/shared/components/ui/textarea";
-import { Toggle } from "@/shared/components/ui/toggle";
 import {
   Select,
   SelectContent,
@@ -28,15 +21,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import DatePicker from "@/shared/components/dialog/DatePicker";
-import { cn } from "@/lib/utils";
+import { Separator } from "@/shared/components/ui/separator";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Toggle } from "@/shared/components/ui/toggle";
 import { frequencyList } from "@/shared/constants/dateConstants";
 import { Field } from "@/shared/types";
 
-import { CategoryAmountSection } from "./section/CategoryAmountSection";
-import { BehaviourSelector } from "./section/BehaviourSelector";
-import { ImageAttachment } from "./section/ImageAttachment";
 import { AccountSelect } from "./section/AccountSelect";
+import { BehaviourSelector } from "./section/BehaviourSelector";
+import { CategoryAmountSection } from "./section/CategoryAmountSection";
+import { ImageAttachment } from "./section/ImageAttachment";
 
 interface Asset {
   id: string;
@@ -75,7 +69,7 @@ const TransactionForm = ({
   const isTransfer = type === "Transfer";
 
   // Recurring toggle is only available for add/edit of non-transfer, non-history
-  const canToggleRecurring = mode !== "transact" && !history && !isTransfer;
+  const canToggleRecurring = mode !== "transact" && !isTransfer;
 
   // Show attachment for past transactions being added/edited
   const showAttachment =
@@ -261,7 +255,6 @@ const TransactionForm = ({
         categoryData={categoryData}
         type={type}
         mode={mode}
-        history={history}
       />
 
       {/* Recurring schedule fields */}

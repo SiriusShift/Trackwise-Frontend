@@ -2,6 +2,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
   Command,
@@ -25,7 +26,6 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { numberInput } from "@/shared/utils/CustomFunctions";
-import { cn } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -36,14 +36,12 @@ interface CategoryAmountSectionProps {
   categoryData: Category[];
   type: string;
   mode: string;
-  history?: boolean;
 }
 
 export const CategoryAmountSection = ({
   categoryData,
   type,
   mode,
-  history,
 }: CategoryAmountSectionProps) => {
   const { control, watch, setValue } = useFormContext();
 
@@ -71,7 +69,7 @@ export const CategoryAmountSection = ({
       return;
     }
 
-    if (value > remainingBalance && (mode === "transact" || history)) {
+    if (value > remainingBalance && mode === "transact") {
       toast.error(`Amount exceeds the total balance of ${remainingBalance}`);
       e.target.value = String(accountBalance ?? "");
       return;
@@ -96,7 +94,6 @@ export const CategoryAmountSection = ({
                   <Button
                     variant="outline"
                     role="combobox"
-                    disabled={history}
                     className={cn(
                       "justify-between",
                       !value && "text-muted-foreground",
@@ -111,7 +108,10 @@ export const CategoryAmountSection = ({
               </PopoverTrigger>
               <PopoverContent full className="w-[200px] h-52 p-0">
                 <Command>
-                  <CommandInput placeholder="Search category..." className="h-9" />
+                  <CommandInput
+                    placeholder="Search category..."
+                    className="h-9"
+                  />
                   <CommandList>
                     <CommandEmpty>No category found.</CommandEmpty>
                     <CommandGroup>
@@ -170,7 +170,7 @@ export const CategoryAmountSection = ({
                 />
               </div>
             </FormControl>
-            {(mode === "transact" || history) && (
+            {mode === "transact" && (
               <p className="text-xs text-muted-foreground">
                 Balance: ₱{Number(watch("balance") ?? 0).toFixed(2)}
               </p>

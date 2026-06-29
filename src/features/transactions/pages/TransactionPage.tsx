@@ -5,7 +5,6 @@ import {
 } from "@/features/transactions/api/transaction/expensesApi";
 import TransactionToolbar from "@/features/transactions/components/toolbar/TransactionToolbar";
 import { navigationData } from "@/routing/navigationData";
-import { useGetCategoryLimitQuery } from "@/shared/api/categoryApi";
 import PageHeader from "@/shared/components/PageHeader";
 import { DataTable } from "@/shared/components/Table/CommonTable";
 import CommonTracker from "@/shared/components/Tracker/Tracker";
@@ -28,7 +27,6 @@ import ScheduledWidget from "@/shared/components/ScheduledWidget/ScheduledWidget
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
 import { categoryType, filterProps } from "@/shared/types";
-import { useGetRecurringQuery } from "../api/transaction/recurringApi";
 const TransactionPage = () => {
   const {
     type,
@@ -60,11 +58,6 @@ const TransactionPage = () => {
 
   console.log(selectedAssets, selectedCategories);
   // Queries
-  const { data: categoryLimit, isFetching: categoryLimitLoading } =
-    useGetCategoryLimitQuery({
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
-    });
 
   const { columns } =
     transactionConfig[type as keyof typeof transactionConfig] || {};
@@ -98,9 +91,6 @@ const TransactionPage = () => {
         skip: type !== "Expense",
       },
     );
-
-  const { data: recurringData, isFetching: recurringFetching } =
-    useGetRecurringQuery();
 
   const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
     {
@@ -290,14 +280,8 @@ const TransactionPage = () => {
 
         {/* Header */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <CommonTracker
-            data={categoryLimit}
-            isLoading={categoryLimitLoading}
-            type="Expense"
-          />{" "}
+          <CommonTracker type="Expense" />{" "}
           <ScheduledWidget
-            data={recurringData}
-            isLoading={categoryLimitLoading}
             editDescription="Adjust and update your budget limit to match your needs."
             addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
             title="Budget Limit"

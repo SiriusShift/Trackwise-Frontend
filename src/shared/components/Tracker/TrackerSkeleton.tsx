@@ -1,7 +1,6 @@
-import React from "react";
+import { Card, CardContent } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import { Skeleton } from "../ui/skeleton";
-import { Card, CardContent } from "../ui/card";
 
 const TrackerSkeleton = ({ count }) => {
   return (
@@ -11,7 +10,7 @@ const TrackerSkeleton = ({ count }) => {
       <Card className="h-full relative">
         {" "}
         <Skeleton className="absolute top-4 right-4 h-6 w-3" />
-        <CardContent className="flex h-[80px] items-center p-3 gap-3">
+        <CardContent className="flex h-[120px] items-center p-3 gap-3">
           {/* Circle placeholder for radial chart */}
           <Skeleton className="h-12 w-12 rounded-full ml-5" />
           {/* Text placeholders */}

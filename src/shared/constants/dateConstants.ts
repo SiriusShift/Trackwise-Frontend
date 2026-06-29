@@ -1,3 +1,5 @@
+import { Calendar1, CalendarDays } from "lucide-react";
+
 export const months = [
   "January",
   "February",
@@ -24,6 +26,13 @@ export const frequencies = [
 ];
 
 export const frequencyList = ["day", "week", "month", "year"];
+
+export const budgetFrequency = [
+  // { id: 2, name: "Weekly", interval: 7, unit: "day", icon: Calendar1 },
+  // { id: 3, name: "Bi-weekly", interval: 2, unit: "week", icon: CalendarRange },
+  { name: "Monthly", value: "monthly", icon: CalendarDays },
+  { name: "Annually", value: "yearly", icon: Calendar1 },
+];
 
 export const daysOfWeek = [
   "Sunday",

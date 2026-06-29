@@ -1,22 +1,16 @@
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog";
 
 import * as Icon from "lucide-react";
 
 import { Badge } from "../../ui/badge";
-import { Button } from "../../ui/button";
 
-import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
-import ViewImage from "./ViewImage";
-import { Separator } from "../../ui/separator";
-import { Card } from "../../ui/card";
 import { IRootState } from "@/app/store";
+import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
+import { Card } from "../../ui/card";
+import { Separator } from "../../ui/separator";
+import CommonDialog from "../CommonDialog";
+import ViewImage from "./ViewImage";
 
 const transactionTypeConfig = {
   expense: {
@@ -140,7 +134,7 @@ const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
 
 const ViewTransaction = ({ transaction, open, setOpen }) => {
   if (!transaction) return null;
-  const mode = useSelector((state: IRootState) => state.active.type)
+  const mode = useSelector((state: IRootState) => state.active.type);
   const [previewImage, setPreviewImage] = React.useState(false);
   const type =
     transactionTypeConfig[transaction?.type?.toLowerCase()] ||
@@ -150,120 +144,113 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
 
   const TypeIcon = type.icon;
   const StatusIcon = status?.icon;
-
-  console.log(mode)
+  const title = transaction?.interval
+    ? "Recurring Transaction"
+    : "Transaction Details";
+  console.log(mode);
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg sm:max-h-[75%] overflow-y-auto p-0 flex flex-col">
-          {/* Header */}
-          <DialogHeader className="border-b px-5 py-4">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-                <Icon.ReceiptText className="h-5 w-5" />
-
-                {transaction?.interval
-                  ? "Recurring Transaction"
-                  : "Transaction Details"}
-              </DialogTitle>
-            </div>
-          </DialogHeader>
-
-          {/* Content */}
-          <div className="p-5">
-            {/* Amount Section */}
-            <div className="flex flex-col items-center justify-center gap-3 pb-6">
-              <div className={`rounded-2xl p-4 ${type.bg}`}>
-                <TypeIcon className={`h-6 w-6 ${type.iconColor}`} />
-              </div>
-
-              <div className="text-center">
-                <h1 className={`text-3xl font-bold ${type.text}`}>
-                  {type.prefix}
-                  {formatCurrency(transaction.amount)}
-                </h1>
-
-                {status && (
-                  <Badge
-                    variant="outline"
-                    className={`mt-3 gap-1.5 rounded-full px-3 py-1 ${status.className}`}
-                  >
-                    <StatusIcon className="h-3.5 w-3.5" />
-
-                    {transaction.status}
-                  </Badge>
-                )}
-              </div>
+      <CommonDialog
+        open={open}
+        setOpen={setOpen}
+        icon={Icon.ReceiptText}
+        title={title}
+      >
+        {/* Content */}
+        <div className="p-5">
+          {/* Amount Section */}
+          <div className="flex flex-col items-center justify-center gap-3 pb-6">
+            <div className={`rounded-2xl p-4 ${type.bg}`}>
+              <TypeIcon className={`h-6 w-6 ${type.iconColor}`} />
             </div>
 
-            {/* Details */}
-            <div className="flex flex-col gap-3">
-              {/* <hr/>
+            <div className="text-center">
+              <h1 className={`text-3xl font-bold ${type.text}`}>
+                {type.prefix}
+                {formatCurrency(transaction.amount)}
+              </h1>
+
+              {status && (
+                <Badge
+                  variant="outline"
+                  className={`mt-3 gap-1.5 rounded-full px-3 py-1 ${status.className}`}
+                >
+                  <StatusIcon className="h-3.5 w-3.5" />
+
+                  {transaction.status}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="flex flex-col gap-3">
+            {/* <hr/>
             <InfoRow
               icon={Icon.Hash}
               label="Transaction ID"
               value={`#${transaction.id}`}
             /> */}
 
-              <InfoRow
-                icon={Icon.Calendar}
-                label="Date"
-                value={formatDate(transaction.date || transaction.startDate)}
-              />
+            <InfoRow
+              icon={Icon.Calendar}
+              label="Date"
+              value={formatDate(transaction.date || transaction.startDate)}
+            />
 
-              <Separator />
+            <Separator />
 
-              <InfoRow
-                icon={Icon.Tag}
-                label="Category"
-                value={transaction.category?.name}
-              />
-              <Separator />
+            <InfoRow
+              icon={Icon.Tag}
+              label="Category"
+              value={transaction.category?.name}
+            />
+            <Separator />
 
-              <InfoRow
-                icon={Icon.FileText}
-                label="Description"
-                value={transaction.description}
-              />
-              <Separator />
+            <InfoRow
+              icon={Icon.FileText}
+              label="Description"
+              value={transaction.description}
+            />
+            <Separator />
 
-              {mode !== "Transfer" ? (
-                <>
-                  <InfoRow
-                    icon={Icon.Wallet}
-                    label="Account"
-                    value={transaction?.asset?.name}
-                  />
-                  <Separator />
-                </>
-              ) : (
-                <>
-                  {" "}
-                  <InfoRow
-                    icon={Icon.Wallet}
-                    label="Source"
-                    value={transaction?.fromAsset?.name}
-                  />
-                  <Separator />
-                  <InfoRow
-                    icon={Icon.Wallet}
-                    label="Destination"
-                    value={transaction?.toAsset?.name}
-                  />
-                  <Separator />
-                </>
-              )}
+            {mode !== "Transfer" ? (
+              <>
+                <InfoRow
+                  icon={Icon.Wallet}
+                  label="Account"
+                  value={transaction?.asset?.name}
+                />
+                <Separator />
+              </>
+            ) : (
+              <>
+                {" "}
+                <InfoRow
+                  icon={Icon.Wallet}
+                  label="Source"
+                  value={transaction?.fromAsset?.name}
+                />
+                <Separator />
+                <InfoRow
+                  icon={Icon.Wallet}
+                  label="Destination"
+                  value={transaction?.toAsset?.name}
+                />
+                <Separator />
+              </>
+            )}
 
-              <InfoRow
-                icon={Icon.Image}
-                label="Image"
-                value={transaction.image}
-                onPreview={setPreviewImage}
-              />
-            </div>
+            <InfoRow
+              icon={Icon.Image}
+              label="Image"
+              value={transaction.image}
+              onPreview={setPreviewImage}
+            />
+          </div>
 
-            {/* Actions */}
-            {/* {transaction?.status !== "Paid" &&
+          {/* Actions */}
+          {/* {transaction?.status !== "Paid" &&
             transaction?.category?.type === "Expense" && (
               <div className="flex justify-end gap-2 pt-5">
                 <Button size="sm" variant="outline">
@@ -273,9 +260,8 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                 <Button size="sm">Pay</Button>
               </div>
             )} */}
-          </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </CommonDialog>
       <ViewImage
         image={transaction.image}
         open={previewImage}

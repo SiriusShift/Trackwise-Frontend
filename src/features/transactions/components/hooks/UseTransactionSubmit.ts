@@ -1,14 +1,13 @@
-import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { toast } from "sonner";
-import { assetsApi } from "@/shared/api/assetsApi";
-import { categoryApi } from "@/shared/api/categoryApi";
 import { transactionApi } from "@/features/transactions/api/transaction";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { transferApi } from "@/features/transactions/api/transaction/transferApi";
-import { IRootState } from "@/app/store";
+import { assetsApi } from "@/shared/api/assetsApi";
+import { categoryApi } from "@/shared/api/categoryApi";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import moment from "moment";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 type TransactionType = "Expense" | "Income" | "Transfer";
 
@@ -27,10 +26,8 @@ const SUCCESS_VERB: Record<string, Record<string, string>> = {
 interface UseTransactionSubmitProps {
   type: TransactionType;
   mode: string;
-  history?: boolean;
   categoryLimit: any[];
   fetchData: (data: any) => Promise<any>;
-  editHistory: (args: any) => Promise<any>;
   watch: (field?: string) => any;
   reset: () => void;
   setOpen: (open: boolean) => void;
@@ -39,10 +36,8 @@ interface UseTransactionSubmitProps {
 export function useTransactionSubmit({
   type,
   mode,
-  history,
   categoryLimit,
   fetchData,
-  editHistory,
   watch,
   reset,
   setOpen,
@@ -151,9 +146,6 @@ export function useTransactionSubmit({
       showLoadingOnConfirm: true,
       onConfirm: async () => {
         try {
-          // if (history) {
-          //   await editHistory({ data: formattedData, id: data.id }).unwrap();
-          // } else
           if (mode === "edit" || mode === "transact") {
             await fetchData({ data: formattedData, id: data.id }).unwrap();
           } else {

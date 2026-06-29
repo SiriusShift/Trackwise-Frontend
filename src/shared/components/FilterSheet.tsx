@@ -5,10 +5,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/shared/components/ui/sheet";
 import * as LucideIcon from "lucide-react";
-import { Filter, type LucideProps } from "lucide-react";
+import { type LucideProps } from "lucide-react";
 import type { ComponentType } from "react";
 import { Separator } from "./ui/separator";
 export function FilterSheet({
@@ -32,14 +31,7 @@ export function FilterSheet({
     ? (LucideIcon[icon] as ComponentType<LucideProps>)
     : undefined;
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button size="sm" variant="outline" className="flex items-center gap-2">
-          <Filter />
-          <span className="hidden md:inline">Filter</span>
-        </Button>
-      </SheetTrigger>
-
+    <Sheet open={open} onOpenChange={setOpen}>
       {/* Mobile-friendly Sheet Content */}
       <SheetContent
         side="right"

@@ -1,21 +1,19 @@
 import * as Icons from "lucide-react";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useMemo, useState } from "react";
 
+import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { CarouselItem } from "../ui/carousel";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { CarouselItem } from "../ui/carousel";
-import { Card, CardContent } from "../ui/card";
-import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 
-import { IRootState } from "@/app/store";
-import { commonTrackerProps } from "@/shared/types";
 import { cn } from "@/lib/utils";
+import { commonTrackerProps } from "@/shared/types";
 import { StackedBar } from "../charts/CommonBar";
 
 interface TrackerCardProps extends commonTrackerProps {
@@ -46,6 +44,16 @@ const TrackerCard = ({
   const iconKey = (item?.category?.icon as keyof typeof Icons) ?? "BusFront";
   const Icon = Icons[iconKey] as React.ElementType;
 
+  const segment = useMemo(
+    () => [
+      {
+        label: "Spent",
+        value: item.total,
+        color: isOverBudget ? "hsl(var(--destructive))" : "hsl(var(--primary))",
+      },
+    ],
+    [item],
+  );
   return (
     <>
       <CarouselItem
@@ -87,9 +95,9 @@ const TrackerCard = ({
               <DropdownMenuItem onClick={() => onDelete(item)}>
                 <Icons.Trash2 className="mr-2 h-4 w-4" /> Delete
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
+              {/* <DropdownMenuItem disabled>
                 <Icons.Eye className="mr-2 h-4 w-4" /> View
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -138,15 +146,7 @@ const TrackerCard = ({
               <StackedBar
                 mode="progress"
                 maxValue={item.value}
-                segments={[
-                  {
-                    label: "Spent",
-                    value: item.total,
-                    color: isOverBudget
-                      ? "hsl(var(--destructive))"
-                      : "hsl(var(--primary))",
-                  },
-                ]}
+                segments={segment}
                 formatValue={(v) => `₱${v.toLocaleString()}`}
               />
 

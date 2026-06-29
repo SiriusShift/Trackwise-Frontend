@@ -1,41 +1,6 @@
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { CreditCard, Loader, Pencil, Plus } from "lucide-react";
-import React from "react";
-import { Button } from "../../../../shared/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogDescription,
-} from "../../../../shared/components/ui/alert-dialog";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetClose,
-} from "@/shared/components/ui/sheet";
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { usePostRecurringPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { payRecurringSchema } from "@/schema/schema";
-import { payRecurringForm } from "@/shared/types";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../../../shared/components/ui/form";
-import { Input } from "../../../../shared/components/ui/input";
-import { numberInput } from "@/shared/utils/CustomFunctions";
-import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
-import { toast } from "sonner";
+import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
 import {
   Select,
@@ -44,10 +9,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
-import { useDispatch } from "react-redux";
-import { usePostRecurringPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { Separator } from "@/shared/components/ui/separator";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { payRecurringForm } from "@/shared/types";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
+import { CreditCard, Loader, Pencil, Plus } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../../../../shared/components/ui/alert-dialog";
+import { Button } from "../../../../shared/components/ui/button";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../../shared/components/ui/form";
 
 function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
   const width = useScreenWidth();
@@ -81,12 +78,12 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
         body: { ...data, amount: rowData?.amount },
         id: rowData?.id,
       });
-  
+
       // Ensure response is valid before showing success toast
       if (response?.error) {
         throw new Error(response.error); // Force it to go to the catch block
       }
-  
+
       toast.success("Payment successful");
       reset();
     } catch (err) {
@@ -94,7 +91,6 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
       toast.error("Error processing payment");
     }
   };
-  
 
   // Define the form UI
   const formContent = (
@@ -118,7 +114,7 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
                       // Find the selected category object based on the value (category name)
                       console.log(value);
                       const selectedSource = assetData?.find(
-                        (source) => source.name === value
+                        (source) => source.name === value,
                       );
                       field.onChange(selectedSource); // Set the entire object in the form state
                     }}
@@ -208,7 +204,13 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
           <SheetFooter className="flex py-1 justify-end gap-2 px-0">
             <SheetClose asChild>
               <Button type="submit" disabled={!isValid}>
-              {isSubmitting ? <Loader className="animate-spin w-4 h-4 mr-2" /> : mode === "edit" ? "Update Now" : "Pay Now"}
+                {isSubmitting ? (
+                  <Loader className="animate-spin w-4 h-4 mr-2" />
+                ) : mode === "edit" ? (
+                  "Update Now"
+                ) : (
+                  "Pay Now"
+                )}
               </Button>
             </SheetClose>
             <SheetClose asChild>
@@ -231,7 +233,10 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
       {width > 640 ? (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem disabled={rowData?.status === "Paid"} onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              disabled={rowData?.status === "Paid"}
+              onSelect={(e) => e.preventDefault()}
+            >
               <CreditCard />
               Pay
             </DropdownMenuItem>
@@ -255,7 +260,10 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
       ) : (
         <Sheet>
           <SheetTrigger asChild>
-            <DropdownMenuItem disabled={rowData?.status === "Paid"} onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              disabled={rowData?.status === "Paid"}
+              onSelect={(e) => e.preventDefault()}
+            >
               <CreditCard />
               Pay
             </DropdownMenuItem>
@@ -275,7 +283,7 @@ function PayDialog({ rowData, mode }: { rowData: Object; mode: string }) {
                   {mode === "add" ? "Add" : "Edit"} Payment
                 </SheetTitle>
               </div>
-        <Separator />
+              <Separator />
             </SheetHeader>
             {formContent}
           </SheetContent>

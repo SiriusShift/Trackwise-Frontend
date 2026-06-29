@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { frequencies } from "@/shared/constants/dateConstants";
 import { yupResolver } from "@hookform/resolvers/yup";
 import moment from "moment";
-import { frequencies } from "@/shared/constants/dateConstants";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 interface UseTransactionFormProps {
   open: boolean;
@@ -29,13 +29,17 @@ function buildResetData(type: string, mode: string, rowData: any) {
       category: rowData.category,
       frequency: rowData.unit,
       every: rowData.interval,
-      repeat:
-        frequencies?.find(
-          (f) => f.interval === rowData.interval && f.unit === rowData.unit,
-        ) ?? { id: 9, interval: rowData.interval, name: "Custom", unit: rowData.unit },
-      ...(rowData.fromAssetId && { from: rowData.fromAssetId }),
-      ...(rowData.toAsset && { to: rowData.toAsset }),
-      auto: rowData.auto,
+      repeat: frequencies?.find(
+        (f) => f.interval === rowData.interval && f.unit === rowData.unit,
+      ) ?? {
+        id: 9,
+        interval: rowData.interval,
+        name: "Custom",
+        unit: rowData.unit,
+      },
+      ...(rowData.fromAsset && { account: rowData.fromAsset }),
+      ...(rowData.toAsset && { to: rowData.fromAsset }),
+      behaviour: rowData.behaviour,
     };
   }
 
@@ -44,7 +48,10 @@ function buildResetData(type: string, mode: string, rowData: any) {
     date: isTransact ? moment().toDate() : rowData.date,
     id: rowData.id,
     description: isTransact || isRecurringTemplate ? "" : rowData.description,
-    amount: isTransact || isRecurringTemplate ? rowData.remainingBalance : rowData.amount,
+    amount:
+      isTransact || isRecurringTemplate
+        ? rowData.remainingBalance
+        : rowData.amount,
     category: rowData.category,
     image: rowData.image ?? null,
     balance: rowData.remainingBalance ?? null,
@@ -84,7 +91,7 @@ export function useTransactionForm({
     defaultValues: schema?.defaultValues,
   });
 
-  console.log(form.watch())
+  console.log(form.watch());
 
   useEffect(() => {
     if (!open) return;
