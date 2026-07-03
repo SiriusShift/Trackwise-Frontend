@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
-import { commonWidgetProps } from "@/shared/types";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import AnimateNumber from "@/shared/components/AnimateNumber";
 import { StackedBar } from "@/shared/components/charts/CommonBar";
-import * as Icons from "lucide-react";
-import { Separator } from "@/shared/components/ui/separator";
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Separator } from "@/shared/components/ui/separator";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { commonWidgetProps } from "@/shared/types";
+import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import * as Icons from "lucide-react";
+import { useState } from "react";
 
 // ─── Empty state for the stacked bar ────────────────────────────────────────
 function BarEmptyState({ title }: { title: string }) {
@@ -110,7 +110,7 @@ const WidgetLayout = ({
         relative overflow-hidden border border-border/60 bg-card
         p-5 flex flex-col rounded-2xl shadow-sm col-span-full
         ${isOverview ? "md:col-span-2" : "md:col-span-1"}
-        xl:col-span-1 2xl:col-span-1
+        xl:col-span-2 2xl:col-span-1
         transition-shadow hover:shadow-md
       `}
       // style={{

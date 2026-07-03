@@ -7,9 +7,9 @@ import { Badge } from "../../ui/badge";
 import { IRootState } from "@/app/store";
 import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
-import { Card } from "../../ui/card";
 import { Separator } from "../../ui/separator";
 import CommonDialog from "../CommonDialog";
+import { InfoRow } from "./InfoRow";
 import ViewImage from "./ViewImage";
 
 const transactionTypeConfig = {
@@ -89,48 +89,6 @@ const statusConfig = {
     icon: Icon.XCircle,
   },
 };
-
-const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
-  <div
-    className={`flex flex-1 items-start justify-between gap-3 ${
-      label === "Image" && "flex-col"
-    }`}
-  >
-    <div className="flex flex-row gap-1">
-      <IconComponent className="mt-0.5 text-muted-foreground" size={15} />
-      <p className="text-sm text-muted-foreground">{label}</p>
-    </div>
-
-    {label === "Image" ? (
-      value ? (
-        <button
-          type="button"
-          onClick={() => onPreview(value)}
-          className="group relative h-52 w-full overflow-hidden rounded-xl"
-        >
-          <img
-            src={value}
-            alt="Transaction attachment"
-            className="h-full w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-
-          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
-            <span className="opacity-0 group-hover:opacity-100 text-white text-sm font-medium">
-              View Image
-            </span>
-          </div>
-        </button>
-      ) : (
-        <Card className="text-sm text-muted-foreground w-full h-52 flex flex-col items-center justify-center">
-          <Icon.ImageOff />
-          <h1>No image</h1>
-        </Card>
-      )
-    ) : (
-      <p className="font-medium break-words text-sm">{value || "N/A"}</p>
-    )}
-  </div>
-);
 
 const ViewTransaction = ({ transaction, open, setOpen }) => {
   if (!transaction) return null;

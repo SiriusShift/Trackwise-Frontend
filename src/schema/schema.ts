@@ -67,3 +67,11 @@ export const notificationSettings = {
     mobileNotification: false,
   },
 };
+
+export const payRecurringSchema = {
+  schema: yup.object().shape({
+    amount: yup.number().required("Amount is required"),
+    date: yup.string().required("Date is required"),
+    account: yup.object().required("Account is required"),
+  }),
+};

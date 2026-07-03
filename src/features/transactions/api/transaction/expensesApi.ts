@@ -64,7 +64,7 @@ export const expensesApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Recurring", "Expenses"],
+        invalidatesTags: ["Recurring"],
       }),
 
       getRecurringExpenses: builder.query({
@@ -84,15 +84,6 @@ export const expensesApi = api
         invalidatesTags: ["Expenses"],
       }),
 
-      postPayment: builder.mutation({
-        query: ({ data, id }) => ({
-          url: `/transactions/expense/pay/${id}`,
-          method: "PATCH",
-          body: data,
-        }),
-        invalidatesTags: ["Recurring", "Expenses"],
-      }),
-
       getGraphExpense: builder.query({
         query: (params) => ({
           params,
@@ -103,21 +94,49 @@ export const expensesApi = api
         providesTags: ["Expenses"],
       }),
 
-      postAutoPayment: builder.mutation({
-        query: ({ data, id }) => ({
-          url: `/transactions/expense/pay/auto/${id}`,
-          method: "POST",
-          body: data,
-        }),
-      }),
+      // postAutoPayment: builder.mutation({
+      //   query: ({ data, id }) => ({
+      //     url: `/transactions/expense/pay/auto/${id}`,
+      //     method: "POST",
+      //     body: data,
+      //   }),
+      // }),
 
       getBills: builder.query({
-        query: () => ({
+        query: (params) => ({
           url: "/transactions/expense/bills",
+          method: "GET",
+          params,
+        }),
+        transformResponse: (response: any) => response.data,
+        providesTags: ["Recurring"],
+      }),
+
+      getBill: builder.query({
+        query: (id) => ({
+          url: `/transactions/expense/bills/${id}`,
           method: "GET",
         }),
         transformResponse: (response: any) => response.data,
-        providesTags: ["Expenses"],
+        providesTags: ["Recurring"],
+      }),
+
+      getBillPayments: builder.query({
+        query: (id) => ({
+          url: `/transactions/expense/bills/${id}/history`,
+          method: "GET",
+        }),
+        transformResponse: (response: any) => response.data,
+        providesTags: ["Recurring"],
+      }),
+
+      postPayment: builder.mutation({
+        query: ({ id, data }) => ({
+          url: `/transactions/expense/bills/${id}`,
+          method: "POST",
+          body: data,
+        }),
+        invalidatesTags: ["Recurring", "Expenses"],
       }),
     }),
   });
@@ -135,6 +154,11 @@ export const {
   useUpdateRecurringExpenseMutation,
   useCancelRecurringExpenseMutation,
   usePostPaymentMutation,
-  usePostAutoPaymentMutation,
+  // usePostAutoPaymentMutation,
   useGetBillsQuery,
+  useLazyGetBillsQuery,
+  useGetBillQuery,
+  useLazyGetBillQuery,
+  useGetBillPaymentsQuery,
+  useLazyGetBillPaymentsQuery,
 } = expensesApi;

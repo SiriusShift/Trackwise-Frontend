@@ -1,8 +1,8 @@
-import { RouterProvider } from "react-router-dom";
-import { router } from "./routing/router";
-import { ThemeProvider } from "@/shared/provider/ThemeProvider";
-import { Toaster } from "sonner";
 import { ConfirmProvider } from "@/shared/provider/ConfirmProvider";
+import { ThemeProvider } from "@/shared/provider/ThemeProvider";
+import { RouterProvider } from "react-router-dom";
+import { Toaster } from "sonner";
+import { router } from "./routing/router";
 
 function App() {
   return (

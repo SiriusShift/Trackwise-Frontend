@@ -1,11 +1,11 @@
-import { Bell, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { cn } from "@/lib/utils";
+import { Bell, Zap } from "lucide-react";
 
 type Behaviour = "AUTO_LOG" | "REMIND";
 
@@ -13,7 +13,8 @@ const OPTIONS = [
   {
     value: "AUTO_LOG" as Behaviour,
     label: "Auto-log",
-    description: "Automatically create and log the transaction on the due date.",
+    description:
+      "Automatically create and log the transaction on the due date.",
     icon: Zap,
   },
   {

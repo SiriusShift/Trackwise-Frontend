@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { commonDialogProps } from "@/shared/types";
 import { LucideIcon } from "lucide-react";
@@ -18,6 +19,7 @@ interface CommonDialogProps extends commonDialogProps {
   description?: string;
   icon?: LucideIcon;
   preventClickOutside?: boolean;
+  contentClassName?: string;
 }
 
 const CommonDialog = ({
@@ -30,9 +32,9 @@ const CommonDialog = ({
   description,
   icon: Icon,
   preventClickOutside = false,
+  contentClassName = "sm:max-w-lg",
 }: CommonDialogProps) => {
   const { confirm } = useConfirm();
-
   const handleCloseIntent = () => {
     if (!isDirty) {
       setOpen(false);
@@ -61,14 +63,19 @@ const CommonDialog = ({
       }}
     >
       <DialogContent
-        className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0"
+        className={
+          (cn(
+            "flex flex-col w-full max-w-full h-dvh p-0  sm:h-auto sm:max-h-[90vh] overflow gap-0",
+          ),
+          contentClassName)
+        }
         onInteractOutside={(e) => preventClickOutside && e.preventDefault()}
       >
         <DialogHeader className="flex flex-row items-center gap-3 px-6 py-5 border-b space-y-0">
           {Icon && <Icon className="h-5 w-5 shrink-0 text-muted-foreground" />}
 
           <div className="min-w-0 space-y-0">
-            <DialogTitle className="">{title}</DialogTitle>
+            <DialogTitle className="text-start">{title}</DialogTitle>
             {description && (
               <DialogDescription>{description}</DialogDescription>
             )}

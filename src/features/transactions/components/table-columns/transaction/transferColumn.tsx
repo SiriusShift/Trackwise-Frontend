@@ -1,23 +1,9 @@
-import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
-  Banknote,
-  CheckCircle,
-  CircleAlert,
-  Clock,
-  CreditCard,
-  Eye,
-  Loader,
-  MoreHorizontal,
-  Pencil,
-  RefreshCcw,
-  History,
-  Trash2,
-  X,
-  Archive,
-  Check,
-} from "lucide-react";
-import { Expense, Transfer } from "@/shared/types";
+  useCancelRecurringExpenseMutation,
+  useDeleteExpenseMutation,
+} from "@/features/transactions/api/transaction/expensesApi";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -27,32 +13,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import moment from "moment";
-import { Badge } from "@/shared/components/ui/badge";
+import { Expense, Transfer } from "@/shared/types";
+import { ColumnDef } from "@tanstack/react-table";
 import {
-  useCancelRecurringExpenseMutation,
-  useDeleteExpenseMutation,
-  usePostAutoPaymentMutation,
-} from "@/features/transactions/api/transaction/expensesApi";
-import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
-import { useDispatch, useSelector } from "react-redux";
+  Archive,
+  ArrowUpDown,
+  Check,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  RefreshCcw,
+  X,
+} from "lucide-react";
+import moment from "moment";
+import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
+import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { useState } from "react";
-import ViewImage from "@/shared/components/dialog/ViewDialog/ViewImage";
+import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { Portal } from "@radix-ui/react-tooltip";
-import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import { StatusIcon } from "@/features/transactions/components/statusIcon";
-import { setOpenDialog } from "@/shared/slices/activeSlice";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { Portal } from "@radix-ui/react-tooltip";
+import { useState } from "react";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const transferColumns: ColumnDef<Transfer>[] = [
@@ -209,7 +198,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
       console.log(expense);
 
       const [deleteExpense] = useDeleteExpenseMutation();
-      const [payAuto] = usePostAutoPaymentMutation();
+      // const [payAuto] = usePostAutoPaymentMutation();
       const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
       const onArchive = async () => {

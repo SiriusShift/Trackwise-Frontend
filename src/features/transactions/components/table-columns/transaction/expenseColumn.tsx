@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Expense } from "@/shared/types";
@@ -18,12 +17,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   Archive,
   ArrowUpDown,
-  Banknote,
   Eye,
   MoreHorizontal,
   Pencil,
   RefreshCcw,
-  X,
 } from "lucide-react";
 import moment from "moment";
 import { useDispatch } from "react-redux";
@@ -34,15 +31,9 @@ import { StatusIcon } from "@/features/transactions/components/StatusIcon";
 import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Portal } from "@radix-ui/react-tooltip";
 import { useState } from "react";
-import ConfirmDialog from "../../dialogs/ConfirmDialog";
+import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 
 export const expenseColumns: ColumnDef<Expense>[] = [
   {
@@ -245,30 +236,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
 
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-              {/* --- Pay --- */}
-              {expense.recurringTemplate && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>
-                      <DropdownMenuItem
-                        onSelect={() => setConfirmOpen(true)}
-                        // disabled={expense?.status === "Completed"}
-                      >
-                        <Banknote /> Confirm
-                      </DropdownMenuItem>
-                    </span>
-                  </TooltipTrigger>
-                  <Portal>
-                    {expense?.status === "Completed" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Already paid
-                      </TooltipContent>
-                    )}
-                  </Portal>
-                </Tooltip>
-              )}
-
               {/* --- Edit --- */}
               <DropdownMenuItem
                 onSelect={(e) => {
@@ -290,21 +257,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               <DropdownMenuItem onClick={onArchive}>
                 <Archive /> Archive
               </DropdownMenuItem>
-              {/* -------- Recurring Section -------- */}
-              {expense?.recurringTemplate && (
-                <>
-                  <DropdownMenuSeparator />
-
-                  {/* Stop whole series */}
-                  <DropdownMenuItem
-                    disabled={!expense?.recurringTemplate?.isActive}
-                    onClick={onStopSeries}
-                  >
-                    <X className="h-4 w-4 text-destructive" />
-                    Stop Recurring
-                  </DropdownMenuItem>
-                </>
-              )}
 
               {/* --- Payment History --- */}
               {/* {expense?.recurringId && (

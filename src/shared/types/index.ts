@@ -130,6 +130,7 @@ export interface trackerFormType {
 
 export interface payRecurringForm {
   amount: number;
+  date: string;
   source: object;
 }
 

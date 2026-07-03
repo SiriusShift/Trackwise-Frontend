@@ -1,10 +1,8 @@
-import CryptoJS from "crypto-js";
-import { saltkey } from "./saltkey";
-import { useSelector } from "react-redux";
-import moment from "moment";
-import { TrendingDown, TrendingUp, ArrowRightLeft } from "lucide-react";
-import { DateRange } from "react-day-picker";
 import { IRootState } from "@/app/store";
+import CryptoJS from "crypto-js";
+import moment from "moment";
+import { useSelector } from "react-redux";
+import { saltkey } from "./saltkey";
 export const formatDate = (dateString: Date) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
@@ -16,8 +14,8 @@ export const formatDate = (dateString: Date) => {
 };
 
 export const CapitalCase = (text: string) => {
-  return String(text).charAt(0).toUpperCase() + String(text).slice(1)
-}
+  return String(text).charAt(0).toUpperCase() + String(text).slice(1);
+};
 
 export const formatString = (str: string) => {
   if (str.length <= 24) return str;
@@ -39,8 +37,6 @@ export const formatDateDisplay = (): string => {
   return "Select Date";
 };
 
-
-
 export const formatMode = () => {
   const mode = useSelector((state: IRootState) => state.active.mode);
   if (mode === "daily") return "day";
@@ -48,18 +44,16 @@ export const formatMode = () => {
   if (mode === "monthly") return "month";
   if (mode === "yearly") return "year";
 };
-
-export const formatCurrency = (amount) => {
-  const currency = useSelector((state: IRootState) => state.settings.currency);
+export const formatCurrency = (amount: number, currency = "PHP") => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currency,
+    currency,
   }).format(amount);
 };
 
 export const numberInput = (
   e: React.ChangeEvent<HTMLInputElement>,
-  field: any
+  field: any,
 ) => {
   let value = e.target.value;
 
@@ -80,7 +74,6 @@ export const numberInput = (
   }
 };
 
-
 export const decryptString = (data: any) => {
   if (!data) return null;
 
@@ -93,7 +86,7 @@ export const encryptString = (data: any) => {
   if (!data) return null;
   const ciphertext = CryptoJS.AES.encrypt(
     JSON.stringify(data),
-    saltkey
+    saltkey,
   ).toString();
   return ciphertext;
 };
@@ -118,4 +111,40 @@ export const handleCatchErrorMessage = (error) => {
   } else {
     return "An unexpected error occurred";
   }
+};
+
+export const getStatus = (date) => {
+  const today = moment();
+  const due = moment(date);
+  if (due.isBefore(today, "day"))
+    return {
+      label: "Overdue",
+      color: "text-red-600",
+      bg: "bg-red-50 dark:bg-red-950/40",
+      dot: "bg-red-500",
+      border: "border-red-200 dark:border-red-900",
+    };
+  if (due.isSame(today, "day"))
+    return {
+      label: "Due Today",
+      color: "text-amber-600",
+      bg: "bg-amber-50 dark:bg-amber-950/40",
+      dot: "bg-amber-400",
+      border: "border-amber-200 dark:border-amber-900",
+    };
+  if (due.diff(today, "day") <= 7)
+    return {
+      label: "Due Soon",
+      color: "text-orange-600",
+      bg: "bg-orange-50 dark:bg-orange-950/40",
+      dot: "bg-orange-400",
+      border: "border-orange-200 dark:border-orange-900",
+    };
+  return {
+    label: "Upcoming",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+    dot: "bg-emerald-400",
+    border: "border-emerald-200 dark:border-emerald-900",
+  };
 };

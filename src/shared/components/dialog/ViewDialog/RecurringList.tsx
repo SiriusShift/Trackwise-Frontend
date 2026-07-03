@@ -1,18 +1,19 @@
-import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import { formatDate } from "@/shared/utils/CustomFunctions";
-import { Button } from "../../ui/button";
-import { Paperclip, Pencil, Eye, Trash } from "lucide-react";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useDeleteTransactionHistoryMutation } from "@/features/transactions/api/transaction";
-import { toast } from "sonner";
-import { useDispatch } from "react-redux";
-import { categoryApi } from "@/shared/api/categoryApi";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
+import { categoryApi } from "@/shared/api/categoryApi";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
+import { Paperclip, Pencil, Trash } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { Button } from "../../ui/button";
 
 const RecurringList = ({ history, setImageOpen, setOpen }) => {
   const { confirm } = useConfirm();
   const dispatch = useDispatch();
+  const currency = useSelector((state: IRootState) => state.settings.currency);
+
   console.log(history);
 
   const [trigger, { isLoading }] = useDeleteTransactionHistoryMutation();
@@ -69,7 +70,7 @@ const RecurringList = ({ history, setImageOpen, setOpen }) => {
                   `}
             >
               {/* {history?.transactionType === "Expense" ? "-" : "+"} */}
-              {formatCurrency(history?.amount)}
+              {formatCurrency(history?.amount, currency)}
             </span>
           </div>
         </div>

@@ -43,7 +43,7 @@ const Dashboard = () => {
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
           <div className="flex w-full flex-col gap-5">
-            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5 ">
+            <div className="grid grid-cols-2 xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5 ">
               <OverviewWidget data={data} isLoading={isFetching} />
               <ExpenseWidget data={data} isLoading={isFetching} />
               <IncomeWidget data={data} isLoading={isFetching} />

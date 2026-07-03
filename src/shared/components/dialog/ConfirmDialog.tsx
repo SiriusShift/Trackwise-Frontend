@@ -27,7 +27,7 @@ const ConfirmDialog = ({ open, setOpen, data }) => {
         <Separator />
         <div className="flex flex-row justify-between">
           <h1 className="text-sm font-semibold">Account</h1>
-          <p className="text-sm text-muted-foreground">{data?.asset.name}</p>
+          <p className="text-sm text-muted-foreground">{data?.asset?.name}</p>
         </div>
         <div className="w-full gap-2 grid grid-cols-2">
           <Button variant={"outline"} className="col-span-1">

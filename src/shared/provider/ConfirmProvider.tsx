@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-  useRef,
-} from "react";
-import { AlertTriangle, Info, AlertCircle } from "lucide-react";
-import ClipLoader from "react-spinners/ClipLoader";
+import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -16,7 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
+import ClipLoader from "react-spinners/ClipLoader";
 
 type ConfirmVariant = "destructive" | "warning" | "info";
 
@@ -99,7 +99,7 @@ export const ConfirmProvider = ({
         resolverRef.current = undefined;
       }
     },
-    [options]
+    [options],
   );
 
   const handleConfirm = useCallback(async () => {
@@ -187,8 +187,8 @@ export const ConfirmProvider = ({
         }}
       >
         <DialogContent
-        removeClose
-        className="w-4/5 sm:min-w-[425px] sm:w-auto"
+          removeClose
+          className="w-4/5 sm:min-w-[425px] sm:w-auto p-6"
           onInteractOutside={(e) => {
             if (shouldPreventClose || options.preventCloseOnOutsideClick) {
               e.preventDefault();

@@ -1,19 +1,17 @@
-import React from "react";
-import * as Icons from "lucide-react";
 import { StatusIcon } from "@/features/transactions/components/statusIcon";
-import { motion } from "motion/react";
 import { Badge } from "@/shared/components/ui/badge";
-import moment from "moment";
-import { useDispatch } from "react-redux";
-import {
-  setActionShow,
-  setActiveRow,
-  setOpenDialog,
-} from "@/shared/slices/activeSlice";
 import useLongPress from "@/shared/hooks/useLongPress";
+import { setActionShow, setActiveRow } from "@/shared/slices/activeSlice";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import * as Icons from "lucide-react";
+import moment from "moment";
+import { motion } from "motion/react";
+import React from "react";
+import { useDispatch } from "react-redux";
 const TransactionItem = React.memo(function TransactionItem({ item, index }) {
   const dispatch = useDispatch();
+  const currency = useSelector((state: IRootState) => state.settings.currency);
+
   const LucidIcon = Icons[item.category?.icon];
   const statusIcon = StatusIcon[item?.status];
 
@@ -62,7 +60,7 @@ const TransactionItem = React.memo(function TransactionItem({ item, index }) {
                     : "text-primary"
               } font-semibold text-base whitespace-nowrap ml-2`}
             >
-              {formatCurrency(item.amount)}
+              {formatCurrency(item.amount, currency)}
             </h1>
           </div>
 

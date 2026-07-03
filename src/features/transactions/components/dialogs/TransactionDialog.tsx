@@ -97,10 +97,8 @@ export function TransactionDialog({
   const { onSubmit, getActionLabel } = useTransactionSubmit({
     type,
     mode,
-    history,
     categoryLimit: categoryLimit ?? [],
     fetchData,
-    editHistory,
     watch,
     reset,
     setOpen,

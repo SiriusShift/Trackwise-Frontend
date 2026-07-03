@@ -1,3 +1,4 @@
+import { IRootState } from "@/app/store";
 import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -5,6 +6,7 @@ import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import * as Icons from "lucide-react";
 import moment from "moment";
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const itemVariants = {
@@ -37,6 +39,7 @@ function AmountLabel({
   categoryName: string;
   amount: number;
 }) {
+  const currency = useSelector((state: IRootState) => state.settings.currency);
   const colorClass =
     type === "Income"
       ? "text-emerald-500"
@@ -51,7 +54,7 @@ function AmountLabel({
       className={`${colorClass} font-medium text-sm whitespace-nowrap tabular-nums`}
     >
       {prefix}
-      {formatCurrency(amount)}
+      {formatCurrency(amount, currency)}
     </span>
   );
 }

@@ -145,6 +145,13 @@ const TrackerCard = memo(
       [schedule.behaviour],
     );
 
+    const unit =
+      schedule.interval === 1
+        ? schedule.unit?.toLowerCase()
+        : `${schedule.unit?.toLowerCase()}s`;
+
+    const frequencyLabel =
+      frequency?.name ?? `Every ${schedule.interval} ${unit}`;
     return (
       <>
         <CarouselItem
@@ -262,16 +269,15 @@ const TrackerCard = memo(
                   They'll clip if there's truly no room rather than wrap.
                 */}
                 <div className="flex min-w-0 shrink items-center gap-1 overflow-hidden">
-                  {frequency?.name && (
-                    <Badge
-                      className={cn(
-                        "shrink-0 text-xs font-semibold capitalize tracking-wide",
-                      )}
-                      variant={"outline"}
-                    >
-                      {frequency.name}
-                    </Badge>
-                  )}
+                  <Badge
+                    className={cn(
+                      "shrink-0 text-xs font-semibold capitalize tracking-wide",
+                    )}
+                    variant={"outline"}
+                  >
+                    {frequencyLabel}
+                  </Badge>
+
                   {behaviour && (
                     <Badge
                       className={cn(
