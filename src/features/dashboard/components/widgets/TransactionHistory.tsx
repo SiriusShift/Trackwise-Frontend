@@ -133,7 +133,7 @@ const TransactionHistory = () => {
                 key={`${item.id}-${index}`}
                 className="flex items-center p-2 gap-2 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border"
               >
-                <TransactionIcon icon={item.category?.icon} />
+                <TransactionIcon icon={item?.category?.icon} />
 
                 <div className="flex-1 min-w-0">
                   <p

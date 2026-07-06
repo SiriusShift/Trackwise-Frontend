@@ -253,3 +253,7 @@ body {
 .fc .fc-daygrid-event {
   border: none !important;
 }
+
+.fc {
+  --fc-border-color: hsl(var(--border));
+}

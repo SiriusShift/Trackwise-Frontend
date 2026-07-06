@@ -12,7 +12,7 @@ const TransactionItem = React.memo(function TransactionItem({ item, index }) {
   const dispatch = useDispatch();
   const currency = useSelector((state: IRootState) => state.settings.currency);
 
-  const LucidIcon = Icons[item.category?.icon];
+  const LucidIcon = Icons[item?.category?.icon];
   const statusIcon = StatusIcon[item?.status];
 
   const longPressProps = useLongPress(() => {

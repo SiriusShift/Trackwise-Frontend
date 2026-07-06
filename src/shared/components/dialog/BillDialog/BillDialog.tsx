@@ -58,8 +58,8 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
   const status = getStatus(bill?.nextDueDate);
 
   const Icon =
-    data?.category?.icon && data.category.icon in LucideIcons
-      ? LucideIcons[data.category.icon]
+    bill?.category?.icon && bill.category.icon in LucideIcons
+      ? LucideIcons[bill.category.icon]
       : CircleHelp;
 
   const frequency = useMemo(
