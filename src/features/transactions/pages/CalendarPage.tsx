@@ -1,11 +1,12 @@
+import { Button } from "@/shared/components/ui/button";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
 import FullCalendar, { type DateClickArg } from "@fullcalendar/react";
 import * as LucideIcon from "lucide-react";
 import moment from "moment";
 import { useEffect, useMemo, useRef, useState } from "react";
-
-import { Button } from "@/shared/components/ui/button";
 import { useLazyGetBillsQuery } from "../api/transaction/expensesApi";
 import { UpcomingBillsSidebar } from "../components/BillsSidebar";
 
@@ -31,11 +32,11 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const calendarRef = useRef<FullCalendar>(null);
+  const width = useScreenWidth();
   const [trigger, { data, isFetching }] = useLazyGetBillsQuery();
 
-  const prev = () => calendarRef.current?.getApi().prev();
-  const next = () => calendarRef.current?.getApi().next();
-  const today = () => calendarRef.current?.getApi().today();
+  const navigateCalendar = (action: "prev" | "next" | "today") =>
+    calendarRef.current?.getApi()?.[action]();
 
   useEffect(() => {
     if (!monthRange.start || !monthRange.end) return;
@@ -58,6 +59,9 @@ const CalendarPage = () => {
     );
   }, [data]);
 
+  const isMobile = width < 768;
+  const today = moment();
+
   // Derived, not stored: sidebar shows only the selected day's bills,
   // or everything in range when no day is selected.
   const displayedEvents = useMemo(() => {
@@ -79,29 +83,42 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-65px)]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-65px)]">
       {/* Calendar */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-4 ">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">{title}</h2>
           <div className="flex gap-2">
-            <Button size="icon" variant="outline" onClick={prev}>
+            <Button variant="outline" onClick={() => navigateCalendar("prev")}>
               <LucideIcon.ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" onClick={today}>
+            <Button variant="outline" onClick={() => navigateCalendar("today")}>
               Today
             </Button>
-            <Button size="icon" variant="outline" onClick={next}>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => navigateCalendar("next")}
+            >
               <LucideIcon.ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
-        <div className="min-h-0 flex-1">
+        <div
+          className="min-h-0 flex-1"
+          style={
+            {
+              "--fc-event-bg-color": "transparent",
+              "--fc-event-border-color": "transparent",
+              "--fc-event-text-color": "inherit",
+            } as React.CSSProperties
+          }
+        >
           <FullCalendar
             ref={calendarRef}
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
+            plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+            initialView={"dayGridMonth"}
             fixedWeekCount={false}
             showNonCurrentDates
             headerToolbar={false}
@@ -126,25 +143,41 @@ const CalendarPage = () => {
               return isSelected ? ["bg-primary/10"] : [];
             }}
             eventContent={(arg) => {
-              const dueDate = moment(arg.event.start);
-              const isOverdue = dueDate.isBefore(moment(), "day");
-              const isDueToday = dueDate.isSame(moment(), "day");
+              const category = arg.event.extendedProps?.category;
+              const color = category?.color ?? "#94a3b8";
 
-              const className = isOverdue
-                ? "bg-red-100 text-destructive"
-                : isDueToday
-                  ? "bg-yellow-400 text-yellow-950"
-                  : "bg-blue-100 text-primary";
+              const dueDate = moment(arg.event.start);
+              const isOverdue = dueDate.isBefore(today, "day");
+              const isDueToday = dueDate.isSame(today, "day");
 
               return (
                 <div
-                  className={`w-full truncate border-0 border-border px-2 py-1 text-xs font-medium ${className}`}
+                  className="flex w-full items-center gap-1.5 truncate px-2 py-1 text-xs font-medium"
+                  style={{
+                    backgroundColor: `${color}26`,
+                    borderLeft: `3px solid ${color}`,
+                    color,
+                  }}
                 >
-                  {arg.event.title}
+                  {(isOverdue || isDueToday) && (
+                    <span
+                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                        isOverdue ? "bg-destructive" : "bg-yellow-500"
+                      }`}
+                    />
+                  )}
+                  <span className="truncate">{arg.event.title}</span>
                 </div>
               );
             }}
+            moreLinkContent={(arg) => (
+              <div className="w-full truncate rounded px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80">
+                +{arg.num} more
+              </div>
+            )}
+            moreLinkClick="popover"
             dateClick={handleDateClick}
+            dayMaxEvents={true}
           />
         </div>
       </div>

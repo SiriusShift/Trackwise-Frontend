@@ -132,6 +132,7 @@ export interface payRecurringForm {
   amount: number;
   date: string;
   source: object;
+  account: AssetData;
 }
 
 export interface commonWidgetProps<T = any> {

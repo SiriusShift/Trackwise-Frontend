@@ -44,13 +44,6 @@ export const transactionApi = api
         }),
         invalidatesTags: ["Stats", "History"],
       }),
-      dueTransactions: builder.query({
-        query: () => ({
-          url: "/transactions/due",
-          method: "GET",
-        }),
-        transformResponse: (response: any) => response.data,
-      }),
     }),
   });
 
@@ -60,5 +53,4 @@ export const {
   useDeleteTransactionHistoryMutation,
   useGetStatisticsQuery,
   useArchiveTransactionMutation,
-  useDueTransactionsQuery
 } = transactionApi;

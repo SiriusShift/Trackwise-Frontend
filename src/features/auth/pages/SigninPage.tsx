@@ -1,30 +1,28 @@
 // app/components/SignInForm.tsx
 "use client";
-import { Button } from "@/shared/components/ui/button";
-import { Input, PasswordInput } from "@/shared/components/ui/input";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "../schema/authSchema";
 import Google from "@/assets/images/Google.svg";
-import Logo from "@/assets/images/Logo.svg";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import {
   useGetAuthStatusQuery,
   usePostSigninMutation,
 } from "@/features/auth/api/signinApi";
-import { setUserInfo } from "@/shared/slices/userSlice";
 import LayoutAuth from "@/layout/AuthLayout";
-import { useEffect, useRef, useState } from "react";
-import { useCookies } from "react-cookie";
-import { decryptString, handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { Button } from "@/shared/components/ui/button";
+import { Input, PasswordInput } from "@/shared/components/ui/input";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { loginSchema } from "../schema/authSchema";
 
 const SignInPage = () => {
   const router = useNavigate();
   const location = useLocation();
   const [cookies] = useCookies(["user"]);
-  const [postSignin, {isLoading: signinLoading}] = usePostSigninMutation();
+  const [postSignin, { isLoading: signinLoading }] = usePostSigninMutation();
 
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
@@ -70,6 +68,7 @@ const SignInPage = () => {
         }).unwrap();
         router("/");
       } catch (error) {
+        console.log(error);
         let errorMessage = handleCatchErrorMessage(error); // Default message
         toast.error(errorMessage);
       }
@@ -119,7 +118,7 @@ const SignInPage = () => {
                 disabled={!isValid || signinLoading}
                 type="submit"
               >
-                {signinLoading && <Loader2 className="animate-spin"/> }Login
+                {signinLoading && <Loader2 className="animate-spin" />}Login
               </Button>
             </div>
             <div className="relative flex py-3 w-full sm:w-full items-center">
@@ -140,7 +139,10 @@ const SignInPage = () => {
             </Button>
             <p className="mt-2 text-sm text-center">
               Don't have an account?{" "}
-              <a className="font-bold cursor-pointer" onClick={() => router("/sign-up")}>
+              <a
+                className="font-bold cursor-pointer"
+                onClick={() => router("/sign-up")}
+              >
                 Sign Up
               </a>
             </p>

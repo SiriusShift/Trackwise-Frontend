@@ -18,6 +18,7 @@ import { Separator } from "../../ui/separator";
 import CommonDialog from "../CommonDialog";
 import PayDialog from "../PayDialog";
 // import SkipDialog from "../SkipDialog";
+import { cn } from "@/lib/utils";
 import SkipDialog from "../SkipDialog";
 import { InfoRow } from "../ViewDialog/InfoRow";
 import ButtonSkeleton from "./ButtonSkeleton";
@@ -194,8 +195,12 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
           ) : history?.length ? (
             <div className="space-y-3">
               {history.map((payment) => {
+                const isSkipped = payment.status === "Skipped";
                 const due = payment?.recurringDueDate;
-                const daysLate = due ? today.diff(due, "days") : 0;
+                const daysLate =
+                  !isSkipped && due
+                    ? moment(payment.date).diff(due, "days")
+                    : 0;
 
                 return (
                   <div
@@ -203,24 +208,41 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
                     className="flex items-center justify-between rounded-xl border p-4"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="rounded-full bg-primary/10 p-2">
-                        <LucideIcons.CalendarCheck className="h-4 w-4 text-primary" />
+                      <div
+                        className={cn(
+                          "rounded-full p-2",
+                          isSkipped ? "bg-muted" : "bg-primary/10",
+                        )}
+                      >
+                        {isSkipped ? (
+                          <LucideIcons.CalendarX className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <LucideIcons.CalendarCheck className="h-4 w-4 text-primary" />
+                        )}
                       </div>
 
                       <div>
                         <p className="text-sm">
-                          {moment(payment.date).format("MMMM DD, YYYY")}
+                          {moment(isSkipped ? due : payment.date).format(
+                            "MMMM DD, YYYY",
+                          )}
                         </p>
                         <p className="font-medium text-xs text-muted-foreground">
-                          Paid{" "}
-                          {daysLate > 0
-                            ? `${daysLate} ${daysLate > 1 ? "day" : "days"} late`
-                            : "on time"}
+                          {isSkipped
+                            ? "Skipped"
+                            : daysLate > 0
+                              ? `${daysLate} ${daysLate > 1 ? "days" : "day"} late`
+                              : "Paid on time"}
                         </p>
                       </div>
                     </div>
 
-                    <p className="font-medium">
+                    <p
+                      className={cn(
+                        "font-medium",
+                        isSkipped && "text-muted-foreground line-through",
+                      )}
+                    >
                       {formatCurrency(payment.amount, currency)}
                     </p>
                   </div>

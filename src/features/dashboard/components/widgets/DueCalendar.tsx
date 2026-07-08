@@ -109,7 +109,7 @@ export default function DueCalendar() {
             )}
           </CardTitle>
           <Link
-            to="/transactions/calendar"
+            to="/transactions/schedules"
             className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
           >
             See All →

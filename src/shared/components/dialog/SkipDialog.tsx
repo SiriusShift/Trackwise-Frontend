@@ -1,3 +1,4 @@
+import { useSkipPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { commonDialogProps } from "@/shared/types";
 import * as LucideIcons from "lucide-react";
 import moment from "moment";
@@ -13,6 +14,7 @@ interface BillDialogProps extends commonDialogProps {
     };
     description: string;
     nextDueDate: string;
+    id: number;
   };
 }
 
@@ -23,6 +25,13 @@ const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
       ? LucideIcons[iconName]
       : LucideIcons.CircleHelp;
   const pastDue = moment().isAfter(moment(data?.nextDueDate), "day");
+
+  const [triggerSkip, { isLoading }] = useSkipPaymentMutation();
+
+  const onSubmit = async () => {
+    await triggerSkip(data.id);
+    setOpen(false);
+  };
 
   return (
     <CommonDialog
@@ -83,7 +92,7 @@ const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
         <Button variant={"outline"} onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button>Skip this cycle</Button>
+        <Button onClick={onSubmit}>Skip this cycle</Button>
       </div>
     </CommonDialog>
   );

@@ -132,9 +132,17 @@ export const expensesApi = api
 
       postPayment: builder.mutation({
         query: ({ id, data }) => ({
-          url: `/transactions/expense/bills/${id}`,
+          url: `/transactions/expense/bills/${id}/pay`,
           method: "POST",
           body: data,
+        }),
+        invalidatesTags: ["Recurring", "Expenses"],
+      }),
+
+      skipPayment: builder.mutation({
+        query: (id) => ({
+          url: `/transactions/expense/bills/${id}/skip`,
+          method: "PATCH",
         }),
         invalidatesTags: ["Recurring", "Expenses"],
       }),
@@ -161,4 +169,5 @@ export const {
   useLazyGetBillQuery,
   useGetBillPaymentsQuery,
   useLazyGetBillPaymentsQuery,
+  useSkipPaymentMutation,
 } = expensesApi;

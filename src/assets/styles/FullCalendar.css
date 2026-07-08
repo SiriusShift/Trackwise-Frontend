@@ -1,0 +1,52 @@
+/* FullCalendar "+X more" popover — themed to match shadcn/ui tokens.
+   Import this once, e.g. in CalendarPage.tsx: import "./fullcalendar-overrides.css" */
+
+.fc-popover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.3),
+    0 4px 6px -4px rgb(0 0 0 / 0.3);
+  overflow: hidden;
+}
+
+.fc-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.fc-popover-title {
+  color: hsl(var(--foreground));
+}
+
+.fc-popover-close {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.fc-popover-close:hover {
+  opacity: 1;
+  color: hsl(var(--foreground));
+}
+
+.fc-popover-body {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Each event inside the popover still renders via your eventContent
+   callback, so category color/accent carries over automatically. */
+.fc-popover .fc-daygrid-event-harness {
+  margin: 0 !important;
+}

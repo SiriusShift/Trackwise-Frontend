@@ -231,7 +231,7 @@ const TransactionPage = () => {
   return (
     <>
       <CommonToolbar />
-      <div className="flex p-5 flex-col gap-2">
+      <div className="flex p-5 flex-col gap-5">
         <PageHeader
           pageName={currentPageName?.name}
           description={`Overview of ${type.toLocaleLowerCase()} for this ${formatMode()}`}
