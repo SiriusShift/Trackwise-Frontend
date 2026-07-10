@@ -1,3 +1,4 @@
+import { IRootState } from "@/app/store";
 import { StatusIcon } from "@/features/transactions/components/statusIcon";
 import { Badge } from "@/shared/components/ui/badge";
 import useLongPress from "@/shared/hooks/useLongPress";
@@ -7,7 +8,7 @@ import * as Icons from "lucide-react";
 import moment from "moment";
 import { motion } from "motion/react";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 const TransactionItem = React.memo(function TransactionItem({ item, index }) {
   const dispatch = useDispatch();
   const currency = useSelector((state: IRootState) => state.settings.currency);

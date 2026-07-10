@@ -15,13 +15,6 @@ const Status = ({
         onValueChange={(value) => setStatus(value)} // Ensure value is updated
         className="space-y-2"
       >
-        {/* Option 1 */}
-        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-warning">
-          <RadioGroupItem id="Pending" value="Pending" />
-          <label htmlFor="Pending" className="text-sm font-medium">
-            Pending
-          </label>
-        </div>
         {/* Option 2 */}
         <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
           <RadioGroupItem id="Paid" value="Paid" />
@@ -33,7 +26,7 @@ const Status = ({
         <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-destructive">
           <RadioGroupItem id="Overdue" value="Overdue" />
           <label htmlFor="Overdue" className="text-sm font-medium">
-            Overdue
+            Skipped
           </label>
         </div>
       </RadioGroup>

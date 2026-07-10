@@ -7,7 +7,6 @@ import TrackerCard from "@/shared/components/Tracker/TrackerCard";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Plus } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -99,8 +98,8 @@ function Tracker() {
           <Button
             className="shadow-sm h-9 transition-all hover:scale-[1.02]"
             onClick={() => setOpen(true)}
+            variant="ghost"
           >
-            <Plus className="w-4 h-4" />
             Add
           </Button>
         </div>

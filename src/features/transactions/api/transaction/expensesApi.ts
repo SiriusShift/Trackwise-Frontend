@@ -40,7 +40,7 @@ export const expensesApi = api
       putExpense: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transactions/expense/${id}`,
-          method: "PATCH",
+          method: "PUT",
           body: data,
         }),
         invalidatesTags: ["Expenses"],

@@ -1,5 +1,6 @@
 // app/components/SignUpForm.tsx
 "use client";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "../../../shared/components/ui/button";
 import { Input } from "../../../shared/components/ui/input";
 import {
@@ -8,24 +9,23 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "../../../shared/components/ui/input-otp";
-import { yupResolver } from "@hookform/resolvers/yup";
 // import Logo from "../assets/images/Logo.svg";
 import Google from "@/assets/images/Google.svg";
-import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { signupSchema } from "../schema/authSchema";
-import { encryptString } from "../../../shared/utils/CustomFunctions";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-// import { setSignup } from "../feature/authentication/reducers/signupSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
-  usePostVerifyMutation,
-  usePostSignupMutation,
-} from "../api/signupApi";
-import LayoutAuth from "../../../layout/AuthLayout";
-import moment from "moment-timezone"
+  encryptString,
+  handleCatchErrorMessage,
+} from "../../../shared/utils/CustomFunctions";
+import { signupSchema } from "../schema/authSchema";
+// import { setSignup } from "../feature/authentication/reducers/signupSlice";
 import { Loader2 } from "lucide-react";
+import moment from "moment-timezone";
+import LayoutAuth from "../../../layout/AuthLayout";
+import { usePostSignupMutation, usePostVerifyMutation } from "../api/signupApi";
 
 interface FormData {
   email: string;
@@ -44,7 +44,7 @@ const signUp = () => {
   // const device = encryptString(getBrowserInfo());
   const router = useNavigate();
   const dispatch = useDispatch();
-  const tz = moment.tz.guess()
+  const tz = moment.tz.guess();
 
   const [postVerify, { isLoading }] = usePostVerifyMutation();
   const [postSignup, { isLoading: postSignupLoading }] =
@@ -80,18 +80,14 @@ const signUp = () => {
       console.log(response);
       router("/");
     } catch (err) {
-      let errorMessage = "An error occurred"; // Default message
-      if (err && (err as { data?: { message?: string } }).data) {
-        errorMessage =
-          (err as { data: { message: string } }).data.message || errorMessage; // Extract the message or use default
-      }
+      let errorMessage = handleCatchErrorMessage(err); // Default message
       toast.error(errorMessage);
     }
   };
 
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    console.log("test")
+    console.log("test");
     if (isValid) {
       try {
         const response = await postVerify({
@@ -102,7 +98,7 @@ const signUp = () => {
         resendCode();
         setIsVerifying(true);
       } catch (err) {
-        let errorMessage = "An error occurred"; // Default message
+        let errorMessage = handleCatchErrorMessage(err); // Default message
         if (err && (err as { data?: { message?: string } }).data) {
           errorMessage =
             (err as { data: { message: string } }).data.message || errorMessage; // Extract the message or use default
@@ -115,26 +111,25 @@ const signUp = () => {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:5000/auth/google/sign-up'; // Redirect to backend OAuth route
+    window.location.href = "http://localhost:5000/auth/google/sign-up"; // Redirect to backend OAuth route
   };
 
-const resendCode = () => {
-  setIsDisabled(true);     // ⬅️ disable resend immediately
-  setCountdown(60);        // ⬅️ start 60-second countdown
-};
+  const resendCode = () => {
+    setIsDisabled(true); // ⬅️ disable resend immediately
+    setCountdown(60); // ⬅️ start 60-second countdown
+  };
 
-useEffect(() => {
-  if (countdown > 0) {
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
 
-    return () => clearInterval(timer);
-  } else {
-    setIsDisabled(false);  // ⬅️ re-enable when timer ends
-  }
-}, [countdown]);
-
+      return () => clearInterval(timer);
+    } else {
+      setIsDisabled(false); // ⬅️ re-enable when timer ends
+    }
+  }, [countdown]);
 
   return (
     <>
@@ -189,7 +184,7 @@ useEffect(() => {
                 disabled={!isValid || isLoading}
                 className="w-full sm:w-96"
               >
-                {isLoading ? <Loader2 className="animate-spin"/> : "Signup"} 
+                {isLoading ? <Loader2 className="animate-spin" /> : "Signup"}
               </Button>
               <div className="relative flex w-full items-center">
                 <div className="flex-grow border-t border-gray-400"></div>
@@ -198,13 +193,21 @@ useEffect(() => {
                 </span>
                 <div className="flex-grow border-t border-gray-400"></div>
               </div>
-              <Button variant={"outline"} type="button" onClick={handleGoogleSignup} className="w-full sm:w-96 shadow-md">
+              <Button
+                variant={"outline"}
+                type="button"
+                onClick={handleGoogleSignup}
+                className="w-full sm:w-96 shadow-md"
+              >
                 <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
                 Continue with Google
               </Button>
               <p className="text-center text-sm">
                 Already have an account?{" "}
-                <a className="font-bold cursor-pointer" onClick={() => router("/sign-in")}>
+                <a
+                  className="font-bold cursor-pointer"
+                  onClick={() => router("/sign-in")}
+                >
                   Login
                 </a>
               </p>
@@ -226,34 +229,38 @@ useEffect(() => {
                   <InputOTPSlot index={5} className="sm:h-12 sm:w-14" />
                 </InputOTPGroup>
               </InputOTP>
-<a
-  className={`cursor-pointer ${
-    isDisabled ? "text-gray-400 pointer-events-none" : "text-blue-500"
-  }`}
-  onClick={!isDisabled ? onSubmit : undefined}
->
-  {isDisabled
-    ? `Resend in ${countdown}s`
-    : "Didn't receive a code? Resend"}
-</a>
-
-
+              <a
+                className={`cursor-pointer ${
+                  isDisabled
+                    ? "text-gray-400 pointer-events-none"
+                    : "text-blue-500"
+                }`}
+                onClick={!isDisabled ? onSubmit : undefined}
+              >
+                {isDisabled
+                  ? `Resend in ${countdown}s`
+                  : "Didn't receive a code? Resend"}
+              </a>
             </div>
             <div className="gap-3 flex flex-col items-center">
               <Button
                 type="submit"
-                className="w-full sm:w-96 "
+                className="w-full sm:w-96"
                 onClick={submitSignup}
                 disabled={postSignupLoading}
               >
-                {postSignupLoading ? <Loader2 className="animate-spin"/> : "Signup"} 
+                {postSignupLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Signup"
+                )}
               </Button>
-              <a
-                className="text-gray-600"
+              <p
+                className="text-gray-600  cursor-pointer"
                 onClick={() => setIsVerifying(false)}
               >
                 Return to signup
-              </a>
+              </p>
             </div>
           </div>
         )}

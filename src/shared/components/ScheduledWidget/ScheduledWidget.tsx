@@ -4,8 +4,9 @@ import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { commonTrackerProps } from "@/shared/types";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import {
   Carousel,
@@ -28,8 +29,7 @@ function getVisibleCount(width: number): number {
 }
 
 function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
-  const [open, setOpen] = useState(false);
-
+  const navigate = useNavigate();
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
@@ -83,6 +83,13 @@ function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
               Track your active schedules
             </p>
           </div>
+          <Button
+            size={"sm"}
+            variant={"ghost"}
+            onClick={() => navigate("/transactions/schedules")}
+          >
+            View Schedule
+          </Button>
         </div>
 
         {/* carousel */}

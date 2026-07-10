@@ -7,32 +7,71 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { useEffect, useState } from "react";
 
+interface GroupedSegment extends StackedBarSegment {
+  breakdown?: StackedBarSegment[];
+}
+
 interface StackedBarProps {
   segments: StackedBarSegment[];
   formatValue?: (value: number) => string;
   mode?: "stacked" | "progress";
   maxValue?: number;
+  /** Max number of individual legend/bar segments before the rest get bucketed into "Others" */
+  maxLegendItems?: number;
 }
 
 function defaultFormat(value: number) {
   return value.toLocaleString();
 }
 
+const OTHERS_COLOR = "hsl(var(--muted-foreground))";
+
+// Sorts by value desc, keeps the top (maxItems - 1), buckets the remainder into "Others".
+// Returns the original array untouched if it's already within the limit.
+function groupSegments(
+  segments: StackedBarSegment[] | undefined,
+  maxItems: number,
+): GroupedSegment[] {
+  if (!segments) return [];
+
+  const sorted = [...segments].sort((a, b) => b.value - a.value);
+
+  if (sorted.length <= maxItems) {
+    return sorted;
+  }
+
+  const visible = sorted.slice(0, maxItems - 1);
+  const rest = sorted.slice(maxItems - 1);
+
+  return [
+    ...visible,
+    {
+      label: "Others",
+      value: rest.reduce((sum, s) => sum + s.value, 0),
+      color: OTHERS_COLOR,
+      breakdown: rest,
+    },
+  ];
+}
+
 export function StackedBar({
-  segments,
+  segments: rawSegments,
   formatValue = defaultFormat,
   mode = "stacked",
   maxValue,
+  maxLegendItems = 10,
 }: StackedBarProps) {
   const [animated, setAnimated] = useState(false);
+
+  const segments = groupSegments(rawSegments, maxLegendItems);
+
+  console.log(segments);
 
   useEffect(() => {
     setAnimated(false);
     const t = setTimeout(() => setAnimated(true), 50);
     return () => clearTimeout(t);
-  }, [segments]);
-
-  console.log(segments, "animated");
+  }, [rawSegments]);
 
   const total = segments?.reduce((sum, s) => sum + s.value, 0) ?? 0;
   const denominator = mode === "progress" ? (maxValue ?? total) : total;
@@ -130,12 +169,34 @@ export function StackedBar({
                     />
                     <p className="font-medium text-foreground">{seg.label}</p>
                   </div>
-                  <p className="text-muted-foreground pl-3.5">
-                    {formatValue(seg.value)}
-                  </p>
-                  <p className="text-muted-foreground pl-3.5">
-                    {pct.toFixed(1)}% of total
-                  </p>
+
+                  {"breakdown" in seg && seg.breakdown?.length ? (
+                    <div className="pl-3.5 space-y-0.5 max-w-[180px]">
+                      {seg.breakdown.map((b) => (
+                        <div
+                          key={b.label}
+                          className="flex justify-between gap-3 text-muted-foreground"
+                        >
+                          <span className="truncate">{b.label}</span>
+                          <span className="shrink-0">
+                            {formatValue(b.value)}
+                          </span>
+                        </div>
+                      ))}
+                      <p className="text-muted-foreground pt-0.5 border-t border-border/60 mt-1">
+                        {formatValue(seg.value)} · {pct.toFixed(1)}% of total
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-muted-foreground pl-3.5">
+                        {formatValue(seg.value)}
+                      </p>
+                      <p className="text-muted-foreground pl-3.5">
+                        {pct.toFixed(1)}% of total
+                      </p>
+                    </>
+                  )}
                 </TooltipContent>
               </Tooltip>
             );
