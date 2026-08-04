@@ -4,7 +4,6 @@ import { FormProvider } from "react-hook-form";
 import { useSelector } from "react-redux";
 
 import { IRootState } from "@/app/store";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
 import {
   useGetCategoryLimitQuery,
   useGetCategoryQuery,
@@ -25,6 +24,7 @@ import { useUpdateTransactionHistoryMutation } from "../../api/transaction";
 import { transactionConfig } from "../../config/transactionConfig";
 import TransactionForm from "../forms/TransactionForm";
 
+import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { commonDialogProps } from "@/shared/types";
 import { useTransactionForm } from "../hooks/useTransactionForm";
 import { useTransactionSubmit } from "../hooks/UseTransactionSubmit";
@@ -50,7 +50,7 @@ export function TransactionDialog({
   const { confirm } = useConfirm();
 
   const { data: categoryData } = useGetCategoryQuery({ type });
-  const { data: rawAssetData } = useGetAssetQuery();
+  const { data: rawAssetData } = useGetAccountsQuery();
   const { data: categoryLimit } = useGetCategoryLimitQuery({
     startDate,
     endDate,

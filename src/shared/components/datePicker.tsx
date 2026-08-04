@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from "react";
+import { IRootState } from "@/app/store";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { endOfWeek, formatDate, isAfter, startOfWeek } from "date-fns";
-import { Button } from "./ui/button";
-import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
-import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
-import { setActive, setMode } from "@/shared/slices/activeSlice";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
-import { Calendar } from "./ui/calendar";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { RootState } from "@reduxjs/toolkit/query";
-import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
-import { assetsApi } from "@/shared/api/assetsApi";
 import { months } from "@/shared/constants/dateConstants";
-import { IRootState } from "@/app/store";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { setActive, setMode } from "@/shared/slices/activeSlice";
+import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
+import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button } from "./ui/button";
 
 interface DateRange {
   from: string;
@@ -33,7 +28,7 @@ interface DateRange {
 const currentYear = new Date().getFullYear();
 const years = Array.from(
   { length: currentYear - 2000 + 1 },
-  (_, i) => currentYear - i
+  (_, i) => currentYear - i,
 );
 const Content = () => {
   const dispatch = useDispatch();
@@ -42,14 +37,14 @@ const Content = () => {
 
   const [activeYear, setActiveYear] = useState(new Date().getFullYear());
   const [date, setDate] = useState<Date | { from?: Date; to?: Date } | null>(
-    active
+    active,
   );
 
   useEffect(() => {
-    if(active !== date) {
-      dispatch(assetsApi.util.invalidateTags(["Assets"]))
+    if (active !== date) {
+      dispatch(accountsApi.util.invalidateTags(["Assets"]));
     }
-  }, [mode, active])
+  }, [mode, active]);
 
   // Set activeYear based on current active date
   useEffect(() => {

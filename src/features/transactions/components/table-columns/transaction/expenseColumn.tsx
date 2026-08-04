@@ -28,7 +28,6 @@ import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
 import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
 import { StatusIcon } from "@/features/transactions/components/StatusIcon";
-import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
@@ -74,17 +73,17 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
   },
-  {
-    accessorKey: "remainingBalance",
-    header: "Balance",
-    cell: ({ getValue }) => {
-      const amount = getValue() as number | undefined;
-      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "remainingBalance",
+  //   header: "Balance",
+  //   cell: ({ getValue }) => {
+  //     const amount = getValue() as number | undefined;
+  //     return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
+  //   },
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "category.name",
     header: "Category",
@@ -186,7 +185,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               dispatch(expensesApi.util.invalidateTags(["Expenses"]));
-              dispatch(assetsApi.util.invalidateTags(["Assets"]));
+              dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);

@@ -1,22 +1,21 @@
 import { IRootState } from "@/app/store";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import useScreenWidth from "../hooks/useScreenWidth";
-import { setActionShow } from "../slices/activeSlice";
-import { motion } from "motion/react";
-import { Button } from "@/shared/components/ui/button";
-import { Archive, Banknote, Check, Eye, Pencil, Trash2, X } from "lucide-react";
-import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
-import ViewTransaction from "./dialog/ViewDialog/ViewTransaction";
-import { useConfirm } from "../provider/ConfirmProvider";
-import { handleCatchErrorMessage } from "../utils/CustomFunctions";
-import { toast } from "sonner";
-import { categoryApi } from "../api/categoryApi";
-import { assetsApi } from "../api/assetsApi";
 import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { transferApi } from "@/features/transactions/api/transaction/transferApi";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
+import { Button } from "@/shared/components/ui/button";
+import { Archive, Banknote, Check, Eye, Pencil, X } from "lucide-react";
+import { motion } from "motion/react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { categoryApi } from "../api/categoryApi";
+import useScreenWidth from "../hooks/useScreenWidth";
+import { useConfirm } from "../provider/ConfirmProvider";
+import { setActionShow } from "../slices/activeSlice";
+import { handleCatchErrorMessage } from "../utils/CustomFunctions";
+import ViewTransaction from "./dialog/ViewDialog/ViewTransaction";
 
 const CommonToolbar = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -96,7 +95,7 @@ const CommonToolbar = () => {
             );
           }
           dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          dispatch(assetsApi.util.invalidateTags(["Assets"]));
+          dispatch(accountsApi.util.invalidateTags(["Assets"]));
         } catch (err) {
           console.log(err);
           toast.error(err?.data?.error);

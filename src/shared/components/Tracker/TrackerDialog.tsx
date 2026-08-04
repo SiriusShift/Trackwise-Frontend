@@ -100,6 +100,8 @@ function TrackerDialog({
     formState: { errors, isValid, isDirty },
   } = form;
 
+  console.log(watch());
+
   function handleCloseIntent() {
     if (!isDirty) {
       setOpen(false);
@@ -256,7 +258,11 @@ function TrackerDialog({
                                           onChange(category);
                                         }}
                                         className="flex p-2 justify-between"
-                                        disabled={category?.hasTracker}
+                                        disabled={
+                                          category?.hasTracker &&
+                                          watch("category")?.name !==
+                                            category?.name
+                                        }
                                       >
                                         <div className="flex flex-row items-center gap-3">
                                           <Card
@@ -270,7 +276,7 @@ function TrackerDialog({
                                           </Card>
                                           <p> {category.name}</p>
                                         </div>
-                                        <div className="flex flex-row items-center">
+                                        <div className="flex flex-row items-center gap-2">
                                           {category?.hasTracker && (
                                             <Badge
                                               variant={"outline"}

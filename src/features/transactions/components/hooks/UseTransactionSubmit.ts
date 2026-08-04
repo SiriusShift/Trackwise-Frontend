@@ -2,9 +2,10 @@ import { transactionApi } from "@/features/transactions/api/transaction";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { transferApi } from "@/features/transactions/api/transaction/transferApi";
-import { assetsApi } from "@/shared/api/assetsApi";
+import { accountsApi } from "@/shared/api/accountsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -122,7 +123,7 @@ export function useTransactionSubmit({
       };
       dispatch(apiMap[type].util.invalidateTags(tagMap[type]));
     }
-    dispatch(assetsApi.util.invalidateTags(["Assets"]));
+    dispatch(accountsApi.util.invalidateTags(["Assets"]));
     dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
     dispatch(transactionApi.util.invalidateTags(["History", "Stats"]));
   }
@@ -159,7 +160,8 @@ export function useTransactionSubmit({
             `${type} ${SUCCESS_VERB[mode]?.[type] ?? "submitted"} successfully.`,
           );
         } catch (err: any) {
-          toast.error(err?.data?.error ?? "Something went wrong.");
+          console.log(err);
+          toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
         }
       },
     });

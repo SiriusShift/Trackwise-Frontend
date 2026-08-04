@@ -1,5 +1,5 @@
 import { IRootState } from "@/app/store";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { useGetCategoryQuery } from "@/shared/api/categoryApi";
 import { FilterSheet } from "@/shared/components/FilterSheet";
 import { Button } from "@/shared/components/ui/button";
@@ -15,6 +15,7 @@ import { AssetData, Category, categoryType } from "@/shared/types";
 import { ChevronDown, Download, Filter, Plus } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import ReportDialog from "../dialogs/ReportDialog";
 import { TransactionDialog } from "../dialogs/TransactionDialog";
 import Assets from "./filters/Assets";
 import Status from "./filters/Status";
@@ -47,6 +48,8 @@ const TransactionToolbar = ({
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+
   const [status, setStatus] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [selectedAssets, setSelectedAssets] = useState<any[]>([]);
@@ -54,7 +57,7 @@ const TransactionToolbar = ({
 
   const type = useSelector((state: IRootState) => state.active.type);
 
-  const { data: assets } = useGetAssetQuery();
+  const { data: assets } = useGetAccountsQuery();
   const { data: categoryData } = useGetCategoryQuery({
     type,
   });
@@ -103,7 +106,11 @@ const TransactionToolbar = ({
               <Plus className="lg:mr-2" />
               <span className="hidden md:inline">Add</span>
             </Button>
-            <Button size="sm" variant="outline">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setReportOpen(true)}
+            >
               <Download className="lg:mr-2" />
               <span className="hidden md:inline">Export</span>
             </Button>
@@ -213,6 +220,7 @@ const TransactionToolbar = ({
         </div>
       </div>
       <TransactionDialog open={dialogOpen} setOpen={setDialogOpen} mode="add" />
+      <ReportDialog setOpen={setReportOpen} open={reportOpen} />
     </>
   );
 };

@@ -1,54 +1,38 @@
-import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
-  Banknote,
-  CheckCircle,
-  CircleAlert,
-  Clock,
-  CreditCard,
-  Eye,
-  Loader,
-  MoreHorizontal,
-  Pencil,
-  RefreshCcw,
-  History,
-  Trash2,
-  X,
-  Archive,
-} from "lucide-react";
-import { Expense } from "@/shared/types";
+  useCancelRecurringIncomeMutation,
+  useDeleteIncomeMutation,
+  usePostAutoReceiveMutation,
+} from "@/features/transactions/api/transaction/incomeApi";
+import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
+import { categoryApi } from "@/shared/api/categoryApi";
+import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import moment from "moment";
-import { Badge } from "@/shared/components/ui/badge";
-import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
-import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { useState } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
-import { Portal } from "@radix-ui/react-tooltip";
+import { Expense } from "@/shared/types";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { ColumnDef } from "@tanstack/react-table";
 import {
-  useCancelRecurringIncomeMutation,
-  useDeleteIncomeMutation,
-  usePostAutoReceiveMutation,
-} from "@/features/transactions/api/transaction/incomeApi";
+  Archive,
+  ArrowUpDown,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  RefreshCcw,
+} from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import { StatusIcon } from "../../statusIcon";
-import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import { assetsApi } from "@/shared/api/assetsApi";
+import { accountsApi } from "@/shared/api/accountsApi";
 export const incomeColumns: ColumnDef<Income>[] = [
   // {
   //   accessorKey: "id",
@@ -102,28 +86,28 @@ export const incomeColumns: ColumnDef<Income>[] = [
       cellClassName: "border-b",
     },
   },
-  {
-    accessorKey: "remainingBalance",
-    header: "Balance",
-    // header: ({ column }) => {
-    //   return (
-    //     <Button
-    //       variant={"ghost"}
-    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //     >
-    //       Paid
-    //       <ArrowUpDown />
-    //     </Button>
-    //   );
-    // },
-    cell: ({ getValue }) => {
-      const amount = getValue() as number | undefined;
-      return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
-    },
-    meta: {
-      cellClassName: "border-b",
-    },
-  },
+  // {
+  //   accessorKey: "remainingBalance",
+  //   header: "Balance",
+  //   // header: ({ column }) => {
+  //   //   return (
+  //   //     <Button
+  //   //       variant={"ghost"}
+  //   //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //   //     >
+  //   //       Paid
+  //   //       <ArrowUpDown />
+  //   //     </Button>
+  //   //   );
+  //   // },
+  //   cell: ({ getValue }) => {
+  //     const amount = getValue() as number | undefined;
+  //     return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
+  //   },
+  //   meta: {
+  //     cellClassName: "border-b",
+  //   },
+  // },
   {
     accessorKey: "category.name",
     header: "Category",
@@ -259,7 +243,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
                 id: income.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              dispatch(assetsApi.util.invalidateTags(["Assets"]));
+              dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);
@@ -303,85 +287,24 @@ export const incomeColumns: ColumnDef<Income>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-              {/* --- Pay --- */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <DropdownMenuItem
-                      onSelect={onPayment}
-                      disabled={income?.status === "Received"}
-                    >
-                      <Banknote /> Receive
-                    </DropdownMenuItem>
-                  </span>
-                </TooltipTrigger>
-                <Portal>
-                  {income?.status === "Received" && (
-                    <TooltipContent side="right" sideOffset={10}>
-                      Already Received
-                    </TooltipContent>
-                  )}
-                </Portal>
-              </Tooltip>
-
               {/* --- Edit --- */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setMode("edit");
-                        setDialogOpen(true);
-                        setDropdownOpen(false);
-                      }}
-                      disabled={
-                        income?.status === "Received" ||
-                        income?.status === "Partial"
-                      }
-                    >
-                      <Pencil /> Edit
-                    </DropdownMenuItem>
-                  </span>
-                </TooltipTrigger>
-                <Portal>
-                  <>
-                    {income?.status === "Partial" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this income is partially received.
-                        Changing the amount could cause balance conflicts.
-                      </TooltipContent>
-                    )}
-                    {income?.status === "Received" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — this income is already received.
-                      </TooltipContent>
-                    )}
-                  </>
-                </Portal>
-              </Tooltip>
+
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMode("edit");
+                  setDialogOpen(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                <Pencil /> Edit
+              </DropdownMenuItem>
 
               {/* --- View --- */}
               <DropdownMenuItem onClick={onView}>
                 <Eye /> View
               </DropdownMenuItem>
-
-              {/* --- Cancel Recurring --- */}
-              {income?.recurringTemplate && (
-                <>
-                  <DropdownMenuSeparator />
-
-                  {/* Stop whole series */}
-                  <DropdownMenuItem
-                    disabled={!income?.recurringTemplate?.isActive}
-                    onClick={onStopSeries}
-                  >
-                    <X className="h-4 w-4 text-destructive" />
-                    Stop Recurring
-                  </DropdownMenuItem>
-                </>
-              )}
 
               {/* --- Archive --- */}
               <DropdownMenuItem onClick={onArchive}>

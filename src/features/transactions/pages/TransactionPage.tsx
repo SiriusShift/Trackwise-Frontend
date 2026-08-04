@@ -63,7 +63,52 @@ const TransactionPage = () => {
     transactionConfig[type as keyof typeof transactionConfig] || {};
   // Expense
   const { data: expenseData, isFetching: expenseFetching } =
-    useGetExpensesQuery({
+    useGetExpensesQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        pageSize,
+        pageIndex,
+        ...(filter?.status && { status: filter?.status }),
+        ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
+        ...(selectedCategories.length && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id),
+          ),
+        }),
+        ...(selectedAssets.length && {
+          Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Expense",
+      },
+    );
+
+  const { data: expenseGraphData, isFetching: expenseGraphFetching } =
+    useGetGraphExpenseQuery(
+      {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        mode,
+        ...(filter?.status && { status: filter?.status }),
+        ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
+        ...(selectedCategories.length && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id),
+          ),
+        }),
+        ...(selectedAssets.length && {
+          Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
+        }),
+      },
+      {
+        skip: type !== "Expense",
+      },
+    );
+
+  const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
+    {
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
       pageSize,
@@ -78,26 +123,6 @@ const TransactionPage = () => {
       ...(selectedAssets.length && {
         Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
       }),
-    });
-
-  const { data: expenseGraphData, isFetching: expenseGraphFetching } =
-    useGetGraphExpenseQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        mode,
-      },
-      {
-        skip: type !== "Expense",
-      },
-    );
-
-  const { data: incomeData, isFetching: incomeFetching } = useGetIncomeQuery(
-    {
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
-      pageSize,
-      pageIndex,
     },
     {
       skip: type !== "Income",
@@ -110,6 +135,16 @@ const TransactionPage = () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         mode,
+        ...(filter?.status && { status: filter?.status }),
+        ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
+        ...(selectedCategories.length && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id),
+          ),
+        }),
+        ...(selectedAssets.length && {
+          Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
+        }),
       },
       {
         skip: type !== "Income",
@@ -124,6 +159,16 @@ const TransactionPage = () => {
         endDate: endDate?.toISOString(),
         pageSize,
         pageIndex,
+        ...(filter?.status && { status: filter?.status }),
+        ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
+        ...(selectedCategories.length && {
+          Categories: JSON.stringify(
+            selectedCategories.map((category) => category.id),
+          ),
+        }),
+        ...(selectedAssets.length && {
+          Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
+        }),
       },
       {
         skip: type !== "Transfer",

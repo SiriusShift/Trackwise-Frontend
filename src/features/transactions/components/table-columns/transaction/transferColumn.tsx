@@ -1,7 +1,4 @@
-import {
-  useCancelRecurringExpenseMutation,
-  useDeleteExpenseMutation,
-} from "@/features/transactions/api/transaction/expensesApi";
+import { useCancelRecurringExpenseMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -29,8 +26,8 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
+import { useDeleteTransferMutation } from "@/features/transactions/api/transaction/transferApi";
 import { StatusIcon } from "@/features/transactions/components/statusIcon";
-import { assetsApi } from "@/shared/api/assetsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import {
@@ -197,7 +194,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
       const dispatch = useDispatch();
       console.log(expense);
 
-      const [deleteExpense] = useDeleteExpenseMutation();
+      const [deleteTransfer] = useDeleteTransferMutation();
       // const [payAuto] = usePostAutoPaymentMutation();
       const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
@@ -211,14 +208,14 @@ export const transferColumns: ColumnDef<Transfer>[] = [
           cancelText: "Cancel",
           onConfirm: async () => {
             try {
-              await deleteExpense({
+              await deleteTransfer({
                 data: {
                   delete: true,
                 },
                 id: expense.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              dispatch(assetsApi.util.invalidateTags(["Assets"]));
+              dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
               toast.error(err?.data?.error);

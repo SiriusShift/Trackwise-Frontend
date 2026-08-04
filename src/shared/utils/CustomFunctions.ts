@@ -44,10 +44,16 @@ export const formatMode = () => {
   if (mode === "monthly") return "month";
   if (mode === "yearly") return "year";
 };
-export const formatCurrency = (amount: number, currency = "PHP") => {
+
+export const formatCurrency = (
+  amount: number,
+  currency = "PHP",
+  currencyDisplay: Intl.NumberFormatOptions["currencyDisplay"] = "symbol",
+) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
+    currencyDisplay,
   }).format(amount);
 };
 

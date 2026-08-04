@@ -97,6 +97,15 @@ const WidgetLayout = ({
           : "text-success-500"
         : "text-muted-foreground";
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty(
+      "--mouse-x",
+      `${e.clientX - rect.left}px`,
+    );
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+  };
+
   const toggleBalanceVisibility = () => {
     setShowBalance((prev) => {
       localStorage.setItem("showBalance", JSON.stringify(!prev));
@@ -106,23 +115,35 @@ const WidgetLayout = ({
 
   return (
     <Card
-      className={`
-        relative overflow-hidden border border-border/60 bg-card
-        p-5 flex flex-col rounded-2xl shadow-sm col-span-full
-        ${isOverview ? "md:col-span-2" : "md:col-span-1"}
-        xl:col-span-2 2xl:col-span-1
-        transition-shadow hover:shadow-md
-      `}
-      // style={{
-      //   backgroundImage: `
-      //     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-      //     radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-      //   `,
-      // }}
+      onMouseMove={handleMouseMove}
+      className={cn(
+        `relative overflow-hidden border border-border/60 bg-card
+    p-5 flex flex-col rounded-2xl shadow-sm col-span-full
+    ${isOverview ? "md:col-span-2" : "md:col-span-1"}
+    xl:col-span-2 2xl:col-span-1
+    transition-shadow hover:shadow-md group`,
+      )}
     >
-      {/* Top accent */}
-      {/* <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" /> */}
+      {/* Spotlight fill */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(200px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.15), transparent 80%)`,
+        }}
+      />
 
+      {/* Border glow that tracks the cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          padding: "1px",
+          background: `radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.7), transparent 70%)`,
+          WebkitMask:
+            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+        }}
+      />
       <CardHeader className="p-0">
         <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground flex flex-row gap-1 items-center">
           {title}

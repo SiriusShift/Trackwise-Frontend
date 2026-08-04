@@ -1,3 +1,4 @@
+import SavingsPage from "@/features/accounts/pages/AccountPage";
 import ForgotPassword from "@/features/auth/pages/ForgotPassword";
 import ResetPassword from "@/features/auth/pages/ResetPassword";
 import Dashboard from "@/features/dashboard/pages/Dashboard";
@@ -11,7 +12,6 @@ import SecuritySettings from "@/features/settings/pages/SecuritySettings";
 import ThemeSettings from "@/features/settings/pages/ThemeSettings";
 import CalendarPage from "@/features/transactions/pages/CalendarPage";
 import TransactionPage from "@/features/transactions/pages/TransactionPage";
-import SavingsPage from "@/pages/AccountPage";
 import LoanPage from "@/pages/LoanPage";
 import { createBrowserRouter } from "react-router-dom";
 import SigninPage from "../features/auth/pages/SigninPage";

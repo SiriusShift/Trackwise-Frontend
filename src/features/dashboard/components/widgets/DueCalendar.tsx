@@ -1,5 +1,6 @@
 import { IRootState } from "@/app/store";
 import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
+import { cn } from "@/lib/utils";
 import BillDialog from "@/shared/components/dialog/BillDialog/BillDialog";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -83,13 +84,45 @@ export default function DueCalendar() {
     setOpen(true);
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty(
+      "--mouse-x",
+      `${e.clientX - rect.left}px`,
+    );
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+  };
+
   return (
     <>
       <Card
-        className="relative overflow-hidden border border-border/60 bg-card
-    p-5 flex flex-col rounded-2xl shadow-sm col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
-    transition-shadow hover:shadow-md"
+        onMouseMove={handleMouseMove}
+        className={cn(
+          `relative overflow-hidden border border-border/60 bg-card
+    p-5 flex flex-col rounded-2xl shadow-sm  col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
+    transition-shadow hover:shadow-md group`,
+        )}
       >
+        {/* Spotlight fill */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(200px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.15), transparent 80%)`,
+          }}
+        />
+
+        {/* Border glow that tracks the cursor */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            padding: "1px",
+            background: `radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.7), transparent 70%)`,
+            WebkitMask:
+              "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+            maskComposite: "exclude",
+          }}
+        />
         {/* Header */}
         <CardHeader className="flex flex-row w-full justify-between p-0">
           <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground flex flex-row gap-1 items-center">

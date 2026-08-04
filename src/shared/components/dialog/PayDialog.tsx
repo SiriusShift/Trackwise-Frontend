@@ -2,7 +2,7 @@ import { usePostPaymentMutation } from "@/features/transactions/api/transaction/
 import { AccountSelect } from "@/features/transactions/components/forms/section/AccountSelect";
 import { cn } from "@/lib/utils";
 import { payRecurringSchema } from "@/schema/schema";
-import { useGetAssetQuery } from "@/shared/api/assetsApi";
+import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { commonDialogProps, payRecurringForm } from "@/shared/types";
 import { numberInput } from "@/shared/utils/CustomFunctions";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -22,7 +22,7 @@ interface PayDialogType extends commonDialogProps {
 }
 function PayDialog({ data, open, setOpen }: PayDialogType) {
   const [openDate, setOpenDate] = useState(false);
-  let { data: assetData } = useGetAssetQuery();
+  let { data: assetData } = useGetAccountsQuery();
   assetData = assetData?.data;
   const [triggerPayment, { isLoading }] = usePostPaymentMutation();
 
