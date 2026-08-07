@@ -1,3 +1,4 @@
+import { useLazyGetSignoutQuery } from "@/features/auth/api/signinApi";
 import {
   Sidebar,
   SidebarContent,
@@ -6,26 +7,23 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@/shared/components/ui/sidebar";
-import { WalletMinimal, LogOut } from "lucide-react";
-import { navigationData } from "../../routing/navigationData";
-import { useEffect, useState } from "react";
-import { Link, useMatch, useNavigate } from "react-router-dom";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipArrow,
-} from "@radix-ui/react-tooltip";
-import { useLazyGetSignoutQuery } from "@/features/auth/api/signinApi";
-import { Button } from "./ui/button";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import useLocationHook from "@/shared/hooks/useLocation";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
+import { LogOut, WalletMinimal } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
+import { navigationData } from "../../routing/navigationData";
 export function AppSidebar() {
   const location = useLocationHook();
   const parent = `/${location?.location?.pathname?.split("/")[1]}`;
@@ -92,10 +90,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {navigationData.map((item) => {
-                console.log(item?.name);
+                const isCollapsed = state === "collapsed";
+
                 return (
                   <SidebarMenuItem
-                    className={`flex justify-center lg:justify-start lg:ms-1`}
+                    className="flex justify-center lg:justify-start lg:ms-1"
                     key={item.name}
                   >
                     {screenWidth > 767 && screenWidth < 1024 ? (
@@ -126,44 +125,59 @@ export function AppSidebar() {
                             className="p-2 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
                           >
                             <p className="tracking-wide">{item.name}</p>
-                            {/* <TooltipArrow className="bg-primary-foreground" />{" "} */}
-                            {/* Add styles to customize the arrow */}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <SidebarMenuButton
-                        variant={parent === item.path ? "default" : "ghost"}
-                        asChild
-                      >
-                        <Link
-                          to={item.path}
-                          onClick={() => setActive(item.path)}
-                          className="
-    flex items-center rounded
-    transition-all duration-300
-    justify-start
-    data-[state=collapsed]:justify-center
-  "
-                        >
-                          <item.icon
-                            style={{ width: "17px", height: "17px" }}
-                          />
-                          <span
-                            className="
-    ml-2
-    transition-all duration-300
-    whitespace-nowrap
-    overflow-hidden
-    max-w-[160px]
-    data-[state=collapsed]:max-w-0
-    data-[state=collapsed]:opacity-0
-  "
-                          >
-                            {item.name}
-                          </span>
-                        </Link>
-                      </SidebarMenuButton>
+                      <TooltipProvider>
+                        <Tooltip disableHoverableContent={!isCollapsed}>
+                          <TooltipTrigger asChild disabled={!isCollapsed}>
+                            <SidebarMenuButton
+                              variant={
+                                parent === item.path ? "default" : "ghost"
+                              }
+                              asChild
+                            >
+                              <Link
+                                to={item.path}
+                                onClick={() => setActive(item.path)}
+                                className="
+                                  flex items-center rounded
+                                  transition-all duration-300
+                                  justify-start
+                                  data-[state=collapsed]:justify-center
+                                "
+                              >
+                                <item.icon
+                                  style={{ width: "17px", height: "17px" }}
+                                />
+                                <span
+                                  className="
+                              ml-2
+                              transition-all duration-300
+                              whitespace-nowrap
+                              overflow-hidden
+                              max-w-[160px]
+                              data-[state=collapsed]:max-w-0
+                              data-[state=collapsed]:opacity-0
+                            "
+                                >
+                                  {item.name}
+                                </span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </TooltipTrigger>
+                          {isCollapsed && (
+                            <TooltipContent
+                              side="right"
+                              sideOffset={5}
+                              className="p-1 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
+                            >
+                              <p className="tracking-wide">{item.name}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                   </SidebarMenuItem>
                 );

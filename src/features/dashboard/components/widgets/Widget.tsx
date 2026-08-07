@@ -42,9 +42,10 @@ const WidgetLayout = ({
   icon,
 }: commonWidgetProps) => {
   const [showBalance, setShowBalance] = useState(() => {
-    const saved = localStorage.getItem("showBalance");
+    const saved = localStorage.getItem(`showBalance:${title}`);
     return saved ? JSON.parse(saved) : true;
   });
+
   const date = formatDateDisplay();
   const mode = formatMode();
   console.log(segments);
@@ -108,7 +109,7 @@ const WidgetLayout = ({
 
   const toggleBalanceVisibility = () => {
     setShowBalance((prev) => {
-      localStorage.setItem("showBalance", JSON.stringify(!prev));
+      localStorage.setItem(`showBalance:${title}`, JSON.stringify(!prev));
       return !prev;
     });
   };
@@ -192,16 +193,23 @@ const WidgetLayout = ({
                       <span className="text-muted-foreground font-normal">
                         ₱
                       </span>
-                      <span
-                        className={cn(
-                          "transition-all duration-400",
-                          showBalance
-                            ? "blur-none opacity-100"
-                            : "blur-[8px] opacity-50 select-none",
-                        )}
-                      >
-                        <AnimateNumber duration={2} value={balance} />
-                      </span>
+                      {showBalance ? (
+                        <span className="transition-all duration-300">
+                          <AnimateNumber duration={2} value={balance} />
+                        </span>
+                      ) : (
+                        <span
+                          className="flex items-center gap-1.5 py-1 select-none"
+                          aria-label="Balance hidden"
+                        >
+                          {Array.from({ length: 7 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className="w-2 h-2 rounded-full bg-foreground/70"
+                            />
+                          ))}
+                        </span>
+                      )}
                     </div>
 
                     <Button

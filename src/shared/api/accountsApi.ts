@@ -18,12 +18,13 @@ export const accountsApi = api
       createAccount: builder.mutation({
         query: (body) => ({
           url: "/assets",
-          method: "GET",
+          method: "POST",
           headers: {
             Accept: "application/json",
           },
           body,
         }),
+        invalidatesTags: ["Assets"],
       }),
       updateAccount: builder.mutation({
         query: (body) => ({
@@ -34,6 +35,7 @@ export const accountsApi = api
           },
           body,
         }),
+        invalidatesTags: ["Assets"],
       }),
     }),
   });

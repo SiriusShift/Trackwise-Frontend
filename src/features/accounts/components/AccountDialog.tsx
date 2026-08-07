@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, Wallet } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Wallet } from "lucide-react";
 import { useEffect } from "react";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import CommonDialog from "@/shared/components/dialog/CommonDialog";
 import { Button } from "@/shared/components/ui/button";
@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { commonDialogProps } from "@/shared/types";
 import { toast } from "sonner";
 
 import { IRootState } from "@/app/store";
@@ -47,42 +46,29 @@ import {
 } from "@/shared/components/ui/popover";
 import currencyCodes from "currency-codes";
 import { useSelector } from "react-redux";
+import { ACCOUNT_SUBTYPES, ACCOUNT_TYPES, ICON_OPTIONS } from "../constants";
+import { accountSchema } from "../schema/account.schema";
+import {
+  AccountCategory,
+  AccountDialogProps,
+  AccountFormValues,
+} from "../types/account.types";
 
-const ACCOUNT_TYPES = [
-  { value: "CASH", label: "Cash" },
-  { value: "BANK", label: "Bank Account" },
-  { value: "CREDIT", label: "Credit" },
-  { value: "LOAN", label: "Loan" },
-  { value: "INVESTMENT", label: "Investment" },
+const ICON_MAP = Object.fromEntries(
+  ICON_OPTIONS.map((opt) => [opt.value, opt.Icon]),
+) as Record<string, (typeof ICON_OPTIONS)[number]["Icon"]>;
+
+// A fixed swatch palette rather than a free-form color input — keeps every
+// account card visually consistent instead of users picking near-duplicate
+// shades. Stored as Asset.color (hex string).
+const COLOR_OPTIONS = [
+  "#3b82f6", // blue
+  "#22c55e", // green
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#a855f7", // purple
+  "#ec4899", // pink
 ] as const;
-
-// Keyed by AssetCategory — CASH intentionally has no entry (no subtype),
-// matching the AssetSubtype mapping documented in schema.prisma.
-const ACCOUNT_SUBTYPES = {
-  BANK: [
-    { value: "SAVINGS", label: "Savings" },
-    { value: "CHECKING", label: "Checking" },
-    { value: "E_WALLET", label: "E-Wallet" },
-  ],
-  CREDIT: [
-    { value: "CREDIT_CARD", label: "Credit Card" },
-    { value: "LINE_OF_CREDIT", label: "Line of Credit" },
-  ],
-  LOAN: [
-    { value: "PERSONAL", label: "Personal Loan" },
-    { value: "HOME", label: "Home Loan" },
-    { value: "AUTO", label: "Auto Loan" },
-  ],
-  INVESTMENT: [
-    { value: "STOCK", label: "Stock" },
-    { value: "ETF", label: "ETF" },
-    { value: "CRYPTO", label: "Crypto" },
-    { value: "MUTUAL_FUND", label: "Mutual Fund" },
-    { value: "BOND", label: "Bond" },
-  ],
-} as const;
-
-type AccountCategory = keyof typeof ACCOUNT_SUBTYPES | "CASH";
 
 // Small helper so required labels are visually consistent everywhere.
 const RequiredMark = () => (
@@ -94,59 +80,6 @@ const RequiredMark = () => (
 // Field names match CreditDetail (schema.prisma) exactly — statementDate/
 // dueDate, not statementDay/dueDay — so the onSubmit reshape below is a
 // straight passthrough instead of a renaming trap.
-const accountSchema = z
-  .object({
-    name: z.string().min(1, "Account name is required"),
-    type: z.enum(["CASH", "BANK", "CREDIT", "LOAN", "INVESTMENT"]),
-    sub_type: z.string().optional(),
-    currency: z.object({
-      code: z.string(),
-      currency: z.string(),
-      digits: z.number(),
-      number: z.string(),
-    }),
-    balance: z
-      .number()
-      .positive()
-      .refine((v) => !isNaN(Number(v)), "Must be a valid number"),
-
-    // Lives on Asset itself (institution: String?) — applies to any account
-    // type, not just credit. Always optional.
-    institution: z.string().optional(),
-
-    // Mirrors CreditDetail: only creditLimit is non-nullable there.
-    creditLimit: z.number().positive().optional(),
-    statementDate: z.number().int().min(1).max(31).optional(),
-    dueDate: z.number().int().min(1).max(31).optional(),
-    minimumPayment: z.number().nonnegative().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.type !== "CASH" && !data.sub_type?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["sub_type"],
-        message: "Sub type is required",
-      });
-    }
-
-    if (data.type === "CREDIT" && data.creditLimit == null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["creditLimit"],
-        message: "Credit limit is required",
-      });
-    }
-  });
-type AccountFormValues = z.infer<typeof accountSchema>;
-
-interface AccountData extends AccountFormValues {
-  id: string;
-}
-
-interface AccountDialogProps extends commonDialogProps {
-  mode: string;
-  account?: AccountData;
-}
 
 // Sensible default matching Trackwise's PHP-first convention — the currency
 // combobox still requires an explicit selection to submit, this just avoids
@@ -159,7 +92,7 @@ const AccountDialog = ({
   account,
 }: AccountDialogProps) => {
   const currency = useSelector((state: IRootState) => state.settings.currency);
-  const isEdit = mode === "Edit";
+  const isEdit = mode === "edit";
 
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
   const [updateAccount, { isLoading: isUpdating }] = useUpdateAccountMutation();
@@ -170,7 +103,11 @@ const AccountDialog = ({
     defaultValues: {
       name: "",
       type: "",
+      sub_type: "",
+      includeNetWorth: false,
       balance: 0,
+      color: COLOR_OPTIONS[0],
+      icon: ICON_OPTIONS[0].value,
       currency: currencyCodes?.data?.find((item) => item?.code === currency),
     },
   });
@@ -183,7 +120,11 @@ const AccountDialog = ({
     formState: { isValid },
   } = form;
 
+  console.log(watch());
+
   const accountType = watch("type") as AccountCategory;
+  const selectedColor = watch("color");
+  const selectedIcon = watch("icon");
   const subtypeOptions =
     accountType in ACCOUNT_SUBTYPES
       ? ACCOUNT_SUBTYPES[accountType as keyof typeof ACCOUNT_SUBTYPES]
@@ -214,7 +155,11 @@ const AccountDialog = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountType]);
 
-  // Reset form with account data when opening in edit mode
+  // Reset form with account data when opening in edit mode.
+  // Previously this only restored name/type/sub_type/currency/balance —
+  // institution, the credit fields, and includeNetWorth were left commented
+  // out, so editing an existing account silently dropped them from the form.
+  // Restoring color/icon here too, now that they exist.
   useEffect(() => {
     if (open) {
       if (isEdit && account) {
@@ -229,6 +174,9 @@ const AccountDialog = ({
           statementDate: account.statementDate,
           dueDate: account.dueDate,
           minimumPayment: account.minimumPayment,
+          color: account.color ?? COLOR_OPTIONS[0],
+          icon: account.icon ?? ICON_OPTIONS[0].value,
+          includeNetWorth: account.includeNetWorth,
         });
       } else {
         reset();
@@ -271,6 +219,9 @@ const AccountDialog = ({
       );
     }
   };
+
+  const SelectedIcon = ICON_MAP[selectedIcon ?? ICON_OPTIONS[0].value];
+
   return (
     <CommonDialog
       icon={Wallet}
@@ -480,6 +431,149 @@ const AccountDialog = ({
               )}
             />
           )}
+
+          {/* Icon + color are plain Asset fields — apply to every account type,
+              used for card/list identification (avatar swatch + icon). */}
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name="icon"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Icon</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full justify-start gap-2 h-10"
+                        >
+                          <span
+                            className="flex h-6 w-6 items-center justify-center rounded-full"
+                            style={{
+                              backgroundColor: `${selectedColor ?? COLOR_OPTIONS[0]}20`,
+                            }}
+                          >
+                            <SelectedIcon
+                              className="h-3.5 w-3.5"
+                              style={{
+                                color: selectedColor ?? COLOR_OPTIONS[0],
+                              }}
+                            />
+                          </span>
+                          {ICON_OPTIONS.find((o) => o.value === field.value)
+                            ?.label ?? "Select icon"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-2">
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {ICON_OPTIONS.map(({ value, label, Icon }) => (
+                          <button
+                            key={value}
+                            type="button"
+                            title={label}
+                            onClick={() => field.onChange(value)}
+                            className={cn(
+                              "flex h-9 w-9 items-center justify-center rounded-md border transition-colors hover:bg-muted",
+                              field.value === value
+                                ? "border-primary bg-muted"
+                                : "border-transparent",
+                            )}
+                          >
+                            <Icon className="h-4 w-4" />
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name="color"
+              render={({ field }) => {
+                const isCustomColor =
+                  !!field.value &&
+                  !COLOR_OPTIONS.includes(
+                    field.value as (typeof COLOR_OPTIONS)[number],
+                  );
+
+                return (
+                  <FormItem>
+                    <FormLabel>Color</FormLabel>
+                    <FormControl>
+                      <div className="flex h-10 flex-wrap items-center gap-1.5">
+                        {COLOR_OPTIONS.map((hex) => (
+                          <button
+                            key={hex}
+                            type="button"
+                            title={hex}
+                            onClick={() => field.onChange(hex)}
+                            className={cn(
+                              "h-6 w-6 rounded-full ring-offset-2 ring-offset-background transition-shadow",
+                              field.value === hex
+                                ? "ring-2 ring-primary"
+                                : "ring-1 ring-border",
+                            )}
+                            style={{ backgroundColor: hex }}
+                          />
+                        ))}
+
+                        {/* Custom swatch — opens a react-colorful picker for any
+                            hex, not just the presets above. Shown as the actual
+                            picked color once one is chosen; otherwise a rainbow
+                            ring with a "+" hints that it's the custom option. */}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              title={
+                                isCustomColor ? field.value : "Custom color"
+                              }
+                              className={cn(
+                                "flex h-6 w-6 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition-shadow",
+                                isCustomColor
+                                  ? "ring-2 ring-primary"
+                                  : "ring-1 ring-border",
+                              )}
+                              style={{
+                                background: isCustomColor
+                                  ? field.value
+                                  : "conic-gradient(from 90deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)",
+                              }}
+                            >
+                              {!isCustomColor && (
+                                <Plus className="h-3 w-3 text-white drop-shadow" />
+                              )}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto space-y-2 p-3">
+                            <HexColorPicker
+                              color={field.value ?? COLOR_OPTIONS[0]}
+                              onChange={field.onChange}
+                            />
+                            <HexColorInput
+                              color={field.value ?? COLOR_OPTIONS[0]}
+                              onChange={field.onChange}
+                              prefixed
+                              className="w-full rounded-md border bg-background px-2 py-1 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-primary"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+          </div>
+
           {accountType === "CREDIT" && (
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-4">
