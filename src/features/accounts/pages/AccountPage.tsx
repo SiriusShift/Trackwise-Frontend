@@ -1,3 +1,5 @@
+import { IRootState } from "@/app/store";
+import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
@@ -12,7 +14,11 @@ import {
   Wallet,
 } from "lucide-react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import AccountCard from "../components/AccountCard";
+import AccountCardSkeleton from "../components/AccountCardSkeleton";
 import AccountDialog from "../components/AccountDialog";
+import { Account } from "../types/account.types";
 
 const stats = [
   {
@@ -44,6 +50,17 @@ const stats = [
 const AccountPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [mode, setMode] = useState<string>("add");
+
+  const startDate = useSelector(
+    (state: IRootState) => state.active.active.from,
+  );
+  const endDate = useSelector((state: IRootState) => state.active.active.to);
+
+  const { data: accountsData, isLoading: accountsLoading } =
+    useGetAccountsQuery({
+      dateFrom: startDate,
+      dateTo: endDate,
+    });
 
   const handleAdd = () => {
     setMode("Add");
@@ -105,6 +122,16 @@ const AccountPage = () => {
               </Card>
             );
           })}
+        </div>
+
+        <div className="grid grid-cols-4 gap-5">
+          {accountsLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <AccountCardSkeleton key={i} />
+              ))
+            : accountsData?.data?.map((account: Account) => (
+                <AccountCard key={account.id} account={account} />
+              ))}
         </div>
       </div>
       <AccountDialog open={open} setOpen={setOpen} mode={mode} />

@@ -11,13 +11,13 @@ import {
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { months } from "@/shared/constants/dateConstants";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActive, setMode } from "@/shared/slices/activeSlice";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
 import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import useScreenWidth from "../hooks/useScreenWidth";
 import { Button } from "./ui/button";
 
 interface DateRange {
@@ -224,7 +224,7 @@ const MonthPicker: React.FC = () => {
     <div className="flex flex-col items-start">
       <Popover>
         <PopoverTrigger asChild>
-          <Button size="sm" variant="outline" className="font-normal">
+          <Button variant="outline" className="font-normal">
             <CalendarRange />
             <span className="hidden sm:inline ml-2">{formatDateDisplay()}</span>
           </Button>

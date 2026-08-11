@@ -15,3 +15,19 @@ export interface AccountDialogProps extends commonDialogProps {
 }
 
 export type AccountCategory = keyof typeof ACCOUNT_SUBTYPES | "CASH";
+
+export interface Account {
+  id: number;
+  name: string;
+  balance: string;
+  currency: string;
+  category: string;
+  includeInNetWorth: boolean;
+  totalIncomes: number;
+  totalExpenses: number;
+  totalTransferOut: number;
+  totalTransferIn: number;
+  remainingBalance: number;
+  rangeExpense?: number;
+  rangeIncome?: number;
+}
