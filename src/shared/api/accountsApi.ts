@@ -1,17 +1,21 @@
+import {
+  AccountPayload,
+  AccountTemplate,
+} from "@/features/accounts/types/account.types";
 import { api } from "../services/api";
 
 export const accountsApi = api
   .enhanceEndpoints({ addTagTypes: ["Assets"] })
   .injectEndpoints({
     endpoints: (builder) => ({
-      getAccounts: builder.query<any, void>({
+      getAccounts: builder.query<AccountTemplate, AccountPayload | void>({
         query: (params) => ({
           url: "/assets",
           method: "GET",
           headers: {
             Accept: "application/json",
           },
-          params,
+          params: params ?? undefined,
         }),
         providesTags: ["Assets"],
       }),

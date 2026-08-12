@@ -1,3 +1,4 @@
+import { IRootState } from "@/app/store";
 import { cn } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import CommonDialog from "@/shared/components/dialog/CommonDialog";

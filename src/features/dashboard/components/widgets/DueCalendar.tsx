@@ -179,7 +179,7 @@ export default function DueCalendar() {
                 const IconComponent = getCategoryIcon(bill.category?.icon);
 
                 return (
-                  <div
+                  <Card
                     key={bill.id}
                     className="flex items-center cursor-pointer gap-4 p-2 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors"
                     onClick={() => handleOpenBill(bill)}
@@ -221,7 +221,7 @@ export default function DueCalendar() {
                         {status.label}
                       </span>
                     </div>
-                  </div>
+                  </Card>
                 );
               })}
             </div>

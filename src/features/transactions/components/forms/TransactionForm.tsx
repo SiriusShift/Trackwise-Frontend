@@ -27,6 +27,8 @@ import { Toggle } from "@/shared/components/ui/toggle";
 import { frequencyList } from "@/shared/constants/dateConstants";
 import { Field } from "@/shared/types";
 
+import { IRootState } from "@/app/store";
+import { useSelector } from "react-redux";
 import { AccountSelect } from "./section/AccountSelect";
 import { BehaviourSelector } from "./section/BehaviourSelector";
 import { CategoryAmountSection } from "./section/CategoryAmountSection";
@@ -45,23 +47,19 @@ interface Category {
 
 interface TransactionFormProps {
   assetData: Asset[];
-  categoryData: Category[];
-  type: "Income" | "Expense" | "Transfer";
   mode: string;
-  history?: boolean;
   setRecurring: (fn: (prev: boolean) => boolean) => void;
 }
 
 const TransactionForm = ({
   assetData,
-  categoryData,
-  type,
   mode,
-  history,
   setRecurring,
 }: TransactionFormProps) => {
   const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
+
+  const type = useSelector((state: IRootState) => state.active.type);
 
   const { watch, control, setValue, getValues } = useFormContext();
 
@@ -251,11 +249,7 @@ const TransactionForm = ({
       )}
 
       {/* Category + Amount */}
-      <CategoryAmountSection
-        categoryData={categoryData}
-        type={type}
-        mode={mode}
-      />
+      <CategoryAmountSection type={type} mode={mode} />
 
       {/* Recurring schedule fields */}
       {isRecurring && (

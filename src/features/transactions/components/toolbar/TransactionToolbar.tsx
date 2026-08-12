@@ -208,7 +208,7 @@ const TransactionToolbar = ({
 
                 <Assets
                   selectedAssets={selectedAssets}
-                  assets={assets}
+                  assets={assets?.data ?? []}
                   onChange={handleAssetChange}
                 />
 

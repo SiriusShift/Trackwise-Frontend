@@ -1,17 +1,10 @@
-import { navigationData, settingsNavigation } from "@/routing/navigationData";
+import { navigationData } from "@/routing/navigationData";
 import { Button } from "@/shared/components/ui/button";
-import React, { useState } from "react";
-import {
-  Link,
-  Outlet,
-  useMatch,
-  useNavigate,
-  useNavigation,
-} from "react-router-dom";
 import useLocationHook from "@/shared/hooks/useLocation";
-import { Separator } from "@/shared/components/ui/separator";
-import { ArrowLeft, ArrowRightIcon } from "lucide-react";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { ArrowLeft, ArrowRightIcon } from "lucide-react";
+import { useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 
 const SettingsLayout = () => {
   const location = useLocationHook();
@@ -22,12 +15,12 @@ const SettingsLayout = () => {
   console.log(location);
 
   const subNavigation = navigationData?.find(
-    (item) => item?.name === "Settings"
+    (item) => item?.name === "Settings",
   )?.sub;
 
   const Tabs = () => {
     return (
-      <div className="sm:flex flex-col gap-2 sm:flex-row sm:pb-1 h-full">
+      <div className="sm:flex flex-col gap-2 sm:flex-row sm:pb-1">
         {subNavigation?.map((item, index) => {
           return (
             <Link

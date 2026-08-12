@@ -2,7 +2,9 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
+import { IRootState } from "@/app/store";
 import { cn } from "@/lib/utils";
+import { useGetCategoryQuery } from "@/shared/api/categoryApi";
 import { Button } from "@/shared/components/ui/button";
 import {
   Command,
@@ -26,24 +28,16 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { numberInput } from "@/shared/utils/CustomFunctions";
-
-interface Category {
-  id: string;
-  name: string;
-}
+import { useSelector } from "react-redux";
 
 interface CategoryAmountSectionProps {
-  categoryData: Category[];
-  type: string;
   mode: string;
 }
 
-export const CategoryAmountSection = ({
-  categoryData,
-  type,
-  mode,
-}: CategoryAmountSectionProps) => {
+export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
   const { control, watch, setValue } = useFormContext();
+  const type = useSelector((state: IRootState) => state.active.type);
+  const { data: categoryData } = useGetCategoryQuery({ type });
 
   // Amount is disabled until an account is chosen (for non-recurring past/present transactions)
   const isAmountDisabled =

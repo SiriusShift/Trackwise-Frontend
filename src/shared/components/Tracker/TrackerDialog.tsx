@@ -10,7 +10,7 @@ import { budgetFrequency } from "@/shared/constants/dateConstants";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { trackerFormType } from "@/shared/types";
-import { numberInput } from "@/shared/utils/CustomFunctions";
+import { hexToRgba, numberInput } from "@/shared/utils/CustomFunctions";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Icons from "lucide-react";
 import { useEffect } from "react";
@@ -268,7 +268,10 @@ function TrackerDialog({
                                           <Card
                                             className={`p-2 rounded-lg border`}
                                             style={{
-                                              backgroundColor: `${category?.color}33`,
+                                              backgroundColor: hexToRgba(
+                                                category.color,
+                                                0.2,
+                                              ),
                                               color: category?.color,
                                             }}
                                           >

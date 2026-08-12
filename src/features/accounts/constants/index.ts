@@ -1,13 +1,21 @@
 import {
   Banknote,
+  Bitcoin,
   Building2,
   Car,
+  ChartCandlestick,
+  ChartNoAxesCombined,
   Coins,
   CreditCard,
   Gem,
+  HandCoins,
+  Handshake,
   Home,
+  House,
   Landmark,
+  PieChart,
   PiggyBank,
+  ScrollText,
   ShoppingBag,
   Smartphone,
   TrendingUp,
@@ -25,26 +33,88 @@ export const ACCOUNT_TYPES = [
 // Keyed by AssetCategory — CASH intentionally has no entry (no subtype),
 // matching the AssetSubtype mapping documented in schema.prisma.
 export const ACCOUNT_SUBTYPES = {
+  CASH: [
+    {
+      value: "CASH",
+      label: "Cash",
+      icon: Banknote,
+    },
+  ],
   BANK: [
-    { value: "SAVINGS", label: "Savings" },
-    { value: "CHECKING", label: "Checking" },
-    { value: "E_WALLET", label: "E-Wallet" },
+    {
+      value: "SAVINGS",
+      label: "Savings",
+      icon: Landmark,
+    },
+    {
+      value: "CHECKING",
+      label: "Checking",
+      icon: Wallet,
+    },
+    {
+      value: "E_WALLET",
+      label: "E-Wallet",
+      icon: Smartphone,
+    },
   ],
+
   CREDIT: [
-    { value: "CREDIT_CARD", label: "Credit Card" },
-    { value: "LINE_OF_CREDIT", label: "Line of Credit" },
+    {
+      value: "CREDIT_CARD",
+      label: "Credit Card",
+      icon: CreditCard,
+    },
+    {
+      value: "LINE_OF_CREDIT",
+      label: "Line of Credit",
+      icon: HandCoins,
+    },
   ],
+
   LOAN: [
-    { value: "PERSONAL", label: "Personal Loan" },
-    { value: "HOME", label: "Home Loan" },
-    { value: "AUTO", label: "Auto Loan" },
+    {
+      value: "PERSONAL",
+      label: "Personal Loan",
+      icon: Handshake,
+    },
+    {
+      value: "HOME",
+      label: "Home Loan",
+      icon: House,
+    },
+    {
+      value: "AUTO",
+      label: "Auto Loan",
+      icon: Car,
+    },
   ],
+
   INVESTMENT: [
-    { value: "STOCK", label: "Stock" },
-    { value: "ETF", label: "ETF" },
-    { value: "CRYPTO", label: "Crypto" },
-    { value: "MUTUAL_FUND", label: "Mutual Fund" },
-    { value: "BOND", label: "Bond" },
+    {
+      value: "STOCK",
+      label: "Stock",
+      icon: ChartCandlestick,
+    },
+    {
+      value: "ETF",
+      label: "ETF",
+      icon: ChartNoAxesCombined,
+    },
+    {
+      value: "CRYPTO",
+      label: "Crypto",
+      icon: Bitcoin,
+    },
+    {
+      value: "MUTUAL_FUND",
+      label: "Mutual Fund",
+      icon: PieChart,
+    },
+    {
+      value: "BOND",
+      label: "Bond",
+      icon: ScrollText,
+    },
   ],
 } as const;
 

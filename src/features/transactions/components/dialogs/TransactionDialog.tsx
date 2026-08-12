@@ -4,10 +4,7 @@ import { FormProvider } from "react-hook-form";
 import { useSelector } from "react-redux";
 
 import { IRootState } from "@/app/store";
-import {
-  useGetCategoryLimitQuery,
-  useGetCategoryQuery,
-} from "@/shared/api/categoryApi";
+import { useGetCategoryLimitQuery } from "@/shared/api/categoryApi";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -49,7 +46,6 @@ export function TransactionDialog({
   const endDate = useSelector((state: IRootState) => state.active.active.to);
   const { confirm } = useConfirm();
 
-  const { data: categoryData } = useGetCategoryQuery({ type });
   const { data: rawAssetData } = useGetAccountsQuery();
   const { data: categoryLimit } = useGetCategoryLimitQuery({
     startDate,
@@ -167,9 +163,7 @@ export function TransactionDialog({
 
           <div className="flex-1 overflow-y-auto px-6 py-4">
             <TransactionForm
-              type={type}
               assetData={assetData}
-              categoryData={categoryData}
               mode={mode}
               setRecurring={setRecurring}
             />

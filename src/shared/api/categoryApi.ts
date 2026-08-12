@@ -1,4 +1,5 @@
 import { api } from "@/shared/services/api";
+import { CategoryTemplate, CategoryType } from "../types";
 
 export const categoryApi = api
   .enhanceEndpoints({ addTagTypes: ["Category", "CategoryLimit"] })
@@ -15,16 +16,12 @@ export const categoryApi = api
         }),
         invalidatesTags: ["Category"],
       }),
-      getCategory: builder.query({
+      getCategory: builder.query<CategoryType[], { type?: string } | void>({
         query: (params) => ({
           url: "/categories",
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-          params,
+          params: params ?? undefined,
         }),
-        transformResponse: (response) => response.data,
+        transformResponse: (response: CategoryTemplate) => response.data,
       }),
       getCategoryLimit: builder.query({
         query: (params) => ({

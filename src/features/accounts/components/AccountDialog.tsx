@@ -54,22 +54,25 @@ import {
   AccountFormValues,
 } from "../types/account.types";
 
-const ICON_MAP = Object.fromEntries(
-  ICON_OPTIONS.map((opt) => [opt.value, opt.Icon]),
-) as Record<string, (typeof ICON_OPTIONS)[number]["Icon"]>;
-
 // A fixed swatch palette rather than a free-form color input — keeps every
 // account card visually consistent instead of users picking near-duplicate
 // shades. Stored as Asset.color (hex string).
 const COLOR_OPTIONS = [
   "#3b82f6", // blue
+  "#0ea5e9", // sky
+  "#06b6d4", // cyan
+  "#14b8a6", // teal
   "#22c55e", // green
+  "#84cc16", // lime
   "#f59e0b", // amber
+  "#f97316", // orange
   "#ef4444", // red
-  "#a855f7", // purple
+  "#f43f5e", // rose
   "#ec4899", // pink
+  "#a855f7", // purple
+  "#8b5cf6", // violet
+  "#6366f1", // indigo
 ] as const;
-
 // Small helper so required labels are visually consistent everywhere.
 const RequiredMark = () => (
   <span className="text-destructive ml-0.5" aria-hidden="true">
@@ -100,6 +103,7 @@ const AccountDialog = ({
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
+    mode: "onChange", // without this, isValid stays false on a fresh form and the submit button never enables
     defaultValues: {
       name: "",
       type: "",
@@ -120,11 +124,7 @@ const AccountDialog = ({
     formState: { isValid },
   } = form;
 
-  console.log(watch());
-
   const accountType = watch("type") as AccountCategory;
-  const selectedColor = watch("color");
-  const selectedIcon = watch("icon");
   const subtypeOptions =
     accountType in ACCOUNT_SUBTYPES
       ? ACCOUNT_SUBTYPES[accountType as keyof typeof ACCOUNT_SUBTYPES]
@@ -156,10 +156,6 @@ const AccountDialog = ({
   }, [accountType]);
 
   // Reset form with account data when opening in edit mode.
-  // Previously this only restored name/type/sub_type/currency/balance —
-  // institution, the credit fields, and includeNetWorth were left commented
-  // out, so editing an existing account silently dropped them from the form.
-  // Restoring color/icon here too, now that they exist.
   useEffect(() => {
     if (open) {
       if (isEdit && account) {
@@ -168,7 +164,7 @@ const AccountDialog = ({
           type: account.type,
           sub_type: account.sub_type,
           currency: account.currency,
-          balance: String(account.balance),
+          balance: Number(account.balance),
           institution: account.institution,
           creditLimit: account.creditLimit,
           statementDate: account.statementDate,
@@ -214,13 +210,12 @@ const AccountDialog = ({
       }
       setOpen(false);
     } catch (error) {
-      toast.error(
-        isEdit ? "Failed to update account" : "Failed to create account",
-      );
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ??
+        (isEdit ? "Failed to update account" : "Failed to create account");
+      toast.error(message);
     }
   };
-
-  const SelectedIcon = ICON_MAP[selectedIcon ?? ICON_OPTIONS[0].value];
 
   return (
     <CommonDialog
@@ -349,17 +344,17 @@ const AccountDialog = ({
                           <CommandList>
                             <CommandEmpty>No results found.</CommandEmpty>
                             <CommandGroup>
-                              {currencyCodes?.data?.map((currency, index) => (
+                              {currencyCodes?.data?.map((currency) => (
                                 <CommandItem
-                                  value={currency}
-                                  key={index}
+                                  value={`${currency?.currency} ${currency?.code}`}
+                                  key={currency?.code}
                                   onSelect={() => onChange(currency)}
                                 >
                                   {`${currency?.currency} (${currency?.code})`}
                                   <Check
                                     className={cn(
                                       "ml-auto",
-                                      currency?.currency === value?.currency
+                                      currency?.code === value?.code
                                         ? "opacity-100"
                                         : "opacity-0",
                                     )}
@@ -431,148 +426,6 @@ const AccountDialog = ({
               )}
             />
           )}
-
-          {/* Icon + color are plain Asset fields — apply to every account type,
-              used for card/list identification (avatar swatch + icon). */}
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={control}
-              name="icon"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Icon</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full justify-start gap-2 h-10"
-                        >
-                          <span
-                            className="flex h-6 w-6 items-center justify-center rounded-full"
-                            style={{
-                              backgroundColor: `${selectedColor ?? COLOR_OPTIONS[0]}20`,
-                            }}
-                          >
-                            <SelectedIcon
-                              className="h-3.5 w-3.5"
-                              style={{
-                                color: selectedColor ?? COLOR_OPTIONS[0],
-                              }}
-                            />
-                          </span>
-                          {ICON_OPTIONS.find((o) => o.value === field.value)
-                            ?.label ?? "Select icon"}
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-56 p-2">
-                      <div className="grid grid-cols-5 gap-1.5">
-                        {ICON_OPTIONS.map(({ value, label, Icon }) => (
-                          <button
-                            key={value}
-                            type="button"
-                            title={label}
-                            onClick={() => field.onChange(value)}
-                            className={cn(
-                              "flex h-9 w-9 items-center justify-center rounded-md border transition-colors hover:bg-muted",
-                              field.value === value
-                                ? "border-primary bg-muted"
-                                : "border-transparent",
-                            )}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </button>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
-              name="color"
-              render={({ field }) => {
-                const isCustomColor =
-                  !!field.value &&
-                  !COLOR_OPTIONS.includes(
-                    field.value as (typeof COLOR_OPTIONS)[number],
-                  );
-
-                return (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <div className="flex h-10 flex-wrap items-center gap-1.5">
-                        {COLOR_OPTIONS.map((hex) => (
-                          <button
-                            key={hex}
-                            type="button"
-                            title={hex}
-                            onClick={() => field.onChange(hex)}
-                            className={cn(
-                              "h-6 w-6 rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                              field.value === hex
-                                ? "ring-2 ring-primary"
-                                : "ring-1 ring-border",
-                            )}
-                            style={{ backgroundColor: hex }}
-                          />
-                        ))}
-
-                        {/* Custom swatch — opens a react-colorful picker for any
-                            hex, not just the presets above. Shown as the actual
-                            picked color once one is chosen; otherwise a rainbow
-                            ring with a "+" hints that it's the custom option. */}
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
-                              title={
-                                isCustomColor ? field.value : "Custom color"
-                              }
-                              className={cn(
-                                "flex h-6 w-6 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                                isCustomColor
-                                  ? "ring-2 ring-primary"
-                                  : "ring-1 ring-border",
-                              )}
-                              style={{
-                                background: isCustomColor
-                                  ? field.value
-                                  : "conic-gradient(from 90deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)",
-                              }}
-                            >
-                              {!isCustomColor && (
-                                <Plus className="h-3 w-3 text-white drop-shadow" />
-                              )}
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto space-y-2 p-3">
-                            <HexColorPicker
-                              color={field.value ?? COLOR_OPTIONS[0]}
-                              onChange={field.onChange}
-                            />
-                            <HexColorInput
-                              color={field.value ?? COLOR_OPTIONS[0]}
-                              onChange={field.onChange}
-                              prefixed
-                              className="w-full rounded-md border bg-background px-2 py-1 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-primary"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
-          </div>
 
           {accountType === "CREDIT" && (
             <div className="space-y-2">
@@ -705,6 +558,91 @@ const AccountDialog = ({
 
           <FormField
             control={control}
+            name="color"
+            render={({ field }) => {
+              const isCustomColor =
+                !!field.value &&
+                !COLOR_OPTIONS.includes(
+                  field.value as (typeof COLOR_OPTIONS)[number],
+                );
+
+              return (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <div className="flex h-10 flex-wrap items-center gap-1.5">
+                      {COLOR_OPTIONS.map((hex) => (
+                        <button
+                          key={hex}
+                          type="button"
+                          title={hex}
+                          aria-label={`Select color ${hex}`}
+                          aria-pressed={field.value === hex}
+                          onClick={() => field.onChange(hex)}
+                          className={cn(
+                            "h-6 w-6 rounded-full ring-offset-2 ring-offset-background transition-shadow",
+                            field.value === hex
+                              ? "ring-2 ring-primary"
+                              : "ring-1 ring-border",
+                          )}
+                          style={{ backgroundColor: hex }}
+                        />
+                      ))}
+
+                      {/* Custom swatch — opens a react-colorful picker for any
+                            hex, not just the presets above. Shown as the actual
+                            picked color once one is chosen; otherwise a rainbow
+                            ring with a "+" hints that it's the custom option. */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            title={isCustomColor ? field.value : "Custom color"}
+                            aria-label={
+                              isCustomColor
+                                ? `Custom color ${field.value}`
+                                : "Choose a custom color"
+                            }
+                            className={cn(
+                              "flex h-6 w-6 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition-shadow",
+                              isCustomColor
+                                ? "ring-2 ring-primary"
+                                : "ring-1 ring-border",
+                            )}
+                            style={{
+                              background: isCustomColor
+                                ? field.value
+                                : "conic-gradient(from 90deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)",
+                            }}
+                          >
+                            {!isCustomColor && (
+                              <Plus className="h-3 w-3 text-white drop-shadow" />
+                            )}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto space-y-2 p-3">
+                          <HexColorPicker
+                            color={field.value ?? COLOR_OPTIONS[0]}
+                            onChange={field.onChange}
+                          />
+                          <HexColorInput
+                            color={field.value ?? COLOR_OPTIONS[0]}
+                            onChange={field.onChange}
+                            prefixed
+                            className="w-full rounded-md border bg-background px-2 py-1 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-primary"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+
+          <FormField
+            control={control}
             name="includeNetWorth"
             render={({ field }) => (
               <FormItem>
@@ -724,7 +662,7 @@ const AccountDialog = ({
                       className="cursor-pointer text-sm font-medium leading-none"
                     >
                       Include this account when calculating your total net
-                      worth.{" "}
+                      worth.
                     </FormLabel>
                   </div>
                 </div>

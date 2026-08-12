@@ -1,3 +1,4 @@
+import * as LucideIcon from "lucide-react";
 export interface Expense {
   id: number; // Unique identifier
   date: string; // Date of the expense
@@ -169,10 +170,23 @@ export interface frequencyProps {
   unit: string | null;
 }
 
-export interface categoryType {
+export interface CategoryType {
   id: number;
   name: string;
-  icon: string;
+  type: string;
+  icon?: keyof typeof LucideIcon;
+  color: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  hasTracker: boolean;
+}
+
+export interface CategoryTemplate {
+  data: CategoryType[];
+  message: string;
+  success: boolean;
 }
 
 export interface filterProps {

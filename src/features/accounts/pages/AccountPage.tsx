@@ -8,7 +8,6 @@ import {
   ArrowLeftRight,
   ArrowUpDown,
   CreditCard,
-  EllipsisVertical,
   Landmark,
   Plus,
   Wallet,
@@ -92,15 +91,15 @@ const AccountPage = () => {
             return (
               <Card
                 key={stat.title}
-                className="group relative overflow-hidden p-5 transition-all hover:shadow-md"
+                className="group relative overflow-hidden p-5 transition-all border border-border/50 bg-muted/40 hover:bg-muted/60"
               >
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   className="absolute right-3 top-3 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                 >
                   <EllipsisVertical className="h-4 w-4" />
-                </Button>
+                </Button> */}
 
                 <div className="flex items-center gap-4">
                   <div
@@ -123,7 +122,7 @@ const AccountPage = () => {
             );
           })}
         </div>
-
+        {/* <h2 className="text-lg font-medium tracking-tight">Accounts</h2> */}
         <div className="grid grid-cols-4 gap-5">
           {accountsLoading
             ? Array.from({ length: 8 }).map((_, i) => (

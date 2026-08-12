@@ -1,3 +1,4 @@
+import { Account } from "@/features/accounts/types/account.types";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
@@ -5,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/shared/components/ui/collapsible";
-import { AssetData, AssetTemplate } from "@/shared/types";
+import { AssetData } from "@/shared/types";
 import { ChevronDown } from "lucide-react";
 
 const Assets = ({
@@ -14,7 +15,7 @@ const Assets = ({
   onChange,
 }: {
   selectedAssets: AssetData[];
-  assets: AssetTemplate;
+  assets: Account[];
   onChange: (asset: AssetData) => void;
 }) => {
   return (
@@ -41,7 +42,7 @@ const Assets = ({
 
         <CollapsibleContent>
           <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
-            {assets?.data?.map((asset: AssetData) => (
+            {assets?.map((asset: Account) => (
               <div key={asset.id} className="flex items-center gap-2">
                 <Checkbox
                   id={`asset-${asset.id}`}
