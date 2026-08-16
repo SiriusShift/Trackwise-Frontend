@@ -53,26 +53,8 @@ import {
   AccountDialogProps,
   AccountFormValues,
 } from "../types/account.types";
+import { FormColorPicker } from "@/shared/components/FormColorPicker";
 
-// A fixed swatch palette rather than a free-form color input — keeps every
-// account card visually consistent instead of users picking near-duplicate
-// shades. Stored as Asset.color (hex string).
-const COLOR_OPTIONS = [
-  "#3b82f6", // blue
-  "#0ea5e9", // sky
-  "#06b6d4", // cyan
-  "#14b8a6", // teal
-  "#22c55e", // green
-  "#84cc16", // lime
-  "#f59e0b", // amber
-  "#f97316", // orange
-  "#ef4444", // red
-  "#f43f5e", // rose
-  "#ec4899", // pink
-  "#a855f7", // purple
-  "#8b5cf6", // violet
-  "#6366f1", // indigo
-] as const;
 // Small helper so required labels are visually consistent everywhere.
 const RequiredMark = () => (
   <span className="text-destructive ml-0.5" aria-hidden="true">
@@ -556,90 +538,11 @@ const AccountDialog = ({
             </div>
           )}
 
-          <FormField
-            control={control}
-            name="color"
-            render={({ field }) => {
-              const isCustomColor =
-                !!field.value &&
-                !COLOR_OPTIONS.includes(
-                  field.value as (typeof COLOR_OPTIONS)[number],
-                );
-
-              return (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <FormControl>
-                    <div className="flex h-10 flex-wrap items-center gap-1.5">
-                      {COLOR_OPTIONS.map((hex) => (
-                        <button
-                          key={hex}
-                          type="button"
-                          title={hex}
-                          aria-label={`Select color ${hex}`}
-                          aria-pressed={field.value === hex}
-                          onClick={() => field.onChange(hex)}
-                          className={cn(
-                            "h-6 w-6 rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                            field.value === hex
-                              ? "ring-2 ring-primary"
-                              : "ring-1 ring-border",
-                          )}
-                          style={{ backgroundColor: hex }}
-                        />
-                      ))}
-
-                      {/* Custom swatch — opens a react-colorful picker for any
-                            hex, not just the presets above. Shown as the actual
-                            picked color once one is chosen; otherwise a rainbow
-                            ring with a "+" hints that it's the custom option. */}
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            title={isCustomColor ? field.value : "Custom color"}
-                            aria-label={
-                              isCustomColor
-                                ? `Custom color ${field.value}`
-                                : "Choose a custom color"
-                            }
-                            className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                              isCustomColor
-                                ? "ring-2 ring-primary"
-                                : "ring-1 ring-border",
-                            )}
-                            style={{
-                              background: isCustomColor
-                                ? field.value
-                                : "conic-gradient(from 90deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)",
-                            }}
-                          >
-                            {!isCustomColor && (
-                              <Plus className="h-3 w-3 text-white drop-shadow" />
-                            )}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto space-y-2 p-3">
-                          <HexColorPicker
-                            color={field.value ?? COLOR_OPTIONS[0]}
-                            onChange={field.onChange}
-                          />
-                          <HexColorInput
-                            color={field.value ?? COLOR_OPTIONS[0]}
-                            onChange={field.onChange}
-                            prefixed
-                            className="w-full rounded-md border bg-background px-2 py-1 text-sm font-mono uppercase focus:outline-none focus:ring-1 focus:ring-primary"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
-          />
+  <FormColorPicker
+  control={control}
+  name="color"
+  label="Color"
+/>
 
           <FormField
             control={control}

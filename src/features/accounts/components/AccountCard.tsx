@@ -100,7 +100,7 @@ const AccountCard = ({ account }: { account: Account }) => {
 
       <div className="relative z-10 flex flex-col gap-1">
         <span className="text-2xl font-bold tracking-tight">
-          {formatCurrency(Number(account.balance), account.currency, "symbol")}
+          {formatCurrency(Number(account.remainingBalance), account.currency, "symbol")}
         </span>
         {!account.includeInNetWorth && (
           <Badge variant="outline" className="w-fit text-[10px] font-normal">

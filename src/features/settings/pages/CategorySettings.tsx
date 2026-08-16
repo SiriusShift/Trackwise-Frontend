@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import CategoryCard from "../components/CategoryCard";
 import CategoryCardSkeleton from "../components/CategoryCardSkeleton";
+import CategoryDialog from "../components/CategoryDialog";
 
 const TABS = ["all", "expense", "income", "transfer"] as const;
 type Tab = (typeof TABS)[number];
@@ -16,7 +17,7 @@ const CategorySettings = () => {
   const [tab, setTab] = useState<Tab>("all");
   const [search, setSearch] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
+  const [dialogMode, setDialogMode] = useState<"Add" | "Edit">("Add");
 
   const { data, isLoading } = useGetCategoryQuery();
 
@@ -35,13 +36,13 @@ const CategorySettings = () => {
 
   const handleAdd = () => {
     dispatch(setActiveRow(null));
-    setDialogMode("add");
+    setDialogMode("Add");
     setDialogOpen(true);
   };
 
   const handleEdit = (category: CategoryType) => {
     dispatch(setActiveRow(category));
-    setDialogMode("edit");
+    setDialogMode("Edit");
     setDialogOpen(true);
   };
 
@@ -103,11 +104,11 @@ const CategorySettings = () => {
         )}
       </div>
 
-      {/* <CategoryDialog
+      <CategoryDialog
         open={dialogOpen}
         setOpen={setDialogOpen}
         mode={dialogMode}
-      /> */}
+      />
     </div>
   );
 };

@@ -18,4 +18,10 @@ export const categorySchema = {
       required_error: "Color is required",
     }),
   }),
+    defaultValues: {
+      name: "",
+      type: "",
+      icon: "",
+      color: "",
+    },
 };
