@@ -1,11 +1,13 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FolderTree } from "lucide-react";
-import { icons } from "lucide-react";
-import { useState } from "react";
+import { FolderTree, icons } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
+import { IRootState } from "@/app/store";
 import CommonDialog from "@/shared/components/dialog/CommonDialog";
+import { FormColorPicker } from "@/shared/components/FormColorPicker";
+import IconPicker from "@/shared/components/IconPicker";
+import { Button } from "@/shared/components/ui/button";
 import {
   Form,
   FormControl,
@@ -22,28 +24,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Button } from "@/shared/components/ui/button";
-import { FormColorPicker } from "@/shared/components/FormColorPicker";
-import IconPicker from "@/shared/components/IconPicker";
+import { useSelector } from "react-redux";
 import { categorySchema } from "../schema/settings.schema";
 import { CategoryDialogProps } from "../types/settings.types";
 
 const DEFAULT_ICON = "Shapes";
 
-const CategoryDialog = ({
-  open,
-  setOpen,
-  mode,
-  category, // assumed addition: pass the category being edited, undefined for "Add"
-}: CategoryDialogProps) => {
+const CategoryDialog = ({ open, setOpen, mode }: CategoryDialogProps) => {
   const [openIconPicker, setOpenIconPicker] = useState(false);
+
+  const category = useSelector((state: IRootState) => state.active.activeRow);
 
   const form = useForm({
     resolver: zodResolver(categorySchema.schema),
     defaultValues: categorySchema.defaultValues,
   });
 
-  const { control, formState } = form;
+  const { control, formState, watch } = form;
   const isEdit = mode === "Edit";
 
   // Sync form with the category being edited (or reset to defaults for
@@ -58,6 +55,8 @@ const CategoryDialog = ({
     console.log(data);
     setOpen(false);
   });
+
+  console.log(watch());
 
   return (
     <CommonDialog
@@ -111,8 +110,7 @@ const CategoryDialog = ({
             name="icon"
             render={({ field }) => {
               const Icon =
-                icons[field.value as keyof typeof icons] ??
-                icons[DEFAULT_ICON];
+                icons[field.value as keyof typeof icons] ?? icons[DEFAULT_ICON];
 
               return (
                 <FormItem className="flex flex-col">

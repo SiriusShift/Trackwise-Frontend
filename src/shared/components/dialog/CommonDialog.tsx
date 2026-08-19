@@ -63,12 +63,10 @@ const CommonDialog = ({
       }}
     >
       <DialogContent
-        className={
-          (cn(
-            "flex flex-col w-full max-w-full h-dvh p-0  sm:h-auto sm:max-h-[90vh] overflow gap-0",
-          ),
-          contentClassName)
-        }
+        className={cn(
+          "flex flex-col w-full max-w-full h-dvh p-0 gap-0 sm:h-auto sm:max-h-[70vh]",
+          contentClassName,
+        )}
         onInteractOutside={(e) => preventClickOutside && e.preventDefault()}
       >
         <DialogHeader className="flex flex-row items-center gap-3 px-6 py-5 border-b space-y-0">

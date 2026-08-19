@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, Plus, Wallet } from "lucide-react";
+import { Check, ChevronsUpDown, Wallet } from "lucide-react";
 import { useEffect } from "react";
-import { HexColorInput, HexColorPicker } from "react-colorful";
 import { useForm } from "react-hook-form";
 
 import CommonDialog from "@/shared/components/dialog/CommonDialog";
@@ -30,6 +29,10 @@ import {
   useCreateAccountMutation,
   useUpdateAccountMutation,
 } from "@/shared/api/accountsApi";
+import {
+  COLOR_OPTIONS,
+  FormColorPicker,
+} from "@/shared/components/FormColorPicker";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Command,
@@ -53,8 +56,6 @@ import {
   AccountDialogProps,
   AccountFormValues,
 } from "../types/account.types";
-import { FormColorPicker } from "@/shared/components/FormColorPicker";
-
 // Small helper so required labels are visually consistent everywhere.
 const RequiredMark = () => (
   <span className="text-destructive ml-0.5" aria-hidden="true">
@@ -133,6 +134,7 @@ const AccountDialog = ({
       setValue("statementDate", undefined);
       setValue("dueDate", undefined);
       setValue("minimumPayment", undefined);
+      setValue("minimumPayment", undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountType]);
@@ -164,8 +166,14 @@ const AccountDialog = ({
 
   const onSubmit = async (values: AccountFormValues) => {
     try {
-      const { creditLimit, statementDate, dueDate, minimumPayment, ...rest } =
-        values;
+      const {
+        creditLimit,
+        statementDate,
+        dueDate,
+        minimumPayment,
+        minimumPaymentPercent,
+        ...rest
+      } = values;
 
       const payload = {
         ...rest,
@@ -179,6 +187,7 @@ const AccountDialog = ({
             statementDate,
             dueDate,
             minimumPayment,
+            minimumPaymentPercent,
           },
         }),
       };
@@ -214,204 +223,208 @@ const AccountDialog = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 px-6 py-4"
+          className="space-y-2 px-6  max-h-[90%] overflow-auto"
         >
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Name
-                    <RequiredMark />
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="BPI Savings" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Type
-                    <RequiredMark />
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+          <div className="py-4 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Name
+                      <RequiredMark />
+                    </FormLabel>
                     <FormControl>
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Select account type" />
-                      </SelectTrigger>
+                      <Input placeholder="BPI Savings" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      {ACCOUNT_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Type
+                      <RequiredMark />
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Select account type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {ACCOUNT_TYPES.map((t) => (
+                          <SelectItem key={t.value} value={t.value}>
+                            {t.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="sub_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Subtype
+                      {hasSubtypes && <RequiredMark />}
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-10" disabled={!hasSubtypes}>
+                          <SelectValue placeholder="Select subtype" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {subtypeOptions.map((t) => (
+                          <SelectItem key={t.value} value={t.value}>
+                            {t.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="currency"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Currency
+                      <RequiredMark />
+                    </FormLabel>
+                    <FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !value && "text-muted-foreground",
+                              )}
+                            >
+                              {value?.currency || "Select currency"}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search currency..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>No results found.</CommandEmpty>
+                              <CommandGroup>
+                                {currencyCodes?.data?.map((currency) => (
+                                  <CommandItem
+                                    value={`${currency?.currency} ${currency?.code}`}
+                                    key={currency?.code}
+                                    onSelect={() => onChange(currency)}
+                                  >
+                                    {`${currency?.currency} (${currency?.code})`}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        currency?.code === value?.code
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={control}
-              name="sub_type"
+              name="balance"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Subtype
-                    {hasSubtypes && <RequiredMark />}
+                    {isEdit ? "Current Balance" : "Starting Balance"}
+                    <RequiredMark />
                   </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-10" disabled={!hasSubtypes}>
-                        <SelectValue placeholder="Select subtype" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {subtypeOptions.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                        ₱
+                      </span>
+
+                      <Input
+                        className="pl-7"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              name="currency"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <FormItem>
-                  <FormLabel>
-                    Currency
-                    <RequiredMark />
-                  </FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "w-full justify-between",
-                              !value && "text-muted-foreground",
-                            )}
-                          >
-                            {value?.currency || "Select currency"}
-                            <ChevronsUpDown className="opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search currency..."
-                            className="h-9"
-                          />
-                          <CommandList>
-                            <CommandEmpty>No results found.</CommandEmpty>
-                            <CommandGroup>
-                              {currencyCodes?.data?.map((currency) => (
-                                <CommandItem
-                                  value={`${currency?.currency} ${currency?.code}`}
-                                  key={currency?.code}
-                                  onSelect={() => onChange(currency)}
-                                >
-                                  {`${currency?.currency} (${currency?.code})`}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto",
-                                      currency?.code === value?.code
-                                        ? "opacity-100"
-                                        : "opacity-0",
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
 
-          <FormField
-            control={control}
-            name="balance"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {isEdit ? "Current Balance" : "Starting Balance"}
-                  <RequiredMark />
-                </FormLabel>
-
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                      ₱
-                    </span>
-
-                    <Input
-                      className="pl-7"
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={field.value ?? ""}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value === ""
-                            ? undefined
-                            : parseFloat(e.target.value),
-                        )
-                      }
-                    />
-                  </div>
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
+            {/* Institution is a general Asset field (not credit-specific), always optional */}
+            {accountType && accountType !== "CASH" && (
+              <FormField
+                control={control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Institution</FormLabel>
+                    <FormControl>
+                      <Input placeholder="BPI" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
-          />
 
-          {/* Institution is a general Asset field (not credit-specific), always optional */}
-          {accountType && accountType !== "CASH" && (
-            <FormField
-              control={control}
-              name="institution"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Institution</FormLabel>
-                  <FormControl>
-                    <Input placeholder="BPI" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+            {accountType === "CREDIT" && (
+              <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Credit Card Details
+                </p>
 
-          {accountType === "CREDIT" && (
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={control}
                   name="creditLimit"
@@ -447,135 +460,164 @@ const AccountDialog = ({
                   )}
                 />
 
-                <FormField
-                  control={control}
-                  name="minimumPayment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Minimum Payment</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                            ₱
-                          </span>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={control}
+                    name="minimumPaymentPercent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Min. Payment %</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                              %
+                            </span>
+                            <Input
+                              className="pl-7"
+                              type="number"
+                              step="0.01"
+                              placeholder="0"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ""
+                                    ? undefined
+                                    : parseFloat(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="minimumPaymentFloor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Min. Payment Floor</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                              ₱
+                            </span>
+                            <Input
+                              className="pl-7"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ""
+                                    ? undefined
+                                    : parseFloat(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={control}
+                    name="statementDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Statement Date</FormLabel>
+                        <FormControl>
                           <Input
-                            className="pl-7"
                             type="number"
-                            step="0.01"
-                            placeholder="0.00"
+                            min={1}
+                            max={31}
+                            placeholder="e.g. 15"
                             value={field.value ?? ""}
                             onChange={(e) =>
                               field.onChange(
                                 e.target.value === ""
                                   ? undefined
-                                  : parseFloat(e.target.value),
+                                  : parseInt(e.target.value, 10),
                               )
                             }
                           />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={control}
-                  name="statementDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Statement Date</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={31}
-                          placeholder="e.g. 15"
-                          value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === ""
-                                ? undefined
-                                : parseInt(e.target.value, 10),
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={31}
-                          placeholder="e.g. 5"
-                          value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === ""
-                                ? undefined
-                                : parseInt(e.target.value, 10),
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-          )}
-
-  <FormColorPicker
-  control={control}
-  name="color"
-  label="Color"
-/>
-
-          <FormField
-            control={control}
-            name="includeNetWorth"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-start gap-3 rounded-lg bg-muted/40 p-4">
-                  <FormControl>
-                    <Checkbox
-                      id="include-net-worth"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      className="mt-1"
-                    />
-                  </FormControl>
-
-                  <div className="space-y-1">
-                    <FormLabel
-                      htmlFor="include-net-worth"
-                      className="cursor-pointer text-sm font-medium leading-none"
-                    >
-                      Include this account when calculating your total net
-                      worth.
-                    </FormLabel>
-                  </div>
+                  <FormField
+                    control={control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Due Date</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={31}
+                            placeholder="e.g. 5"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ""
+                                  ? undefined
+                                  : parseInt(e.target.value, 10),
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-
-                <FormMessage />
-              </FormItem>
+              </div>
             )}
-          />
 
-          <div className="flex justify-end gap-2 pt-2">
+            <FormColorPicker control={control} name="color" label="Color" />
+
+            <FormField
+              control={control}
+              name="includeNetWorth"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-start gap-3 rounded-lg bg-muted/40 p-4">
+                    <FormControl>
+                      <Checkbox
+                        id="include-net-worth"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1"
+                      />
+                    </FormControl>
+
+                    <div className="space-y-1">
+                      <FormLabel
+                        htmlFor="include-net-worth"
+                        className="cursor-pointer text-sm font-medium leading-none"
+                      >
+                        Include this account when calculating your total net
+                        worth.
+                      </FormLabel>
+                    </div>
+                  </div>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="sticky bottom-0 -mx-6  flex justify-end gap-2 border-t bg-background px-6 py-4">
             <Button
               type="button"
               variant="outline"
@@ -585,6 +627,9 @@ const AccountDialog = ({
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting || !isValid}>
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {isSubmitting
                 ? isEdit
                   ? "Saving..."

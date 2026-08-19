@@ -71,7 +71,7 @@ const AccountPage = () => {
         <PageHeader
           pageName="Accounts"
           description="Manage and track your accounts"
-          monthPicker={false}
+          monthPicker={true}
         >
           <div className="flex flex-row gap-2">
             <Button variant={"ghost"}>

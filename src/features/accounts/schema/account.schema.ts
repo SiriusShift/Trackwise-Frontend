@@ -12,9 +12,11 @@ export const accountSchema = z
       number: z.string(),
     }),
     balance: z
-      .number()
-      .positive()
-      .refine((v) => !isNaN(Number(v)), "Must be a valid number"),
+      .number({
+        required_error: "Balance is required",
+        invalid_type_error: "Must be a valid number",
+      })
+      .min(0, "Balance cannot be negative"),
 
     // Lives on Asset itself (institution: String?) — applies to any account
     // type, not just credit. Always optional.
@@ -29,6 +31,7 @@ export const accountSchema = z
     creditLimit: z.number().positive().optional(),
     statementDate: z.number().int().min(1).max(31).optional(),
     dueDate: z.number().int().min(1).max(31).optional(),
+    minimumPaymentPercent: z.number().nonnegative().optional(),
     minimumPayment: z.number().nonnegative().optional(),
     includeNetWorth: z.boolean(),
   })
