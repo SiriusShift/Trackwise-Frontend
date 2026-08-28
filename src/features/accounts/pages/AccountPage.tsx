@@ -65,6 +65,12 @@ const AccountPage = () => {
     setMode("Add");
     setOpen(true);
   };
+
+  const handleEdit = () => {
+    setMode("Edit");
+    setOpen(true);
+  };
+
   return (
     <>
       <div className="flex flex-col gap-5 p-5">
@@ -129,7 +135,11 @@ const AccountPage = () => {
                 <AccountCardSkeleton key={i} />
               ))
             : accountsData?.data?.map((account: Account) => (
-                <AccountCard key={account.id} account={account} />
+                <AccountCard
+                  key={account.id}
+                  account={account}
+                  openDialog={handleEdit}
+                />
               ))}
         </div>
       </div>

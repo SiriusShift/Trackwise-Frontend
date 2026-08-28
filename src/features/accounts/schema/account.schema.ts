@@ -31,8 +31,8 @@ export const accountSchema = z
     creditLimit: z.number().positive().optional(),
     statementDate: z.number().int().min(1).max(31).optional(),
     dueDate: z.number().int().min(1).max(31).optional(),
-    minimumPaymentPercent: z.number().nonnegative().optional(),
-    minimumPayment: z.number().nonnegative().optional(),
+    // minimumPaymentPercent: z.number().nonnegative().optional(),
+    // minimumPayment: z.number().nonnegative().optional(),
     includeNetWorth: z.boolean(),
   })
   .superRefine((data, ctx) => {

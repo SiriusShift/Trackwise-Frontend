@@ -12,7 +12,6 @@ export interface AccountData extends AccountFormValues {
 
 export interface AccountDialogProps extends commonDialogProps {
   mode: string;
-  account?: AccountData;
 }
 
 export type AccountCategory = keyof typeof ACCOUNT_SUBTYPES | "CASH";

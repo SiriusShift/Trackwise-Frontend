@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, Wallet } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Wallet } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -52,9 +52,11 @@ import { useSelector } from "react-redux";
 import { ACCOUNT_SUBTYPES, ACCOUNT_TYPES, ICON_OPTIONS } from "../constants";
 import { accountSchema } from "../schema/account.schema";
 import {
+  Account,
   AccountCategory,
   AccountDialogProps,
   AccountFormValues,
+  CreditDetail,
 } from "../types/account.types";
 // Small helper so required labels are visually consistent everywhere.
 const RequiredMark = () => (
@@ -71,14 +73,12 @@ const RequiredMark = () => (
 // combobox still requires an explicit selection to submit, this just avoids
 // forcing every new account to start on an empty/invalid value.
 
-const AccountDialog = ({
-  open,
-  setOpen,
-  mode,
-  account,
-}: AccountDialogProps) => {
+const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
   const currency = useSelector((state: IRootState) => state.settings.currency);
-  const isEdit = mode === "edit";
+  const account = useSelector(
+    (state: IRootState) => state.active.activeRow as Account,
+  );
+  const isEdit = mode === "Edit";
 
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
   const [updateAccount, { isLoading: isUpdating }] = useUpdateAccountMutation();
@@ -89,8 +89,8 @@ const AccountDialog = ({
     mode: "onChange", // without this, isValid stays false on a fresh form and the submit button never enables
     defaultValues: {
       name: "",
-      type: "",
-      sub_type: "",
+      type: undefined,
+      sub_type: undefined,
       includeNetWorth: false,
       balance: 0,
       color: COLOR_OPTIONS[0],
@@ -104,9 +104,10 @@ const AccountDialog = ({
     control,
     setValue,
     reset,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = form;
 
+  console.log(watch());
   const accountType = watch("type") as AccountCategory;
   const subtypeOptions =
     accountType in ACCOUNT_SUBTYPES
@@ -133,47 +134,71 @@ const AccountDialog = ({
       setValue("creditLimit", undefined);
       setValue("statementDate", undefined);
       setValue("dueDate", undefined);
-      setValue("minimumPayment", undefined);
-      setValue("minimumPayment", undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountType]);
 
+  console.log(currencyCodes);
   // Reset form with account data when opening in edit mode.
   useEffect(() => {
-    if (open) {
-      if (isEdit && account) {
-        form.reset({
-          name: account.name,
-          type: account.type,
-          sub_type: account.sub_type,
-          currency: account.currency,
-          balance: Number(account.balance),
-          institution: account.institution,
-          creditLimit: account.creditLimit,
-          statementDate: account.statementDate,
-          dueDate: account.dueDate,
-          minimumPayment: account.minimumPayment,
-          color: account.color ?? COLOR_OPTIONS[0],
-          icon: account.icon ?? ICON_OPTIONS[0].value,
-          includeNetWorth: account.includeNetWorth,
-        });
-      } else {
-        reset();
-      }
+    if (!open) {
+      form.reset({
+        name: "",
+        type: undefined,
+        sub_type: undefined,
+        includeNetWorth: false,
+        balance: 0,
+        color: COLOR_OPTIONS[0],
+        icon: ICON_OPTIONS[0].value,
+        currency: currencyCodes?.data?.find((item) => item?.code === currency),
+      });
+      return;
     }
-  }, [open, isEdit, account, form]);
+
+    if (isEdit && account) {
+      const creditAccount = account.creditDetail as CreditDetail & {
+        creditLimit?: number;
+        statementDate?: number;
+        dueDate?: number;
+      };
+
+      form.reset({
+        name: account.name,
+        type: account.category,
+        ...(account.category !== "CASH"
+          ? { sub_type: account.subtype }
+          : { sub_type: undefined }),
+        currency: currencyCodes?.data?.find(
+          (data) => data.code === account.currency,
+        ),
+        balance: Number(account.balance),
+        institution: account.institution,
+        color: account.color ?? COLOR_OPTIONS[0],
+        icon: account.icon ?? ICON_OPTIONS[0].value,
+        includeNetWorth: account.includeInNetWorth,
+        ...(account.category === "CREDIT" && {
+          creditLimit: creditAccount.creditLimit,
+          statementDate: creditAccount.statementDate,
+          dueDate: creditAccount.dueDate,
+        }),
+      });
+    } else {
+      form.reset({
+        name: "",
+        type: undefined,
+        sub_type: undefined,
+        includeNetWorth: false,
+        balance: 0,
+        color: COLOR_OPTIONS[0],
+        icon: ICON_OPTIONS[0].value,
+        currency: currencyCodes?.data?.find((item) => item?.code === currency),
+      });
+    }
+  }, [open, mode, account]);
 
   const onSubmit = async (values: AccountFormValues) => {
     try {
-      const {
-        creditLimit,
-        statementDate,
-        dueDate,
-        minimumPayment,
-        minimumPaymentPercent,
-        ...rest
-      } = values;
+      const { creditLimit, statementDate, dueDate, ...rest } = values;
 
       const payload = {
         ...rest,
@@ -186,11 +211,11 @@ const AccountDialog = ({
             creditLimit,
             statementDate,
             dueDate,
-            minimumPayment,
-            minimumPaymentPercent,
           },
         }),
       };
+
+      console.log(payload);
 
       if (isEdit && account) {
         await updateAccount({ id: account.id, ...payload }).unwrap();
@@ -214,6 +239,9 @@ const AccountDialog = ({
       open={open}
       setOpen={setOpen}
       title={`${mode} Account`}
+      preventClickOutside={true}
+      reset={reset}
+      isDirty={isDirty}
       description={
         mode === "Add"
           ? "Add a new account to manage your finances"
@@ -255,7 +283,7 @@ const AccountDialog = ({
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-10">
+                        <SelectTrigger className="h-10" disabled={isEdit}>
                           <SelectValue placeholder="Select account type" />
                         </SelectTrigger>
                       </FormControl>
@@ -285,7 +313,10 @@ const AccountDialog = ({
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-10" disabled={!hasSubtypes}>
+                        <SelectTrigger
+                          className="h-10"
+                          disabled={!hasSubtypes || isEdit}
+                        >
                           <SelectValue placeholder="Select subtype" />
                         </SelectTrigger>
                       </FormControl>
@@ -321,6 +352,7 @@ const AccountDialog = ({
                                 "w-full justify-between",
                                 !value && "text-muted-foreground",
                               )}
+                              disabled={isEdit}
                             >
                               {value?.currency || "Select currency"}
                               <ChevronsUpDown className="opacity-50" />
@@ -385,6 +417,7 @@ const AccountDialog = ({
                         type="number"
                         step="0.01"
                         placeholder="0.00"
+                        disabled={isEdit}
                         value={field.value ?? ""}
                         onChange={(e) =>
                           field.onChange(
@@ -460,7 +493,7 @@ const AccountDialog = ({
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={control}
                     name="minimumPaymentPercent"
@@ -523,7 +556,7 @@ const AccountDialog = ({
                       </FormItem>
                     )}
                   />
-                </div>
+                </div> */}
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField

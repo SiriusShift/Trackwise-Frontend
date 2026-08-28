@@ -33,13 +33,7 @@ export const ACCOUNT_TYPES = [
 // Keyed by AssetCategory — CASH intentionally has no entry (no subtype),
 // matching the AssetSubtype mapping documented in schema.prisma.
 export const ACCOUNT_SUBTYPES = {
-  CASH: [
-    {
-      value: "CASH",
-      label: "Cash",
-      icon: Banknote,
-    },
-  ],
+  CASH: [],
   BANK: [
     {
       value: "SAVINGS",
