@@ -104,10 +104,11 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
     control,
     setValue,
     reset,
-    formState: { isValid, isDirty },
+    formState: { isValid, isDirty, errors },
   } = form;
 
   console.log(watch());
+  console.log(errors);
   const accountType = watch("type") as AccountCategory;
   const subtypeOptions =
     accountType in ACCOUNT_SUBTYPES
@@ -177,7 +178,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
         icon: account.icon ?? ICON_OPTIONS[0].value,
         includeNetWorth: account.includeInNetWorth,
         ...(account.category === "CREDIT" && {
-          creditLimit: creditAccount.creditLimit,
+          creditLimit: Number(creditAccount.creditLimit),
           statementDate: creditAccount.statementDate,
           dueDate: creditAccount.dueDate,
         }),

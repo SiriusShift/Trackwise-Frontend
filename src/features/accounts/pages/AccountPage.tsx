@@ -22,25 +22,25 @@ import { Account } from "../types/account.types";
 const stats = [
   {
     title: "Net Worth",
-    value: formatCurrency(5000, "PHP", "symbol"),
+    key: "netWorth",
     icon: Wallet,
     color: "text-primary bg-primary/10",
   },
   {
     title: "Assets",
-    value: formatCurrency(5000, "PHP", "symbol"),
+    key: "total",
     icon: Landmark,
     color: "text-emerald-600 bg-emerald-500/10",
   },
   {
     title: "Liabilities",
-    value: formatCurrency(5000, "PHP", "symbol"),
+    key: "liabilities",
     icon: ArrowUpDown,
     color: "text-red-600 bg-red-500/10",
   },
   {
     title: "Accounts",
-    value: "4",
+    key: "count",
     icon: CreditCard,
     color: "text-violet-600 bg-violet-500/10",
   },
@@ -53,6 +53,7 @@ const AccountPage = () => {
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
   );
+  const currency = useSelector((state: IRootState) => state.settings.currency);
   const endDate = useSelector((state: IRootState) => state.active.active.to);
 
   const { data: accountsData, isLoading: accountsLoading } =
@@ -70,6 +71,41 @@ const AccountPage = () => {
     setMode("Edit");
     setOpen(true);
   };
+
+  const assetsLength = accountsData?.data?.length ?? 0;
+  const excludedAccountsLength = accountsData?.data?.filter(
+    (item) => !item.includeInNetWorth,
+  )?.length;
+
+  console.log(excludedAccountsLength);
+
+  const statistics = stats.map((item) => {
+    switch (item.key) {
+      case "netWorth":
+        return {
+          ...item,
+          value: accountsData?.netWorth ?? 0,
+        };
+
+      case "total":
+        return {
+          ...item,
+          value: accountsData?.total ?? 0,
+        };
+
+      case "liabilities":
+        return {
+          ...item,
+          value: accountsData?.liabilities ?? 0,
+        };
+
+      default:
+        return {
+          ...item,
+          value: assetsLength,
+        };
+    }
+  });
 
   return (
     <>
@@ -91,7 +127,7 @@ const AccountPage = () => {
         </PageHeader>
 
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => {
+          {statistics.map((stat) => {
             const Icon = stat.icon;
 
             return (
@@ -107,7 +143,7 @@ const AccountPage = () => {
                   <EllipsisVertical className="h-4 w-4" />
                 </Button> */}
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 h-full">
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.color}`}
                   >
@@ -120,8 +156,17 @@ const AccountPage = () => {
                     </span>
 
                     <span className="text-2xl font-bold tracking-tight">
-                      {stat.value}
+                      {stat.key !== "count"
+                        ? formatCurrency(stat.value, currency, "symbol")
+                        : stat.value}
                     </span>
+
+                    {stat.key === "count" && (
+                      <span className="text-xs text-muted-f">
+                        ⓘ Excluded {excludedAccountsLength} account
+                        {excludedAccountsLength > 1 ? "s" : ""}
+                      </span>
+                    )}
                   </div>
                 </div>
               </Card>
@@ -129,7 +174,7 @@ const AccountPage = () => {
           })}
         </div>
         {/* <h2 className="text-lg font-medium tracking-tight">Accounts</h2> */}
-        <div className="grid grid-cols-4 gap-5">
+        <div className="grid grid-cols-1  sm:grid-cols-2  xl:grid-cols-4 gap-5">
           {accountsLoading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <AccountCardSkeleton key={i} />

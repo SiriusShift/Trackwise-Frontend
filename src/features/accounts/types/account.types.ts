@@ -51,6 +51,7 @@ export interface AccountTemplate {
   data: Account[];
   message: string;
   netWorth: number;
+  liabilities: number;
   success: boolean;
   total: number;
 }

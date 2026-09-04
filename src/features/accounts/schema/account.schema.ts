@@ -20,7 +20,7 @@ export const accountSchema = z
 
     // Lives on Asset itself (institution: String?) — applies to any account
     // type, not just credit. Always optional.
-    institution: z.string().optional(),
+    institution: z.string().optional().nullable(),
 
     // Also plain Asset fields (Asset.color / Asset.icon) — cosmetic only,
     // so both stay optional with form-level defaults rather than required.
@@ -29,8 +29,8 @@ export const accountSchema = z
 
     // Mirrors CreditDetail: only creditLimit is non-nullable there.
     creditLimit: z.number().positive().optional(),
-    statementDate: z.number().int().min(1).max(31).optional(),
-    dueDate: z.number().int().min(1).max(31).optional(),
+    statementDate: z.number().int().min(1).max(31).optional().nullable(),
+    dueDate: z.number().int().min(1).max(31).optional().nullable(),
     // minimumPaymentPercent: z.number().nonnegative().optional(),
     // minimumPayment: z.number().nonnegative().optional(),
     includeNetWorth: z.boolean(),

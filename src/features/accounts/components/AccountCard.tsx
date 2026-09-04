@@ -99,7 +99,7 @@ const AccountCard = ({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-3 top-3 z-10 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+        className="absolute right-3 top-3 z-20 h-8 w-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         onClick={handleEdit}
       >
         <Pencil className="h-4 w-4" />
