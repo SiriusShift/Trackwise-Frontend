@@ -1,20 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  FileX,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import TransactionList from "@/features/transactions/components/TransactionList/TransactionList";
 import { Button } from "@/shared/components/ui/button";
 import {
   Select,
@@ -23,22 +7,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import * as React from "react";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import {
   ColumnDef,
-  flexRender,
-  SortingState,
   ColumnFiltersState,
-  useReactTable,
+  flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
 } from "@tanstack/react-table";
-import NoData from "@/assets/images/noData.svg";
-import CommonPieGraph from "../charts/CommonPieGraph";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import TransactionList from "@/features/transactions/components/TransactionList/TransactionList";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  FileX,
+} from "lucide-react";
+import * as React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -120,7 +116,7 @@ export function DataTable<TData, TValue>({
       {/* Filter */}
       {/* Table container with responsive and overflow behavior */}
       {width > 639 ? (
-        <div className="relative min-h-[376px] max-h-[400px] rounded-md border overflow-x-auto">
+        <div className="relative h-[376px] rounded-md border overflow-x-auto">
           <Table className="table-auto">
             <TableHeader className="h-8 text-xs sticky top-0 bg-background z-10">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -181,25 +177,22 @@ export function DataTable<TData, TValue>({
                 ))
               ) : (
                 // Fallback for no data
-                <TableRow >
-                  <TableCell
-                    colSpan={columns?.length}
-                    className="text-center"
-                  >
-                  <div className="flex flex-col min-h-[293px] items-center justify-center gap-3 rounded-xl  p-8 text-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                      <FileX className="text-muted-foreground" size={22} />
+                <TableRow>
+                  <TableCell colSpan={columns?.length} className="text-center">
+                    <div className="flex flex-col min-h-[293px] items-center justify-center gap-3 rounded-xl  p-8 text-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                        <FileX className="text-muted-foreground" size={22} />
+                      </div>
+
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-foreground">
+                          No data available
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          There’s nothing to display right now.
+                        </p>
+                      </div>
                     </div>
-                  
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-foreground">
-                        No data available
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        There’s nothing to display right now.
-                      </p>
-                    </div>
-                  </div>
                   </TableCell>
                 </TableRow>
               )}
