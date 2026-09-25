@@ -27,6 +27,7 @@ const SignInPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
   const message = searchParams.get("message");
+const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const { error, data, isLoading } = useGetAuthStatusQuery({});
 
@@ -74,10 +75,9 @@ const SignInPage = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google/sign-in"; // Redirect to backend OAuth route
-  };
-
+const handleGoogleLogin = () => {
+  window.location.href = `${API_URL}/auth/google/sign-in`;
+};
   return (
     <>
       {!isLoading && (!data?.authenticated || !cookies.user) && (

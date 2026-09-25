@@ -34,6 +34,7 @@ const signUp = () => {
   // const device = encryptString(getBrowserInfo());
   const router = useNavigate();
   const tz = moment.tz.guess();
+const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const [postVerify, { isLoading }] = usePostVerifyMutation();
   const [postSignup, { isLoading: postSignupLoading }] =
@@ -96,9 +97,10 @@ const signUp = () => {
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = "http://localhost:5000/auth/google/sign-up"; // Redirect to backend OAuth route
-  };
+
+const handleGoogleLogin = () => {
+  window.location.href = `${API_URL}/auth/google/sign-in`;
+};
 
   const resendCode = () => {
     setIsDisabled(true); // ⬅️ disable resend immediately
