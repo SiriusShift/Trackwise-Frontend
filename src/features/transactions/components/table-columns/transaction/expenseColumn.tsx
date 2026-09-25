@@ -1,7 +1,4 @@
-import {
-  expensesApi,
-  useCancelRecurringExpenseMutation,
-} from "@/features/transactions/api/transaction/expensesApi";
+import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -12,7 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { Expense } from "@/shared/types";
+import { TransactionRow } from "@/shared/types";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { accountsApi } from "@/shared/api/accountsApi";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Archive,
@@ -34,7 +33,7 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useState } from "react";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 
-export const expenseColumns: ColumnDef<Expense>[] = [
+export const expenseColumns: ColumnDef<TransactionRow>[] = [
   {
     accessorKey: "date",
     header: "Date and Time",
@@ -89,7 +88,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{getValue()}</Badge>
+        <Badge variant="outline">{getValue<string>()}</Badge>
       </div>
     ),
     meta: {
@@ -109,7 +108,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
             />
           </span>
         )}
-        <span className="truncate"> {getValue() || "-"}</span>
+        <span className="truncate"> {getValue<string>() || "-"}</span>
       </div>
     ),
 
@@ -121,7 +120,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "asset.name",
     header: "Source",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    cell: ({ getValue }) => <span>{getValue<string>() || "-"}</span>,
     meta: {
       cellClassName: "border-b",
     },
@@ -133,11 +132,11 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       cellClassName: "border-b",
     },
     cell: ({ getValue }) => {
-      const status = getValue() as Expense["status"];
+      const status = getValue<string>();
 
       return (
         <Badge variant="outline" className="p-1 px-2">
-          {StatusIcon[status] || null}
+          {StatusIcon[status as keyof typeof StatusIcon] || null}
           {status || "Unknown"}
         </Badge>
       );
@@ -156,7 +155,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
       const [confirmOpen, setConfirmOpen] = useState(false);
-      const [mode, setMode] = useState<string>();
+      const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
       const expense = row.original;
@@ -165,7 +164,6 @@ export const expenseColumns: ColumnDef<Expense>[] = [
       console.log(expense);
 
       const [deleteExpense] = useArchiveTransactionMutation();
-      const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
       const onArchive = async () => {
         confirm({
@@ -188,27 +186,7 @@ export const expenseColumns: ColumnDef<Expense>[] = [
               dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
-              toast.error(err?.data?.error);
-            }
-          },
-        });
-      };
-
-      const onStopSeries = async () => {
-        console.log(expense);
-        confirm({
-          description: `Are you sure you want to cancel this recurring expense?`,
-          title: `Cancel recurring expense`,
-          variant: "info",
-          confirmText: "Confirm",
-          showLoadingOnConfirm: true,
-          cancelText: "Cancel",
-          onConfirm: async () => {
-            try {
-              await cancelRecurring(expense?.recurringTemplate?.id).unwrap();
-            } catch (err) {
-              console.log(err);
-              toast.error(err?.data?.error);
+              toast.error(handleCatchErrorMessage(err));
             }
           },
         });

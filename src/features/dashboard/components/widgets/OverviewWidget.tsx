@@ -1,13 +1,8 @@
 import Widget from "@/features/dashboard/components/widgets/Widget";
+import { statisticsWidgetProps } from "@/shared/types";
 
-export interface StackedBarSegment {
-  label: string;
-  value: number;
-  color: string;
-}
-
-const OverviewWidget = ({ data, isLoading }) => {
-  const formattedData = data?.assetBreakdown?.map((item, index) => ({
+const OverviewWidget = ({ data, isLoading }: statisticsWidgetProps) => {
+  const formattedData = data?.assetBreakdown?.map((item) => ({
     label: item.name,
     value: item.balance,
     color: item.color

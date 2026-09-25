@@ -1,6 +1,6 @@
 // app/components/SignUpForm.tsx
 "use client";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../../shared/components/ui/button";
 import { Input } from "../../../shared/components/ui/input";
 import {
@@ -13,7 +13,6 @@ import {
 import Google from "@/assets/images/Google.svg";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -27,23 +26,13 @@ import moment from "moment-timezone";
 import LayoutAuth from "../../../layout/AuthLayout";
 import { usePostSignupMutation, usePostVerifyMutation } from "../api/signupApi";
 
-interface FormData {
-  email: string;
-  password: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-}
-
 const signUp = () => {
-  const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [countdown, setCountdown] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState(false);
   const [code, setCode] = useState("");
   // const device = encryptString(getBrowserInfo());
   const router = useNavigate();
-  const dispatch = useDispatch();
   const tz = moment.tz.guess();
 
   const [postVerify, { isLoading }] = usePostVerifyMutation();
@@ -51,15 +40,12 @@ const signUp = () => {
     usePostSignupMutation();
 
   const {
-    handleSubmit,
     register,
     getValues,
     formState: { errors, isValid },
-    reset,
-    setValue,
     watch,
   } = useForm({
-    resolver: yupResolver(signupSchema.schema),
+    resolver: zodResolver(signupSchema.schema),
     mode: "onChange",
     defaultValues: signupSchema.defaultValues,
   });
@@ -85,7 +71,7 @@ const signUp = () => {
     }
   };
 
-  const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     console.log("test");
     if (isValid) {

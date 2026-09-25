@@ -2,11 +2,21 @@ import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import { Separator } from "@/shared/components/ui/separator";
 
-const ConfirmDialog = ({ open, setOpen, data }) => {
+interface ConfirmDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  data?: {
+    description?: string;
+    amount?: number;
+    asset?: { name: string } | null;
+  };
+}
+
+const ConfirmDialog = ({ open, setOpen, data }: ConfirmDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        onInteractOutside={false}
+        onInteractOutside={(e) => e.preventDefault()}
         className="w-full flex flex-col max-w-full h-dvh sm:max-w-md sm:h-auto sm:max-h-[90%] sm:min-h-lg sm:w-md"
       >
         <div>

@@ -1,7 +1,26 @@
 import * as Icon from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "../../ui/badge";
 import { Card } from "../../ui/card";
-export const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
+interface ScheduleValue {
+  label?: string;
+  behaviour?: string;
+}
+
+interface InfoRowProps {
+  icon: Icon.LucideIcon;
+  label: string;
+  // A string/node for most rows, an image URL for "Image", a ScheduleValue for "Schedule"
+  value?: ReactNode | ScheduleValue;
+  onPreview?: (value: string) => void;
+}
+
+export const InfoRow = ({
+  icon: IconComponent,
+  label,
+  value,
+  onPreview,
+}: InfoRowProps) => (
   <div
     className={`flex flex-1 items-start justify-between gap-3 ${
       label === "Image" && "flex-col"
@@ -16,11 +35,11 @@ export const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
       value ? (
         <button
           type="button"
-          onClick={() => onPreview(value)}
+          onClick={() => onPreview?.(value as string)}
           className="group relative h-52 w-full overflow-hidden rounded-xl"
         >
           <img
-            src={value}
+            src={value as string}
             alt="Transaction attachment"
             className="h-full w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -43,20 +62,22 @@ export const InfoRow = ({ icon: IconComponent, label, value, onPreview }) => (
           variant="outline"
           className="shrink-0 text-xs font-semibold capitalize tracking-wide bg-blue-100 text-blue-700"
         >
-          {value?.label}
+          {(value as ScheduleValue)?.label}
         </Badge>
 
-        {value?.behaviour && (
+        {(value as ScheduleValue)?.behaviour && (
           <Badge
             variant="outline"
-            className={`shrink-0 text-xs font-semibold capitalize tracking-wide ${value.behaviour === "REMIND" ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"}`}
+            className={`shrink-0 text-xs font-semibold capitalize tracking-wide ${(value as ScheduleValue).behaviour === "REMIND" ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"}`}
           >
-            {value.behaviour === "AUTO_LOG" ? "Auto Log" : value.behaviour}
+            {(value as ScheduleValue).behaviour === "AUTO_LOG"
+              ? "Auto Log"
+              : (value as ScheduleValue).behaviour}
           </Badge>
         )}
       </div>
     ) : (
-      <p className="font-medium break-words text-sm">{value || "N/A"}</p>
+      <p className="font-medium break-words text-sm">{(value as ReactNode) || "N/A"}</p>
     )}
   </div>
 );

@@ -5,7 +5,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Separator } from "@/shared/components/ui/separator";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { commonWidgetProps } from "@/shared/types";
+import { commonWidgetProps, StackedBarSegment } from "@/shared/types";
+import { getLucideIcon } from "@/shared/utils/icons";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import * as Icons from "lucide-react";
 import { useState } from "react";
@@ -29,8 +30,10 @@ function BarEmptyState({ title }: { title: string }) {
 }
 
 // ─── Helper ─────────────────────────────────────────────────────────────────
-function hasData(segments: commonWidgetProps["segments"]) {
-  return segments?.length > 0 && segments.some((s) => s.value > 0);
+function hasData(
+  segments?: StackedBarSegment[],
+): segments is StackedBarSegment[] {
+  return !!segments?.some((s) => s.value > 0);
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -41,7 +44,7 @@ const WidgetLayout = ({
   segments,
   icon,
 }: commonWidgetProps) => {
-  const [showBalance, setShowBalance] = useState(() => {
+  const [showBalance, setShowBalance] = useState<boolean>(() => {
     const saved = localStorage.getItem(`showBalance:${title}`);
     return saved ? JSON.parse(saved) : true;
   });
@@ -57,15 +60,15 @@ const WidgetLayout = ({
         : data?.balance;
 
   const trend =
-    title === "Expense"
+    (title === "Expense"
       ? data?.expenseTrend
       : title === "Income"
         ? data?.incomeTrend
-        : data?.balanceTrend;
+        : data?.balanceTrend) ?? NaN;
 
   const isOverview = title === "Overview";
 
-  const IconComponent = Icons[icon as keyof typeof Icons] || Icons.Banknote;
+  const IconComponent = getLucideIcon(icon, Icons.Banknote);
 
   const gradientColor =
     title === "Expense"
@@ -195,7 +198,7 @@ const WidgetLayout = ({
                       </span>
                       {showBalance ? (
                         <span className="transition-all duration-300">
-                          <AnimateNumber duration={2} value={balance} />
+                          <AnimateNumber duration={2} value={balance ?? 0} />
                         </span>
                       ) : (
                         <span

@@ -28,7 +28,7 @@ export const categorySchema = {
 };
 
 export const profileSchema = z.object({
-  profile_image: z.string().nullable(),
+  profile_image: z.instanceof(File).nullable(),
   first_name: z.string({
     required_error: "First Name is required",
   }),

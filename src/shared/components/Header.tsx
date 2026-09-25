@@ -1,9 +1,7 @@
 import DefaultProfile from "@/assets/images/default.png";
-import { navigationData } from "@/routing/navigationData";
-import { Bell, Menu, Sun } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "./ui/button";
 import ModeToggle from "@/shared/components/ModeToggle";
-import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useCookies } from "react-cookie";
 import { decryptString } from "@/shared/utils/CustomFunctions";

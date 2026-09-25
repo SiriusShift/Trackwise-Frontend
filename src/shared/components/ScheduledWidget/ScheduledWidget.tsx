@@ -1,11 +1,7 @@
 import { useGetRecurringQuery } from "@/features/transactions/api/transaction/recurringApi";
-import { useDeleteCategoryLimitMutation } from "@/shared/api/categoryApi";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { commonTrackerProps } from "@/shared/types";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import {
@@ -28,11 +24,16 @@ function getVisibleCount(width: number): number {
   return VISIBLE_CARDS.find((b) => width >= b.minWidth)?.count ?? 1;
 }
 
-function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
+interface ScheduledWidgetProps {
+  type: string;
+  title: string;
+  addDescription: string;
+  editDescription: string;
+}
+
+function ScheduledWidget({ type }: ScheduledWidgetProps) {
   const navigate = useNavigate();
   const width = useScreenWidth();
-  const { confirm } = useConfirm();
-  const [deleteLimit] = useDeleteCategoryLimitMutation();
 
   const { data, isLoading } = useGetRecurringQuery();
 
@@ -45,23 +46,6 @@ function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
 
   // Empty placeholder cards to fill remaining visible slots
   const emptyCount = Math.max(0, visibleCount - itemCount);
-
-  const handleDelete = (item: any) => {
-    confirm({
-      title: "Delete budget",
-      description: "Are you sure you want to delete this budget?",
-      variant: "warning",
-      showLoadingOnConfirm: true,
-      onConfirm: async () => {
-        try {
-          await deleteLimit(item.id).unwrap();
-          toast.success("Budget limit deleted successfully.");
-        } catch {
-          toast.error("Failed to delete budget limit. Please try again.");
-        }
-      },
-    });
-  };
 
   return (
     <Card className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md">
@@ -110,9 +94,6 @@ function ScheduledWidget({ title, editDescription, type }: commonTrackerProps) {
                     <ScheduleCard
                       key={schedule.id ?? index}
                       schedule={schedule}
-                      title={title}
-                      type={type}
-                      editDescription={editDescription}
                       count={itemCount}
                     />
                   ))}

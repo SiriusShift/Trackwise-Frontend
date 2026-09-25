@@ -1,6 +1,5 @@
 import { Card } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import React from "react";
 
 const TransactionListSkeleton = () => {
   return (

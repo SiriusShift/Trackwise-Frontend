@@ -125,8 +125,18 @@ export interface expenseForm {
 }
 
 export interface trackerFormType {
-  category: Object;
+  id?: number;
+  category: Pick<CategoryType, "id" | "name"> | null;
   amount: number;
+  period: string;
+}
+
+export interface CategoryLimit {
+  id: number;
+  value: number;
+  total: number | string;
+  period?: string;
+  category: Pick<CategoryType, "id" | "name" | "icon" | "color">;
 }
 
 export interface payRecurringForm {
@@ -136,10 +146,142 @@ export interface payRecurringForm {
   account: AssetData;
 }
 
-export interface commonWidgetProps<T = any> {
-  data: Array<T>;
+interface NamedRef {
+  id?: number;
+  name: string;
+}
+
+// A transaction (or recurring template) row as returned by the transaction list endpoints.
+export interface TransactionRow {
+  id: number;
+  type?: string;
+  amount: number;
+  date?: string;
+  description?: string;
+  status?: string;
+  image?: string | null;
+  remainingBalance?: number;
+  category?: {
+    id?: number;
+    name: string;
+    type?: string;
+    icon?: string;
+    color?: string;
+  };
+  asset?: NamedRef | null;
+  fromAsset?: NamedRef | null;
+  toAsset?: NamedRef | null;
+  recurringId?: number | null;
+  recurringTemplate?: {
+    id: number;
+    auto?: boolean;
+    isActive?: boolean;
+  } | null;
+}
+
+// A single payment/occurrence belonging to a transaction or recurring template
+export interface TransactionHistoryEntry {
+  id: number;
+  transactionType?: string;
+  amount: number;
+  date: string;
+  description?: string;
+  image?: string | null;
+  status?: string;
+  fromAsset?: NamedRef | null;
+  toAsset?: NamedRef | null;
+}
+
+// Extra fields present when a transaction is opened for viewing
+export interface TransactionDetails extends Omit<TransactionRow, "recurringTemplate"> {
+  interval?: number;
+  unit?: string;
+  startDate?: string;
+  recurringTemplate?: {
+    id: number;
+    auto?: boolean;
+    isActive?: boolean;
+    unit?: string;
+    interval?: number;
+    endDate?: string | null;
+    fromAsset?: NamedRef | null;
+  } | null;
+  transactionHistory?: TransactionHistoryEntry[];
+  generatedExpenses?: TransactionHistoryEntry[];
+  generatedIncomes?: TransactionHistoryEntry[];
+  generatedTransfers?: TransactionHistoryEntry[];
+}
+
+export type ScheduleType = "Expense" | "Income" | "Transfer";
+
+// A recurring transaction template from /transactions/recurring
+export interface Schedule {
+  id: number;
+  type: ScheduleType;
+  description: string;
+  amount: number | string;
+  category: { icon?: string; name: string };
+  fromAsset?: { name: string };
+  behaviour?: string;
+  unit?: string;
+  interval?: number | string;
+  nextDueDate?: string | Date | number;
+}
+
+export interface Bill {
+  id: string;
+  amount: number;
+  description: string;
+  nextDueDate: string;
+  category?: {
+    id?: number;
+    name?: string;
+    color?: string;
+    icon?: string;
+  };
+}
+
+export interface BillPayment {
+  id: number;
+  amount: number;
+  date: string;
+  status: string;
+  recurringDueDate?: string;
+}
+
+export interface StackedBarSegment {
+  label: string;
+  value: number;
+  color: string;
+}
+
+export interface BreakdownItem {
+  name: string;
+  amount: number;
+  color: string;
+}
+
+export interface DashboardStatistics {
+  expense?: number;
+  income?: number;
+  balance?: number;
+  expenseTrend?: number;
+  incomeTrend?: number;
+  balanceTrend?: number;
+  expenseBreakdown?: BreakdownItem[];
+  incomeBreakdown?: BreakdownItem[];
+  assetBreakdown?: { name: string; balance: number; color: string }[];
+}
+
+export interface statisticsWidgetProps {
+  data?: DashboardStatistics;
   isLoading: boolean;
+}
+
+export interface commonWidgetProps extends statisticsWidgetProps {
   title: string;
+  segments?: StackedBarSegment[];
+  icon?: string;
 }
 
 export interface commonDialogProps {
@@ -192,6 +334,6 @@ export interface CategoryTemplate {
 export interface filterProps {
   status?: string;
   search?: string;
-  selectedCategories?: Number[];
-  selectedAssets?: Category[];
+  selectedCategories?: CategoryType[];
+  selectedAssets?: { id: number; name: string }[];
 }

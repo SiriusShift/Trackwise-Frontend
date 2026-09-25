@@ -10,7 +10,7 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
-type TransactionType = "Expense" | "Income" | "Transfer";
+export type TransactionType = "Expense" | "Income" | "Transfer";
 
 const TRANSACT_LABEL: Record<string, string> = {
   expense: "Pay",
@@ -28,7 +28,8 @@ interface UseTransactionSubmitProps {
   type: TransactionType;
   mode: string;
   categoryLimit: any[];
-  fetchData: (data: any) => Promise<any>;
+  // RTK Query mutation trigger; null when the type has no trigger configured
+  fetchData: ((args?: any) => any) | null;
   watch: (field?: string) => any;
   reset: () => void;
   setOpen: (open: boolean) => void;
@@ -146,6 +147,7 @@ export function useTransactionSubmit({
       cancelText: "Cancel",
       showLoadingOnConfirm: true,
       onConfirm: async () => {
+        if (!fetchData) return;
         try {
           if (mode === "edit" || mode === "transact") {
             await fetchData({ data: formattedData, id: data.id }).unwrap();

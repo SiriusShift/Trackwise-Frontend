@@ -1,7 +1,12 @@
 import { Dialog, DialogContent } from "../ui/dialog";
-import React from "react";
 
-const TimePicker = ({ open, setOpen, setDateOpen }) => {
+const TimePicker = ({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) => {
   return (
     <Dialog
       modal={true}

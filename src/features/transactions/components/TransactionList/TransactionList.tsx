@@ -1,22 +1,18 @@
 import VirtualizedInfiniteList from "@/shared/components/VirtualizedInfiniteList";
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import { motion } from "motion/react";
-import * as Icons from "lucide-react";
-import moment from "moment";
-import { Badge } from "@/shared/components/ui/badge";
-import StatusIcon from "../statusIcon";
-import useLongPress from "@/shared/hooks/useLongPress";
-import {
-  setActionShow,
-  setActiveRow,
-  setOpenDialog,
-} from "@/shared/slices/activeSlice";
-import { useDispatch } from "react-redux";
 import { Card } from "@/shared/components/ui/card";
 import NoData from "@/assets/images/noData.svg";
 import TransactionListSkeleton from "./TransactionListSkeleton";
 import TransactionItem from "./TransactionItem";
-const TransactionList = forwardRef(function TransactionList(
+import type { TransactionRow } from "@/shared/types";
+
+interface TransactionListProps {
+  transactions?: TransactionRow[];
+  isFetching: boolean;
+}
+
+const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(function TransactionList(
   { transactions, isFetching },
   ref
 ) {
@@ -49,14 +45,14 @@ const TransactionList = forwardRef(function TransactionList(
       {isFetching ? (
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
-            <TransactionListSkeleton />
+            <TransactionListSkeleton key={i} />
           ))}
         </div>
-      ) : transactions?.length > 0 ? (
+      ) : transactions && transactions.length > 0 ? (
         <VirtualizedInfiniteList
           items={transactions}
           itemSize={130}
-          height={transactions?.length * 130}
+          height={transactions.length * 130}
           ref={ref}
           isFetching={isFetching}
           renderRow={(item, index) => (

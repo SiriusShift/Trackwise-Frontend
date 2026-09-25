@@ -1,27 +1,35 @@
-import * as yup from "yup"
+import {
+  amountField,
+  optionalObject,
+  requiredDate,
+  requiredObject,
+  requiredString,
+  requireFields,
+} from "@/shared/schema/fields";
+import { z } from "zod";
+
 export const transferSchema = {
-  schema: yup.object().shape({
-    category: yup.object().required("Category is required"),
-    description: yup.string().required("Description is required"),
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    date: yup.date().required("Date is required"),
-    image: yup.mixed().nullable(),
-    recurring: yup.boolean(),
-    account: yup.object().when("recurring", {
-      is: false,
-      then: (schema) => schema.required("Source is required"),
-      otherwise: (schema) => schema.notRequired(),
+  schema: z
+    .object({
+      category: requiredObject("Category is required"),
+      description: requiredString("Description is required"),
+      amount: amountField,
+      date: requiredDate("Date is required"),
+      image: z.any(),
+      recurring: z.boolean().optional(),
+      account: optionalObject,
+      to: optionalObject,
+    })
+    // Keep form-only fields (id, from, balance...) in submitted values
+    .passthrough()
+    .superRefine((data, ctx) => {
+      if (data.recurring === false) {
+        requireFields(data, ctx, { account: "Source is required" });
+      }
+      if (data.recurring === true || data.category.name === "Internal") {
+        requireFields(data, ctx, { to: "Destination is required" });
+      }
     }),
-    to: yup.object().when(["recurring", "category"], {
-      is: (recurring: boolean, category: Object) => recurring === true || category.name === "Internal",
-      then: (schema) => schema.required("Destination is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    // auto: yup.boolean(),
-  }),
   defaultValues: {
     category: null,
     description: "",
@@ -32,6 +40,5 @@ export const transferSchema = {
     image: null,
     from: null,
     to: null,
-    // auto: null,
   },
 };

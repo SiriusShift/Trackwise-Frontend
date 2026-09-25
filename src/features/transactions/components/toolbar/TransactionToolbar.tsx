@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui/collapsible";
 import { Input } from "@/shared/components/ui/input";
 import { Separator } from "@/shared/components/ui/separator";
-import { AssetData, Category, categoryType } from "@/shared/types";
+import { AssetData, CategoryType, filterProps } from "@/shared/types";
 import { ChevronDown, Download, Filter, Plus } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -24,17 +24,7 @@ const TransactionToolbar = ({
   onSubmit,
   onClear,
 }: {
-  onSubmit: ({
-    search,
-    status,
-    selectedCategories,
-    selectedAssets,
-  }: {
-    search: string;
-    status: string;
-    selectedCategories: categoryType[];
-    selectedAssets: any[];
-  }) => void;
+  onSubmit: (filter: Required<filterProps>) => void;
   onClear: () => void;
 
   // search: String;
@@ -51,8 +41,10 @@ const TransactionToolbar = ({
   const [reportOpen, setReportOpen] = useState(false);
 
   const [status, setStatus] = useState<string>("");
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  const [selectedAssets, setSelectedAssets] = useState<any[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>(
+    [],
+  );
+  const [selectedAssets, setSelectedAssets] = useState<AssetData[]>([]);
   const [search, setSearch] = useState<string>("");
 
   const type = useSelector((state: IRootState) => state.active.type);
@@ -69,7 +61,7 @@ const TransactionToolbar = ({
     onClear();
   };
 
-  const handleCheckboxChange = (category: any) => {
+  const handleCheckboxChange = (category: CategoryType) => {
     setSelectedCategories((prevSelected) => {
       // If category already exists in selected, remove it (uncheck)
       if (prevSelected.some((selected) => selected.id === category.id)) {
@@ -178,7 +170,7 @@ const TransactionToolbar = ({
                     {/* Content */}
                     <CollapsibleContent>
                       <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
-                        {categoryData?.map((category: Category) => (
+                        {categoryData?.map((category) => (
                           <div
                             key={category.id}
                             className="flex items-center gap-2"

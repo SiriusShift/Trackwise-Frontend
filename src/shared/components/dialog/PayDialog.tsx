@@ -5,8 +5,9 @@ import { payRecurringSchema } from "@/schema/schema";
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { commonDialogProps, payRecurringForm } from "@/shared/types";
 import { numberInput } from "@/shared/utils/CustomFunctions";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as LucideIcons from "lucide-react";
+import { getLucideIcon } from "@/shared/utils/icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -22,16 +23,15 @@ interface PayDialogType extends commonDialogProps {
 }
 function PayDialog({ data, open, setOpen }: PayDialogType) {
   const [openDate, setOpenDate] = useState(false);
-  let { data: assetData } = useGetAccountsQuery();
-  assetData = assetData?.data;
+  const { data: accountsData } = useGetAccountsQuery();
+  const assetData = accountsData?.data;
   const [triggerPayment, { isLoading }] = usePostPaymentMutation();
 
   console.log(data);
   const form = useForm<payRecurringForm>({
-    resolver: yupResolver(payRecurringSchema.schema),
+    resolver: zodResolver(payRecurringSchema.schema),
     mode: "onChange",
     defaultValues: {
-      ...payRecurringSchema.defaultValues,
       amount: data?.amount ?? 0,
     },
   });
@@ -45,11 +45,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
   } = form;
 
   const pastDue = moment().isAfter(moment(data?.nextDueDate), "day");
-  const iconName = data?.category?.icon as keyof typeof LucideIcons;
-  const Icon =
-    iconName && iconName in LucideIcons
-      ? LucideIcons[iconName]
-      : LucideIcons.CircleHelp;
+  const Icon = getLucideIcon(data?.category?.icon, LucideIcons.CircleHelp);
 
   const onSubmit = async (values: payRecurringForm) => {
     const { date, account, ...rest } = values;

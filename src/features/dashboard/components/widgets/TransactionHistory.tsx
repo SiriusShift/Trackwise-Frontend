@@ -9,14 +9,14 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-const itemVariants = {
-  hidden: { x: -20, opacity: 0 },
-  visible: {
-    x: 0,
-    opacity: 1,
-    transition: { ease: [0.25, 0.1, 0.25, 1], duration: 0.35 },
-  },
-};
+interface RecentTransaction {
+  id: number;
+  type: string;
+  amount: number;
+  date: string;
+  description?: string;
+  category?: { name: string; icon?: string };
+}
 
 function TransactionIcon({ icon }: { icon?: string }) {
   const LucidIcon = (icon && Icons[icon as keyof typeof Icons]) as
@@ -32,11 +32,9 @@ function TransactionIcon({ icon }: { icon?: string }) {
 
 function AmountLabel({
   type,
-  categoryName,
   amount,
 }: {
   type: string;
-  categoryName: string;
   amount: number;
 }) {
   const currency = useSelector((state: IRootState) => state.settings.currency);
@@ -65,7 +63,7 @@ const TransactionHistory = () => {
     pageIndex: 0,
   });
 
-  const transactions = data?.data ?? [];
+  const transactions: RecentTransaction[] = data?.data ?? [];
 
   console.log(data);
   const isEmpty = !isFetching && transactions.length === 0;
@@ -150,7 +148,6 @@ const TransactionHistory = () => {
                 <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
                   <AmountLabel
                     type={item?.type}
-                    categoryName={item?.category?.name}
                     amount={item?.amount}
                   />
                   <p className="text-[11px] text-muted-foreground">

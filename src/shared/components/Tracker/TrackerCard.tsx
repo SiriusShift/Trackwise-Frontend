@@ -13,24 +13,19 @@ import {
 } from "../ui/dropdown-menu";
 
 import { cn } from "@/lib/utils";
-import { commonTrackerProps } from "@/shared/types";
+import { CategoryLimit } from "@/shared/types";
+import { getLucideIcon } from "@/shared/utils/icons";
 import { StackedBar } from "../charts/CommonBar";
 
-interface TrackerCardProps extends commonTrackerProps {
-  item: any;
-  title: string;
-  editDescription: string;
-  onDelete: (item: any) => void;
-  onSubmit?: () => void;
-  type: string;
+interface TrackerCardProps {
+  item: CategoryLimit;
+  onDelete: (item: CategoryLimit) => void;
   count: number;
 }
 
 const TrackerCard = ({
   item,
   onDelete,
-  type,
-  onSubmit,
   count,
 }: TrackerCardProps) => {
   const [open, setOpen] = useState(false);
@@ -41,18 +36,17 @@ const TrackerCard = ({
   const isOverBudget = spent > limit;
   const remaining = limit - spent;
 
-  const iconKey = (item?.category?.icon as keyof typeof Icons) ?? "BusFront";
-  const Icon = Icons[iconKey] as React.ElementType;
+  const Icon = getLucideIcon(item?.category?.icon ?? "BusFront");
 
   const segment = useMemo(
     () => [
       {
         label: "Spent",
-        value: item.total,
+        value: spent,
         color: isOverBudget ? "hsl(var(--destructive))" : "hsl(var(--primary))",
       },
     ],
-    [item],
+    [spent, isOverBudget],
   );
   return (
     <>
@@ -182,9 +176,7 @@ const TrackerCard = ({
         mode="edit"
         open={open}
         setOpen={setOpen}
-        onSubmit={onSubmit}
         data={item}
-        type={type}
       />
     </>
   );

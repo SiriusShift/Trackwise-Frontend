@@ -3,15 +3,12 @@ import { Separator } from "@/shared/components/ui/separator";
 import {
   FormField,
   FormItem,
-  FormLabel,
   FormControl,
   FormMessage,
-  Form,
-  FormDescription,
 } from "@/shared/components/ui/form";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   Command,
@@ -29,38 +26,75 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/lib/utils";
 import moment from "moment-timezone";
-import { time } from "console";
-import { Check, ChevronsUpDown, Currency } from "lucide-react";
-import { useSelector } from "react-redux";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useDispatch } from "react-redux";
 import currency from "currency-codes";
-import { IRootState } from "@/app/store";
+import { toast } from "sonner";
+import { GeneralSettingsFormValues } from "@/schema/schema";
+import { setSettings } from "@/shared/slices/settingsSlice";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import {
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+} from "../api/settingsApi";
 
 const GeneralSettings = () => {
-  const settings = useSelector((state: IRootState) => state.settings);
+  const dispatch = useDispatch();
   const timezones = moment.tz.names();
-  console.log(timezones)
-  console.log(settings);
 
-  const form = useForm({
-    resolver: yupResolver(generalSettings?.schema),
+  const { data: settings } = useGetSettingsQuery();
+  const [updateSettings] = useUpdateSettingsMutation();
+
+  const form = useForm<GeneralSettingsFormValues>({
+    resolver: zodResolver(generalSettings?.schema),
     defaultValues: generalSettings?.defaultValues,
   });
 
-  console.log(currency);
-  const { control, reset, watch } = form;
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { isDirty, isSubmitting },
+  } = form;
 
-  console.log(watch());
   useEffect(() => {
+    if (!settings) return;
+
     reset({
-      timezone: settings?.timezone,
-      timeFormat: settings?.timeFormat === "hh:mm A" ? "12" : "24",
-      currency: currency?.data?.find((item) => item?.code === settings?.currency)
+      timezone: settings.timezone,
+      timeFormat: settings.timeFormat === "hh:mm A" ? "12" : "24",
+      currency: currency?.data?.find((item) => item?.code === settings.currency),
     });
-  }, []);
+  }, [settings, reset]);
+
+  const onSubmit = async (values: GeneralSettingsFormValues) => {
+    try {
+      const updated = await updateSettings({
+        timezone: values.timezone,
+        timeFormat: values.timeFormat === "12" ? "hh:mm A" : "HH:mm",
+        currency: values.currency?.code,
+      }).unwrap();
+
+      dispatch(
+        setSettings({
+          timezone: updated.timezone,
+          timeFormat: updated.timeFormat,
+          currency: updated.currency,
+        }),
+      );
+      reset(values);
+      toast.success("Settings updated successfully.");
+    } catch (err) {
+      toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+    }
+  };
 
   return (
     <FormProvider {...form}>
-      <div className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {/* Date & Time Header */}
         <div className="space-y-2">
           <h1 className="text-lg font-semibold">Date & Time</h1>
@@ -166,7 +200,6 @@ const GeneralSettings = () => {
           <Separator />
         </div>
 
-        {/* Duplicate Time Format - Replace or remove */}
         <div className="flex flex-row items-center justify-between">
           <div>
             <h2 className="font-medium">Currency Format</h2>
@@ -207,7 +240,7 @@ const GeneralSettings = () => {
                           <CommandGroup>
                             {currency?.data?.map((currency, index) => (
                               <CommandItem
-                                value={currency}
+                                value={`${currency?.currency} ${currency?.code}`}
                                 key={index}
                                 onSelect={() => onChange(currency)}
                               >
@@ -231,9 +264,16 @@ const GeneralSettings = () => {
               </FormItem>
             )}
           />
-          {/* You might want to replace this duplicate timeFormat field with a real currency format option here */}
         </div>
-      </div>
+
+        <Separator />
+
+        <div className="flex justify-end">
+          <Button type="submit" disabled={!isDirty || isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
+      </form>
     </FormProvider>
   );
 };

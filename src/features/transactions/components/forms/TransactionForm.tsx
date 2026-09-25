@@ -35,14 +35,9 @@ import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 
 interface Asset {
-  id: string;
+  id: number;
   name: string;
   remainingBalance: number;
-}
-
-interface Category {
-  id: string;
-  name: string;
 }
 
 interface TransactionFormProps {
@@ -249,7 +244,7 @@ const TransactionForm = ({
       )}
 
       {/* Category + Amount */}
-      <CategoryAmountSection type={type} mode={mode} />
+      <CategoryAmountSection mode={mode} />
 
       {/* Recurring schedule fields */}
       {isRecurring && (

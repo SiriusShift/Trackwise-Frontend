@@ -14,35 +14,18 @@ import {
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { cn } from "@/lib/utils";
 import { frequencies } from "@/shared/constants/dateConstants";
-import { commonTrackerProps } from "@/shared/types";
+import { Schedule, ScheduleType } from "@/shared/types";
 import moment from "moment";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type ScheduleType = "Expense" | "Income" | "Transfer";
 
-interface Schedule {
-  type: ScheduleType;
-  description: string;
-  amount: number | string;
-  category: { icon?: string; name: string };
-  fromAsset?: { name: string };
-  behaviour?: string;
-  unit?: string;
-  interval?: number | string;
-  nextDueDate?: string | Date | number;
-}
-
-interface TrackerCardProps extends commonTrackerProps {
+interface ScheduleCardProps {
   schedule: Schedule;
-  title: string;
-  editDescription: string;
-  onDelete: (schedule: Schedule) => void;
+  onDelete?: (schedule: Schedule) => void;
   onView?: (schedule: Schedule) => void;
-  onSubmit?: () => void;
-  type: string;
   count: number;
 }
 
@@ -96,14 +79,10 @@ const TYPE_CONFIG: Record<
 const TrackerCard = memo(
   ({
     schedule,
-    title,
-    editDescription,
     onDelete,
     onView,
-    type,
-    onSubmit,
     count,
-  }: TrackerCardProps) => {
+  }: ScheduleCardProps) => {
     const [open, setOpen] = useState(false);
 
     const config = useMemo(
@@ -111,7 +90,7 @@ const TrackerCard = memo(
       [schedule.type],
     );
 
-    const { icon: TypeIcon, prefix, container, text, badge, accent } = config;
+    const { icon: TypeIcon, prefix, container, text } = config;
 
     const nextDue = useMemo(
       () =>
@@ -140,8 +119,10 @@ const TrackerCard = memo(
 
     const behaviour = useMemo(
       () =>
-        schedule.behaviour?.charAt(0).toUpperCase() +
-        schedule.behaviour?.slice(1).toLowerCase(),
+        schedule.behaviour
+          ? schedule.behaviour.charAt(0).toUpperCase() +
+            schedule.behaviour.slice(1).toLowerCase()
+          : undefined,
       [schedule.behaviour],
     );
 
@@ -190,7 +171,8 @@ const TrackerCard = memo(
 
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
-                  onClick={() => onDelete(schedule)}
+                  onClick={() => onDelete?.(schedule)}
+                  disabled={!onDelete}
                 >
                   <Icons.Trash2 className="mr-2 h-4 w-4" />
                   Delete

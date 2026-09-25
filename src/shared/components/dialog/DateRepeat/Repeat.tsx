@@ -1,26 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogDescription,
   DialogTitle,
 } from "../../ui/dialog";
 import { useFormContext } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-  FormLabel,
-  FormMessage,
-} from "../../ui/form";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { frequencies } from "@/shared/constants/dateConstants";
 import { Button } from "../../ui/button";
 import { Check } from "lucide-react";
@@ -36,12 +21,11 @@ const Repeat = ({
   setOpen: (open: boolean) => void;
   setParentDialogOpen: (open: boolean) => void;
 }) => {
-  const [active, setActive] = useState(null);
   const [openCustom, setOpenCustom] = useState(false);
   const { watch, setValue } = useFormContext();
   const selectedRepeat = watch("repeat");
 
-  const handleClick = (frequency) => {
+  const handleClick = (frequency: frequencyProps) => {
     if (frequency?.name !== "Custom") {
       setValue("repeat", frequency, {
         shouldDirty: true,
@@ -52,8 +36,6 @@ const Repeat = ({
       setOpen(false);
     }
   };
-
-  console.log(active);
 
   return (
     <>
@@ -77,7 +59,6 @@ const Repeat = ({
 
           {frequencies?.map((frequency: frequencyProps, index: number) => (
             <Button
-              value={active}
               key={index}
               className="flex justify-between"
               variant={

@@ -1,30 +1,14 @@
 import { Button } from "@/shared/components/ui/button";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import FullCalendar, { type DateClickArg } from "@fullcalendar/react";
+import FullCalendar from "@fullcalendar/react";
+import { type DateClickArg } from "@fullcalendar/interaction";
 import * as LucideIcon from "lucide-react";
 import moment from "moment";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLazyGetBillsQuery } from "../api/transaction/expensesApi";
-import { UpcomingBillsSidebar } from "../components/BillsSidebar";
-
-interface BillEvent {
-  id: string;
-  title: string;
-  start: string;
-  allDay: true;
-  extendedProps: {
-    amount: number;
-    category?: {
-      name?: string;
-      color?: string;
-      icon?: string;
-    };
-    description: string;
-  };
-}
+import { BillEvent, UpcomingBillsSidebar } from "../components/BillsSidebar";
 
 const CalendarPage = () => {
   const [monthRange, setMonthRange] = useState({ start: "", end: "" });
@@ -32,7 +16,6 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const calendarRef = useRef<FullCalendar>(null);
-  const width = useScreenWidth();
   const [trigger, { data, isFetching }] = useLazyGetBillsQuery();
 
   const navigateCalendar = (action: "prev" | "next" | "today") =>
@@ -59,7 +42,6 @@ const CalendarPage = () => {
     );
   }, [data]);
 
-  const isMobile = width < 768;
   const today = moment();
 
   // Derived, not stored: sidebar shows only the selected day's bills,
@@ -75,11 +57,6 @@ const CalendarPage = () => {
     const clicked = moment(info.date).format("YYYY-MM-DD");
     // Clicking the already-selected date deselects it.
     setSelectedDate((prevDate) => (prevDate === clicked ? null : clicked));
-  };
-
-  const handleSelectBill = (event: BillEvent) => {
-    // TODO: wire up to bill detail dialog
-    console.log("selected bill", event.id);
   };
 
   return (

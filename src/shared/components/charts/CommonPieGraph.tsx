@@ -1,6 +1,3 @@
-import moment from "moment";
-import { useLocation } from "react-router-dom";
-import { navigationData } from "@/routing/navigationData";
 import { PuffLoader } from "react-spinners"; // Example spinner component
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from "recharts";
 import {
@@ -21,8 +18,9 @@ import noChartData from "@/assets/images/file.png";
 import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
 import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
+import type { ChartConfig } from "@/shared/components/ui/chart";
 
-const chartConfig = {
+const PIE_LAYOUT = {
   width: 200,
   height: 210,
   innerRadius: 55,
@@ -45,11 +43,12 @@ const chartConfig = {
   ],
 };
 
+const chartConfig: ChartConfig = {};
+
 function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
   const [showChart, setShowChart] = useState(false);
 
   console.log(total)
-  const dateDisplay = formatDateDisplay();
   const modeDisplay = formatMode();
 
   console.log(data, "trend")
@@ -80,8 +79,8 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
         <CardContent className="flex-1 justify-center flex content-center pb-0">
           {showChart && !graphLoading ? (
             <ResponsiveContainer
-              width={data?.length > 0 ? chartConfig.width : 150}
-              height={chartConfig.height}
+              width={data?.length > 0 ? PIE_LAYOUT.width : 150}
+              height={PIE_LAYOUT.height}
               className={"flex justify-center items-center"}
             >
               {data?.length > 0 ? (
@@ -97,17 +96,17 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
                   />
                   <Pie
                     data={data}
-                    dataKey={chartConfig.dataKey}
-                    nameKey={chartConfig.nameKey}
-                    innerRadius={chartConfig.innerRadius}
-                    outerRadius={chartConfig.outerRadius}
-                    strokeWidth={chartConfig.strokeWidth}
-                    stroke={chartConfig.strokeColor}
+                    dataKey={PIE_LAYOUT.dataKey}
+                    nameKey={PIE_LAYOUT.nameKey}
+                    innerRadius={PIE_LAYOUT.innerRadius}
+                    outerRadius={PIE_LAYOUT.outerRadius}
+                    strokeWidth={PIE_LAYOUT.strokeWidth}
+                    stroke={PIE_LAYOUT.strokeColor}
                     isAnimationActive={true}
                     startAngle={90} // Adjust this for your preferred starting position
                     endAngle={-270} // Ensure full 360° rotation
                   >
-                    {data?.map((entry, index) => (
+                    {data?.map((entry: { color: string }, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={

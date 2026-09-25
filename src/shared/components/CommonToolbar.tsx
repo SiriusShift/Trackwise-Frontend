@@ -8,24 +8,25 @@ import { Button } from "@/shared/components/ui/button";
 import { Archive, Banknote, Check, Eye, Pencil, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import type { TransactionDetails } from "@/shared/types";
+import { accountsApi } from "../api/accountsApi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { categoryApi } from "../api/categoryApi";
 import useScreenWidth from "../hooks/useScreenWidth";
 import { useConfirm } from "../provider/ConfirmProvider";
 import { setActionShow } from "../slices/activeSlice";
-import { handleCatchErrorMessage } from "../utils/CustomFunctions";
 import ViewTransaction from "./dialog/ViewDialog/ViewTransaction";
 
 const CommonToolbar = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [viewOpen, setViewOpen] = useState<boolean>(false);
-  const [mode, setMode] = useState<string>();
+  const [mode, setMode] = useState<"edit" | "transact">("edit");
 
   const showActionTab = useSelector((state: IRootState) => state.active.action);
   const selectedData = useSelector(
     (state: IRootState) => state.active.activeRow,
-  );
+  ) as TransactionDetails | null;
   const width = useScreenWidth();
   const dispatch = useDispatch();
   const { confirm } = useConfirm();
@@ -36,35 +37,11 @@ const CommonToolbar = () => {
     setViewOpen(true);
   };
 
-  const onTransact = async () => {
-    console.log(selectedData?.recurringTemplate, "expense payment");
-    if (selectedData?.recurringTemplate?.auto) {
-      confirm({
-        title: "Confirm Payment",
-        description: "Do you want to proceed with paying this expense?",
-        variant: "info",
-        confirmText: "Pay",
-        cancelText: "Cancel",
-        showLoadingOnConfirm: true,
-        onConfirm: async () => {
-          try {
-            await payAuto({
-              id: expense.id,
-              data: {
-                type: "Expense",
-              },
-            }).unwrap();
-            dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-          } catch (err) {
-            let errorMessage = handleCatchErrorMessage(err); // Default message
-            toast.error(errorMessage);
-          }
-        },
-      });
-    } else {
-      setMode("transact");
-      setDialogOpen(true); // open dialog
-    }
+  // Auto-pay for expenses is disabled on the API (postAutoPayment is commented
+  // out in expensesApi), so every row, auto or not, is paid through the dialog.
+  const onTransact = () => {
+    setMode("transact");
+    setDialogOpen(true); // open dialog
   };
 
   const onArchive = async () => {
@@ -79,9 +56,9 @@ const CommonToolbar = () => {
         try {
           await archive({
             data: {
-              type: selectedData?.category?.type.toLowerCase(),
+              type: selectedData?.category?.type?.toLowerCase(),
             },
-            id: selectedData.id,
+            id: selectedData?.id,
           }).unwrap();
           if (selectedData?.category?.type === "Expense") {
             dispatch(
@@ -98,7 +75,7 @@ const CommonToolbar = () => {
           dispatch(accountsApi.util.invalidateTags(["Assets"]));
         } catch (err) {
           console.log(err);
-          toast.error(err?.data?.error);
+          toast.error((err as { data?: { error?: string } })?.data?.error);
         }
       },
     });
@@ -115,15 +92,15 @@ const CommonToolbar = () => {
           <Button
             variant="outline"
             onClick={onEdit}
-            disabled={
-              selectedData?.status === "Paid" ||
-              selectedData?.status === "Received" ||
-              selectedData?.status === "Completed"
-            }
+            // disabled={
+            //   selectedData?.status === "Paid" ||
+            //   selectedData?.status === "Received" ||
+            //   selectedData?.status === "Completed"
+            // }
           >
             <Pencil className="w-4 h-4" />
           </Button>
-          {selectedData?.category?.type !== "Transfer" && (
+          {/* {selectedData?.category?.type !== "Transfer" && (
             <Button
               variant="outline"
               onClick={onTransact}
@@ -144,7 +121,7 @@ const CommonToolbar = () => {
             >
               <Check className="w-4 h-4" />
             </Button>
-          )}
+          )} */}
           <Button variant="outline" onClick={onView}>
             <Eye className="w-4 h-4" />
           </Button>

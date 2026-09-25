@@ -1,41 +1,42 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../../ui/accordion";
-import { Separator } from "../../ui/separator";
-import {
-  formatCurrency,
-  getTypeIcon,
-  formatDate,
-} from "@/shared/utils/CustomFunctions";
 import TransactionHistory from "./TransactionHistory";
 import ViewImage from "./ViewImage";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import RecurringDetails from "./RecurringInfo";
 import RecurringList from "./RecurringList";
+import type {
+  TransactionDetails,
+  TransactionHistoryEntry,
+} from "@/shared/types";
 
-const DialogAccordion = ({ transaction }) => {
+const DialogAccordion = ({
+  transaction,
+}: {
+  transaction: TransactionDetails;
+}) => {
   console.log(transaction);
   const [imageOpen, setImageOpen] = useState(false);
-  const [active, setActive] = useState(null);
+  const [active, setActive] = useState<TransactionHistoryEntry | null>(null);
   const [open, setOpen] = useState(false);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  const isAuto = transaction?.recurringTemplate?.auto ? true : null;
   const list =
     transaction?.generatedExpenses ||
     transaction?.generatedIncomes ||
     transaction?.generatedTransfers;
 
-  const handleImageOpen = (image) => {
-    setPreview(image);
+  const handleImageOpen = (image?: string | null) => {
+    setPreview(image ?? null);
     setImageOpen(true);
   };
 
-  const handleEdit = (history) => {
+  const handleEdit = (history: TransactionHistoryEntry) => {
     setActive(history);
     setOpen(true);
   };
@@ -61,24 +62,21 @@ const DialogAccordion = ({ transaction }) => {
             <AccordionTrigger>Transaction History</AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 text-balance">
               {transaction?.transactionHistory?.map((history) => (
-                <>
-                  <TransactionHistory
-                    setOpen={() => handleEdit(history)}
-                    open={open}
-                    setImageOpen={() => handleImageOpen(history.image)}
-                    history={history}
-                    transaction={transaction}
-                  />
-                </>
+                <TransactionHistory
+                  key={history.id}
+                  setOpen={() => handleEdit(history)}
+                  setImageOpen={() => handleImageOpen(history.image)}
+                  history={history}
+                  transaction={transaction}
+                />
               ))}
               <ViewImage
-                image={preview}
+                image={preview ?? ""}
                 open={imageOpen}
                 setOpen={setImageOpen}
               />
               <TransactionDialog
                 mode="edit"
-                history={true}
                 rowData={{
                   ...active,
                   category: transaction?.category,
@@ -90,29 +88,25 @@ const DialogAccordion = ({ transaction }) => {
             </AccordionContent>
           </AccordionItem>
         )}
-      {list?.length > 0 && (
+      {list && list.length > 0 && (
         <AccordionItem value="list">
           <AccordionTrigger>Generated {transaction?.type}s</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 text-balance">
             {list.map((history) => (
-              <>
-                <RecurringList
-                  setOpen={() => handleEdit(history)}
-                  open={open}
-                  setImageOpen={() => handleImageOpen(history.image)}
-                  history={history}
-                  transaction={transaction}
-                />
-              </>
+              <RecurringList
+                key={history.id}
+                setOpen={() => handleEdit(history)}
+                setImageOpen={() => handleImageOpen(history.image)}
+                history={history}
+              />
             ))}
             <ViewImage
-              image={preview}
+              image={preview ?? ""}
               open={imageOpen}
               setOpen={setImageOpen}
             />
             <TransactionDialog
               mode="edit"
-              history={true}
               rowData={{
                 ...active,
                 category: transaction?.category,

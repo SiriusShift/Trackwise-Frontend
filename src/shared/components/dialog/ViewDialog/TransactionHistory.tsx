@@ -1,7 +1,7 @@
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { formatDate } from "@/shared/utils/CustomFunctions";
 import { Button } from "../../ui/button";
-import { Paperclip, Pencil, Eye, Trash } from "lucide-react";
+import { Paperclip, Pencil, Trash } from "lucide-react";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useDeleteTransactionHistoryMutation } from "@/features/transactions/api/transaction";
 import { toast } from "sonner";
@@ -9,19 +9,31 @@ import { useDispatch } from "react-redux";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import type {
+  TransactionDetails,
+  TransactionHistoryEntry,
+} from "@/shared/types";
+
+interface TransactionHistoryProps {
+  history: TransactionHistoryEntry;
+  setImageOpen: () => void;
+  setOpen: () => void;
+  transaction: TransactionDetails;
+}
 
 const TransactionHistory = ({
   history,
   setImageOpen,
   setOpen,
   transaction,
-}) => {
+}: TransactionHistoryProps) => {
   const { confirm } = useConfirm();
   const dispatch = useDispatch();
   console.log(history);
   console.log(transaction);
 
-  const [trigger, { isLoading }] = useDeleteTransactionHistoryMutation();
+  const [trigger] = useDeleteTransactionHistoryMutation();
   const onDelete = () => {
     console.log("test");
     confirm({
@@ -43,7 +55,7 @@ const TransactionHistory = ({
           }
         } catch (err) {
           console.log(err);
-          toast.error(err?.data?.error);
+          toast.error(handleCatchErrorMessage(err));
         }
       },
     });
@@ -135,7 +147,7 @@ const TransactionHistory = ({
         <div className="flex justify-end gap-2 pt-2 border-t border-border/30">
           {history?.image && (
             <Button
-              onClick={() => setImageOpen(history?.image)}
+              onClick={() => setImageOpen()}
               variant="outline"
               size="sm"
               className="gap-2 hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-950/50"
@@ -145,7 +157,7 @@ const TransactionHistory = ({
             </Button>
           )}
           {history?.transactionType !== "Transfer" && <>          <Button
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen()}
             variant="outline"
             size="sm"
             className="gap-2 hover:bg-gray-50 hover:border-gray-200 dark:hover:bg-gray-800/50"

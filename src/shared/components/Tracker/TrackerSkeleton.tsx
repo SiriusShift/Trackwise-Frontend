@@ -2,7 +2,7 @@ import { Card, CardContent } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import { Skeleton } from "../ui/skeleton";
 
-const TrackerSkeleton = ({ count }) => {
+const TrackerSkeleton = ({ count }: { count: number }) => {
   return (
     <CarouselItem
       className={`${count > 0 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2 flex-1`}

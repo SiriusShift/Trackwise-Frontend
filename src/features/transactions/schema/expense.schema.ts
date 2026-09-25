@@ -1,41 +1,40 @@
+import {
+  amountField,
+  optionalDate,
+  optionalString,
+  requiredDate,
+  requiredObject,
+  requiredString,
+  requireFields,
+} from "@/shared/schema/fields";
 import moment from "moment";
-import * as yup from "yup";
+import { z } from "zod";
+
 export const expenseSchema = {
-  schema: yup.object().shape({
-    category: yup.object().required("Category is required"),
-    description: yup.string().required("Description is required"),
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    date: yup.date().required("Date is required"),
-    image: yup.mixed().notRequired().nullable(),
-    // recurring: yup.boolean(),
-    account: yup.object().required("Account is required"),
-    endDate: yup.date().nullable().notRequired(),
-    behaviour: yup.string().when("recurring", {
-      is: true,
-      then: (schema) => schema.required("Mode is required"),
-      otherwise: (schema) => schema.notRequired(),
+  schema: z
+    .object({
+      category: requiredObject("Category is required"),
+      description: requiredString("Description is required"),
+      amount: amountField,
+      date: requiredDate("Date is required"),
+      image: z.any(),
+      account: requiredObject("Account is required"),
+      endDate: optionalDate,
+      behaviour: optionalString,
+      mode: optionalString,
+      frequency: optionalString,
+      every: optionalString,
+    })
+    // Keep form-only fields (id, recurring, repeat, balance...) in submitted values
+    .passthrough()
+    .superRefine((data, ctx) => {
+      if (data.recurring !== true) return;
+      requireFields(data, ctx, {
+        behaviour: "Mode is required",
+        frequency: "Repeat is required",
+        every: "Unit is required",
+      });
     }),
-    mode: yup.string(),
-    frequency: yup
-      .string()
-      .nullable()
-      .when("recurring", {
-        is: true,
-        then: (schema) => schema.required("Repeat is required"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    every: yup
-      .string()
-      .nullable()
-      .when("recurring", {
-        is: true,
-        then: (schema) => schema.required("Unit is required"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-  }),
   defaultValues: {
     category: null,
     description: "",
@@ -50,13 +49,12 @@ export const expenseSchema = {
 };
 
 export const payExpense = {
-  schema: yup.object().shape({
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    source: yup.object().required("Source is required"),
-  }),
+  schema: z
+    .object({
+      amount: amountField,
+      source: requiredObject("Source is required"),
+    })
+    .passthrough(),
   defaultValues: {
     amount: 0,
     source: null,

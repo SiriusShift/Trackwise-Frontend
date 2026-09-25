@@ -9,10 +9,12 @@ import moment from "moment";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { Bill } from "@/shared/types";
+import { getLucideIcon } from "@/shared/utils/icons";
 
 const PESO_LOCALE = "en-PH";
 
-export const getStatus = (date) => {
+export const getStatus = (date?: moment.MomentInput) => {
   const today = moment();
   const due = moment(date);
   if (due.isBefore(today, "day"))
@@ -50,19 +52,15 @@ export const getStatus = (date) => {
 
 // Returns a lucide-react icon component for a given icon name, falling back
 // to Banknote when the category/icon is missing or unrecognized.
-const getCategoryIcon = (iconName?: string) => {
-  if (iconName && Icons[iconName as keyof typeof Icons]) {
-    return Icons[iconName as keyof typeof Icons];
-  }
-  return Icons.Banknote;
-};
+const getCategoryIcon = (iconName?: string) =>
+  getLucideIcon(iconName, Icons.Banknote);
 
 const formatCurrency = (amount: number) =>
   `₱${Number(amount ?? 0).toLocaleString(PESO_LOCALE)}`;
 
 export default function DueCalendar() {
   const [open, setOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState(null);
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
 
   const active = useSelector((state: IRootState) => state.active.active);
 
@@ -79,7 +77,7 @@ export default function DueCalendar() {
 
   console.log(previewBills);
 
-  const handleOpenBill = (bill) => {
+  const handleOpenBill = (bill: Bill) => {
     setSelectedBill(bill);
     setOpen(true);
   };

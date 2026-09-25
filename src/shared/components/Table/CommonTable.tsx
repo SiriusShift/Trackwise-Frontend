@@ -35,6 +35,7 @@ import {
   FileX,
 } from "lucide-react";
 import * as React from "react";
+import type { TransactionRow } from "@/shared/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]; // Columns definition
@@ -202,7 +203,10 @@ export function DataTable<TData, TValue>({
       ) : (
         <div className="w-full">
           {" "}
-          <TransactionList transactions={data} isFetching={isLoading} />
+          <TransactionList
+            transactions={data as TransactionRow[]}
+            isFetching={isLoading}
+          />
         </div>
       )}
 

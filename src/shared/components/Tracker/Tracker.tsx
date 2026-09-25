@@ -8,6 +8,7 @@ import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import moment from "moment";
+import { CategoryLimit } from "@/shared/types";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -35,12 +36,11 @@ function getVisibleCount(width: number): number {
 
 function Tracker() {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState("");
 
   const width = useScreenWidth();
   const { confirm } = useConfirm();
   const [deleteLimit] = useDeleteCategoryLimitMutation();
-  const { type, active } = useSelector((state: IRootState) => state.active);
+  const active = useSelector((state: IRootState) => state.active.active);
   const { data, isLoading } = useGetCategoryLimitQuery({
     startDate: moment(active?.from).toDate()?.toISOString(),
     endDate: moment(active?.to).toDate()?.toISOString(),
@@ -56,7 +56,7 @@ function Tracker() {
   // Empty placeholder cards to fill remaining visible slots
   const emptyCount = Math.max(0, visibleCount - itemCount);
 
-  const handleDelete = (item: any) => {
+  const handleDelete = (item: CategoryLimit) => {
     confirm({
       title: "Delete budget",
       description: "Are you sure you want to delete this budget?",
@@ -118,11 +118,10 @@ function Tracker() {
                 ? [...Array(visibleCount)].map((_, i) => (
                     <TrackerSkeleton key={i} count={itemCount} />
                   ))
-                : data?.map((item, index) => (
+                : data?.map((item: CategoryLimit, index: number) => (
                     <TrackerCard
                       key={item.id ?? index}
                       item={item}
-                      type={type}
                       count={itemCount}
                       onDelete={handleDelete}
                     />
@@ -145,6 +144,7 @@ function Tracker() {
         </div>
         <TrackerDialog
           title="Add budget"
+          mode="add"
           open={open}
           setOpen={setOpen}
           description="Set a spending limit for a category"

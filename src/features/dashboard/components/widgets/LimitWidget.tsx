@@ -1,11 +1,10 @@
-import Widget from "@/features/dashboard/components/widgets/Widget";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/shared/components/ui/chart";
-import React from "react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 
 const chartConfig1 = {
@@ -25,10 +24,13 @@ const chartData1 = [
 ];
 
 const LimitWidget = () => {
-  const totalVisitors = chartData1[0].bills + chartData1[0].food;
+  const totalVisitors = (chartData1[0].food ?? 0) + (chartData1[1].bills ?? 0);
 
   return (
-    <Widget title="Expense Breakdown">
+    <Card className="p-5">
+      <CardHeader className="p-0 mb-4">
+        <CardTitle>Expense Breakdown</CardTitle>
+      </CardHeader>
       <ChartContainer
         config={chartConfig1}
         className="mx-auto aspect-square z-0 w-full max-w-[250px]"
@@ -86,7 +88,7 @@ const LimitWidget = () => {
           />
         </RadialBarChart>
       </ChartContainer>
-    </Widget>
+    </Card>
   );
 };
 

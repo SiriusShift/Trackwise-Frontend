@@ -1,8 +1,12 @@
-import React from "react";
 import { motion } from "motion/react";
-import { Button } from "react-day-picker";
+import { Button } from "@/shared/components/ui/button";
 import { Pencil } from "lucide-react";
-const ActionTab = ({ onEdit, onCancel, onView, onPay, onDelete }) => {
+
+interface ActionTabProps {
+  onEdit: () => void;
+}
+
+const ActionTab = ({ onEdit }: ActionTabProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }} // start invisible and slightly above
@@ -21,7 +25,7 @@ const ActionTab = ({ onEdit, onCancel, onView, onPay, onDelete }) => {
       }}
       className="w-full border-b px-5 py-2 flex justify-end gap-2"
     >
-      <Button variant="outline">
+      <Button variant="outline" onClick={onEdit}>
         <Pencil className="w-4 h-4" />
       </Button>
     </motion.div>

@@ -26,7 +26,11 @@ import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction"
 import ScheduledWidget from "@/shared/components/ScheduledWidget/ScheduledWidget";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
-import { categoryType, filterProps } from "@/shared/types";
+import {
+  filterProps,
+  TransactionDetails,
+  TransactionRow,
+} from "@/shared/types";
 const TransactionPage = () => {
   const {
     type,
@@ -36,7 +40,7 @@ const TransactionPage = () => {
     openDialog: viewOpen,
   } = useSelector((state: IRootState) => state.active);
 
-  const [transaction, setTransactions] = useState([]);
+  const [transaction, setTransactions] = useState<TransactionRow[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(
     moment(typeof active === "string" ? active : active?.from).toDate(),
   );
@@ -181,12 +185,7 @@ const TransactionPage = () => {
       selectedCategories,
       selectedAssets,
       status,
-    }: {
-      search: string;
-      selectedCategories: categoryType;
-      selectedAssets: any;
-      status: string;
-    }) => {
+    }: Required<filterProps>) => {
       setFilter({
         search,
         selectedCategories,
@@ -200,7 +199,7 @@ const TransactionPage = () => {
   const clearFilter = useCallback(() => {
     setFilter({
       search: "",
-      status: [],
+      status: "",
       selectedCategories: [],
       selectedAssets: [],
     });
@@ -212,7 +211,7 @@ const TransactionPage = () => {
     Transfer: transferData,
   };
 
-  const tableData = tableDataMap[type];
+  const tableData = tableDataMap[type as keyof typeof tableDataMap];
 
   const tableColumn = useMemo(() => columns, [columns]);
   const currentPageName = navigationData.find(
@@ -324,7 +323,7 @@ const TransactionPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <CommonTracker type="Expense" />{" "}
+          <CommonTracker />{" "}
           <ScheduledWidget
             editDescription="Adjust and update your budget limit to match your needs."
             addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
@@ -335,8 +334,8 @@ const TransactionPage = () => {
 
         <ViewDetailed
           open={viewOpen}
-          setOpen={(val) => dispatch(setOpenDialog(val))}
-          transaction={activeRow}
+          setOpen={(val: boolean) => dispatch(setOpenDialog(val))}
+          transaction={activeRow as TransactionDetails | null}
         />
       </div>
     </>

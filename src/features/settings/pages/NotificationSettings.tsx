@@ -1,24 +1,69 @@
 import { notificationSettings } from "@/schema/schema";
 import { FormField, FormItem } from "@/shared/components/ui/form";
 import { Switch } from "@/shared/components/ui/switch";
-import { yupResolver } from "@hookform/resolvers/yup";
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import NotificationSetting from "./components/NotificationSetting";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
 import { Input } from "@/shared/components/ui/input";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import {
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+} from "../api/settingsApi";
+
+interface NotificationSettingsFormValues {
+  notifyDays: number;
+  emailNotification: boolean;
+  mobileNotification: boolean;
+}
 
 const NotificationSettings = () => {
-  const form = useForm({
-    resolver: yupResolver(notificationSettings?.schema),
+  const { data: settings } = useGetSettingsQuery();
+  const [updateSettings] = useUpdateSettingsMutation();
+
+  const form = useForm<NotificationSettingsFormValues>({
+    resolver: zodResolver(notificationSettings?.schema),
     defaultValues: notificationSettings?.defaultValues,
   });
 
-  const { control } = form;
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { isDirty, isSubmitting },
+  } = form;
+
+  useEffect(() => {
+    if (!settings) return;
+
+    reset({
+      notifyDays: settings.notifyDays,
+      emailNotification: settings.emailNotification,
+      mobileNotification: settings.mobileNotification,
+    });
+  }, [settings, reset]);
+
+  const onSubmit = async (values: NotificationSettingsFormValues) => {
+    try {
+      await updateSettings({
+        notifyDays: Number(values.notifyDays),
+        emailNotification: values.emailNotification,
+        mobileNotification: values.mobileNotification,
+      }).unwrap();
+
+      reset(values);
+      toast.success("Notification settings updated successfully.");
+    } catch (err) {
+      toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+    }
+  };
 
   return (
     <FormProvider {...form}>
-      <section className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
           <h1 className="text-lg font-semibold">Settings</h1>
           <Separator />
@@ -100,7 +145,15 @@ const NotificationSettings = () => {
             )}
           />
         </div>
-      </section>
+
+        <Separator />
+
+        <div className="flex justify-end">
+          <Button type="submit" disabled={!isDirty || isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save changes"}
+          </Button>
+        </div>
+      </form>
     </FormProvider>
   );
 };

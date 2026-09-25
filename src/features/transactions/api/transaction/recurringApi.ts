@@ -1,4 +1,5 @@
 import { api } from "@/shared/services/api";
+import { Schedule } from "@/shared/types";
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Recurring"] })
@@ -25,12 +26,12 @@ export const expensesApi = api
         invalidatesTags: ["Recurring"],
       }),
 
-      getRecurring: builder.query<void, void>({
+      getRecurring: builder.query<Schedule[], void>({
         query: () => ({
           url: "/transactions/recurring",
           method: "GET",
         }),
-        transformResponse: (response) => response.data,
+        transformResponse: (response: { data: Schedule[] }) => response.data,
         providesTags: ["Recurring"],
       }),
 

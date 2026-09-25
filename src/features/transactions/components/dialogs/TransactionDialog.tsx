@@ -17,14 +17,16 @@ import {
 } from "@/shared/components/ui/dialog";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { useUpdateTransactionHistoryMutation } from "../../api/transaction";
 import { transactionConfig } from "../../config/transactionConfig";
 import TransactionForm from "../forms/TransactionForm";
 
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { commonDialogProps } from "@/shared/types";
 import { useTransactionForm } from "../hooks/useTransactionForm";
-import { useTransactionSubmit } from "../hooks/UseTransactionSubmit";
+import {
+  TransactionType,
+  useTransactionSubmit,
+} from "../hooks/UseTransactionSubmit";
 
 interface TransactionDialogProps extends commonDialogProps {
   mode: "add" | "edit" | "transact";
@@ -39,7 +41,9 @@ export function TransactionDialog({
 }: TransactionDialogProps) {
   const [recurring, setRecurring] = useState(false);
 
-  const type = useSelector((state: IRootState) => state.active.type);
+  const type = useSelector(
+    (state: IRootState) => state.active.type,
+  ) as TransactionType;
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
   );
@@ -51,7 +55,6 @@ export function TransactionDialog({
     startDate,
     endDate,
   });
-  const [editHistory] = useUpdateTransactionHistoryMutation();
 
   const assetData = rawAssetData?.data ?? [];
 

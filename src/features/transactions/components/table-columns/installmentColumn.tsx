@@ -1,13 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
-  CreditCard,
   Eye,
   MoreHorizontal,
   Pencil,
   Trash2,
 } from "lucide-react";
-import { Expense } from "@/shared/types";
+import { TransactionRow } from "@/shared/types";
+import { categoryApi } from "@/shared/api/categoryApi";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -25,7 +25,7 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useState } from "react";
 import { IRootState } from "@/app/store";
 
-export const installmentColumn: ColumnDef<Expense>[] = [
+export const installmentColumn: ColumnDef<TransactionRow>[] = [
   // {
   //   accessorKey: "id",
   //   header: "ID",
@@ -41,7 +41,7 @@ export const installmentColumn: ColumnDef<Expense>[] = [
       headerClassName: "inline-block w-32 flex items-center",
     },
     cell: ({ getValue }) => {
-      return <span>₱{getValue()}</span>;
+      return <span>₱{getValue<number>()}</span>;
     },
   },
   // {
@@ -68,7 +68,7 @@ export const installmentColumn: ColumnDef<Expense>[] = [
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{getValue()}</Badge>
+        <Badge variant="outline">{getValue<string>()}</Badge>
       </div>
     ),
     meta: {
@@ -78,7 +78,7 @@ export const installmentColumn: ColumnDef<Expense>[] = [
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    cell: ({ getValue }) => <span>{getValue<string>() || "-"}</span>,
     meta: {
       cellClassName: "border-b",
     },
@@ -101,7 +101,7 @@ export const installmentColumn: ColumnDef<Expense>[] = [
       const dispatch = useDispatch();
       console.log(row);
 
-      const [deleteExpense, { isLoading }] = useDeleteExpenseMutation();
+      const [deleteExpense] = useDeleteExpenseMutation();
 
       const onDelete = async () => {
         confirm({
@@ -117,12 +117,10 @@ export const installmentColumn: ColumnDef<Expense>[] = [
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
             } catch (err) {
               console.log(err);
-              toast.error(err?.data?.error);
+              toast.error(handleCatchErrorMessage(err));
             }
           },
         });
-        await deleteExpense(expense.id);
-        dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
       };
 
       return (
@@ -169,7 +167,6 @@ export const installmentColumn: ColumnDef<Expense>[] = [
           <TransactionDialog
             open={dialogOpen}
             setOpen={setDialogOpen}
-            type={activeType}
             rowData={expense}
             mode="edit"
           />

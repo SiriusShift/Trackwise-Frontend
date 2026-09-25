@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,7 @@ const CustomFrequency = ({
   setOpen: (open: boolean) => void;
   setParentDialogOpen: (open: boolean) => void;
 }) => {
-  const { watch, control, setValue } = useFormContext();
+  const { watch, setValue } = useFormContext();
 
   const [frequency, setFrequency] = useState(frequencyList[0]);
   const [every, setEvery] = useState(1);

@@ -1,4 +1,5 @@
 import { api } from "@/shared/services/api";
+import { Bill, BillPayment } from "@/shared/types";
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring"] })
@@ -102,7 +103,7 @@ export const expensesApi = api
       //   }),
       // }),
 
-      getBills: builder.query({
+      getBills: builder.query<Bill[], { dateFrom?: string; dateTo?: string }>({
         query: (params) => ({
           url: "/transactions/expense/bills",
           method: "GET",
@@ -121,7 +122,7 @@ export const expensesApi = api
         providesTags: ["Recurring"],
       }),
 
-      getBillPayments: builder.query({
+      getBillPayments: builder.query<BillPayment[], string | undefined>({
         query: (id) => ({
           url: `/transactions/expense/bills/${id}/history`,
           method: "GET",

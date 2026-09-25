@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import "@/assets/styles/Calendar.css";
-import Widget from "@/features/dashboard/components/widgets/Widget";
+import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { ArrowDownFromLine, ArrowUpFromLine } from "lucide-react";
 
 interface Day {
@@ -51,8 +51,10 @@ const HorizontalCalendar: React.FC<Props> = ({
   }, [activeDay]); // Re-run when activeDay changes
 
   return (
-    <Widget title="Calendar">
-      {" "}
+    <Card className="p-5">
+      <CardHeader className="p-0 mb-4">
+        <CardTitle>Calendar</CardTitle>
+      </CardHeader>
       <div className="space-y-3">
         <div className="flex gap-2 justify-around">
           <div className="flex gap-2">
@@ -103,7 +105,7 @@ const HorizontalCalendar: React.FC<Props> = ({
           ))}
         </div>
       </div>
-    </Widget>
+    </Card>
   );
 };
 

@@ -9,7 +9,7 @@ import LayoutAuth from "@/layout/AuthLayout";
 import { Button } from "@/shared/components/ui/button";
 import { Input, PasswordInput } from "@/shared/components/ui/input";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
@@ -31,14 +31,11 @@ const SignInPage = () => {
   const { error, data, isLoading } = useGetAuthStatusQuery({});
 
   const {
-    handleSubmit,
     register,
     formState: { errors, isValid },
-    reset,
-    setValue,
     watch,
   } = useForm({
-    resolver: yupResolver(loginSchema.schema),
+    resolver: zodResolver(loginSchema.schema),
     mode: "onChange",
     defaultValues: loginSchema.defaultValues,
   });
@@ -62,7 +59,7 @@ const SignInPage = () => {
     event.preventDefault();
     if (isValid) {
       try {
-        const response = await postSignin({
+        await postSignin({
           email: watch("email"),
           password: watch("password"),
         }).unwrap();

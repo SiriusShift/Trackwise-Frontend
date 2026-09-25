@@ -7,11 +7,11 @@ import {
   usePostCategoryLimitMutation,
 } from "@/shared/api/categoryApi";
 import { budgetFrequency } from "@/shared/constants/dateConstants";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { trackerFormType } from "@/shared/types";
+import { CategoryLimit, trackerFormType } from "@/shared/types";
+import { getLucideIcon } from "@/shared/utils/icons";
 import { hexToRgba, numberInput } from "@/shared/utils/CustomFunctions";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as Icons from "lucide-react";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -60,13 +60,12 @@ function TrackerDialog({
   description: string;
   setOpen: (open: boolean) => void;
   open: boolean;
-  data?: Object;
+  data?: CategoryLimit;
 }) {
   //STATE
   // const [open, setOpen] = useState(false);
   //HOOKS
-  const width = useScreenWidth();
-  const { confirm, isOpen } = useConfirm(1);
+  const { confirm } = useConfirm();
   const type = useSelector((state: IRootState) => state.active.type);
   // RTK Query
   const { data: categoryData } = useGetCategoryQuery({
@@ -78,15 +77,8 @@ function TrackerDialog({
     usePatchCategoryLimitMutation();
 
   const isLoading = createLoading || updateLoading;
-  const filteredCategory =
-    Array.isArray(data) && data?.length > 0
-      ? categoryData?.filter((item) =>
-          data?.some((category) => item?.id !== category?.category?.id),
-        )
-      : categoryData;
-
   const form = useForm<trackerFormType>({
-    resolver: yupResolver(trackerSchema.schema),
+    resolver: zodResolver(trackerSchema.schema),
     mode: "onChange",
     defaultValues: trackerSchema.defaultValues,
   });
@@ -97,7 +89,7 @@ function TrackerDialog({
     reset,
     watch,
     setValue,
-    formState: { errors, isValid, isDirty },
+    formState: { isValid, isDirty },
   } = form;
 
   console.log(watch());
@@ -120,7 +112,7 @@ function TrackerDialog({
     });
   }
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: trackerFormType) => {
     console.log(data);
     try {
       if (data?.id) {
@@ -248,11 +240,11 @@ function TrackerDialog({
                                 <CommandEmpty>No category found.</CommandEmpty>
                                 <CommandGroup>
                                   {categoryData?.map((category) => {
-                                    const LucidIcon = Icons[category?.icon];
+                                    const LucidIcon = getLucideIcon(category?.icon);
 
                                     return (
                                       <CommandItem
-                                        value={category}
+                                        value={category.name}
                                         key={category.id}
                                         onSelect={() => {
                                           onChange(category);

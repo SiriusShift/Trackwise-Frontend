@@ -1,8 +1,19 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
-import React from "react";
 import { Skeleton } from "../ui/skeleton";
 
-const CommonPieGraphFooter = ({graphLoading, trend, modeDisplay, type}) => {
+interface CommonPieGraphFooterProps {
+  graphLoading: boolean;
+  trend: number | "NaN";
+  modeDisplay?: string;
+  type: string;
+}
+
+const CommonPieGraphFooter = ({
+  graphLoading,
+  trend,
+  modeDisplay,
+  type,
+}: CommonPieGraphFooterProps) => {
   return (
     <div className="flex flex-col sm:p-4 items-center text-center gap-2 text-sm">
       {graphLoading ? (

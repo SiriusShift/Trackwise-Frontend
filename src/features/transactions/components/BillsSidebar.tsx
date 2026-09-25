@@ -13,21 +13,28 @@ import { formatCurrency } from "@/shared/utils/CustomFunctions"; // adjust path 
 import * as LucideIcon from "lucide-react";
 import { CircleDollarSign } from "lucide-react";
 import moment from "moment";
-import { useState, type ComponentType, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { getLucideIcon } from "@/shared/utils/icons";
 import { useSelector } from "react-redux";
 
-interface UpcomingBillsSidebarProps {
-  events?: Array<{
-    title: string;
-    extendedProps?: {
-      amount?: number;
-      category?: {
-        name?: string;
-        color?: string;
-        icon?: string;
-      };
+export interface BillEvent {
+  id: string;
+  title: string;
+  start: string;
+  allDay: true;
+  extendedProps: {
+    amount: number;
+    category?: {
+      name?: string;
+      color?: string;
+      icon?: string;
     };
-  }>;
+    description: string;
+  };
+}
+
+interface UpcomingBillsSidebarProps {
+  events?: BillEvent[];
   isFetching?: boolean;
   //   onSelectBill?: (event: UpcomingBillsSidebarProps["events"][number]) => void;
 }
@@ -54,10 +61,10 @@ export function UpcomingBillsSidebar({
   isFetching,
 }: UpcomingBillsSidebarProps) {
   const [open, setOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState(null);
+  const [selectedBill, setSelectedBill] = useState<BillEvent | null>(null);
   const currency = useSelector((state: IRootState) => state.settings.currency);
 
-  const handleClick = (event) => {
+  const handleClick = (event: BillEvent) => {
     setSelectedBill(event);
     setOpen(true);
   };
@@ -80,12 +87,7 @@ export function UpcomingBillsSidebar({
   } else {
     cards = events.map((event, index) => {
       const category = event?.extendedProps?.category;
-      const Icon =
-        (category?.icon &&
-          (LucideIcon[
-            category.icon as keyof typeof LucideIcon
-          ] as ComponentType<LucideIcon.LucideProps>)) ||
-        CircleDollarSign;
+      const Icon = getLucideIcon(category?.icon, CircleDollarSign);
       const amount = formatCurrency(
         event?.extendedProps?.amount ?? 0,
         currency,

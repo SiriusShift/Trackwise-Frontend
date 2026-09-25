@@ -3,7 +3,8 @@ import CryptoJS from "crypto-js";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { saltkey } from "./saltkey";
-export const formatDate = (dateString: Date) => {
+export const formatDate = (dateString?: Date | string) => {
+  if (dateString === undefined) return "Invalid Date";
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -98,7 +99,7 @@ export const encryptString = (data: any) => {
 };
 
 //Error Handling
-export const handleCatchErrorMessage = (error) => {
+export const handleCatchErrorMessage = (error: any) => {
   console.log(error);
   if (error?.data?.error?.message) {
     return error?.data?.error?.message;
@@ -121,7 +122,7 @@ export const handleCatchErrorMessage = (error) => {
   }
 };
 
-export const getStatus = (date) => {
+export const getStatus = (date?: moment.MomentInput) => {
   const today = moment();
   const due = moment(date);
   if (due.isBefore(today, "day"))

@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import * as Icons from "lucide-react";
+import { getLucideIcon } from "@/shared/utils/icons";
 
-const categoryIcons = {
+const categoryIcons: Record<string, string> = {
   Food: "CookingPot",
   Transport: "BusFront",
   Shopping: "ShoppingCart",
@@ -9,9 +10,9 @@ const categoryIcons = {
   Bills: "CreditCard",
 };
 
-const useLucideIcon = (categoryName) => {
+const useLucideIcon = (categoryName: string) => {
   return useMemo(() => {
-    return Icons[categoryIcons[categoryName]] || Icons["Circle"]; // Default to "Circle"
+    return getLucideIcon(categoryIcons[categoryName], Icons.Circle); // Default to "Circle"
   }, [categoryName]);
 };
 

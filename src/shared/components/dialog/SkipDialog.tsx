@@ -1,6 +1,7 @@
 import { useSkipPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { commonDialogProps } from "@/shared/types";
 import * as LucideIcons from "lucide-react";
+import { getLucideIcon } from "@/shared/utils/icons";
 import moment from "moment";
 import { Button } from "../ui/button";
 import CommonDialog from "./CommonDialog";
@@ -19,14 +20,10 @@ interface BillDialogProps extends commonDialogProps {
 }
 
 const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
-  const iconName = data?.category?.icon as keyof typeof LucideIcons;
-  const Icon =
-    iconName && iconName in LucideIcons
-      ? LucideIcons[iconName]
-      : LucideIcons.CircleHelp;
+  const Icon = getLucideIcon(data?.category?.icon, LucideIcons.CircleHelp);
   const pastDue = moment().isAfter(moment(data?.nextDueDate), "day");
 
-  const [triggerSkip, { isLoading }] = useSkipPaymentMutation();
+  const [triggerSkip] = useSkipPaymentMutation();
 
   const onSubmit = async () => {
     await triggerSkip(data.id);

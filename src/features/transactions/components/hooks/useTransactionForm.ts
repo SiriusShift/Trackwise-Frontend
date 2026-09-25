@@ -1,5 +1,5 @@
 import { frequencies } from "@/shared/constants/dateConstants";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import moment from "moment";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -86,7 +86,7 @@ export function useTransactionForm({
   schema,
 }: UseTransactionFormProps) {
   const form = useForm({
-    resolver: yupResolver(schema?.schema),
+    resolver: zodResolver(schema?.schema),
     mode: "onChange",
     defaultValues: schema?.defaultValues,
   });

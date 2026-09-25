@@ -75,7 +75,7 @@ const AccountPage = () => {
   const assetsLength = accountsData?.data?.length ?? 0;
   const excludedAccountsLength = accountsData?.data?.filter(
     (item) => !item.includeInNetWorth,
-  )?.length;
+  )?.length ?? 0;
 
   console.log(excludedAccountsLength);
 

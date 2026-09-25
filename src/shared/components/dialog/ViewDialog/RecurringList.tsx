@@ -3,20 +3,33 @@ import { expensesApi } from "@/features/transactions/api/transaction/expensesApi
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { formatCurrency, formatDate } from "@/shared/utils/CustomFunctions";
+import {
+  formatCurrency,
+  formatDate,
+  handleCatchErrorMessage,
+} from "@/shared/utils/CustomFunctions";
 import { Paperclip, Pencil, Trash } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
+import { IRootState } from "@/app/store";
+import { useSelector } from "react-redux";
+import type { TransactionHistoryEntry } from "@/shared/types";
 
-const RecurringList = ({ history, setImageOpen, setOpen }) => {
+interface HistoryItemProps {
+  history: TransactionHistoryEntry;
+  setImageOpen: () => void;
+  setOpen: () => void;
+}
+
+const RecurringList = ({ history, setImageOpen, setOpen }: HistoryItemProps) => {
   const { confirm } = useConfirm();
   const dispatch = useDispatch();
   const currency = useSelector((state: IRootState) => state.settings.currency);
 
   console.log(history);
 
-  const [trigger, { isLoading }] = useDeleteTransactionHistoryMutation();
+  const [trigger] = useDeleteTransactionHistoryMutation();
   const onDelete = () => {
     console.log("test");
     confirm({
@@ -38,7 +51,7 @@ const RecurringList = ({ history, setImageOpen, setOpen }) => {
           }
         } catch (err) {
           console.log(err);
-          toast.error(err?.data?.error);
+          toast.error(handleCatchErrorMessage(err));
         }
       },
     });
@@ -100,7 +113,7 @@ const RecurringList = ({ history, setImageOpen, setOpen }) => {
         <div className="flex justify-end gap-2 pt-2 border-t border-border/30">
           {history?.image && (
             <Button
-              onClick={() => setImageOpen(history?.image)}
+              onClick={() => setImageOpen()}
               variant="outline"
               size="sm"
               className="gap-2 hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-950/50"
@@ -110,7 +123,7 @@ const RecurringList = ({ history, setImageOpen, setOpen }) => {
             </Button>
           )}
           <Button
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen()}
             variant="outline"
             size="sm"
             className="gap-2 hover:bg-gray-50 hover:border-gray-200 dark:hover:bg-gray-800/50"

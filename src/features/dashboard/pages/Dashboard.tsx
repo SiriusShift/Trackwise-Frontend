@@ -4,7 +4,6 @@ import TransactionHistory from "@/features/dashboard/components/widgets/Transact
 import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
 import { navigationData } from "@/routing/navigationData";
 import PageHeader from "@/shared/components/PageHeader";
-import { useTheme } from "@/shared/provider/ThemeProvider";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -16,10 +15,8 @@ import SavingsPlan from "../components/widgets/SavingsWidget";
 export const description = "Loan Payment Progress Chart";
 
 const Dashboard = () => {
-  const { theme } = useTheme();
   const location = useLocation();
   const active = useSelector((state: IRootState) => state.active.active);
-  const mode = useSelector((state: IRootState) => state.active.mode);
 
   const currentPageName = navigationData.find(
     (item) => item.path === location.pathname,
@@ -28,7 +25,7 @@ const Dashboard = () => {
   const { data, isFetching } = useGetStatisticsQuery({
     startDate: active.from,
     endDate: active.to,
-    mode: formatMode(mode),
+    mode: formatMode(),
   });
 
   // const totalVisitors = chartData1[0].bills + chartData1[0].food;

@@ -1,6 +1,4 @@
-import React from "react";
 import { Dialog, DialogContent } from "../../ui/dialog";
-import NoData from "@/assets/images/file.png";
 import { Button } from "../../ui/button";
 import { X } from "lucide-react";
 

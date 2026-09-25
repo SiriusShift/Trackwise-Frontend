@@ -21,18 +21,12 @@ import PayDialog from "../PayDialog";
 import { cn } from "@/lib/utils";
 import SkipDialog from "../SkipDialog";
 import { InfoRow } from "../ViewDialog/InfoRow";
+import { getLucideIcon } from "@/shared/utils/icons";
 import ButtonSkeleton from "./ButtonSkeleton";
 import BillDialogSkeleton from "./InfoSkeleton";
 
 interface BillDialogProps extends commonDialogProps {
-  data?: {
-    id: string;
-    amount: number;
-    nextDueDate?: string | Date;
-    category?: {
-      icon?: keyof typeof LucideIcons;
-    };
-  };
+  data?: { id: string } | null;
 }
 
 const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
@@ -58,10 +52,7 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
   const daysLate = dueDate ? today.diff(dueDate, "days") : 0;
   const status = getStatus(bill?.nextDueDate);
 
-  const Icon =
-    bill?.category?.icon && bill.category.icon in LucideIcons
-      ? LucideIcons[bill.category.icon]
-      : CircleHelp;
+  const Icon = getLucideIcon(bill?.category?.icon, CircleHelp);
 
   const frequency = useMemo(
     () =>

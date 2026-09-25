@@ -1,4 +1,4 @@
-import { StackedBarSegment } from "@/features/dashboard/components/widgets/OverviewWidget";
+import { StackedBarSegment } from "@/shared/types";
 import {
   Tooltip,
   TooltipContent,

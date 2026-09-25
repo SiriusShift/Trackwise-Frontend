@@ -2,7 +2,7 @@ import { ComponentProps, ReactNode } from "react";
 import MonthPicker from "./datePicker";
 
 type PageHeaderProps = ComponentProps<"div"> & {
-  pageName: string;
+  pageName?: string;
   description: string;
   monthPicker?: boolean;
   children?: ReactNode;

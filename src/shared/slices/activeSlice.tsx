@@ -10,7 +10,7 @@ const initialState: {
   type: string;
   mode: string;
   action: boolean;
-  activeRow?: Object;
+  activeRow: object | null;
   openDialog: boolean;
 } = {
   active: {
@@ -28,7 +28,7 @@ export const active = createSlice({
   name: "active",
   initialState,
   reducers: {
-    setActive: (state, action: PayloadAction<Object>) => {
+    setActive: (state, action: PayloadAction<{ from: string; to: string }>) => {
       state.active = action.payload;
     },
     setMode: (state, action: PayloadAction<string>) => {
@@ -41,7 +41,7 @@ export const active = createSlice({
     setType: (state, action: PayloadAction<string>) => {
       state.type = action.payload;
     },
-    setActiveRow: (state, action: PayloadAction<Object>) => {
+    setActiveRow: (state, action: PayloadAction<object | null>) => {
       state.activeRow = action.payload;
     },
     setOpenDialog: (state, action: PayloadAction<boolean>) => {

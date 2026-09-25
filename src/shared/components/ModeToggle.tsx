@@ -18,8 +18,9 @@ const ModeToggle = () => {
       });
     }).ready;
 
-    const { top, left, width, height } =
-      buttonRef.current.getBoundingClientRect();
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const { top, left, width, height } = rect;
     const y = top + height / 2;
     const x = left + width / 2;
     const right = window.innerWidth - left;

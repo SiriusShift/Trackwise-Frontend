@@ -1,19 +1,29 @@
-import * as yup from "yup";
+import {
+  amountField,
+  isEmpty,
+  numberField,
+  requiredDate,
+  requiredNumber,
+  requiredObject,
+  requiredString,
+} from "@/shared/schema/fields";
+import type { CurrencyCodeRecord } from "currency-codes";
+import { z } from "zod";
 
 export const installmentSchema = {
-  schema: yup.object().shape({
-    category: yup.object().required("Category is required"),
-    description: yup.string().required("Description is required"),
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    date: yup.date().required("Date is required"),
-    months: yup
-      .number()
-      .required("Installment Term is required")
-      .positive("Months must be greater than 0"),
-  }),
+  schema: z
+    .object({
+      category: requiredObject("Category is required"),
+      description: requiredString("Description is required"),
+      amount: amountField,
+      date: requiredDate("Date is required"),
+      months: numberField(
+        requiredNumber("Installment Term is required").positive(
+          "Months must be greater than 0",
+        ),
+      ),
+    })
+    .passthrough(),
   defaultValues: {
     category: null,
     description: "",
@@ -24,43 +34,54 @@ export const installmentSchema = {
 };
 
 export const trackerSchema = {
-  schema: yup.object().shape({
-    category: yup.object().required("Category is required"),
-    amount: yup
-      .number()
-      .required("Amount is required")
-      .positive("Amount must be greater than 0"),
-    period: yup.string().required("Period is required"),
-  }),
+  schema: z
+    .object({
+      category: requiredObject("Category is required"),
+      amount: amountField,
+      period: requiredString("Period is required"),
+    })
+    // Keeps `id` when editing an existing limit
+    .passthrough(),
   defaultValues: {
-    category: "",
+    category: null,
     amount: 0,
     period: "",
   },
 };
 
 export const generalSettings = {
-  schema: yup.object().shape({
-    timezone: yup.string().required("Timezone is required"),
-    timeFormat: yup.string().required("Time format is required"),
-    currency: yup.object().required("Currency is required"),
-  }),
+  schema: z
+    .object({
+      timezone: requiredString("Timezone is required"),
+      timeFormat: requiredString("Time format is required"),
+      currency: requiredObject("Currency is required"),
+    })
+    .passthrough(),
   defaultValues: {
     timezone: "MMM DD, YYYY",
     timeFormat: "12",
-    currency: "",
-  },
+    currency: null,
+  } as GeneralSettingsFormValues,
 };
 
+export interface GeneralSettingsFormValues {
+  timezone: string;
+  timeFormat: string;
+  currency: CurrencyCodeRecord | null | undefined;
+}
+
 export const notificationSettings = {
-  schema: yup.object().shape({
-    notifyDays: yup.number().required("Notify expense days is required"),
-    emailNotification: yup.boolean().required("Email Notification is required"),
-    mobileNotification: yup
-      .boolean()
-      .required("Mobile Notification is required"),
-    // budgetNotification: yup.boolean().required("Budget is required"),
-  }),
+  schema: z
+    .object({
+      notifyDays: numberField(requiredNumber("Notify expense days is required")),
+      emailNotification: z.boolean({
+        required_error: "Email Notification is required",
+      }),
+      mobileNotification: z.boolean({
+        required_error: "Mobile Notification is required",
+      }),
+    })
+    .passthrough(),
   defaultValues: {
     notifyDays: 1,
     emailNotification: false,
@@ -69,9 +90,12 @@ export const notificationSettings = {
 };
 
 export const payRecurringSchema = {
-  schema: yup.object().shape({
-    amount: yup.number().required("Amount is required"),
-    date: yup.string().required("Date is required"),
-    account: yup.object().required("Account is required"),
-  }),
+  schema: z
+    .object({
+      amount: numberField(requiredNumber("Amount is required")),
+      // Holds either a date string or a Date from the picker
+      date: z.custom<string | Date>((value) => !isEmpty(value), "Date is required"),
+      account: requiredObject("Account is required"),
+    })
+    .passthrough(),
 };

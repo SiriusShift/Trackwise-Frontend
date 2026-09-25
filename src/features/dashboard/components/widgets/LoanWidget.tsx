@@ -5,7 +5,6 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Construction } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const loans = [
   {

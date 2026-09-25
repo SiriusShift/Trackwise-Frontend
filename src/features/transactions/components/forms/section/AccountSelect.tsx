@@ -23,7 +23,7 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 
 interface Asset {
-  id: string;
+  id: number;
   name: string;
   remainingBalance: number;
 }
@@ -34,7 +34,7 @@ interface AccountSelectProps {
   assets: Asset[];
   control: any;
   disabled?: boolean;
-  excludeId?: string; // filters out one asset (e.g. the "from" account in a transfer)
+  excludeId?: number; // filters out one asset (e.g. the "from" account in a transfer)
 }
 
 export const AccountSelect = ({
@@ -99,7 +99,7 @@ export const AccountSelect = ({
                   <CommandGroup>
                     {filtered.map((asset) => (
                       <CommandItem
-                        value={asset}
+                        value={asset.name}
                         key={asset.id}
                         onSelect={() => onChange(asset)}
                         className="flex justify-between flex-row items-center"

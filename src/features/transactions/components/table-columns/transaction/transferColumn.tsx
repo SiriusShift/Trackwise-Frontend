@@ -1,4 +1,3 @@
-import { useCancelRecurringExpenseMutation } from "@/features/transactions/api/transaction/expensesApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -7,27 +6,25 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { Expense, Transfer } from "@/shared/types";
+import { TransactionRow } from "@/shared/types";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Archive,
   ArrowUpDown,
-  Check,
   Eye,
   MoreHorizontal,
   Pencil,
   RefreshCcw,
-  X,
 } from "lucide-react";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
 import { useDeleteTransferMutation } from "@/features/transactions/api/transaction/transferApi";
-import { StatusIcon } from "@/features/transactions/components/statusIcon";
+import { StatusIcon } from "@/features/transactions/components/StatusIcon";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import {
@@ -36,12 +33,12 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { Portal } from "@radix-ui/react-tooltip";
 import { useState } from "react";
+import { accountsApi } from "@/shared/api/accountsApi";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
-export const transferColumns: ColumnDef<Transfer>[] = [
+export const transferColumns: ColumnDef<TransactionRow>[] = [
   // {
   //   accessorKey: "id",
   //   header: "ID",
@@ -122,7 +119,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{getValue()}</Badge>
+        <Badge variant="outline">{getValue<string>()}</Badge>
       </div>
     ),
     meta: {
@@ -142,7 +139,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
             />
           </span>
         )}
-        <span className="truncate"> {getValue() || "-"}</span>
+        <span className="truncate"> {getValue<string>() || "-"}</span>
       </div>
     ),
     meta: {
@@ -164,11 +161,11 @@ export const transferColumns: ColumnDef<Transfer>[] = [
       cellClassName: "border-b",
     },
     cell: ({ getValue }) => {
-      const status = getValue() as Expense["status"];
+      const status = getValue<string>();
 
       return (
         <Badge variant="outline" className="p-1 px-2">
-          {StatusIcon[status] || null}
+          {StatusIcon[status as keyof typeof StatusIcon] || null}
           {status || "Unknown"}
         </Badge>
       );
@@ -186,22 +183,22 @@ export const transferColumns: ColumnDef<Transfer>[] = [
       // const activeType = useSelector((state: any) => state.active.type);
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
-      const [mode, setMode] = useState<string>();
+      const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
-      const expense = row.original;
+      const transfer = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
-      console.log(expense);
+      console.log(transfer);
 
       const [deleteTransfer] = useDeleteTransferMutation();
       // const [payAuto] = usePostAutoPaymentMutation();
-      const [cancelRecurring] = useCancelRecurringExpenseMutation();
+      // const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
       const onArchive = async () => {
         confirm({
-          description: `Are you sure you want to archive this expense?`,
-          title: `Archive expense`,
+          description: `Are you sure you want to archive this transfer?`,
+          title: `Archive transfer`,
           variant: "info",
           confirmText: "Confirm",
           showLoadingOnConfirm: true,
@@ -212,58 +209,13 @@ export const transferColumns: ColumnDef<Transfer>[] = [
                 data: {
                   delete: true,
                 },
-                id: expense.id,
+                id: transfer.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
-              toast.error(err?.data?.error);
-            }
-          },
-        });
-      };
-
-      const onStopSeries = async () => {
-        console.log(expense);
-        confirm({
-          description: `Are you sure you want to cancel this recurring expense?`,
-          title: `Cancel recurring expense`,
-          variant: "info",
-          confirmText: "Confirm",
-          showLoadingOnConfirm: true,
-          cancelText: "Cancel",
-          onConfirm: async () => {
-            try {
-              await cancelRecurring(expense?.recurringTemplate?.id).unwrap();
-            } catch (err) {
-              console.log(err);
-              toast.error(err?.data?.error);
-            }
-          },
-        });
-      };
-
-      const onConfirm = async () => {
-        confirm({
-          title: "Confirm Payment",
-          description: "Do you want to proceed with paying this expense?",
-          variant: "info",
-          confirmText: "Pay",
-          cancelText: "Cancel",
-          showLoadingOnConfirm: true,
-          onConfirm: async () => {
-            try {
-              await payAuto({
-                id: expense.id,
-                data: {
-                  type: "Expense",
-                },
-              }).unwrap();
-              dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-            } catch (err) {
-              let errorMessage = handleCatchErrorMessage(err); // Default message
-              toast.error(errorMessage);
+              toast.error(handleCatchErrorMessage(err));
             }
           },
         });
@@ -291,27 +243,6 @@ export const transferColumns: ColumnDef<Transfer>[] = [
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-              {/* --- Pay --- */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <DropdownMenuItem
-                      onSelect={onConfirm}
-                      disabled={expense?.status === "Completed"}
-                    >
-                      <Check /> Confirm
-                    </DropdownMenuItem>
-                  </span>
-                </TooltipTrigger>
-                <Portal>
-                  {expense?.status === "Completed" && (
-                    <TooltipContent side="right" sideOffset={10}>
-                      Already transfered
-                    </TooltipContent>
-                  )}
-                </Portal>
-              </Tooltip>
-
               {/* --- Edit --- */}
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -325,8 +256,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
                         setDropdownOpen(false);
                       }}
                       disabled={
-                        expense?.status === "Completed" ||
-                        expense?.status === "Partial"
+                        transfer?.status === "Completed"
                       }
                     >
                       <Pencil /> Edit
@@ -335,12 +265,7 @@ export const transferColumns: ColumnDef<Transfer>[] = [
                 </TooltipTrigger>
                 <Portal>
                   <>
-                    {expense?.status === "Partial" && (
-                      <TooltipContent side="right" sideOffset={10}>
-                        Editing disabled — partially transfered.
-                      </TooltipContent>
-                    )}
-                    {expense?.status === "Completed" && (
+                    {transfer?.status === "Completed" && (
                       <TooltipContent side="right" sideOffset={10}>
                         Editing disabled — already transfered.
                       </TooltipContent>
@@ -357,28 +282,6 @@ export const transferColumns: ColumnDef<Transfer>[] = [
               <DropdownMenuItem onClick={onArchive}>
                 <Archive /> Archive
               </DropdownMenuItem>
-              {/* -------- Recurring Section -------- */}
-              {expense?.recurringExpense && (
-                <>
-                  <DropdownMenuSeparator />
-
-                  {/* Stop whole series */}
-                  <DropdownMenuItem
-                    disabled={!expense?.recurringExpense?.isActive}
-                    onClick={onStopSeries}
-                  >
-                    <X className="h-4 w-4 text-destructive" />
-                    Stop Recurring
-                  </DropdownMenuItem>
-                </>
-              )}
-
-              {/* --- Payment History --- */}
-              {/* {expense?.recurringId && (
-                <DropdownMenuItem onClick={onHistory}>
-                  <History /> Payment History
-                </DropdownMenuItem>
-              )} */}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -386,14 +289,14 @@ export const transferColumns: ColumnDef<Transfer>[] = [
           <TransactionDialog
             open={dialogOpen}
             setOpen={setDialogOpen}
-            rowData={expense}
+            rowData={transfer}
             mode={mode}
           />
 
           <ViewTransaction
             open={viewOpen}
             setOpen={setViewOpen}
-            transaction={expense}
+            transaction={transfer}
           />
         </>
       );

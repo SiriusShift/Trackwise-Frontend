@@ -35,7 +35,7 @@ interface CategoryAmountSectionProps {
 }
 
 export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
-  const { control, watch, setValue } = useFormContext();
+  const { control, watch } = useFormContext();
   const type = useSelector((state: IRootState) => state.active.type);
   const { data: categoryData } = useGetCategoryQuery({ type });
 
@@ -111,10 +111,10 @@ export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
                     <CommandGroup>
                       {categoryData?.map((category) => (
                         <CommandItem
-                          value={category}
+                          value={category.name}
                           key={category.id}
                           onSelect={() => {
-                            if (type === "Transfer") setValue("to", null);
+                            // if (type === "Transfer") setValue("to", null);
                             onChange(category);
                           }}
                         >

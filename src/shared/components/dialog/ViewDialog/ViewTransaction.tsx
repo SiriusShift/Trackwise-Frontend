@@ -11,8 +11,12 @@ import { Separator } from "../../ui/separator";
 import CommonDialog from "../CommonDialog";
 import { InfoRow } from "./InfoRow";
 import ViewImage from "./ViewImage";
+import type { TransactionDetails } from "@/shared/types";
 
-const transactionTypeConfig = {
+const transactionTypeConfig: Record<
+  string,
+  { text: string; bg: string; iconColor: string; icon: Icon.LucideIcon; prefix: string }
+> = {
   expense: {
     text: "text-destructive",
     bg: "bg-destructive/15",
@@ -90,18 +94,26 @@ const statusConfig = {
   },
 };
 
-const ViewTransaction = ({ transaction, open, setOpen }) => {
-  if (!transaction) return null;
+interface ViewTransactionProps {
+  transaction?: TransactionDetails | null;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const ViewTransaction = ({ transaction, open, setOpen }: ViewTransactionProps) => {
+  // Hooks must run before the early return so their order never changes
   const mode = useSelector((state: IRootState) => state.active.type);
   const [previewImage, setPreviewImage] = React.useState(false);
+  if (!transaction) return null;
   const type =
-    transactionTypeConfig[transaction?.type?.toLowerCase()] ||
+    transactionTypeConfig[transaction?.type?.toLowerCase() ?? ""] ||
     transactionTypeConfig.default;
 
-  const status = statusConfig[transaction?.status?.toLowerCase()];
+  const status = transaction?.status
+    ? statusConfig[transaction.status.toLowerCase() as keyof typeof statusConfig]
+    : undefined;
 
   const TypeIcon = type.icon;
-  const StatusIcon = status?.icon;
   const title = transaction?.interval
     ? "Recurring Transaction"
     : "Transaction Details";
@@ -115,7 +127,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
         title={title}
       >
         {/* Content */}
-        <div className="p-5">
+        <div className="p-5 overflow-auto">
           {/* Amount Section */}
           <div className="flex flex-col items-center justify-center gap-3 pb-6">
             <div className={`rounded-2xl p-4 ${type.bg}`}>
@@ -133,7 +145,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
                   variant="outline"
                   className={`mt-3 gap-1.5 rounded-full px-3 py-1 ${status.className}`}
                 >
-                  <StatusIcon className="h-3.5 w-3.5" />
+                  <status.icon className="h-3.5 w-3.5" />
 
                   {transaction.status}
                 </Badge>
@@ -203,7 +215,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
               icon={Icon.Image}
               label="Image"
               value={transaction.image}
-              onPreview={setPreviewImage}
+              onPreview={() => setPreviewImage(true)}
             />
           </div>
 
@@ -221,7 +233,7 @@ const ViewTransaction = ({ transaction, open, setOpen }) => {
         </div>
       </CommonDialog>
       <ViewImage
-        image={transaction.image}
+        image={transaction.image ?? ""}
         open={previewImage}
         setOpen={setPreviewImage}
       />

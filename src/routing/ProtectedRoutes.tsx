@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLazyGetAuthStatusQuery } from "../features/auth/api/signinApi";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";

@@ -445,7 +445,11 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                   <FormItem>
                     <FormLabel>Institution</FormLabel>
                     <FormControl>
-                      <Input placeholder="BPI" {...field} />
+                      <Input
+                        placeholder="BPI"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

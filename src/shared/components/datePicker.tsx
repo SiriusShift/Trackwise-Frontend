@@ -13,11 +13,11 @@ import {
 import { months } from "@/shared/constants/dateConstants";
 import { setActive, setMode } from "@/shared/slices/activeSlice";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
+import { accountsApi } from "@/shared/api/accountsApi";
 import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import useScreenWidth from "../hooks/useScreenWidth";
 import { Button } from "./ui/button";
 
 interface DateRange {
@@ -36,9 +36,7 @@ const Content = () => {
   const mode = useSelector((state: IRootState) => state.active.mode);
 
   const [activeYear, setActiveYear] = useState(new Date().getFullYear());
-  const [date, setDate] = useState<Date | { from?: Date; to?: Date } | null>(
-    active,
-  );
+  const [date, setDate] = useState<DateRange | null>(active);
 
   useEffect(() => {
     if (active !== date) {
@@ -49,14 +47,7 @@ const Content = () => {
   // Set activeYear based on current active date
   useEffect(() => {
     if (active !== date) {
-      if (mode === "daily") {
-        const year = moment(active as string).year();
-        setActiveYear(year);
-      } else {
-        const range = active as DateRange;
-        const year = moment(range.from).year();
-        setActiveYear(year);
-      }
+      setActiveYear(moment(active.from).year());
     }
   }, [active, mode]);
 
@@ -86,14 +77,18 @@ const Content = () => {
       to: moment(date).endOf("year").toISOString(),
     };
     dispatch(setActive(transformDate));
-    setActiveYear(transformDate);
+    setActiveYear(year);
   };
 
   const handleModeChange = (newMode: string) => {
     dispatch(setMode(newMode));
     if (newMode === "daily") {
-      setDate(moment().toISOString());
-      dispatch(setActive(moment().toISOString()));
+      const range = {
+        from: moment().startOf("day").toISOString(),
+        to: moment().endOf("day").toISOString(),
+      };
+      setDate(range);
+      dispatch(setActive(range));
     } else if (newMode === "weekly") {
       const startOfWeek = moment().startOf("week").toISOString();
       const endOfWeek = moment().endOf("week").toISOString();
@@ -137,7 +132,7 @@ const Content = () => {
   const isSelectedMonth = (monthIndex: number): boolean => {
     if (!active || (mode !== "monthly" && mode !== "daily")) return false;
 
-    const activeMoment = moment(active?.from as string);
+    const activeMoment = moment(active.from);
     return (
       activeMoment.year() === activeYear && activeMoment.month() === monthIndex
     );
@@ -218,8 +213,6 @@ const Content = () => {
 };
 
 const MonthPicker: React.FC = () => {
-  const width = useScreenWidth();
-
   return (
     <div className="flex flex-col items-start">
       <Popover>

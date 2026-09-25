@@ -1,6 +1,7 @@
-type AnyRtkHook<TData = any> = () => [
+type AnyRtkHook<TData = any> = () => readonly [
   (args?: any) => any,
-  { data?: TData; isFetching: boolean }
+  // Queries report isFetching; mutation results don't have it
+  { data?: TData; isFetching?: boolean }
 ];
 
 export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
@@ -16,6 +17,6 @@ export function useTriggerFetch<TData = any>(trigger?: AnyRtkHook<TData>) {
   return {
     fetchData,
     data: result.data as TData | undefined,
-    isFetching: result.isFetching,
+    isFetching: result.isFetching ?? false,
   };
 }

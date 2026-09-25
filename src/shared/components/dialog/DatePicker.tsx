@@ -1,11 +1,6 @@
-import React, { useState } from "react";
-import { Dialog, DialogTrigger, DialogContent } from "../ui/dialog";
-import { FormControl } from "../ui/form";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "../ui/dialog";
 import moment from "moment";
 import { Calendar } from "../ui/calendar";
-import { CalendarIcon, Clock } from "lucide-react";
 import { Input } from "../ui/input";
 import { Field } from "@/shared/types";
 // import TimePicker from "./TimePicker";
@@ -42,7 +37,8 @@ const DatePicker = ({
               className="responsive-calendar"
               mode="single"
               selected={field.value ? new Date(field.value) : undefined}
-              onSelect={(date) => {
+              onSelect={(date?: Date) => {
+                if (!date) return;
                 const newDate = new Date(
                   date.setHours(
                     field.value ? new Date(field.value).getHours() : 0,

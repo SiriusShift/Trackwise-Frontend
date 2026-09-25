@@ -1,4 +1,3 @@
-import React from "react";
 
 const SkeletonTable = () => (
   <div className="animate-pulse space-y-4">

@@ -1,5 +1,5 @@
 import { IRootState } from "@/app/store";
-import { StatusIcon } from "@/features/transactions/components/statusIcon";
+import { StatusIcon } from "@/features/transactions/components/StatusIcon";
 import { Badge } from "@/shared/components/ui/badge";
 import useLongPress from "@/shared/hooks/useLongPress";
 import { setActionShow, setActiveRow } from "@/shared/slices/activeSlice";
@@ -8,13 +8,23 @@ import * as Icons from "lucide-react";
 import moment from "moment";
 import { motion } from "motion/react";
 import React from "react";
+import type { TransactionRow } from "@/shared/types";
+import { getLucideIcon } from "@/shared/utils/icons";
 import { useDispatch, useSelector } from "react-redux";
-const TransactionItem = React.memo(function TransactionItem({ item, index }) {
+const TransactionItem = React.memo(function TransactionItem({
+  item,
+  index,
+}: {
+  item: TransactionRow;
+  index: number;
+}) {
   const dispatch = useDispatch();
   const currency = useSelector((state: IRootState) => state.settings.currency);
 
-  const LucidIcon = Icons[item?.category?.icon];
-  const statusIcon = StatusIcon[item?.status];
+  const LucidIcon = getLucideIcon(item?.category?.icon);
+  const statusIcon = item?.status
+    ? StatusIcon[item.status as keyof typeof StatusIcon]
+    : null;
 
   const longPressProps = useLongPress(() => {
     console.log("test");

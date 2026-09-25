@@ -1,15 +1,17 @@
 import { CapitalCase } from "@/shared/utils/CustomFunctions";
+import type { TransactionDetails } from "@/shared/types";
 import {
   Calendar1,
   CalendarClock,
   CalendarCog,
-  FileText,
   Landmark,
-  Repeat,
 } from "lucide-react";
-import React from "react";
-const RecurringInfo = ({ details }) => {
-  const unit = CapitalCase(details?.unit)
+const RecurringInfo = ({
+  details,
+}: {
+  details: NonNullable<TransactionDetails["recurringTemplate"]>;
+}) => {
+  const unit = CapitalCase(details?.unit ?? "")
   console.log(unit)
   return (
     <div className="grid grid-cols-2 gap-6">

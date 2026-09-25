@@ -1,7 +1,5 @@
 import {
-  useCancelRecurringIncomeMutation,
   useDeleteIncomeMutation,
-  usePostAutoReceiveMutation,
 } from "@/features/transactions/api/transaction/incomeApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { categoryApi } from "@/shared/api/categoryApi";
@@ -16,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { Expense } from "@/shared/types";
+import { TransactionRow } from "@/shared/types";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -31,9 +29,9 @@ import moment from "moment";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { StatusIcon } from "../../statusIcon";
+import { StatusIcon } from "../../StatusIcon";
 import { accountsApi } from "@/shared/api/accountsApi";
-export const incomeColumns: ColumnDef<Income>[] = [
+export const incomeColumns: ColumnDef<TransactionRow>[] = [
   // {
   //   accessorKey: "id",
   //   header: "ID",
@@ -60,7 +58,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
   // {
   //   accessorKey: "recipient",
   //   header: "Recipient",
-  //   cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+  //   cell: ({ getValue }) => <span>{getValue<string>() || "-"}</span>,
   //   meta: {
   //     cellClassName: "border-b",
   //   },
@@ -113,7 +111,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
     header: "Category",
     cell: ({ getValue }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{getValue()}</Badge>
+        <Badge variant="outline">{getValue<string>()}</Badge>
       </div>
     ),
     meta: {
@@ -133,7 +131,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
             />
           </span>
         )}
-        <span className="truncate"> {getValue() || "-"}</span>
+        <span className="truncate"> {getValue<string>() || "-"}</span>
       </div>
     ),
 
@@ -145,7 +143,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
   {
     accessorKey: "asset.name",
     header: "Destination",
-    cell: ({ getValue }) => <span>{getValue() || "-"}</span>,
+    cell: ({ getValue }) => <span>{getValue<string>() || "-"}</span>,
     meta: {
       cellClassName: "border-b",
     },
@@ -157,11 +155,11 @@ export const incomeColumns: ColumnDef<Income>[] = [
       cellClassName: "border-b",
     },
     cell: ({ getValue }) => {
-      const status = getValue() as Expense["status"];
+      const status = getValue<string>();
 
       return (
         <Badge variant="outline" className="p-1 px-2">
-          {StatusIcon[status] || null}
+          {StatusIcon[status as keyof typeof StatusIcon] || null}
           {status || "Unknown"}
         </Badge>
       );
@@ -178,7 +176,7 @@ export const incomeColumns: ColumnDef<Income>[] = [
     cell: ({ row }) => {
       const [dropdownOpen, setDropdownOpen] = useState(false);
       const [dialogOpen, setDialogOpen] = useState(false);
-      const [mode, setMode] = useState<string>();
+      const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
       console.log(open);
       const income = row.original;
@@ -187,43 +185,10 @@ export const incomeColumns: ColumnDef<Income>[] = [
       console.log(row);
 
       const [deleteIncome] = useDeleteIncomeMutation();
-      const [receiveAuto] = usePostAutoReceiveMutation();
-      const [cancelRecurring] = useCancelRecurringIncomeMutation();
 
       const onView = () => {
         setDropdownOpen(false);
         setViewOpen(true);
-      };
-
-      const onPayment = async () => {
-        if (income?.recurringTemplate?.auto) {
-          confirm({
-            title: "Confirm Payment",
-            description: "Do you want to proceed with paying this expense?",
-            variant: "info",
-            confirmText: "Pay",
-            cancelText: "Cancel",
-            showLoadingOnConfirm: true,
-            onConfirm: async () => {
-              try {
-                await receiveAuto({
-                  id: income.id,
-                  data: {
-                    type: "Income",
-                  },
-                }).unwrap();
-                dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
-              } catch (err) {
-                let errorMessage = handleCatchErrorMessage(err); // Default message
-                toast.error(errorMessage);
-              }
-            },
-          });
-        } else {
-          setMode("transact");
-          setDialogOpen(true); // open dialog
-          setDropdownOpen(false); // close dropdown manually
-        }
       };
 
       const onArchive = async () => {
@@ -246,30 +211,11 @@ export const incomeColumns: ColumnDef<Income>[] = [
               dispatch(accountsApi.util.invalidateTags(["Assets"]));
             } catch (err) {
               console.log(err);
-              toast.error(err?.data?.error);
+              toast.error(handleCatchErrorMessage(err));
             }
           },
         });
       };
-      const onStopSeries = async () => {
-        confirm({
-          description: `Are you sure you want to cancel this recurring expense?`,
-          title: `Cancel recurring expense`,
-          variant: "info",
-          confirmText: "Confirm",
-          showLoadingOnConfirm: true,
-          cancelText: "Cancel",
-          onConfirm: async () => {
-            try {
-              await cancelRecurring(income?.recurringTemplate?.id).unwrap();
-            } catch (err) {
-              console.log(err);
-              toast.error(err?.data?.error);
-            }
-          },
-        });
-      };
-
       return (
         <>
           <DropdownMenu

@@ -1,7 +1,6 @@
 // app/components/SignUpForm.tsx
 "use client";
-import { WalletMinimal } from "lucide-react";
-import Logo from "../../assets/images/Logo.svg";
+import { LucideIcon, WalletMinimal } from "lucide-react";
 import { ReactNode } from "react";
 import { SubmitHandler } from "react-hook-form";
 
@@ -10,7 +9,7 @@ interface LayoutAuthProps {
   title: string;
   desc: string;
   submit: SubmitHandler<any>; // Use a more general type if necessary
-  icon: React.ComponentType;
+  icon?: LucideIcon;
 }
 
 // Updated the LayoutAuth component

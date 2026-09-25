@@ -8,9 +8,11 @@ import {
 } from "@/features/auth/api/signinApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { MailCheck } from "lucide-react";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { resetPasswordSchema } from "../schema/authSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormValues,
+} from "../schema/authSchema";
 import { useForm } from "react-hook-form";
 
 const ForgotPassword = () => {
@@ -24,16 +26,15 @@ const ForgotPassword = () => {
   const {
     register,
     formState: { errors, isValid },
-    reset,
     watch,
-  } = useForm({
-    resolver: yupResolver(resetPasswordSchema.schema),
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema.schema),
     mode: "onChange",
   });
   console.log(watch());
 
   useEffect(() => {
-    let interval;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (resendTimer > 0) {
       interval = setInterval(() => {
         setResendTimer((prev) => prev - 1);

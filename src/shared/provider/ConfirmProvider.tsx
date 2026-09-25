@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { AlertCircle, AlertTriangle, Info, type LucideIcon } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -145,7 +145,7 @@ export const ConfirmProvider = ({
 
   const getVariantStyles = (): {
     iconClass: string;
-    Icon: React.ComponentType<{ size?: number }>;
+    Icon: LucideIcon;
   } => {
     switch (options.variant) {
       case "destructive":

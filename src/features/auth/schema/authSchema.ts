@@ -1,17 +1,21 @@
-import * as yup from "yup"
+import { requiredString } from "@/shared/schema/fields";
+import { z } from "zod";
+
+const emailField = requiredString("Email is required").email(
+  "Invalid email address",
+);
+
 export const signupSchema = {
-  schema: yup.object().shape({
-    firstName: yup.string().required("First Name is required"),
-    lastName: yup.string().required("Last Name is required"),
-    username: yup.string().required("Username is required"),
-    email: yup.string().email().required("Email is required"),
-    password: yup
-      .string()
-      .required("Password is required")
+  schema: z.object({
+    firstName: requiredString("First Name is required"),
+    lastName: requiredString("Last Name is required"),
+    username: requiredString("Username is required"),
+    email: emailField,
+    password: requiredString("Password is required")
       .min(8, "Password must be at least 8 characters long")
-      .matches(
+      .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       ),
   }),
 
@@ -25,9 +29,9 @@ export const signupSchema = {
 };
 
 export const loginSchema = {
-  schema: yup.object().shape({
-    email: yup.string().email().required("Email is required"),
-    password: yup.string().required("Password is required"),
+  schema: z.object({
+    email: emailField,
+    password: requiredString("Password is required"),
   }),
   defaultValues: {
     email: "",
@@ -36,11 +40,20 @@ export const loginSchema = {
 };
 
 export const resetPasswordSchema = {
-  schema: yup.object({
-    code: yup.string().required("Code is required"),
-    password: yup.string().required("Password is required"),
-    passwordConfirmation: yup
-      .string()
-      .oneOf([yup.ref("password")], "Passwords must match"),
-  }),
+  schema: z
+    .object({
+      code: requiredString("Code is required"),
+      password: requiredString("Password is required"),
+      passwordConfirmation: z.string().optional(),
+    })
+    .refine(
+      (data) =>
+        data.passwordConfirmation === undefined ||
+        data.passwordConfirmation === data.password,
+      { message: "Passwords must match", path: ["passwordConfirmation"] },
+    ),
 };
+
+export type SignupFormValues = z.infer<typeof signupSchema.schema>;
+export type LoginFormValues = z.infer<typeof loginSchema.schema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema.schema>;
