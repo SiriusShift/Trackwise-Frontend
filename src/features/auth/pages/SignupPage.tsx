@@ -98,8 +98,8 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
   };
 
 
-const handleGoogleLogin = () => {
-  window.location.href = `${API_URL}/auth/google/sign-in`;
+const handleGoogleSignup = () => {
+  window.location.href = `${API_URL}/auth/google/sign-up`;
 };
 
   const resendCode = () => {

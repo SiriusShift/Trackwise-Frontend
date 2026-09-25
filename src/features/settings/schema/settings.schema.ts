@@ -39,6 +39,6 @@ export const profileSchema = z.object({
     required_error: "Email is required",
   }),
   phone_number: z
-    .string()
-    .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    .string().optional()
+    // .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
 });

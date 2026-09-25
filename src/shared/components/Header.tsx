@@ -5,10 +5,11 @@ import ModeToggle from "@/shared/components/ModeToggle";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useCookies } from "react-cookie";
 import { decryptString } from "@/shared/utils/CustomFunctions";
+import { IRootState } from "@/app/store";
+import { useSelector } from "react-redux";
 
 const Header = () => {
-  const [cookies] = useCookies();
-  const userInfo = cookies?.user ? decryptString(cookies.user) : null;
+  const userInfo = useSelector((state: IRootState) => state.userDetails)
 
   return (
     <header className="sticky top-0 bg-background z-50 border-b items-center">

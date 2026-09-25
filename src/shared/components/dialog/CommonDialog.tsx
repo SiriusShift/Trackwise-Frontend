@@ -75,7 +75,7 @@ const CommonDialog = ({
           <div className="min-w-0 space-y-0">
             <DialogTitle className="text-start">{title}</DialogTitle>
             {description && (
-              <DialogDescription>{description}</DialogDescription>
+              <DialogDescription className="text-start">{description}</DialogDescription>
             )}
           </div>
         </DialogHeader>

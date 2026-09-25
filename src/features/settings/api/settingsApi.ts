@@ -11,17 +11,45 @@ export interface UserSettings {
   mobileNotification: boolean;
   notifyDays: number;
   updatedAt: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  profileImageUrl: string | null;
 }
 
 export type UpdateSettingsPayload = Partial<
-  Omit<UserSettings, "id" | "updatedAt">
->;
+  Omit<
+    UserSettings,
+    "id" | "updatedAt" | "firstName" | "lastName" | "phoneNumber" | "profileImageUrl"
+  >
+> & {
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  profile_image?: File | null;
+};
 
 interface SettingsResponse {
   success: boolean;
   message: string;
   data: UserSettings;
 }
+
+const toFormData = (payload: UpdateSettingsPayload) => {
+  const formData = new FormData();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (key === "profile_image" || value === undefined || value === null) return;
+    formData.append(key, String(value));
+  });
+
+  if (payload.profile_image) {
+    formData.append("image", payload.profile_image);
+  }
+
+  return formData;
+};
 
 export const settingsApi = api
   .enhanceEndpoints({ addTagTypes: ["Settings"] })
@@ -37,10 +65,10 @@ export const settingsApi = api
       }),
 
       updateSettings: builder.mutation<UserSettings, UpdateSettingsPayload>({
-        query: (body) => ({
+        query: (payload) => ({
           url: "/settings",
           method: "PATCH",
-          body,
+          body: toFormData(payload),
         }),
         transformResponse: (response: SettingsResponse) => response.data,
         invalidatesTags: ["Settings"],
