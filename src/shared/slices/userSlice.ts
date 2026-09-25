@@ -8,7 +8,8 @@ const initialState = {
   email: "",
   role: "",
   phoneNumber: "",
-  profileImage: "" 
+  profileImage: "",
+  google_id: ""
 };
 
 export const signFormSlice = createSlice({
@@ -23,7 +24,8 @@ export const signFormSlice = createSlice({
       state.email = action.payload.email;
       state.role = action.payload.role;
       state.phoneNumber = action.payload.phoneNumber;
-      state.profileImage = action.payload.profileImage
+      state.profileImage = action.payload.profileImage;
+      state.google_id = action.payload.google_id;
     },
   },
 });

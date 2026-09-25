@@ -73,7 +73,18 @@ export const settingsApi = api
         transformResponse: (response: SettingsResponse) => response.data,
         invalidatesTags: ["Settings"],
       }),
+
+      unlinkGoogle: builder.mutation<{ success: boolean; message: string }, void>({
+        query: () => ({
+          url: "/auth/google/unlink",
+          method: "DELETE",
+        }),
+      }),
     }),
   });
 
-export const { useGetSettingsQuery, useUpdateSettingsMutation } = settingsApi;
+export const {
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+  useUnlinkGoogleMutation,
+} = settingsApi;

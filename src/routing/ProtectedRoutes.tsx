@@ -37,6 +37,7 @@ function ProtectedRoutes() {
               role: response?.user?.role,
               phoneNumber: response?.user?.phoneNumber,
               profileImage: response?.user?.profileImage,
+              google_id: response?.user?.google_id
             })
           );
           dispatch(

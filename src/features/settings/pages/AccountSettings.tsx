@@ -11,14 +11,19 @@ import { Controller, useForm } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import ImageCropDialog from "../components/ImageCropDialog";
 import { profileSchema } from "../schema/settings.schema";
 import { ProfileSettingsFormValues } from "../types/settings.types";
-import { useUpdateSettingsMutation } from "../api/settingsApi";
+import {
+  useUnlinkGoogleMutation,
+  useUpdateSettingsMutation,
+} from "../api/settingsApi";
 import { toast } from "sonner";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { setUserInfo } from "@/shared/slices/userSlice";
 import { cn } from "@/lib/utils";
+import Google from "@/assets/images/Google.svg";
 
 const PhoneNumberInput = forwardRef<
   HTMLInputElement,
@@ -59,6 +64,19 @@ const AccountSettings = () => {
   const user = useSelector((state: IRootState) => state.userDetails);
   const dispatch = useDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("linked") === "true") {
+      toast.success("Google account connected");
+    } else if (searchParams.get("linkError") === "true") {
+      toast.error(searchParams.get("message") || "Unable to link Google account");
+    } else {
+      return;
+    }
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Raw file the user just picked, held only long enough to crop it —
   // the form's profile_image is set from the cropped result, not this.
@@ -67,8 +85,9 @@ const AccountSettings = () => {
   );
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
 
-
   const [updateSettings, { isLoading }] = useUpdateSettingsMutation();
+  const [unlinkGoogle, { isLoading: isUnlinkingGoogle }] =
+    useUnlinkGoogleMutation();
   const {
     register,
     control,
@@ -87,6 +106,8 @@ const AccountSettings = () => {
       phone_number: user?.phoneNumber ?? "",
     },
   });
+
+  console.log(watch());
 
   const profileImageFile = watch("profile_image");
 
@@ -137,6 +158,33 @@ const AccountSettings = () => {
         }),
       );
       toast.success("Account updated");
+    } catch (err) {
+      const errorMessage = handleCatchErrorMessage(err);
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleConnectGoogle = () => {
+    window.location.href = `${import.meta.env.VITE_PUBLIC_BASEURL}/auth/google/link`;
+  };
+
+  const handleDisconnectGoogle = async () => {
+    try {
+      await unlinkGoogle().unwrap();
+      dispatch(
+        setUserInfo({
+          id: user?.id ?? null,
+          firstName: user?.firstName ?? "",
+          lastName: user?.lastName ?? "",
+          username: user?.username ?? "",
+          email: user?.email ?? "",
+          role: user?.role ?? "",
+          phoneNumber: user?.phoneNumber ?? "",
+          profileImage: user?.profileImage ?? "",
+          google_id: "",
+        }),
+      );
+      toast.success("Google account disconnected");
     } catch (err) {
       const errorMessage = handleCatchErrorMessage(err);
       toast.error(errorMessage);
@@ -278,6 +326,28 @@ const AccountSettings = () => {
             </p>
           )}
         </div>
+      </SettingsRow>
+
+      <Separator />
+
+      <SettingsRow
+        title="Google"
+        description="Connect your credentials to your google account. You can login with google after"
+        stack={false}
+      >
+        <Button
+          type="button"
+          variant={"outline"}
+          disabled={isUnlinkingGoogle}
+          onClick={user.google_id ? handleDisconnectGoogle : handleConnectGoogle}
+        >
+          <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
+          {isUnlinkingGoogle
+            ? "Disconnecting..."
+            : user.google_id
+              ? "Disconnect"
+              : "Connect"}
+        </Button>
       </SettingsRow>
 
       <Separator />

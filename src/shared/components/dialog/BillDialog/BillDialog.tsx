@@ -99,6 +99,7 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
         title="Bill Details"
         icon={ReceiptText}
       >
+        <div className="overflow-auto">
         {billLoading ? (
           <BillDialogSkeleton />
         ) : (
@@ -250,13 +251,14 @@ const BillDialog = ({ open, setOpen, data }: BillDialogProps) => {
         {billLoading ? (
           <ButtonSkeleton />
         ) : (
-          <div className="p-3 flex justify-end gap-3 border-t">
+          <div className="p-3 flex justify-end gap-3 bg-card sticky bottom-0 border-t">
             <Button variant={"outline"} onClick={() => setOpenSkip(true)}>
               Skip
             </Button>
             <Button onClick={() => setOpenConfirm(true)}>Pay</Button>
           </div>
         )}
+        </div>
       </CommonDialog>
       <PayDialog open={openConfirm} setOpen={setOpenConfirm} data={bill} />
       <SkipDialog open={openSkip} setOpen={setOpenSkip} data={bill} />

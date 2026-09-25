@@ -161,7 +161,7 @@ const AccountPage = () => {
                         : stat.value}
                     </span>
 
-                    {stat.key === "count" && (
+                    {(stat.key === "count" && excludedAccountsLength > 1) && (
                       <span className="text-xs text-muted-f">
                         ⓘ Excluded {excludedAccountsLength} account
                         {excludedAccountsLength > 1 ? "s" : ""}
