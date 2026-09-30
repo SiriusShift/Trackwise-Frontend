@@ -13,6 +13,9 @@ import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
 } from "../api/settingsApi";
+import { useSelector } from "react-redux";
+import { IRootState } from "@/app/store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip";
 
 interface NotificationSettingsFormValues {
   notifyDays: number;
@@ -21,6 +24,7 @@ interface NotificationSettingsFormValues {
 }
 
 const NotificationSettings = () => {
+  const user = useSelector((state: IRootState) => state.userDetails);
   const { data: settings } = useGetSettingsQuery();
   const [updateSettings] = useUpdateSettingsMutation();
 
@@ -102,14 +106,27 @@ const NotificationSettings = () => {
           <FormField
             name="mobileNotification"
             control={control}
-            render={({ field }) => (
-              <FormItem>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const hasPhone = user.phoneNumber !== "";
+              return (
+                <FormItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={!hasPhone}
+                        />
+                      </span>
+                    </TooltipTrigger>
+                    {!hasPhone && (
+                      <TooltipContent side="left" align="end">No phone number added</TooltipContent>
+                    )}
+                  </Tooltip>
+                </FormItem>
+              );
+            }}
           />
         </div>
 
