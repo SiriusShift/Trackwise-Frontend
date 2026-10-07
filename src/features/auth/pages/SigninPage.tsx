@@ -102,13 +102,12 @@ const handleGoogleLogin = () => {
                 required
               />
               <div className="flex justify-end">
-                <a
-                  href="/forgot-password"
+                <p
                   className="text-sm text-right -mt-4"
                   onClick={() => router("/forgot-password")}
                 >
                   Forgot Password?
-                </a>
+                </p>
               </div>
               <Button
                 className="w-full sm:w-96 text-right"

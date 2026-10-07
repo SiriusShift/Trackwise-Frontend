@@ -14,14 +14,15 @@ import {
   type ResetPasswordFormValues,
 } from "../schema/authSchema";
 import { useForm } from "react-hook-form";
+import { Loader2 } from "lucide-react";
 
 const ForgotPassword = () => {
   const router = useNavigate();
   const [resendTimer, setResendTimer] = useState(0);
   const [email, setEmail] = useState("");
   const [step, setStep] = useState("email");
-  const [postForgotPassword] = usePostForgotPasswordMutation();
-  const [resetTrigger] = usePostResetPasswordMutation();
+  const [postForgotPassword, {isLoading: forgetLoading}] = usePostForgotPasswordMutation();
+  const [resetTrigger, {isLoading: resetLoading}] = usePostResetPasswordMutation();
 
   const {
     register,
@@ -50,7 +51,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await postForgotPassword([email]).unwrap();
+      await postForgotPassword({email: email}).unwrap();
       toast.success("Password reset link sent to your email");
       if (step === "email") {
         setStep("reset");
@@ -107,9 +108,9 @@ const ForgotPassword = () => {
               <Button
                 type="submit"
                 className="w-full sm:w-96"
-                disabled={!email}
+                disabled={!email || forgetLoading}
               >
-                Submit
+                {forgetLoading ? <Loader2 className="animate-spin"/>  : "Submit"}
               </Button>
               <a className="text-gray-600" onClick={() => router("/sign-in")}>
                 Return to Sign In
@@ -150,9 +151,9 @@ const ForgotPassword = () => {
               <Button
                 type="submit"
                 className="w-full sm:w-96"
-                disabled={!isValid}
+                disabled={!isValid }
               >
-                Reset
+                {forgetLoading ? <Loader2 className="animate-spin"/>  : "Reset"}
               </Button>
               <span>
                 Didn't receive the email?{" "}

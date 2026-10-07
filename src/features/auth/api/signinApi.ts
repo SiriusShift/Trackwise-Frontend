@@ -33,7 +33,7 @@ const signInApi = api.injectEndpoints({
         }),
         postForgotPassword: builder.mutation({
             query: (payload) => ({
-                url: "/aws-ses/forgot-password",
+                url: "/auth/forgot-password",
                 method: "POST",
                 headers: { Accept: "application/json" },
                 body: payload
