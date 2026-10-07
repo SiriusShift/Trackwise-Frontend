@@ -1,0 +1,32 @@
+import { cn } from "@/lib/utils";
+
+interface AnimatedLogoProps {
+  className?: string;
+}
+
+// Wallet logo that traces its outline, holds, then erases on a loop.
+// Uses currentColor, so set the color with a text-* class.
+function AnimatedLogo({ className }: AnimatedLogoProps) {
+  return (
+    <svg
+      viewBox="0 0 36 34"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("h-16 w-16 text-primary animate-logo-pulse", className)}
+      role="img"
+      aria-label="Loading"
+    >
+      <path
+        d="M26.0014 21.0298H26.0174M30.4444 2H7.68889C5.6976 2 4.70194 2 3.94137 2.40871C3.27234 2.76824 2.72841 3.34192 2.38754 4.04754C2 4.8497 2 5.89979 2 7.99999V26C2 28.1002 2 29.1502 2.38754 29.9525C2.72841 30.6581 3.27234 31.2316 3.94137 31.5913C4.70194 32 5.69758 32 7.68889 32H28.3111C30.3024 32 31.2981 32 32.0587 31.5913C32.7276 31.2316 33.2716 30.6581 33.6124 29.9525C34 29.1502 34 28.1002 34 26V15.5C34 13.3998 34 12.3497 33.6124 11.5475C33.2716 10.8419 32.7276 10.2682 32.0587 9.9087C31.2981 9.49999 30.3024 9.49999 28.3111 9.49999H9.11111M26.8014 21.0298C26.8014 21.4957 26.4432 21.8735 26.0014 21.8735C25.5596 21.8735 25.2014 21.4957 25.2014 21.0298C25.2014 20.5638 25.5596 20.186 26.0014 20.186C26.4432 20.186 26.8014 20.5638 26.8014 21.0298Z"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        pathLength={1}
+        className="animate-logo-draw"
+      />
+    </svg>
+  );
+}
+
+export default AnimatedLogo;

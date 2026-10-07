@@ -8,10 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "@/shared/slices/userSlice";
 import { setSettings } from "@/shared/slices/settingsSlice";
 import { IRootState } from "@/app/store";
+import LoadingScreen from "@/shared/components/LoadingScreen";
 
 function ProtectedRoutes() {
   const navigate = useNavigate();
-  const [authTrigger, { data, error }] = useLazyGetAuthStatusQuery();
+  const [authTrigger, { data, error, isLoading }] = useLazyGetAuthStatusQuery();
   const dispatch = useDispatch();
   console.log(data);
   const [cookies, setCookie] = useCookies(["user"]);
@@ -60,8 +61,11 @@ function ProtectedRoutes() {
     checkAuthStatus();
   }, []);
 
-  return <>{data && <MainLayout />}</>;
+  if (isLoading || (!data && !error)) {
+    return <LoadingScreen />;
+  }
 
+  return <>{data && <MainLayout />}</>;
   // return <MainLayout />;
 }
 
