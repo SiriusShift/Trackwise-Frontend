@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   setPageSize: React.Dispatch<React.SetStateAction<number>>; // Page size setter
   graphData: any;
   isLoading: boolean;
+  onLoadMore?: () => void; // Mobile infinite scroll trigger
 }
 
 // const chartConfig = {
@@ -85,6 +86,7 @@ export function DataTable<TData, TValue>({
   isLoading,
   setPageIndex,
   setPageSize,
+  onLoadMore,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -206,6 +208,7 @@ export function DataTable<TData, TValue>({
           <TransactionList
             transactions={data as TransactionRow[]}
             isFetching={isLoading}
+            onLoadMore={onLoadMore}
           />
         </div>
       )}

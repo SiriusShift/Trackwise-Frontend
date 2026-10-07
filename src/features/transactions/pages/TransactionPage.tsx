@@ -66,7 +66,7 @@ const TransactionPage = () => {
   const { columns } =
     transactionConfig[type as keyof typeof transactionConfig] || {};
   // Expense
-  const { data: expenseData, isFetching: expenseFetching } =
+  const { data: expenseData, isFetching: expenseFetching, refetch } =
     useGetExpensesQuery(
       {
         startDate: startDate?.toISOString(),
@@ -243,16 +243,28 @@ const TransactionPage = () => {
     );
   }, [active]);
 
+  // Restart from the first page whenever the query changes
   useEffect(() => {
-    setTransactions([]);
-  }, [type]);
+    setPageIndex(0);
+  }, [type, startDate?.getTime(), endDate?.getTime(), filter]);
 
+  // Mobile list: page 0 replaces, later pages append (deduped by id)
   useEffect(() => {
-    console.log("add");
-    if (tableData?.data?.length) {
-      setTransactions((prev) => [...prev, ...tableData?.data]);
+    if (!tableData?.data) return;
+    if (pageIndex === 0) {
+      setTransactions(tableData.data);
+      return;
     }
-  }, [JSON.stringify(tableData), tableFetching]);
+    setTransactions((prev) => {
+      const seen = new Set(prev.map((row) => row.id));
+      return [...prev, ...tableData.data.filter((row: TransactionRow) => !seen.has(row.id))];
+    });
+  }, [tableData]);
+
+  const handleLoadMore = useCallback(() => {
+    if (tableFetching || totalPages === undefined) return;
+    if (pageIndex < totalPages - 1) setPageIndex((prev) => prev + 1);
+  }, [tableFetching, totalPages, pageIndex]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -303,6 +315,7 @@ const TransactionPage = () => {
               pageIndex={pageIndex}
               pageSize={pageSize}
               isLoading={tableFetching}
+              onLoadMore={handleLoadMore}
               graphData={graphData}
               data={width > 639 ? tableData?.data : transaction || []}
             />

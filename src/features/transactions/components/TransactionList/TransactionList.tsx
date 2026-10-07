@@ -10,10 +10,11 @@ import type { TransactionRow } from "@/shared/types";
 interface TransactionListProps {
   transactions?: TransactionRow[];
   isFetching: boolean;
+  onLoadMore?: () => void;
 }
 
 const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(function TransactionList(
-  { transactions, isFetching },
+  { transactions, isFetching, onLoadMore },
   ref
 ) {
   // const dispatch = useDispatch();
@@ -42,7 +43,7 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
 
   return (
     <motion.div initial="hidden" animate="visible">
-      {isFetching ? (
+      {isFetching && !transactions?.length ? (
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
             <TransactionListSkeleton key={i} />
@@ -52,9 +53,10 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
         <VirtualizedInfiniteList
           items={transactions}
           itemSize={130}
-          height={transactions.length * 130}
+          height={Math.min(transactions.length * 130, 520)}
           ref={ref}
           isFetching={isFetching}
+          onLoadMore={onLoadMore}
           renderRow={(item, index) => (
             <TransactionItem item={item} index={index} />
           )}
