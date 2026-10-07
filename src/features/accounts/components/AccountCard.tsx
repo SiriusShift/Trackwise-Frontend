@@ -6,6 +6,7 @@ import { setActiveRow } from "@/shared/slices/activeSlice";
 import { formatCurrency, hexToRgba } from "@/shared/utils/CustomFunctions";
 import {
   Activity,
+  Archive,
   ArrowDownRight,
   ArrowUpRight,
   Banknote,
@@ -60,10 +61,12 @@ const AccountCard = ({
   account,
   key,
   openDialog,
+  onArchive,
 }: {
   account: Account;
   key: number;
   openDialog: () => void;
+  onArchive: (key: number) => void;
 }) => {
   const dispatch = useDispatch();
   const { Icon, glowStyle, badgeStyle, ghostStyle } = getAccountConfig(
@@ -103,6 +106,14 @@ const AccountCard = ({
         onClick={handleEdit}
       >
         <Pencil className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-12 top-3 z-20 h-8 w-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        onClick={() => onArchive(key)}
+      >
+        <Archive className="h-4 w-4" />
       </Button>
       <div className="space-y-2">
         <div className="relative z-10 flex items-center gap-3">

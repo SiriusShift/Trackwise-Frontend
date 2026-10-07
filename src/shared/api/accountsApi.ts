@@ -30,6 +30,15 @@ export const accountsApi = api
         }),
         invalidatesTags: ["Assets"],
       }),
+      archiveAccount: builder.mutation({
+        query: (id) => ({
+          url: `/assets/${id}`,
+          method: "PATCH",
+                    headers: {
+            Accept: "application/json",
+          },
+        })
+      }),
       updateAccount: builder.mutation({
         query: (body) => ({
           url: "/assets",
@@ -49,4 +58,5 @@ export const {
   useLazyGetAccountsQuery,
   useCreateAccountMutation,
   useUpdateAccountMutation,
+  useArchiveAccountMutation
 } = accountsApi;

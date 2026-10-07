@@ -123,7 +123,6 @@ export const ConfirmProvider = ({
   }, [options, handleClose]);
 
   const handleCancel = useCallback(async () => {
-    console.log("test");
     try {
       // Show loading if requested
       if (options.showLoadingOnCancel) {
@@ -150,18 +149,19 @@ export const ConfirmProvider = ({
     switch (options.variant) {
       case "destructive":
         return {
-          iconClass: "text-red-600",
+          iconClass: "bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400",
           Icon: AlertTriangle,
         };
       case "warning":
         return {
-          iconClass: "text-yellow-600",
+          iconClass:
+            "bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-400",
           Icon: AlertCircle,
         };
       case "info":
       default:
         return {
-          iconClass: "text-blue-600",
+          iconClass: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
           Icon: Info,
         };
     }
@@ -188,7 +188,7 @@ export const ConfirmProvider = ({
       >
         <DialogContent
           removeClose
-          className="w-4/5 sm:min-w-[425px] sm:w-auto p-6"
+          className="w-[calc(100%-2rem)] sm:w-full sm:max-w-md p-6 gap-4"
           onInteractOutside={(e) => {
             if (shouldPreventClose || options.preventCloseOnOutsideClick) {
               e.preventDefault();
@@ -201,31 +201,35 @@ export const ConfirmProvider = ({
           }}
         >
           <DialogHeader>
-            <div className="flex flex-col sm:flex-row items-center">
-              <div className={`p-3 rounded-sm  ${iconClass}`}>
-                <Icon size={40} />
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+              <div
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconClass}`}
+              >
+                <Icon size={24} />
               </div>
 
-              <div className="flex flex-col px-4 gap-2">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <DialogTitle>
                   {options.title || "Are you absolutely sure?"}
                 </DialogTitle>
 
                 {options.description && (
-                  <DialogDescription>{options.description}</DialogDescription>
+                  <DialogDescription className="break-words">
+                    {options.description}
+                  </DialogDescription>
                 )}
               </div>
             </div>
           </DialogHeader>
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2 sm:pt-0">
             <DialogClose asChild>
               <Button
                 onClick={handleCancel}
                 disabled={isLoading}
                 variant="outline"
                 size={"sm"}
-                className="order-2 sm:order-1"
+                className="order-2 sm:order-1 w-full sm:w-auto sm:min-w-[88px]"
               >
                 {isLoading && options.showLoadingOnCancel ? (
                   <ClipLoader size={15} color="currentColor" />
@@ -239,7 +243,7 @@ export const ConfirmProvider = ({
               onClick={handleConfirm}
               disabled={isLoading}
               size={"sm"}
-              className="order-1 sm:order-1"
+              className="order-1 sm:order-2 w-full sm:w-auto sm:min-w-[88px]"
             >
               {isLoading && options.showLoadingOnConfirm !== false ? (
                 <ClipLoader size={15} color="white" />

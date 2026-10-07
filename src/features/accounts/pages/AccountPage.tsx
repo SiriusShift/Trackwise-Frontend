@@ -1,9 +1,16 @@
 import { IRootState } from "@/app/store";
-import { useGetAccountsQuery } from "@/shared/api/accountsApi";
+import {
+  useArchiveAccountMutation,
+  useGetAccountsQuery,
+} from "@/shared/api/accountsApi";
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
-import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import {
+  formatCurrency,
+  handleCatchErrorMessage,
+} from "@/shared/utils/CustomFunctions";
 import {
   ArrowLeftRight,
   ArrowUpDown,
@@ -18,6 +25,8 @@ import AccountCard from "../components/AccountCard";
 import AccountCardSkeleton from "../components/AccountCardSkeleton";
 import AccountDialog from "../components/AccountDialog";
 import { Account } from "../types/account.types";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { toast } from "sonner";
 
 const stats = [
   {
@@ -56,12 +65,14 @@ const AccountPage = () => {
   const currency = useSelector((state: IRootState) => state.settings.currency);
   const endDate = useSelector((state: IRootState) => state.active.active.to);
 
+  const { confirm } = useConfirm();
   const { data: accountsData, isLoading: accountsLoading } =
     useGetAccountsQuery({
       dateFrom: startDate,
       dateTo: endDate,
     });
 
+  const [archive, { isLoading }] = useArchiveAccountMutation();
   const handleAdd = () => {
     setMode("Add");
     setOpen(true);
@@ -72,10 +83,28 @@ const AccountPage = () => {
     setOpen(true);
   };
 
+  const handleArchive = (id : number) => {
+    confirm({
+      description: `Are you sure you want to archive this account?`,
+      title: `Archive account`,
+      variant: "info",
+      confirmText: "Confirm",
+      showLoadingOnConfirm: true,
+      cancelText: "Cancel",
+      onConfirm: async () => {
+        try {
+          await archive(id).unwrap();
+        } catch (err) {
+          console.log(err);
+          toast.error(handleCatchErrorMessage(err));
+        }
+      },
+    });
+  };
+
   const assetsLength = accountsData?.data?.length ?? 0;
-  const excludedAccountsLength = accountsData?.data?.filter(
-    (item) => !item.includeInNetWorth,
-  )?.length ?? 0;
+  const excludedAccountsLength =
+    accountsData?.data?.filter((item) => !item.includeInNetWorth)?.length ?? 0;
 
   console.log(excludedAccountsLength);
 
@@ -155,13 +184,19 @@ const AccountPage = () => {
                       {stat.title}
                     </span>
 
-                    <span className="text-2xl font-bold tracking-tight">
-                      {stat.key !== "count"
-                        ? formatCurrency(stat.value, currency, "symbol")
-                        : stat.value}
-                    </span>
+                    {accountsLoading ? (
+                      <Skeleton className="mt-1 h-7 w-28" />
+                    ) : (
+                      <span className="text-2xl font-bold tracking-tight">
+                        {stat.key !== "count"
+                          ? formatCurrency(stat.value, currency, "symbol")
+                          : stat.value}
+                      </span>
+                    )}
 
-                    {(stat.key === "count" && excludedAccountsLength > 1) && (
+                    {!accountsLoading &&
+                      stat.key === "count" &&
+                      excludedAccountsLength > 0 && (
                       <span className="text-xs text-muted-f">
                         ⓘ Excluded {excludedAccountsLength} account
                         {excludedAccountsLength > 1 ? "s" : ""}
@@ -184,6 +219,7 @@ const AccountPage = () => {
                   key={account.id}
                   account={account}
                   openDialog={handleEdit}
+                  onArchive={handleArchive}
                 />
               ))}
         </div>
