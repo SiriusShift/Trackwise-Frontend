@@ -38,6 +38,7 @@ interface Asset {
   id: number;
   name: string;
   remainingBalance: number;
+  currency: string | undefined;
 }
 
 interface TransactionFormProps {

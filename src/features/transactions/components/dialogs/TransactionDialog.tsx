@@ -6,17 +6,9 @@ import { useSelector } from "react-redux";
 import { IRootState } from "@/app/store";
 import { useGetCategoryLimitQuery } from "@/shared/api/categoryApi";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+import CommonDialog from "@/shared/components/dialog/CommonDialog";
+import { DialogClose, DialogFooter } from "@/shared/components/ui/dialog";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { transactionConfig } from "../../config/transactionConfig";
 import TransactionForm from "../forms/TransactionForm";
 
@@ -48,7 +40,6 @@ export function TransactionDialog({
     (state: IRootState) => state.active.active.from,
   );
   const endDate = useSelector((state: IRootState) => state.active.active.to);
-  const { confirm } = useConfirm();
 
   const { data: rawAssetData } = useGetAccountsQuery();
   const { data: categoryLimit } = useGetCategoryLimitQuery({
@@ -122,75 +113,41 @@ export function TransactionDialog({
         ? `Confirm and complete this ${recurringLabel}${type.toLowerCase()}.`
         : `Update the details of this ${recurringLabel}${type.toLowerCase()}.`;
 
-  function handleCloseIntent() {
-    if (!isDirty) {
-      setOpen(false);
-      return;
-    }
-    confirm({
-      title: "Discard changes?",
-      description: "All unsaved changes will be lost.",
-      variant: "destructive",
-      confirmText: "Discard",
-      cancelText: "Keep editing",
-      onConfirm: () => {
-        setOpen(false);
-        reset();
-      },
-    });
-  }
-
   return (
     <FormProvider {...form}>
-      <Dialog
+      <CommonDialog
         open={open}
-        onOpenChange={(o) => {
-          if (!o) handleCloseIntent();
-          else setOpen(o);
-        }}
+        setOpen={setOpen}
+        isDirty={isDirty}
+        reset={reset}
+        title={dialogTitle}
+        description={dialogDescription}
+        icon={ReceiptText}
+        preventClickOutside
+        contentClassName="sm:max-w-lg sm:max-h-[90vh]"
       >
-        <DialogContent
-          className="flex flex-col w-full max-w-full h-dvh p-0 sm:max-w-lg sm:h-auto sm:max-h-[90vh] gap-0"
-          onInteractOutside={(e) => e.preventDefault()}
-          onEscapeKeyDown={(e) => e.preventDefault()}
-        >
-          <DialogHeader className="flex flex-row items-center gap-3 px-6 py-4 border-b">
-            <ReceiptText className="h-5 w-5 shrink-0 text-muted-foreground" />
-            <div className="min-w-0">
-              <DialogTitle>{dialogTitle}</DialogTitle>
-              <DialogDescription className="mt-0.5">
-                {dialogDescription}
-              </DialogDescription>
-            </div>
-          </DialogHeader>
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <TransactionForm
+            assetData={assetData}
+            mode={mode}
+            setRecurring={setRecurring}
+          />
+        </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-4">
-            <TransactionForm
-              assetData={assetData}
-              mode={mode}
-              setRecurring={setRecurring}
-            />
-          </div>
-
-          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCloseIntent}
-              >
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              disabled={(!isDirty && mode !== "transact") || !isValid}
-            >
-              {getActionLabel()}
+        <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Cancel
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </DialogClose>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            disabled={(!isDirty && mode !== "transact") || !isValid}
+          >
+            {getActionLabel()}
+          </Button>
+        </DialogFooter>
+      </CommonDialog>
     </FormProvider>
   );
 }
