@@ -38,7 +38,7 @@ function buildResetData(type: string, mode: string, rowData: any) {
         unit: rowData.unit,
       },
       ...(rowData.fromAsset && { account: rowData.fromAsset }),
-      ...(rowData.toAsset && { to: rowData.fromAsset }),
+      ...(rowData.toAsset && { to: rowData.toAsset }),
       behaviour: rowData.behaviour,
     };
   }
@@ -90,8 +90,6 @@ export function useTransactionForm({
     mode: "onChange",
     defaultValues: schema?.defaultValues,
   });
-
-  console.log(form.watch());
 
   useEffect(() => {
     if (!open) return;

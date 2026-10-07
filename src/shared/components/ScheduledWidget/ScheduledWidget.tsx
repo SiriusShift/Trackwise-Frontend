@@ -1,4 +1,11 @@
-import { useGetRecurringQuery } from "@/features/transactions/api/transaction/recurringApi";
+import {
+  useCancelRecurringMutation,
+  useGetRecurringQuery,
+} from "@/features/transactions/api/transaction/recurringApi";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { Schedule } from "@/shared/types";
+import { toast } from "sonner";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useNavigate } from "react-router-dom";
@@ -26,21 +33,38 @@ function getVisibleCount(width: number): number {
 
 interface ScheduledWidgetProps {
   type: string;
-  title: string;
-  addDescription: string;
-  editDescription: string;
 }
 
 function ScheduledWidget({ type }: ScheduledWidgetProps) {
   const navigate = useNavigate();
   const width = useScreenWidth();
+  const { confirm } = useConfirm();
 
-  const { data, isLoading } = useGetRecurringQuery();
+  const { data, isLoading } = useGetRecurringQuery(type);
+  const [cancelRecurring] = useCancelRecurringMutation();
+
+  const handleDelete = (schedule: Schedule) => {
+    confirm({
+      title: "Delete schedule",
+      description: `Stop "${schedule.description}"? Transactions already created are kept, but no new ones will be scheduled.`,
+      variant: "warning",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      showLoadingOnConfirm: true,
+      onConfirm: async () => {
+        try {
+          await cancelRecurring(schedule.id).unwrap();
+          toast.success("Schedule deleted successfully.");
+        } catch (err: any) {
+          toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+        }
+      },
+    });
+  };
 
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;
 
-  console.log(visibleCount);
   // Show nav arrows only when there are more items than visible slots
   const shouldShowNav = itemCount > visibleCount;
 
@@ -94,6 +118,7 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
                     <ScheduleCard
                       key={schedule.id ?? index}
                       schedule={schedule}
+                      onDelete={handleDelete}
                       count={itemCount}
                     />
                   ))}

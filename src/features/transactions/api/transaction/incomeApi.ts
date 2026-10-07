@@ -92,23 +92,6 @@ export const incomeApi = api
         providesTags: ["Income"],
       }),
 
-      postReceive: builder.mutation({
-        query: ({ data, id }) => ({
-          url: `/transactions/income/receive/${id}`,
-          method: "PATCH",
-          body: data,
-        }),
-        invalidatesTags: ["Income", "Recurring"],
-      }),
-
-      postAutoReceive: builder.mutation({
-        query: ({ data, id }) => ({
-          url: `/transactions/income/receive/auto/${id}`,
-          method: "POST",
-          body: data,
-        }),
-      }),
-
       cancelRecurringIncome: builder.mutation({
         query: (id) => ({
           url: `/transactions/income/recurring/${id}`,
@@ -131,7 +114,5 @@ export const {
   usePostRecurringIncomeMutation,
   useUpdateRecurringIncomeMutation,
   useDeleteRecurringIncomeMutation,
-  usePostAutoReceiveMutation,
-  usePostReceiveMutation,
   useCancelRecurringIncomeMutation
 } = incomeApi;

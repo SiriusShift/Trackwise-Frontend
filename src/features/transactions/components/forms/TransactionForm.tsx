@@ -62,8 +62,9 @@ const TransactionForm = ({
   const isRecurring = watch("recurring");
   const isTransfer = type === "Transfer";
 
-  // Recurring toggle is only available for add/edit of non-transfer, non-history
-  const canToggleRecurring = mode !== "transact" && !isTransfer;
+  // Recurring toggle is only available when adding a non-transfer. When editing, the
+  // record already is (or isn't) a schedule, and switching would hit the wrong endpoint.
+  const canToggleRecurring = mode === "add" && !isTransfer;
 
   // Show attachment for past transactions being added/edited
   const showAttachment =

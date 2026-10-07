@@ -13,6 +13,10 @@ import { transactionConfig } from "../../config/transactionConfig";
 import TransactionForm from "../forms/TransactionForm";
 
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
+import {
+  usePostRecurringMutation,
+  useUpdateRecurringMutation,
+} from "../../api/transaction/recurringApi";
 import { commonDialogProps } from "@/shared/types";
 import { useTransactionForm } from "../hooks/useTransactionForm";
 import {
@@ -53,20 +57,7 @@ export function TransactionDialog({
     postTrigger,
     editTrigger,
     schema,
-    transactTrigger,
-    postRecurringTrigger,
   } = transactionConfig[type] || {};
-
-  const trigger =
-    mode === "edit"
-      ? editTrigger
-      : mode === "transact"
-        ? transactTrigger
-        : recurring
-          ? postRecurringTrigger
-          : postTrigger;
-
-  const { fetchData } = useTriggerFetch(trigger);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const form = useTransactionForm({
@@ -82,6 +73,24 @@ export function TransactionDialog({
     watch,
     formState: { isDirty, isValid },
   } = form;
+
+  // Schedules use the recurring endpoints; everything else uses the per-type ones.
+  // Both hooks are always called (hook order must not change when "recurring" toggles).
+  const { fetchData: transactionFetch } = useTriggerFetch(
+    mode === "edit" ? editTrigger : postTrigger,
+  );
+  const { fetchData: updateRecurringFetch } = useTriggerFetch(
+    useUpdateRecurringMutation,
+  );
+  const { fetchData: postRecurringFetch } = useTriggerFetch(
+    usePostRecurringMutation,
+  );
+
+  const fetchData = form.watch("recurring")
+    ? mode === "edit"
+      ? updateRecurringFetch
+      : postRecurringFetch
+    : transactionFetch;
 
   // ── Submit logic ─────────────────────────────────────────────────────────────
   const { onSubmit, getActionLabel } = useTransactionSubmit({

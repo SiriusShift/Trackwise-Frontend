@@ -13,21 +13,6 @@ export const transactionApi = api
         transformResponse: (response) => response.data,
         providesTags: ["History"],
       }),
-      updateTransactionHistory: builder.mutation({
-        query: ({ data, id }) => ({
-          url: `/transactions/edit/${id}`,
-          method: "PATCH",
-          body: data,
-        }),
-        invalidatesTags: ["History", "Stats"],
-      }),
-      deleteTransactionHistory: builder.mutation({
-        query: (id) => ({
-          url: `/transactions/delete/${id}`,
-          method: "PATCH",
-        }),
-        invalidatesTags: ["History", "Stats"],
-      }),
       getStatistics: builder.query({
         query: (params) => ({
           url: `/transactions/statistics`,
@@ -49,8 +34,6 @@ export const transactionApi = api
 
 export const {
   useGetTransactionHistoryQuery,
-  useUpdateTransactionHistoryMutation,
-  useDeleteTransactionHistoryMutation,
   useGetStatisticsQuery,
   useArchiveTransactionMutation,
 } = transactionApi;

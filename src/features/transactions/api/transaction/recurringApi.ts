@@ -17,7 +17,7 @@ export const expensesApi = api
       updateRecurring: builder.mutation({
         query: ({ data, id }) => ({
           url: `/transactions/recurring/${id}`,
-          method: "PATCH",
+          method: "PUT",
           headers: {
             Accept: "application/json",
           },
@@ -26,10 +26,11 @@ export const expensesApi = api
         invalidatesTags: ["Recurring"],
       }),
 
-      getRecurring: builder.query<Schedule[], void>({
-        query: () => ({
+      getRecurring: builder.query<Schedule[], string | void>({
+        query: (type) => ({
           url: "/transactions/recurring",
           method: "GET",
+          ...(type && { params: { type } }),
         }),
         transformResponse: (response: { data: Schedule[] }) => response.data,
         providesTags: ["Recurring"],

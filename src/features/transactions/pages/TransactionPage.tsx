@@ -337,12 +337,7 @@ const TransactionPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <CommonTracker />{" "}
-          <ScheduledWidget
-            editDescription="Adjust and update your budget limit to match your needs."
-            addDescription="Set a monthly spending limit for your budget category. You'll be notified when you're approaching your limit."
-            title="Budget Limit"
-            type="Expense"
-          />
+          <ScheduledWidget type={type} />
         </div>
 
         <ViewDetailed

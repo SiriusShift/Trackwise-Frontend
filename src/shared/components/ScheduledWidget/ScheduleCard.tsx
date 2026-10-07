@@ -25,7 +25,6 @@ import { Separator } from "../ui/separator";
 interface ScheduleCardProps {
   schedule: Schedule;
   onDelete?: (schedule: Schedule) => void;
-  onView?: (schedule: Schedule) => void;
   count: number;
 }
 
@@ -80,7 +79,6 @@ const TrackerCard = memo(
   ({
     schedule,
     onDelete,
-    onView,
     count,
   }: ScheduleCardProps) => {
     const [open, setOpen] = useState(false);
@@ -174,16 +172,8 @@ const TrackerCard = memo(
                   onClick={() => onDelete?.(schedule)}
                   disabled={!onDelete}
                 >
-                  <Icons.Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={() => onView?.(schedule)}
-                  disabled={!onView}
-                >
-                  <Icons.Eye className="mr-2 h-4 w-4" />
-                  View
+                  <Icons.Ban className="mr-2 h-4 w-4" />
+                  Cancel
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

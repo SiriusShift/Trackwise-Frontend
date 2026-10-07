@@ -226,6 +226,8 @@ export interface Schedule {
   unit?: string;
   interval?: number | string;
   nextDueDate?: string | Date | number;
+  isActive?: boolean;
+  endedAt?: string | Date | null;
 }
 
 export interface Bill {
