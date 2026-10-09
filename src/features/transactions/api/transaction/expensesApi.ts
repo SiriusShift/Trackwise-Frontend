@@ -1,5 +1,4 @@
 import { api } from "@/shared/services/api";
-import { Bill, BillPayment } from "@/shared/types";
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring"] })
@@ -94,59 +93,6 @@ export const expensesApi = api
         transformResponse: (response: any) => response.data,
         providesTags: ["Expenses"],
       }),
-
-      // postAutoPayment: builder.mutation({
-      //   query: ({ data, id }) => ({
-      //     url: `/transactions/expense/pay/auto/${id}`,
-      //     method: "POST",
-      //     body: data,
-      //   }),
-      // }),
-
-      getBills: builder.query<Bill[], { dateFrom?: string; dateTo?: string }>({
-        query: (params) => ({
-          url: "/transactions/expense/bills",
-          method: "GET",
-          params,
-        }),
-        transformResponse: (response: any) => response.data,
-        providesTags: ["Recurring"],
-      }),
-
-      getBill: builder.query({
-        query: (id) => ({
-          url: `/transactions/expense/bills/${id}`,
-          method: "GET",
-        }),
-        transformResponse: (response: any) => response.data,
-        providesTags: ["Recurring"],
-      }),
-
-      getBillPayments: builder.query<BillPayment[], string | undefined>({
-        query: (id) => ({
-          url: `/transactions/expense/bills/${id}/history`,
-          method: "GET",
-        }),
-        transformResponse: (response: any) => response.data,
-        providesTags: ["Recurring"],
-      }),
-
-      postPayment: builder.mutation({
-        query: ({ id, data }) => ({
-          url: `/transactions/expense/bills/${id}/pay`,
-          method: "POST",
-          body: data,
-        }),
-        invalidatesTags: ["Recurring", "Expenses"],
-      }),
-
-      skipPayment: builder.mutation({
-        query: (id) => ({
-          url: `/transactions/expense/bills/${id}/skip`,
-          method: "PATCH",
-        }),
-        invalidatesTags: ["Recurring", "Expenses"],
-      }),
     }),
   });
 
@@ -162,13 +108,4 @@ export const {
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,
   useCancelRecurringExpenseMutation,
-  usePostPaymentMutation,
-  // usePostAutoPaymentMutation,
-  useGetBillsQuery,
-  useLazyGetBillsQuery,
-  useGetBillQuery,
-  useLazyGetBillQuery,
-  useGetBillPaymentsQuery,
-  useLazyGetBillPaymentsQuery,
-  useSkipPaymentMutation,
 } = expensesApi;

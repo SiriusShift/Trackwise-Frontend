@@ -1,41 +1,47 @@
-import { useSkipPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
+import { useSkipRecurringScheduleMutation } from "@/features/transactions/api/transaction/schedulesApi";
 import { commonDialogProps } from "@/shared/types";
+import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import {
+  getNextDuePreview,
+  getScheduleColor,
+  getScheduleIcon,
+} from "@/shared/utils/schedule";
 import * as LucideIcons from "lucide-react";
-import { getLucideIcon } from "@/shared/utils/icons";
 import moment from "moment";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import CommonDialog from "./CommonDialog";
+import { PayTarget } from "./PayDialog";
 
-interface BillDialogProps extends commonDialogProps {
-  data: {
-    category: {
-      color: string;
-      icon: string;
-      name: string;
-    };
-    description: string;
-    nextDueDate: string;
-    id: number;
-  };
+interface SkipDialogProps extends commonDialogProps {
+  data?: PayTarget | null;
 }
 
-const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
-  const Icon = getLucideIcon(data?.category?.icon, LucideIcons.CircleHelp);
-  const pastDue = moment().isAfter(moment(data?.nextDueDate), "day");
+const SkipDialog = ({ open, setOpen, data }: SkipDialogProps) => {
+  const Icon = getScheduleIcon(data);
+  const color = getScheduleColor(data);
+  const pastDue = moment().isAfter(moment(data?.dueDate), "day");
+  const typeLabel = data?.type?.toLowerCase() ?? "transaction";
 
-  const [triggerSkip] = useSkipPaymentMutation();
+  const [triggerSkip, { isLoading }] = useSkipRecurringScheduleMutation();
 
   const onSubmit = async () => {
-    await triggerSkip(data.id);
-    setOpen(false);
+    if (!data) return;
+    try {
+      await triggerSkip(data.id).unwrap();
+      toast.success(`${data.description} skipped for this cycle.`);
+      setOpen(false);
+    } catch (err) {
+      toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+    }
   };
 
   return (
     <CommonDialog
       open={open}
       setOpen={setOpen}
-      title="Skip this bill cycle?"
-      description="This cycle won't be logged as an expense."
+      title="Skip this cycle?"
+      description={`This cycle won't be logged as ${typeLabel === "transfer" ? "a" : "an"} ${typeLabel}.`}
       icon={LucideIcons.SkipForward}
     >
       <div className="p-4 space-y-1">
@@ -43,10 +49,7 @@ const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
           <div className="flex gap-3">
             <div
               className="flex p-3 items-center justify-center rounded-lg"
-              style={{
-                backgroundColor: `${data?.category?.color}20`,
-                color: data?.category?.color,
-              }}
+              style={{ backgroundColor: `${color}20`, color }}
             >
               <Icon className="h-4 w-4" />
             </div>
@@ -60,10 +63,7 @@ const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
                 </span>
                 <span>
                   {pastDue && "was "}
-                  due{" "}
-                  {moment(data?.nextDueDate)
-                    .format("MMMM DD, YYYY")
-                    .toLocaleString()}
+                  due {moment(data?.dueDate).format("MMMM DD, YYYY")}
                 </span>
               </div>
             </div>
@@ -71,25 +71,27 @@ const SkipDialog = ({ open, setOpen, data }: BillDialogProps) => {
         </div>
         <div className="flex text-sm text-muted-foreground items-center gap-1">
           <LucideIcons.X width={15} />
-          <p>No expense will be added to Bills for this cycle</p>
+          <p>No {typeLabel} will be recorded for this cycle</p>
         </div>
         <div className="flex text-sm text-muted-foreground items-center gap-1">
           <LucideIcons.Calendar width={15} />
           <p>
             Next due date moves to{" "}
-            {moment(data?.nextDueDate).add(1, "month").format("MMMM DD, YYYY")}
+            {getNextDuePreview(data?.dueDate, data?.interval, data?.unit)}
           </p>
         </div>
         <div className="flex text-sm text-muted-foreground items-center gap-1">
           <LucideIcons.History width={15} />
-          <p>This will show as Skipped in the bill's payment history</p>
+          <p>This will show as Skipped in the schedule's history</p>
         </div>
       </div>
       <div className="p-4 border-t flex flex-row justify-end gap-2">
         <Button variant={"outline"} onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button onClick={onSubmit}>Skip this cycle</Button>
+        <Button onClick={onSubmit} disabled={isLoading}>
+          {isLoading ? "Skipping..." : "Skip this cycle"}
+        </Button>
       </div>
     </CommonDialog>
   );

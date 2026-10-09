@@ -1,13 +1,31 @@
-import { usePostPaymentMutation } from "@/features/transactions/api/transaction/expensesApi";
+import {
+  usePayCreditStatementMutation,
+  usePayRecurringScheduleMutation,
+} from "@/features/transactions/api/transaction/schedulesApi";
 import { AccountSelect } from "@/features/transactions/components/forms/section/AccountSelect";
 import { cn } from "@/lib/utils";
 import { payRecurringSchema } from "@/schema/schema";
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
-import { commonDialogProps, payRecurringForm } from "@/shared/types";
-import { numberInput } from "@/shared/utils/CustomFunctions";
+import {
+  commonDialogProps,
+  payRecurringForm,
+  ScheduleAccount,
+  ScheduleCategory,
+  ScheduleSource,
+  ScheduleType,
+} from "@/shared/types";
+import {
+  handleCatchErrorMessage,
+  numberInput,
+} from "@/shared/utils/CustomFunctions";
+import {
+  getNextDuePreview,
+  getScheduleColor,
+  getScheduleIcon,
+  scheduleActionLabels,
+} from "@/shared/utils/schedule";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as LucideIcons from "lucide-react";
-import { getLucideIcon } from "@/shared/utils/icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -18,16 +36,45 @@ import { Input } from "../ui/input";
 import CommonDialog from "./CommonDialog";
 import DatePicker from "./DatePicker";
 
-interface PayDialogType extends commonDialogProps {
-  data: any;
+// What is being paid: the current cycle of a recurring schedule, or a credit
+// card statement.
+export interface PayTarget {
+  source: ScheduleSource;
+  id: number;
+  type: ScheduleType;
+  description: string;
+  amount: number;
+  dueDate: string;
+  category?: ScheduleCategory | null;
+  // Account preselected in the form
+  account?: ScheduleAccount | null;
+  // Destination (transfer target / credit card); excluded from the account list
+  toAsset?: ScheduleAccount | null;
+  interval?: number;
+  unit?: string;
 }
+
+interface PayDialogType extends commonDialogProps {
+  data?: PayTarget | null;
+}
+
 function PayDialog({ data, open, setOpen }: PayDialogType) {
   const [openDate, setOpenDate] = useState(false);
   const { data: accountsData } = useGetAccountsQuery();
   const assetData = accountsData?.data;
-  const [triggerPayment, { isLoading }] = usePostPaymentMutation();
+  const [payRecurring, { isLoading: recurringLoading }] =
+    usePayRecurringScheduleMutation();
+  const [payCredit, { isLoading: creditLoading }] =
+    usePayCreditStatementMutation();
+  const isLoading = recurringLoading || creditLoading;
 
-  console.log(data);
+  const isCredit = data?.source === "CREDIT_STATEMENT";
+  const labels = isCredit
+    ? scheduleActionLabels.Expense
+    : scheduleActionLabels[data?.type ?? "Expense"];
+  // Income adds to the account, so there's no balance to run out of.
+  const checksBalance = data?.type !== "Income";
+
   const form = useForm<payRecurringForm>({
     resolver: zodResolver(payRecurringSchema.schema),
     mode: "onChange",
@@ -44,23 +91,30 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
     formState: { isSubmitting, isValid },
   } = form;
 
-  const pastDue = moment().isAfter(moment(data?.nextDueDate), "day");
-  const Icon = getLucideIcon(data?.category?.icon, LucideIcons.CircleHelp);
+  const pastDue = moment().isAfter(moment(data?.dueDate), "day");
+  const Icon = getScheduleIcon(data);
+  const color = getScheduleColor(data);
 
   const onSubmit = async (values: payRecurringForm) => {
-    const { date, account, ...rest } = values;
-
-    await triggerPayment({
-      id: data?.id,
+    if (!data) return;
+    const { date, account, amount } = values;
+    const payload = {
+      id: data.id,
       data: {
-        category: data?.category?.id,
-        description: data?.description,
-        account: account?.id,
-        ...rest,
-        date: moment(date),
+        amount: Number(amount),
+        date: moment(date).toISOString(),
+        account: (account as { id?: number })?.id,
       },
-    });
-    setOpen(false);
+    };
+
+    try {
+      if (isCredit) await payCredit(payload).unwrap();
+      else await payRecurring(payload).unwrap();
+      toast.success(`${data.description} marked as ${labels.done.toLowerCase()}.`);
+      setOpen(false);
+    } catch (err) {
+      toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+    }
   };
 
   const handleAmountChange = (
@@ -68,10 +122,18 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
     field: any,
   ) => {
     const value = Number(e.target.value);
-    const accountBalance = watch("account")?.remainingBalance;
+    const account = watch("account") as
+      | { remainingBalance?: number; category?: string }
+      | undefined;
+    const accountBalance = account?.remainingBalance;
 
-    console.log(value, accountBalance);
-    if (value > accountBalance) {
+    // Credit accounts can go "negative" (charges increase what's owed).
+    if (
+      checksBalance &&
+      account?.category !== "CREDIT" &&
+      accountBalance !== undefined &&
+      value > accountBalance
+    ) {
       toast.error(
         `Amount exceeds the total balance of ${accountBalance.toFixed(2)}`,
       );
@@ -83,33 +145,33 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
   };
 
   useEffect(() => {
+    if (!open) return;
     reset({
-      account: data?.fromAsset,
-      amount: Number(data?.amount),
+      account: assetData?.find(
+        (asset: { id: number }) => asset.id === data?.account?.id,
+      ),
+      amount: Number(data?.amount ?? 0),
       date: moment().toLocaleString(),
     });
-  }, [data]);
+  }, [data, open, assetData, reset]);
 
   return (
     <CommonDialog
       open={open}
       setOpen={setOpen}
-      title="Mark as paid"
-      description="Confirm the payment details before recording this payment."
+      title={labels.title}
+      description="Confirm the details before recording this transaction."
       icon={LucideIcons.CheckCircle2}
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4 p-5">
-            {/* Bill summary */}
+            {/* Summary */}
             <div className="rounded-xl border p-3">
               <div className="flex gap-3">
                 <div
                   className="flex p-3 items-center justify-center rounded-lg"
-                  style={{
-                    backgroundColor: `${data?.category?.color}20`,
-                    color: data?.category?.color,
-                  }}
+                  style={{ backgroundColor: `${color}20`, color }}
                 >
                   <Icon className="h-4 w-4" />
                 </div>
@@ -117,16 +179,19 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                 <div>
                   <p className="text-sm font-bold">{data?.description}</p>
                   <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                    <span className="truncate">{data?.category?.name}</span>
+                    <span className="truncate">
+                      {isCredit
+                        ? data?.toAsset?.name
+                        : data?.type === "Transfer"
+                          ? `To ${data?.toAsset?.name ?? "—"}`
+                          : data?.category?.name}
+                    </span>
                     <span aria-hidden="true" className="shrink-0">
                       ·
                     </span>
                     <span>
                       {pastDue && "was "}
-                      due{" "}
-                      {moment(data?.nextDueDate)
-                        .format("MMMM DD, YYYY")
-                        .toLocaleString()}
+                      due {moment(data?.dueDate).format("MMMM DD, YYYY")}
                     </span>
                   </div>
                 </div>
@@ -139,7 +204,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
               control={control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount paid</FormLabel>
+                  <FormLabel>{labels.amount}</FormLabel>
 
                   <FormControl>
                     <div className="relative">
@@ -159,8 +224,9 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                     </div>
                   </FormControl>
                   <p className="text-xs text-muted-foreground">
-                    Default is the scheduled amount. Edit if the actual bill
-                    differs.
+                    {isCredit
+                      ? "Default is the remaining statement balance. Pay less for a partial payment."
+                      : "Default is the scheduled amount. Edit if the actual amount differs."}
                   </p>
                   <FormMessage />
                 </FormItem>
@@ -173,7 +239,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                 name="date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col flex-1">
-                    <FormLabel>Date paid</FormLabel>
+                    <FormLabel>{labels.date}</FormLabel>
                     <Button
                       variant="outline"
                       type="button"
@@ -199,25 +265,31 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
               />
               <AccountSelect
                 name="account"
-                label="Account"
+                label={
+                  data?.type === "Income"
+                    ? "To account"
+                    : data?.type === "Transfer" || isCredit
+                      ? "From account"
+                      : "Account"
+                }
                 assets={assetData ?? []}
                 control={control}
+                excludeId={data?.toAsset?.id}
               />
             </div>
-            <div className="rounded-lg border p-3">
-              <div className="flex flex-row justify-between gap-3">
-                <div className="flex flex-row items-center text-muted-foreground gap-2">
-                  <LucideIcons.Calendar className="h-3 w-3" />
-                  <p className="text-xs font-bold">Next due after payment</p>
+            {!isCredit && (
+              <div className="rounded-lg border p-3">
+                <div className="flex flex-row justify-between gap-3">
+                  <div className="flex flex-row items-center text-muted-foreground gap-2">
+                    <LucideIcons.Calendar className="h-3 w-3" />
+                    <p className="text-xs font-bold">Next due after this</p>
+                  </div>
+                  <p className="text-xs font-bold">
+                    {getNextDuePreview(data?.dueDate, data?.interval, data?.unit)}
+                  </p>
                 </div>
-                <p className="text-xs font-bold">
-                  {moment(data?.nextDueDate)
-                    .add(1, "month")
-                    .format("MMMM DD, YYYY")
-                    .toLocaleString()}
-                </p>
               </div>
-            </div>
+            )}
           </div>
           <div className="flex justify-end gap-2 p-3 border-t">
             <Button
@@ -233,7 +305,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
               type="submit"
               disabled={isSubmitting || isLoading || !isValid}
             >
-              {isSubmitting || isLoading ? "Recording..." : "Confirm Payment"}
+              {isSubmitting || isLoading ? "Recording..." : `Confirm`}
             </Button>
           </div>
         </form>

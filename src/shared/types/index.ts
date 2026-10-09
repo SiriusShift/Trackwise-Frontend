@@ -230,25 +230,96 @@ export interface Schedule {
   endedAt?: string | Date | null;
 }
 
-export interface Bill {
-  id: string;
-  amount: number;
-  description: string;
-  nextDueDate: string;
-  category?: {
-    id?: number;
-    name?: string;
-    color?: string;
-    icon?: string;
-  };
+// An item from /transactions/schedules: a recurring transaction cycle or a
+// credit card statement, normalized to one shape.
+export type ScheduleSource = "RECURRING" | "CREDIT_STATEMENT";
+
+export interface ScheduleAccount {
+  id: number;
+  name: string;
+  category?: string;
+  color?: string | null;
+  remainingBalance?: number | null;
 }
 
-export interface BillPayment {
+export interface ScheduleCategory {
+  id?: number;
+  name?: string;
+  color?: string;
+  icon?: string;
+}
+
+export interface ScheduledItem {
+  key: string;
+  source: ScheduleSource;
+  // RecurringTransaction id or CreditStatement id; null for a projected statement
+  sourceId: number | null;
+  type: ScheduleType;
+  description: string;
+  amount: number;
+  dueDate: string;
+  behaviour?: "AUTO_LOG" | "REMIND";
+  interval?: number;
+  unit?: string;
+  category?: ScheduleCategory | null;
+  fromAsset?: ScheduleAccount | null;
+  toAsset?: ScheduleAccount | null;
+  // Credit statements only
+  status?: string | null;
+  statementDate?: string;
+  statementBalance?: number;
+  minimumPaymentDue?: number;
+  amountPaid?: number;
+  // A future cycle shown for planning; it can't be paid/skipped yet
+  projected: boolean;
+  // Needs the user to pay/skip it (REMIND, or a failed AUTO_LOG)
+  actionable: boolean;
+  needsAttention: boolean;
+  failureReason?: string | null;
+}
+
+export interface RecurringScheduleDetail {
+  id: number;
+  source: "RECURRING";
+  type: ScheduleType;
+  description: string;
+  amount: number;
+  dueDate: string;
+  nextDueDate: string;
+  startDate: string;
+  endDate?: string | null;
+  interval: number;
+  unit: string;
+  behaviour: "AUTO_LOG" | "REMIND";
+  category?: ScheduleCategory | null;
+  account?: ScheduleAccount | null;
+  fromAsset?: ScheduleAccount | null;
+  toAsset?: ScheduleAccount | null;
+}
+
+export interface ScheduleHistoryEntry {
+  key: string;
   id: number;
   amount: number;
   date: string;
   status: string;
-  recurringDueDate?: string;
+  dueDate?: string | null;
+}
+
+export interface CreditStatementDetail extends ScheduledItem {
+  id: number;
+  currentBalance?: number | null;
+  creditLimit: number;
+  interestCharged: number;
+  lateFeeCharged: number;
+  fees: { id: number; label: string; amount: number }[];
+  payments: {
+    id: number;
+    amount: number;
+    date: string;
+    description?: string | null;
+    fromAsset?: ScheduleAccount | null;
+  }[];
 }
 
 export interface StackedBarSegment {

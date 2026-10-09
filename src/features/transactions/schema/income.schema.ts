@@ -19,36 +19,30 @@ export const incomeSchema = {
       amount: amountField,
       date: requiredDate("Date is required"),
       image: z.any(),
+      account: requiredObject("Account is required"),
       endDate: optionalDate,
       behaviour: optionalString,
-      account: optionalObject,
       mode: optionalString,
-      repeat: optionalObject,
+      frequency: optionalString,
+      every: optionalString,
     })
-    // Keep form-only fields (id, recurring, auto, balance...) in submitted values
+    // Keep form-only fields (id, recurring, repeat, balance...) in submitted values
     .passthrough()
     .superRefine((data, ctx) => {
-      if (data.recurring === true) {
-        requireFields(data, ctx, {
-          behaviour: "Mode is required",
-          mode: "Mode is required",
-          repeat: "Repeat is required",
-        });
-      }
-
-      const needsAccount =
-        (data.recurring && data.auto) ||
-        (!data.recurring && moment(data.date).isSameOrBefore(moment()));
-      if (needsAccount) {
-        requireFields(data, ctx, { account: "Destination is required" });
-      }
+      if (data.recurring !== true) return;
+      requireFields(data, ctx, {
+        behaviour: "Mode is required",
+        frequency: "Repeat is required",
+        every: "Unit is required",
+      });
     }),
   defaultValues: {
     category: null,
     description: "",
-    amount: "",
+    amount: 0,
     recurring: false,
-    date: new Date(),
+    date: moment(),
+    endDate: null,
     account: null,
     image: null,
     behaviour: null,

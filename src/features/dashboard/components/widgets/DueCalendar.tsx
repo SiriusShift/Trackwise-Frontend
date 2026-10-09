@@ -1,7 +1,7 @@
 import { IRootState } from "@/app/store";
-import { useGetBillsQuery } from "@/features/transactions/api/transaction/expensesApi";
+import { useGetSchedulesQuery } from "@/features/transactions/api/transaction/schedulesApi";
 import { cn } from "@/lib/utils";
-import BillDialog from "@/shared/components/dialog/BillDialog/BillDialog";
+import ScheduleDialog from "@/shared/components/dialog/ScheduleDialog/ScheduleDialog";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import * as Icons from "lucide-react";
@@ -9,8 +9,12 @@ import moment from "moment";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Bill } from "@/shared/types";
-import { getLucideIcon } from "@/shared/utils/icons";
+import { ScheduledItem } from "@/shared/types";
+import {
+  getAmountPrefix,
+  getScheduleIcon,
+  getScheduleSubtitle,
+} from "@/shared/utils/schedule";
 
 const PESO_LOCALE = "en-PH";
 
@@ -50,34 +54,37 @@ export const getStatus = (date?: moment.MomentInput) => {
   };
 };
 
-// Returns a lucide-react icon component for a given icon name, falling back
-// to Banknote when the category/icon is missing or unrecognized.
-const getCategoryIcon = (iconName?: string) =>
-  getLucideIcon(iconName, Icons.Banknote);
-
 const formatCurrency = (amount: number) =>
   `₱${Number(amount ?? 0).toLocaleString(PESO_LOCALE)}`;
 
 export default function DueCalendar() {
   const [open, setOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [selectedBill, setSelectedBill] = useState<ScheduledItem | null>(null);
 
   const active = useSelector((state: IRootState) => state.active.active);
 
-  const { data, isLoading } = useGetBillsQuery({
+  // Everything that needs the user (bills, income to confirm, transfers,
+  // credit card statements) up to the end of the active period, incl. overdue.
+  const { data, isLoading } = useGetSchedulesQuery({
     dateTo: active.to,
+    actionable: true,
   });
 
   const upcomingBills = data?.slice(0, 2) ?? [];
   const remaining = Math.max((data?.length ?? 0) - 2, 0);
   const remainingEmpty = Math.max(2 - (data?.length ?? 0), 0);
+  // Net cash effect of the hidden items: income adds, expenses subtract.
+  // Transfers only move money between accounts, so they don't change it.
   const totalRemaining =
-    data?.slice(2)?.reduce((sum, p) => sum + Number(p.amount ?? 0), 0) ?? 0;
+    data?.slice(2)?.reduce((sum, p) => {
+      const amount = Number(p.amount ?? 0);
+      if (p.type === "Income") return sum + amount;
+      if (p.type === "Expense") return sum - amount;
+      return sum;
+    }, 0) ?? 0;
   const previewBills = data?.slice(2, 3) ?? [];
 
-  console.log(previewBills);
-
-  const handleOpenBill = (bill: Bill) => {
+  const handleOpenBill = (bill: ScheduledItem) => {
     setSelectedBill(bill);
     setOpen(true);
   };
@@ -125,7 +132,7 @@ export default function DueCalendar() {
         <CardHeader className="flex flex-row w-full justify-between p-0">
           <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground flex flex-row gap-1 items-center">
             <h1 className="text-sm font-semibold uppercase tracking-widest">
-              Payment Due
+              Transactions Due
             </h1>
             {isLoading ? (
               <Skeleton className="w-20 h-3 mt-1" />
@@ -133,7 +140,7 @@ export default function DueCalendar() {
               <>
                 <span>•</span>
                 <p className="text-[11px] font-medium text-muted-foreground">
-                  {data?.length ?? 0} bill
+                  {data?.length ?? 0} item
                   {data?.length !== 1 ? "s" : ""}
                 </p>
               </>
@@ -147,9 +154,9 @@ export default function DueCalendar() {
           </Link>
         </CardHeader>
 
-        {/* Body — centers content vertically when only 1 bill */}
+        {/* Body — centers content vertically when only 1 item */}
         <div className="flex-1 flex flex-col justify-start gap-2 mt-4">
-          {/* Bill list */}
+          {/* Due list */}
           {isLoading ? (
             <div className="space-y-3">
               {[...Array(2)].map((_, i) => (
@@ -172,13 +179,13 @@ export default function DueCalendar() {
           ) : upcomingBills.length > 0 ? (
             <div className="space-y-3">
               {upcomingBills.map((bill) => {
-                const status = getStatus(bill.nextDueDate);
-                const dueDate = moment(bill.nextDueDate);
-                const IconComponent = getCategoryIcon(bill.category?.icon);
+                const status = getStatus(bill.dueDate);
+                const dueDate = moment(bill.dueDate);
+                const IconComponent = getScheduleIcon(bill);
 
                 return (
                   <Card
-                    key={bill.id}
+                    key={bill.key}
                     className="flex items-center cursor-pointer gap-4 p-2 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors"
                     onClick={() => handleOpenBill(bill)}
                   >
@@ -201,13 +208,14 @@ export default function DueCalendar() {
                           {bill.description}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {bill.category?.name}
+                      <p className="text-xs text-muted-foreground truncate">
+                        {getScheduleSubtitle(bill)}
                       </p>
                     </div>
 
                     <div className="shrink-0 flex flex-col items-end gap-1.5">
                       <span className="text-sm font-bold">
+                        {getAmountPrefix(bill.type)}
                         {formatCurrency(bill.amount)}
                       </span>
                       <span
@@ -233,7 +241,7 @@ export default function DueCalendar() {
                   All caught up
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  No pending bills at the moment.
+                  Nothing is waiting on you right now.
                 </p>
               </div>
             </div>
@@ -257,7 +265,7 @@ export default function DueCalendar() {
                 {/* Text */}
                 <div className="flex-1">
                   <p className="text-sm font-medium text-muted-foreground">
-                    No upcoming bill
+                    Nothing else due
                   </p>
                   <p className="text-xs text-muted-foreground/70">
                     You're all caught up.
@@ -275,12 +283,11 @@ export default function DueCalendar() {
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-1.5">
                   {previewBills.map((p) => {
-                    const LucidIcon = getCategoryIcon(p.category?.icon);
-                    const isDue = moment(p?.nextDueDate).isBefore(moment());
-                    console.log(isDue, "DUE");
+                    const LucidIcon = getScheduleIcon(p);
+                    const isDue = moment(p?.dueDate).isBefore(moment());
                     return (
                       <span
-                        key={p.id}
+                        key={p.key}
                         className={`w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center text-[9px] ${isDue ? "border border-destructive" : ""}`}
                       >
                         <LucidIcon
@@ -293,17 +300,18 @@ export default function DueCalendar() {
                   })}
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  +{remaining} more bill{remaining !== 1 ? "s" : ""}
+                  +{remaining} more transaction{remaining !== 1 ? "s" : ""}
                 </span>
               </div>
               <span className="text-xs font-semibold tabular-nums text-muted-foreground group-hover:text-foreground transition-colors">
-                {formatCurrency(totalRemaining)}
+                {totalRemaining > 0 ? "+" : totalRemaining < 0 ? "−" : ""}
+                {formatCurrency(Math.abs(totalRemaining))}
               </span>
             </div>
           )}
         </div>
       </Card>
-      <BillDialog open={open} setOpen={setOpen} data={selectedBill} />
+      <ScheduleDialog open={open} setOpen={setOpen} data={selectedBill} />
     </>
   );
 }

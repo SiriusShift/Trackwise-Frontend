@@ -10,8 +10,8 @@ import { useLocation } from "react-router-dom";
 import DueCalendar from "../components/widgets/DueCalendar";
 import ExpenseWidget from "../components/widgets/ExpenseWidget";
 import IncomeWidget from "../components/widgets/IncomeWidget";
-import LoanBalance from "../components/widgets/LoanWidget";
 import SavingsPlan from "../components/widgets/SavingsWidget";
+import BudgetWidget from "../components/widgets/BudgetWidget";
 export const description = "Loan Payment Progress Chart";
 
 const Dashboard = () => {
@@ -47,7 +47,7 @@ const Dashboard = () => {
               <DueCalendar />
             </div>
             <div className="gap-5 space-y-5 sm:space-y-0 sm:grid-rows-2 md:grid-rows-2 xl:grid-rows-1 sm:grid grid-cols-4 xl:grid-cols-3">
-              <LoanBalance />
+              <BudgetWidget />
               <SavingsPlan />
               <TransactionHistory />
             </div>
