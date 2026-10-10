@@ -31,6 +31,15 @@ const signInApi = api.injectEndpoints({
                 credentials: 'include'
             }),
         }),
+        postGoogleOneTap: builder.mutation<SigninResponse, { credential: string }>({
+            query: (payload) => ({
+                url: "/auth/google/one-tap",
+                method: "POST",
+                headers: { Accept: "application/json" },
+                body: payload,
+                credentials: 'include'
+            }),
+        }),
         postForgotPassword: builder.mutation({
             query: (payload) => ({
                 url: "/auth/forgot-password",
@@ -75,4 +84,4 @@ const signInApi = api.injectEndpoints({
     }),
 });
 
-export const { usePostSigninMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery, useLazyGetAuthStatusQuery, useLazyGetSignoutQuery } = signInApi;
+export const { usePostSigninMutation, usePostGoogleOneTapMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery, useLazyGetAuthStatusQuery, useLazyGetSignoutQuery } = signInApi;

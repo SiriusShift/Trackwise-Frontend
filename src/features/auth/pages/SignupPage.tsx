@@ -21,10 +21,21 @@ import {
 } from "../../../shared/utils/CustomFunctions";
 import { signupSchema } from "../schema/authSchema";
 // import { setSignup } from "../feature/authentication/reducers/signupSlice";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import moment from "moment-timezone";
 import LayoutAuth from "../../../layout/AuthLayout";
 import { usePostSignupMutation, usePostVerifyMutation } from "../api/signupApi";
+
+const passwordChecks = [
+  { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
+  { label: "One lowercase letter", test: (v: string) => /[a-z]/.test(v) },
+  { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "One number", test: (v: string) => /\d/.test(v) },
+  {
+    label: "One special character (!@#$%^&*()_+)",
+    test: (v: string) => /[!@#$%^&*()_+]/.test(v),
+  },
+];
 
 const signUp = () => {
   const [isVerifying, setIsVerifying] = useState(false);
@@ -50,6 +61,10 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
     mode: "onChange",
     defaultValues: signupSchema.defaultValues,
   });
+
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const passwordField = register("password");
+  const passwordValue = watch("password") || "";
 
   const submitSignup = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -153,15 +168,42 @@ const handleGoogleSignup = () => {
               )}
             </div>
             <div className="gap-5 flex flex-col">
-              <div>
+              <div className="relative">
                 <Input
                   placeholder="Password"
                   type="password"
                   className={`w-full sm:w-96`}
-                  {...register("password")}
+                  {...passwordField}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={(e) => {
+                    passwordField.onBlur(e);
+                    setPasswordFocused(false);
+                  }}
                   aria-invalid={errors.password ? "true" : "false"}
                 />
-                {errors.password && (
+                {passwordFocused && (
+                  <ul className="absolute z-10 mt-2 w-full sm:w-96 rounded-md border bg-card p-3 shadow-md text-sm flex flex-col gap-1">
+                    {passwordChecks.map((check) => {
+                      const passed = check.test(passwordValue);
+                      return (
+                        <li
+                          key={check.label}
+                          className={`flex items-center gap-2 ${
+                            passed ? "text-green-600" : "text-gray-500"
+                          }`}
+                        >
+                          {passed ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <X className="h-4 w-4" />
+                          )}
+                          {check.label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                {!passwordFocused && errors.password && (
                   <p className="text-red-500 text-sm">
                     {errors.password.message}
                   </p>
@@ -175,11 +217,11 @@ const handleGoogleSignup = () => {
                 {isLoading ? <Loader2 className="animate-spin" /> : "Signup"}
               </Button>
               <div className="relative flex w-full items-center">
-                <div className="flex-grow border-t border-gray-400"></div>
-                <span className="flex-shrink text-xs mx-4 text-gray-400">
+                <div className="grow border-t border-gray-400"></div>
+                <span className="shrink text-xs mx-4 text-gray-400">
                   OR CONTINUE WITH
                 </span>
-                <div className="flex-grow border-t border-gray-400"></div>
+                <div className="grow border-t border-gray-400"></div>
               </div>
               <Button
                 variant={"outline"}

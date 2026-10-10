@@ -3,6 +3,7 @@
 import Google from "@/assets/images/Google.svg";
 import {
   useGetAuthStatusQuery,
+  usePostGoogleOneTapMutation,
   usePostSigninMutation,
 } from "@/features/auth/api/signinApi";
 import LayoutAuth from "@/layout/AuthLayout";
@@ -23,6 +24,7 @@ const SignInPage = () => {
   const location = useLocation();
   const [cookies] = useCookies(["user"]);
   const [postSignin, { isLoading: signinLoading }] = usePostSigninMutation();
+  const [postGoogleOneTap] = usePostGoogleOneTapMutation();
 
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
@@ -47,6 +49,45 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
       router("/"); // Redirect to home if already authenticated
     }
   }, [data, router]);
+
+  // Google One Tap
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || isLoading || data?.authenticated) return;
+
+    const init = () => {
+      const google = (window as any).google;
+      if (!google?.accounts?.id) return;
+      google.accounts.id.initialize({
+        client_id: clientId,
+        auto_select: false,
+        cancel_on_tap_outside: false,
+        use_fedcm_for_prompt: true,
+        callback: async ({ credential }: { credential: string }) => {
+          try {
+            await postGoogleOneTap({ credential }).unwrap();
+            window.location.href = "/";
+          } catch (err) {
+            toast.error(handleCatchErrorMessage(err));
+          }
+        },
+      });
+      google.accounts.id.prompt();
+    };
+
+    if ((window as any).google?.accounts?.id) {
+      init();
+      return () => (window as any).google?.accounts?.id?.cancel();
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = init;
+    document.head.appendChild(script);
+    return () => (window as any).google?.accounts?.id?.cancel();
+  }, [isLoading, data?.authenticated, postGoogleOneTap]);
 
   useEffect(() => {
     if (errorStatus) {
@@ -118,11 +159,11 @@ const handleGoogleLogin = () => {
               </Button>
             </div>
             <div className="relative flex py-3 w-full sm:w-full items-center">
-              <div className="flex-grow border-t border-gray-400"></div>
-              <span className="flex-shrink text-xs mx-4 text-gray-400">
+              <div className="grow border-t border-gray-400"></div>
+              <span className="shrink text-xs mx-4 text-gray-400">
                 OR CONTINUE WITH
               </span>
-              <div className="flex-grow border-t border-gray-400"></div>
+              <div className="grow border-t border-gray-400"></div>
             </div>
             <Button
               type="button"
