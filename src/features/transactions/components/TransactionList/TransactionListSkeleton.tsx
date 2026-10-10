@@ -5,7 +5,7 @@ const TransactionListSkeleton = () => {
   return (
     <Card className="w-full rounded-md h-[100px] p-3">
       <div className="flex items-center w-full">
-        <Skeleton className="w-12 h-12 border rounded-md flex-shrink-0" />
+        <Skeleton className="w-12 h-12 border rounded-md shrink-0" />
         <div className="ml-3 flex-1 min-w-0">
           <div className="flex justify-between items-start">
             <Skeleton className="h-5 w-36" />

@@ -43,7 +43,7 @@ function SavingsPlan() {
   return (
     <Card
       className=" relative overflow-hidden border border-border/60 bg-card
-        flex flex-col p-5 rounded-2xl shadow-sm col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
+        flex flex-col p-5 rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
         transition-shadow hover:shadow-md"
   //     style={{
   //       backgroundImage: `
@@ -108,7 +108,7 @@ function SavingsPlan() {
             const pct = ((plan.saved / plan.goal) * 100).toFixed(1);
             return (
               <div key={plan.name} className="py-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-base flex-shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-base shrink-0">
                   {plan.icon}
                 </div>
 
@@ -162,7 +162,7 @@ function SavingsPlan() {
         </div>
 
         {/* Icon */}
-        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm">
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-xs">
           <Construction className="w-5 h-5 text-yellow-500" />
         </div>
 

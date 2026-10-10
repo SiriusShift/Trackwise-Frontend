@@ -214,7 +214,7 @@ export const ConfirmProvider = ({
                 </DialogTitle>
 
                 {options.description && (
-                  <DialogDescription className="break-words">
+                  <DialogDescription className="wrap-break-word">
                     {options.description}
                   </DialogDescription>
                 )}

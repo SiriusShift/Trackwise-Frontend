@@ -166,7 +166,7 @@ function BudgetWidget() {
   const overall = getStatus(totals.percent);
 
   return (
-    <Card className="gap-4 relative overflow-hidden border border-border/60 bg-card p-5 flex flex-col rounded-2xl shadow-sm col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1 transition-shadow hover:shadow-md">
+    <Card className="gap-4 relative overflow-hidden border border-border/60 bg-card p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1 transition-shadow hover:shadow-md">
       <CardHeader className="space-y-0 p-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base font-semibold uppercase tracking-widest">

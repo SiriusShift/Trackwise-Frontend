@@ -52,7 +52,7 @@ const TrackerCard = ({
     <>
       <CarouselItem
         className={cn(
-          count > 1 ? "basis-[90%]" : "basis-[100%]",
+          count > 1 ? "basis-[90%]" : "basis-full",
           "2xl:basis-1/2",
         )}
       >

@@ -69,7 +69,7 @@ export function FormColorPicker<T extends FieldValues>({
                     onClick={() => field.onChange(hex)}
                     className={cn(
                       "h-6 w-6 rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
                       field.value === hex
                         ? "ring-2 ring-primary"
                         : "ring-1 ring-border",
@@ -85,7 +85,7 @@ export function FormColorPicker<T extends FieldValues>({
                       title={isCustomColor ? field.value : "Custom color"}
                       className={cn(
                         "flex h-6 w-6 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition-shadow",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
                         isCustomColor
                           ? "ring-2 ring-primary"
                           : "ring-1 ring-border",
@@ -97,7 +97,7 @@ export function FormColorPicker<T extends FieldValues>({
                       }}
                     >
                       {!isCustomColor && (
-                        <Plus className="h-3 w-3 text-white drop-shadow" />
+                        <Plus className="h-3 w-3 text-white drop-shadow-sm" />
                       )}
                     </button>
                   </PopoverTrigger>

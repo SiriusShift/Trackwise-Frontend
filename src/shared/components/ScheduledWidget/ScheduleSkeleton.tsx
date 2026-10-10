@@ -5,7 +5,7 @@ import { Skeleton } from "../ui/skeleton";
 const ScheduleSkeleton = ({ count }: { count: number }) => {
   return (
     <CarouselItem
-      className={`${count > 1 ? "basis-[90%]" : "basis-[100%]"} xl:basis-1/2 flex-1`}
+      className={`${count > 1 ? "basis-[90%]" : "basis-full"} xl:basis-1/2 flex-1`}
     >
       <Card className="h-full">
         {" "}

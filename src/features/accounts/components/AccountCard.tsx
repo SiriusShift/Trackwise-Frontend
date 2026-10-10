@@ -96,7 +96,7 @@ const AccountCard = ({
       <Icon
         aria-hidden
         style={ghostStyle}
-        className="pointer-events-none absolute -bottom-6 -right-6 h-32 w-32 rotate-[-12deg] transition-transform duration-300 group-hover:rotate-[-6deg] group-hover:scale-105"
+        className="pointer-events-none absolute -bottom-6 -right-6 h-32 w-32 -rotate-12 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"
         strokeWidth={1.5}
       />
       <Button

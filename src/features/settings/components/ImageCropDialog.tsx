@@ -98,7 +98,7 @@ const ImageCropDialog = ({
         </div>
       </div>
 
-      <div className="sticky -mx-0 flex justify-end gap-2 border-t bg-background px-6 py-2">
+      <div className="sticky mx-0 flex justify-end gap-2 border-t bg-background px-6 py-2">
         <Button
           type="button"
           variant="outline"

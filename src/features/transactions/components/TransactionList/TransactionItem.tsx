@@ -43,13 +43,13 @@ const TransactionItem = React.memo(function TransactionItem({
       key={`${item.id}-${index}`}
       // variants={itemVariants}
       onClick={handleClick}
-      className="flex flex-col border rounded-lg hover:shadow-sm transition-all duration-200 cursor-pointer bg-card hover:bg-muted/50 p-3"
+      className="flex flex-col border rounded-lg hover:shadow-xs transition-all duration-200 cursor-pointer bg-card hover:bg-muted/50 p-3"
       {...longPressProps}
     >
       {/* Top row: icon + main info */}
       <div className="flex items-center w-full">
         {/* Icon */}
-        <div className="p-2 border rounded-md w-12 h-12 flex-shrink-0 flex justify-center items-center">
+        <div className="p-2 border rounded-md w-12 h-12 shrink-0 flex justify-center items-center">
           <LucidIcon className="text-foreground" width={25} height={25} />
         </div>
 

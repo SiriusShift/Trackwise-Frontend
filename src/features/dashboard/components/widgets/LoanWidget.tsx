@@ -10,7 +10,7 @@ function LoanBalance() {
   return (
     <Card
       className="gap-4        relative overflow-hidden border border-border/60 bg-card
-        p-5 flex flex-col rounded-2xl shadow-sm col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
+        p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
         transition-shadow hover:shadow-md"
       //     style={{
       //       backgroundImage: `
@@ -51,7 +51,7 @@ function LoanBalance() {
         </div>
 
         {/* Icon */}
-        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-sm">
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-xs">
           <Construction className="w-5 h-5 text-yellow-500" />
         </div>
 

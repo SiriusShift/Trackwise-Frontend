@@ -122,7 +122,7 @@ const WidgetLayout = ({
       onMouseMove={handleMouseMove}
       className={cn(
         `relative overflow-hidden border border-border/60 bg-card
-    p-5 flex flex-col rounded-2xl shadow-sm col-span-full
+    p-5 flex flex-col rounded-2xl shadow-xs col-span-full
     ${isOverview ? "md:col-span-2" : "md:col-span-1"}
     xl:col-span-2 2xl:col-span-1
     transition-shadow hover:shadow-md group`,

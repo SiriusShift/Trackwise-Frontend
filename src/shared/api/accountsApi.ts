@@ -40,8 +40,8 @@ export const accountsApi = api
         })
       }),
       updateAccount: builder.mutation({
-        query: (body) => ({
-          url: "/assets",
+        query: ({ id, ...body }) => ({
+          url: `/assets/${id}`,
           method: "PUT",
           headers: {
             Accept: "application/json",

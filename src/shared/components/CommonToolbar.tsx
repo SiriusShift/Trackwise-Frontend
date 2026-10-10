@@ -138,7 +138,7 @@ const CommonToolbar = () => {
 
       {showActionTab && (
         <div
-          className="fixed inset-0 z-40 bg-black/5 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/5 backdrop-blur-xs"
           onClick={() => dispatch(setActionShow(false))}
         />
       )}

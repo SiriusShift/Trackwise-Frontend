@@ -77,7 +77,7 @@ export const InfoRow = ({
         )}
       </div>
     ) : (
-      <p className="font-medium break-words text-sm">{(value as ReactNode) || "N/A"}</p>
+      <p className="font-medium wrap-break-word text-sm">{(value as ReactNode) || "N/A"}</p>
     )}
   </div>
 );

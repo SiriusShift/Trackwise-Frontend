@@ -191,7 +191,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-3">
         <SidebarMenuButton
           variant="ghost"
-          className="lg:flex ms-1 justify-start lg:w-full rounded w-[100%]"
+          className="lg:flex ms-1 justify-start lg:w-full rounded w-full"
           onClick={handleLogout}
         >
           <LogOut />

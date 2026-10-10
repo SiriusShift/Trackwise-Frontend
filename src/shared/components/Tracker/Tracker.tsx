@@ -74,7 +74,7 @@ function Tracker() {
   };
 
   return (
-    <Card className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md">
+    <Card className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 right-0 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
@@ -96,7 +96,7 @@ function Tracker() {
           </div>
 
           <Button
-            className="shadow-sm h-9 transition-all hover:scale-[1.02]"
+            className="shadow-xs h-9 transition-all hover:scale-[1.02]"
             onClick={() => setOpen(true)}
             variant="ghost"
           >

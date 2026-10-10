@@ -24,7 +24,7 @@ function TransactionIcon({ icon }: { icon?: string }) {
     | undefined;
   if (!LucidIcon) return null;
   return (
-    <div className="w-9 h-9 rounded-lg flex-shrink-0 flex justify-center items-center bg-muted border border-border/60">
+    <div className="w-9 h-9 rounded-lg shrink-0 flex justify-center items-center bg-muted border border-border/60">
       <LucidIcon className="text-muted-foreground" width={16} height={16} />
     </div>
   );
@@ -70,7 +70,7 @@ const TransactionHistory = () => {
 
   return (
     <Card
-      className="relative border border-border/60 p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-sm col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
+      className="relative border border-border/60 p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
       // style={{
       //   backgroundImage: `
       //     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
@@ -79,7 +79,7 @@ const TransactionHistory = () => {
       // }}
     >
       {/* Top accent */}
-      {/* <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" /> */}
+      {/* <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" /> */}
 
       <CardHeader className="p-0">
         <div className="flex justify-between items-center">
@@ -100,7 +100,7 @@ const TransactionHistory = () => {
           <div className="space-y-3 py-1">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
-                <Skeleton className="w-9 h-9 rounded-lg flex-shrink-0" />
+                <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
                 <div className="flex-1 space-y-1.5">
                   <Skeleton className="h-3.5 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
@@ -145,7 +145,7 @@ const TransactionHistory = () => {
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                <div className="flex flex-col items-end gap-0.5 shrink-0">
                   <AmountLabel
                     type={item?.type}
                     amount={item?.amount}

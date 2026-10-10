@@ -38,10 +38,10 @@ export const ImageAttachment = ({ value, onChange }: ImageAttachmentProps) => {
               <img
                 src={previewUrl}
                 alt="Attachment preview"
-                className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded flex-shrink-0"
+                className="h-16 w-16 sm:w-[85px] sm:h-[85px] object-cover rounded shrink-0"
               />
             ) : (
-              <div className="w-[85px] h-[85px] flex-shrink-0 flex items-center justify-center border rounded text-center text-xs text-muted-foreground">
+              <div className="w-[85px] h-[85px] shrink-0 flex items-center justify-center border rounded text-center text-xs text-muted-foreground">
                 No image
               </div>
             )}

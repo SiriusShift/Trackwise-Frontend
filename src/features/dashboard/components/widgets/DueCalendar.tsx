@@ -104,7 +104,7 @@ export default function DueCalendar() {
         onMouseMove={handleMouseMove}
         className={cn(
           `relative overflow-hidden border border-border/60 bg-card
-    p-5 flex flex-col rounded-2xl shadow-sm  col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
+    p-5 flex flex-col rounded-2xl shadow-xs  col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
     transition-shadow hover:shadow-md group`,
         )}
       >
@@ -189,7 +189,7 @@ export default function DueCalendar() {
                     className="flex items-center cursor-pointer gap-4 p-2 rounded-xl border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors"
                     onClick={() => handleOpenBill(bill)}
                   >
-                    <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-sm">
+                    <div className="shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-background border border-border/60 shadow-xs">
                       <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
                         {dueDate.format("MMM")}
                       </span>

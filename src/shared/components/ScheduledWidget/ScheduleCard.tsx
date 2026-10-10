@@ -134,7 +134,7 @@ const TrackerCard = memo(
     return (
       <>
         <CarouselItem
-          className={`${count > 1 ? "basis-[90%]" : "basis-[100%]"} 2xl:basis-1/2`}
+          className={`${count > 1 ? "basis-[90%]" : "basis-full"} 2xl:basis-1/2`}
         >
           <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-[120px]">
             {/* ── Left accent bar ───────────────────────────────────── */}

@@ -164,7 +164,7 @@ export function StackedBar({
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <span
-                      className="inline-block h-2 w-2 rounded-full flex-shrink-0"
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
                       style={{ background: seg.color }}
                     />
                     <p className="font-medium text-foreground">{seg.label}</p>
@@ -208,7 +208,7 @@ export function StackedBar({
           {segments?.map((seg) => (
             <div key={seg.label} className="flex items-center gap-1.5">
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full flex-shrink-0"
+                className="inline-block h-1.5 w-1.5 rounded-full shrink-0"
                 style={{ background: seg.color }}
               />
               <span className="text-[11px] text-muted-foreground leading-none">
