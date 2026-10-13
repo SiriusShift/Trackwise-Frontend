@@ -2,7 +2,7 @@ import { api } from "@/shared/services/api";
 import { Schedule } from "@/shared/types";
 
 export const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Recurring"] })
+  .enhanceEndpoints({ addTagTypes: ["Recurring", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       postRecurring: builder.mutation({
@@ -11,7 +11,7 @@ export const expensesApi = api
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Recurring"],
+        invalidatesTags: ["Recurring", "Schedules"],
       }),
 
       updateRecurring: builder.mutation({
@@ -23,7 +23,7 @@ export const expensesApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Recurring"],
+        invalidatesTags: ["Recurring", "Schedules"],
       }),
 
       getRecurring: builder.query<Schedule[], string | void>({
@@ -41,7 +41,7 @@ export const expensesApi = api
           url: `/transactions/recurring/${id}`,
           method: "PATCH",
         }),
-        invalidatesTags: ["Recurring"],
+        invalidatesTags: ["Recurring", "Schedules"],
       }),
     }),
   });

@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const incomeApi = api
-  .enhanceEndpoints({ addTagTypes: ["Income", "Recurring"] })
+  .enhanceEndpoints({ addTagTypes: ["Income", "Recurring", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       postIncome: builder.mutation({
@@ -10,7 +10,7 @@ export const incomeApi = api
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Income"],
+        invalidatesTags: ["Income", "Schedules"],
       }),
       putIncome: builder.mutation({
         query: ({ data, id }) => ({
@@ -18,7 +18,7 @@ export const incomeApi = api
           method: "PUT",
           body: data,
         }),
-        invalidatesTags: ["Income"],
+        invalidatesTags: ["Income", "Schedules"],
       }),
       getIncome: builder.query({
         query: (params) => ({
@@ -34,7 +34,7 @@ export const incomeApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["Income"],
+        invalidatesTags: ["Income", "Schedules"],
       }),
       postRecurringIncome: builder.mutation({
         query: (body) => ({
@@ -45,6 +45,7 @@ export const incomeApi = api
           },
           body,
         }),
+        invalidatesTags: ["Recurring", "Income", "Schedules"],
       }),
       updateRecurringIncome: builder.mutation({
         query: ({ data, id }) => ({
@@ -55,7 +56,7 @@ export const incomeApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Recurring", "Income"],
+        invalidatesTags: ["Recurring", "Income", "Schedules"],
       }),
 
       getRecurringIncome: builder.query({
@@ -76,7 +77,7 @@ export const incomeApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["Income"],
+        invalidatesTags: ["Income", "Schedules"],
       }),
 
       getGraphIncome: builder.query({
@@ -97,7 +98,7 @@ export const incomeApi = api
           url: `/transactions/income/recurring/${id}`,
           method: "PATCH",
         }),
-        invalidatesTags: ["Income"],
+        invalidatesTags: ["Income", "Schedules"],
       }),
     }),
   });

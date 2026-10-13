@@ -5,7 +5,7 @@ import {
 import { api } from "../services/api";
 
 export const accountsApi = api
-  .enhanceEndpoints({ addTagTypes: ["Assets"] })
+  .enhanceEndpoints({ addTagTypes: ["Assets", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getAccounts: builder.query<AccountTemplate, AccountPayload | void>({
@@ -28,7 +28,7 @@ export const accountsApi = api
           },
           body,
         }),
-        invalidatesTags: ["Assets"],
+        invalidatesTags: ["Assets", "Schedules"],
       }),
       archiveAccount: builder.mutation({
         query: (id) => ({
@@ -38,7 +38,7 @@ export const accountsApi = api
             Accept: "application/json",
           },
         }),
-        invalidatesTags: ["Assets"]
+        invalidatesTags: ["Assets", "Schedules"]
       }),
       updateAccount: builder.mutation({
         query: ({ id, ...body }) => ({
@@ -49,7 +49,7 @@ export const accountsApi = api
           },
           body,
         }),
-        invalidatesTags: ["Assets"],
+        invalidatesTags: ["Assets", "Schedules"],
       }),
     }),
   });

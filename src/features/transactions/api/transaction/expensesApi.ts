@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring"] })
+  .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getExpenses: builder.query({
@@ -22,7 +22,7 @@ export const expensesApi = api
           // },
           body,
         }),
-        invalidatesTags: ["Expenses"],
+        invalidatesTags: ["Expenses", "Schedules"],
       }),
 
       deleteExpense: builder.mutation({
@@ -34,7 +34,7 @@ export const expensesApi = api
           //   Accept: "application/json",
           // },
         }),
-        invalidatesTags: ["Expenses"],
+        invalidatesTags: ["Expenses", "Schedules"],
       }),
 
       putExpense: builder.mutation({
@@ -43,7 +43,7 @@ export const expensesApi = api
           method: "PUT",
           body: data,
         }),
-        invalidatesTags: ["Expenses"],
+        invalidatesTags: ["Expenses", "Schedules"],
       }),
 
       postRecurringExpense: builder.mutation({
@@ -52,7 +52,7 @@ export const expensesApi = api
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Recurring", "Expenses"],
+        invalidatesTags: ["Recurring", "Expenses", "Schedules"],
       }),
 
       updateRecurringExpense: builder.mutation({
@@ -64,7 +64,7 @@ export const expensesApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Recurring"],
+        invalidatesTags: ["Recurring", "Schedules"],
       }),
 
       getRecurringExpenses: builder.query({
@@ -81,7 +81,7 @@ export const expensesApi = api
           url: `/transactions/expense/recurring/${id}`,
           method: "PATCH",
         }),
-        invalidatesTags: ["Expenses"],
+        invalidatesTags: ["Expenses", "Schedules"],
       }),
 
       getGraphExpense: builder.query({

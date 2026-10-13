@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const transferApi = api
-  .enhanceEndpoints({ addTagTypes: ["Transfer", "Graph", "Recurring"] })
+  .enhanceEndpoints({ addTagTypes: ["Transfer", "Graph", "Recurring", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getTransfer: builder.query({
@@ -18,7 +18,7 @@ export const transferApi = api
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Graph", "Transfer"],
+        invalidatesTags: ["Graph", "Transfer", "Schedules"],
       }),
       putTransfer: builder.mutation({
         query: ({ data, id }) => ({
@@ -26,7 +26,7 @@ export const transferApi = api
           method: "PUT",
           body: data,
         }),
-        invalidatesTags: ["Graph", "Transfer"],
+        invalidatesTags: ["Graph", "Transfer", "Schedules"],
       }),
       deleteTransfer: builder.mutation({
         query: ({ data, id }) => ({
@@ -34,7 +34,7 @@ export const transferApi = api
           method: "PATCH",
           body: data,
         }),
-                invalidatesTags: ["Graph", "Transfer"],
+                invalidatesTags: ["Graph", "Transfer", "Schedules"],
 
       }),
 
@@ -47,7 +47,7 @@ export const transferApi = api
           },
           body,
         }),
-        invalidatesTags: ["Recurring", "Transfer", "Graph"],
+        invalidatesTags: ["Recurring", "Transfer", "Graph", "Schedules"],
       }),
       updateRecurringTransfer: builder.mutation({
         query: ({ data, id }) => ({
@@ -58,7 +58,7 @@ export const transferApi = api
           },
           body: data,
         }),
-        invalidatesTags: ["Recurring", "Transfer", "Graph"],
+        invalidatesTags: ["Recurring", "Transfer", "Graph", "Schedules"],
       }),
 
       getRecurringTransfer: builder.query({
@@ -79,7 +79,7 @@ export const transferApi = api
           method: "PATCH",
           body: data,
         }),
-        invalidatesTags: ["Transfer"],
+        invalidatesTags: ["Transfer", "Schedules"],
       }),
       getGraphTransfer: builder.query({
         query: (params) => ({

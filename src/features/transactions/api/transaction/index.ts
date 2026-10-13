@@ -1,7 +1,7 @@
 import { api } from "@/shared/services/api";
 
 export const transactionApi = api
-  .enhanceEndpoints({ addTagTypes: ["History", "Stats"] })
+  .enhanceEndpoints({ addTagTypes: ["History", "Stats", "Schedules"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getTransactionHistory: builder.query({
@@ -27,7 +27,7 @@ export const transactionApi = api
           method: "PATCH",
           params: data,
         }),
-        invalidatesTags: ["Stats", "History"],
+        invalidatesTags: ["Stats", "History", "Schedules"],
       }),
     }),
   });
