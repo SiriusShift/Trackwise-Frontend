@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 import { Input } from "@/shared/components/ui/input";
 import LayoutAuth from "@/layout/AuthLayout";
 import { Button } from "@/shared/components/ui/button";
@@ -11,6 +12,12 @@ import {
   type ResetPasswordFormValues,
 } from "../schema/authSchema";
 const ResetPassword = () => {
+
+  usePageMeta({
+    title: "Set a new password | Trackwise",
+    description:
+      "Choose a new password for your Trackwise account.",
+  });
   const router = useNavigate();
   const location = useLocation();
   const [resetTrigger] = usePostResetPasswordMutation();

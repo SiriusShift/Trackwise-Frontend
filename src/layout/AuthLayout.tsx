@@ -20,7 +20,6 @@ const LayoutAuth = ({
   submit,
   icon: Icon,
 }: LayoutAuthProps) => {
-  console.log(Icon);
   // Create the form handler
   // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   //   event.preventDefault(); // Prevent the default form submission

@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 // app/components/SignUpForm.tsx
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +39,12 @@ const passwordChecks = [
 ];
 
 const signUp = () => {
+
+  usePageMeta({
+    title: "Create account | Trackwise",
+    description:
+      "Create a Trackwise account to track expenses, income, transfers, and credit card billing.",
+  });
   const [isVerifying, setIsVerifying] = useState(false);
   const [countdown, setCountdown] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -80,7 +87,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
         otp: code || "",
       }).unwrap();
       console.log(response);
-      router("/");
+      router("/dashboard");
     } catch (err) {
       let errorMessage = handleCatchErrorMessage(err); // Default message
       toast.error(errorMessage);
@@ -229,7 +236,7 @@ const handleGoogleSignup = () => {
                 onClick={handleGoogleSignup}
                 className="w-full sm:w-96 shadow-md"
               >
-                <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
+                <img src={Google} alt="" className="h-3 w-3 me-2" />
                 Continue with Google
               </Button>
               <p className="text-center text-sm">

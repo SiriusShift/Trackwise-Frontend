@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 
 export const navigationData = [
-  { name: "Dashboard", path: "/", icon: LayoutGrid },
+  { name: "Dashboard", path: "/dashboard", icon: LayoutGrid },
   { name: "Transactions", path: "/transactions", icon: ChartNoAxesCombined },
   { name: "Accounts", path: "/accounts", icon: CreditCard },
-  { name: "Loan", path: "/loans", icon: HandCoins },
+  // { name: "Loan", path: "/loans", icon: HandCoins },
   {
     name: "Settings",
     path: "/settings",

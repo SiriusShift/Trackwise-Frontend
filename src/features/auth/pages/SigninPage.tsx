@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 // app/components/SignInForm.tsx
 "use client";
 import Google from "@/assets/images/Google.svg";
@@ -20,6 +21,12 @@ import { toast } from "sonner";
 import { loginSchema } from "../schema/authSchema";
 
 const SignInPage = () => {
+
+  usePageMeta({
+    title: "Sign in | Trackwise",
+    description:
+      "Sign in to Trackwise to manage your expenses, income, transfers, and credit card billing.",
+  });
   const router = useNavigate();
   const location = useLocation();
   const [cookies] = useCookies(["user"]);
@@ -45,14 +52,13 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   useEffect(() => {
     if (data?.authenticated && !error && cookies.user) {
-      console.log("test1");
-      router("/"); // Redirect to home if already authenticated
+      router("/dashboard"); // Redirect to dashboard if already authenticated
     }
   }, [data, router]);
 
   // Google One Tap
   useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
     if (!clientId || isLoading || data?.authenticated) return;
 
     const init = () => {
@@ -66,13 +72,20 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
         callback: async ({ credential }: { credential: string }) => {
           try {
             await postGoogleOneTap({ credential }).unwrap();
-            window.location.href = "/";
+            window.location.href = "/dashboard";
           } catch (err) {
             toast.error(handleCatchErrorMessage(err));
           }
         },
       });
-      google.accounts.id.prompt();
+      google.accounts.id.prompt((n: any) => {
+        console.log("[OneTap]", {
+          displayed: n.isDisplayed?.(),
+          notDisplayed: n.isNotDisplayed?.() && n.getNotDisplayedReason?.(),
+          skipped: n.isSkippedMoment?.() && n.getSkippedReason?.(),
+          dismissed: n.isDismissedMoment?.() && n.getDismissedReason?.(),
+        });
+      });
     };
 
     if ((window as any).google?.accounts?.id) {
@@ -105,14 +118,12 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
           email: watch("email"),
           password: watch("password"),
         }).unwrap();
-        router("/");
+        router("/dashboard");
       } catch (error) {
-        console.log(error);
         let errorMessage = handleCatchErrorMessage(error); // Default message
         toast.error(errorMessage);
       }
     } else {
-      console.log(errors);
     }
   };
 
@@ -171,7 +182,7 @@ const handleGoogleLogin = () => {
               variant={"outline"}
               className="w-full sm:w-96 shadow-md"
             >
-              <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
+              <img src={Google} alt="" className="h-3 w-3 me-2" />
               Continue with Google
             </Button>
             <p className="mt-2 text-sm text-center">

@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 import { Input } from "@/shared/components/ui/input";
 import LayoutAuth from "@/layout/AuthLayout";
 import { Button } from "@/shared/components/ui/button";
@@ -17,6 +18,12 @@ import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 
 const ForgotPassword = () => {
+
+  usePageMeta({
+    title: "Reset your password | Trackwise",
+    description:
+      "Reset your Trackwise password by email.",
+  });
   const router = useNavigate();
   const [resendTimer, setResendTimer] = useState(0);
   const [email, setEmail] = useState("");

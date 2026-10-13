@@ -72,6 +72,14 @@ const signInApi = api.injectEndpoints({
                 credentials: 'include'
             }),
         }),
+        patchCompleteTour: builder.mutation({
+            query: () => ({
+                url: "/auth/tour",
+                method: "PATCH",
+                headers: { Accept: "application/json" },
+                credentials: 'include'
+            }),
+        }),
         getUserGoogle: builder.query({
             query: () => ({
                 url: "/auth/google",
@@ -84,4 +92,4 @@ const signInApi = api.injectEndpoints({
     }),
 });
 
-export const { usePostSigninMutation, usePostGoogleOneTapMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery, useLazyGetAuthStatusQuery, useLazyGetSignoutQuery } = signInApi;
+export const { usePostSigninMutation, usePostGoogleOneTapMutation, usePostForgotPasswordMutation, usePostResetPasswordMutation, useGetAuthStatusQuery, useLazyGetAuthStatusQuery, useLazyGetSignoutQuery, usePatchCompleteTourMutation } = signInApi;

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /transactions
+Disallow: /accounts
+Disallow: /loans
+
+Sitemap: https://trackwise.hygen.live/sitemap.xml

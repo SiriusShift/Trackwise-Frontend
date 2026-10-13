@@ -2,6 +2,7 @@ import SavingsPage from "@/features/accounts/pages/AccountPage";
 import ForgotPassword from "@/features/auth/pages/ForgotPassword";
 import ResetPassword from "@/features/auth/pages/ResetPassword";
 import Dashboard from "@/features/dashboard/pages/Dashboard";
+import LandingPage from "@/features/landing/pages/LandingPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountSettings from "@/features/settings/pages/AccountSettings";
 import BackupSettings from "@/features/settings/pages/BackupSettings";
@@ -42,10 +43,13 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
+    element: <LandingPage />,
+  },
+  {
     element: <ProtectedRoutes />,
     children: [
       {
-        path: "/",
+        path: "/dashboard",
         element: <Dashboard />,
       },
       {
@@ -65,10 +69,10 @@ export const router = createBrowserRouter([
         path: "/accounts",
         element: <SavingsPage />,
       },
-      {
-        path: "/loans",
-        element: <LoanPage />,
-      },
+      // {
+      //   path: "/loans",
+      //   element: <LoanPage />,
+      // },
       {
         path: "/settings",
         element: <SettingsLayout />,
