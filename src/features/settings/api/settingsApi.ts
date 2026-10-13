@@ -74,6 +74,17 @@ export const settingsApi = api
         invalidatesTags: ["Settings"],
       }),
 
+      changePassword: builder.mutation<
+        { success: boolean; message: string },
+        { currentPassword?: string; newPassword: string }
+      >({
+        query: (body) => ({
+          url: "/change-password",
+          method: "PATCH",
+          body,
+        }),
+      }),
+
       unlinkGoogle: builder.mutation<{ success: boolean; message: string }, void>({
         query: () => ({
           url: "/auth/google/unlink",
@@ -87,4 +98,5 @@ export const {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
   useUnlinkGoogleMutation,
+  useChangePasswordMutation,
 } = settingsApi;

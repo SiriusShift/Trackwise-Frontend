@@ -12,6 +12,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import ChangePasswordForm from "../components/ChangePasswordForm";
 import ImageCropDialog from "../components/ImageCropDialog";
 import { profileSchema } from "../schema/settings.schema";
 import { ProfileSettingsFormValues } from "../types/settings.types";
@@ -192,7 +193,8 @@ const AccountSettings = () => {
   };
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex flex-col gap-4">
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} data-tour="settings-content">
       <SettingsRow title="Profile picture" stack={false}>
         <div className="relative h-14 w-14 rounded-full bg-muted flex items-center justify-center">
           <img
@@ -375,6 +377,11 @@ const AccountSettings = () => {
         }}
       />
     </form>
+
+    <Separator />
+
+    <ChangePasswordForm />
+    </div>
   );
 };
 

@@ -86,9 +86,7 @@ const SettingsLayout = () => {
           )}
         </div>
       </div>
-      <div data-tour="settings-content">
         <Outlet />
-      </div>
     </div>
   );
 };
