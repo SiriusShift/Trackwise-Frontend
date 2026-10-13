@@ -27,6 +27,7 @@ import AccountDialog from "../components/AccountDialog";
 import { Account } from "../types/account.types";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { toast } from "sonner";
+import usePageTour from "@/shared/tour/usePageTour";
 
 const stats = [
   {
@@ -56,6 +57,7 @@ const stats = [
 ];
 
 const AccountPage = () => {
+  const { Tour } = usePageTour("accounts");
   const [open, setOpen] = useState<boolean>(false);
   const [mode, setMode] = useState<string>("add");
 
@@ -138,6 +140,7 @@ const AccountPage = () => {
 
   return (
     <>
+      {Tour}
       <div className="flex flex-col gap-5 p-5">
         <PageHeader
           pageName="Accounts"
@@ -145,17 +148,20 @@ const AccountPage = () => {
           monthPicker={true}
         >
           <div className="flex flex-row gap-2">
-            <Button variant={"ghost"}>
+            {/* <Button variant={"ghost"}>
               <ArrowLeftRight />
               Transfer
-            </Button>
-            <Button onClick={handleAdd}>
+            </Button> */}
+            <Button data-tour="add-account" onClick={handleAdd}>
               <Plus /> Add
             </Button>
           </div>
         </PageHeader>
 
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div
+          data-tour="account-stats"
+          className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+        >
           {statistics.map((stat) => {
             const Icon = stat.icon;
 
@@ -209,17 +215,38 @@ const AccountPage = () => {
           })}
         </div>
         {/* <h2 className="text-lg font-medium tracking-tight">Accounts</h2> */}
-        <div className="grid grid-cols-1  sm:grid-cols-2  xl:grid-cols-4 gap-5">
+        <div
+          data-tour="account-list"
+          className="grid grid-cols-1  sm:grid-cols-2  xl:grid-cols-4 gap-5"
+        >
           {accountsLoading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <AccountCardSkeleton key={i} />
               ))
-            : accountsData?.data?.map((account: Account) => (
+            : assetsLength === 0
+              ? (
+                <Card className="col-span-full flex flex-col items-center justify-center gap-3 border-dashed p-10 text-center">
+                  <div className="rounded-full bg-primary/10 p-3 text-primary">
+                    <Wallet className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="font-medium">No accounts yet</p>
+                    <p className="text-sm text-muted-foreground">
+                      Add a bank account, e-wallet, cash or credit card to get
+                      started.
+                    </p>
+                  </div>
+                  <Button onClick={handleAdd}>
+                    <Plus className="h-4 w-4" /> Add account
+                  </Button>
+                </Card>
+              )
+              : accountsData?.data?.map((account: Account) => (
                 <AccountCard
                   key={account.id}
                   account={account}
                   openDialog={handleEdit}
-                  onArchive={handleArchive}
+                  onArchive={() => handleArchive(account.id)}
                 />
               ))}
         </div>

@@ -37,7 +37,8 @@ export const accountsApi = api
                     headers: {
             Accept: "application/json",
           },
-        })
+        }),
+        invalidatesTags: ["Assets"]
       }),
       updateAccount: builder.mutation({
         query: ({ id, ...body }) => ({

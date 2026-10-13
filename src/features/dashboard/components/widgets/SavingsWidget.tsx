@@ -54,9 +54,9 @@ function SavingsPlan() {
     >
       <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
         <CardTitle>
-          <h1 className="text-sm font-semibold uppercase tracking-widest">
+          <span className="block text-sm font-semibold uppercase tracking-widest">
             Savings Plan
-          </h1>
+          </span>
 
           {/* <p className="text-xs text-muted-foreground mt-0.5">
               {savingsPlans?.length} active plan

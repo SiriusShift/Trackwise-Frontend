@@ -25,14 +25,14 @@ import {
 export const ACCOUNT_TYPES = [
   { value: "CASH", label: "Cash" },
   { value: "BANK", label: "Bank Account" },
-  { value: "CREDIT", label: "Credit" },
-  { value: "LOAN", label: "Loan" },
-  { value: "INVESTMENT", label: "Investment" },
+  // { value: "CREDIT", label: "Credit" },
+  // { value: "LOAN", label: "Loan" },
+  // { value: "INVESTMENT", label: "Investment" },
 ] as const;
 
 // Keyed by AssetCategory — CASH intentionally has no entry (no subtype),
 // matching the AssetSubtype mapping documented in schema.prisma.
-export const ACCOUNT_SUBTYPES = {
+export const  ACCOUNT_SUBTYPES = {
   CASH: [],
   BANK: [
     {
@@ -43,7 +43,7 @@ export const ACCOUNT_SUBTYPES = {
     {
       value: "CHECKING",
       label: "Checking",
-      icon: Wallet,
+      icon: Landmark,
     },
     {
       value: "E_WALLET",

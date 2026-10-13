@@ -1,5 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, Loader2, Wallet } from "lucide-react";
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Wallet,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -33,6 +40,7 @@ import {
   COLOR_OPTIONS,
   FormColorPicker,
 } from "@/shared/components/FormColorPicker";
+import { Calendar } from "@/shared/components/ui/calendar";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Command,
@@ -107,9 +115,10 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
     formState: { isValid, isDirty, errors },
   } = form;
 
-  console.log(watch());
-  console.log(errors);
   const accountType = watch("type") as AccountCategory;
+  const accountSubType = watch("sub_type");
+  const savingsRequired = watch("targetAmount") || watch("targetDate");
+
   const subtypeOptions =
     accountType in ACCOUNT_SUBTYPES
       ? ACCOUNT_SUBTYPES[accountType as keyof typeof ACCOUNT_SUBTYPES]
@@ -199,7 +208,14 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
 
   const onSubmit = async (values: AccountFormValues) => {
     try {
-      const { creditLimit, statementDate, dueDate, ...rest } = values;
+      const {
+        creditLimit,
+        statementDate,
+        dueDate,
+        targetDate,
+        targetAmount,
+        ...rest
+      } = values;
 
       const payload = {
         ...rest,
@@ -212,6 +228,12 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
             creditLimit,
             statementDate,
             dueDate,
+          },
+        }),
+        ...(values.sub_type === "SAVINGS" && {
+          savingDetail: {
+            targetDate,
+            targetAmount,
           },
         }),
       };
@@ -498,71 +520,6 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                   )}
                 />
 
-                {/* <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={control}
-                    name="minimumPaymentPercent"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min. Payment %</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                              %
-                            </span>
-                            <Input
-                              className="pl-7"
-                              type="number"
-                              step="0.01"
-                              placeholder="0"
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value === ""
-                                    ? undefined
-                                    : parseFloat(e.target.value),
-                                )
-                              }
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="minimumPaymentFloor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min. Payment Floor</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                              ₱
-                            </span>
-                            <Input
-                              className="pl-7"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value === ""
-                                    ? undefined
-                                    : parseFloat(e.target.value),
-                                )
-                              }
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div> */}
-
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={control}
@@ -613,6 +570,95 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                             }
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            {accountSubType === "SAVINGS" && (
+              <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Savings Details
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={control}
+                    name="targetAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Target Amount
+                          {savingsRequired && <RequiredMark />}
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                              ₱
+                            </span>
+                            <Input
+                              className="pl-7"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ""
+                                    ? undefined
+                                    : parseFloat(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="targetDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Target Date {savingsRequired && <RequiredMark />}
+                        </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !field.value && "text-muted-foreground",
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value ?? undefined}
+                              onSelect={(date) => field.onChange(date)}
+                              disabled={(date) =>
+                                date < new Date(new Date().setHours(0, 0, 0, 0))
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}

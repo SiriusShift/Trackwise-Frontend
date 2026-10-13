@@ -34,6 +34,8 @@ export const accountSchema = z
     // minimumPaymentPercent: z.number().nonnegative().optional(),
     // minimumPayment: z.number().nonnegative().optional(),
     includeNetWorth: z.boolean(),
+    targetAmount: z.number().positive().optional().nullable(),
+    targetDate: z.date().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.type !== "CASH" && !data.sub_type?.trim()) {
@@ -49,6 +51,24 @@ export const accountSchema = z
         code: z.ZodIssueCode.custom,
         path: ["creditLimit"],
         message: "Credit limit is required",
+      });
+    }
+
+    const hasGoal = data.targetAmount != null;
+    const hasDate = data.targetDate != null;
+
+    if (hasGoal && !hasDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["targetDate"],
+        message: "Target date is required when a savings goal is set",
+      });
+    }
+    if (hasDate && !hasGoal) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["savingsGoal"],
+        message: "Savings goal is required when a target date is set",
       });
     }
   });
