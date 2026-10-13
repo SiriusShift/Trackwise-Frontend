@@ -59,7 +59,7 @@ function AmountLabel({
 
 const TransactionHistory = () => {
   const { data, isFetching } = useGetTransactionHistoryQuery({
-    pageSize: 3,
+    pageSize: 4,
     pageIndex: 0,
   });
 
