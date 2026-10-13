@@ -197,23 +197,40 @@ export const tourSteps: Record<TourPage, Step[]> = {
     {
       target: '[data-tour="settings-content"]',
       title: "Your profile",
-      content: "Update your name, photo and personal details.",
+      content:
+        "Update your name, photo and personal details, and connect your Google account to sign in with one click.",
       placement: "top",
       data: { route: "/settings/account" },
     },
     {
-      target: '[data-tour="settings-content"]',
-      title: "Theme",
-      content: "Switch between light and dark and pick the look you prefer.",
+      target: '[data-tour="google-link"]',
+      title: "Google sign-in",
+      content:
+        "Connect your Google account to sign in with one click. You can disconnect it any time once you have a password set.",
       placement: "top",
-      data: { route: "/settings/theme" },
+      data: { route: "/settings/account" },
     },
     {
-      target: '[data-tour="settings-content"]',
-      title: "Backup",
-      content: "Keep a copy of your data safe so you can restore it later.",
+      target: '[data-tour="change-password"]',
+      title: "Password",
+      content:
+        "Change your password here. If you signed up with Google, you can set one so you can also sign in with your email.",
       placement: "top",
-      data: { route: "/settings/backup" },
+      data: { route: "/settings/account" },
     },
+    // {
+    //   target: '[data-tour="settings-content"]',
+    //   title: "Theme",
+    //   content: "Switch between light and dark and pick the look you prefer.",
+    //   placement: "top",
+    //   data: { route: "/settings/theme" },
+    // },
+    // {
+    //   target: '[data-tour="settings-content"]',
+    //   title: "Backup",
+    //   content: "Keep a copy of your data safe so you can restore it later.",
+    //   placement: "top",
+    //   data: { route: "/settings/backup" },
+    // },
   ],
 };

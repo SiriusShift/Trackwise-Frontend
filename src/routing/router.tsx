@@ -89,22 +89,22 @@ export const router = createBrowserRouter([
             path: "/settings/category",
             element: <CategorySettings />,
           },
-          {
-            path: "/settings/theme",
-            element: <ThemeSettings />,
-          },
+          // {
+          //   path: "/settings/theme",
+          //   element: <ThemeSettings />,
+          // },
           {
             path: "/settings/notifications",
             element: <NotificationSettings />,
           },
-          {
-            path: "/settings/security",
-            element: <SecuritySettings />,
-          },
-          {
-            path: "/settings/backup",
-            element: <BackupSettings />,
-          },
+          // {
+          //   path: "/settings/security",
+          //   element: <SecuritySettings />,
+          // },
+          // {
+          //   path: "/settings/backup",
+          //   element: <BackupSettings />,
+          // },
         ],
       },
     ],
