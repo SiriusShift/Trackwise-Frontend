@@ -1,14 +1,17 @@
 import DefaultProfile from "@/assets/images/default.png";
-import { Bell } from "lucide-react";
-import { Button } from "./ui/button";
+import NotificationBell from "./NotificationBell";
 import ModeToggle from "@/shared/components/ModeToggle";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useCookies } from "react-cookie";
 import { IRootState } from "@/app/store";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 const Header = () => {
   const userInfo = useSelector((state: IRootState) => state.userDetails)
+  const hour = moment().hour()
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
 
   return (
     <header className="sticky top-0 bg-background z-50 border-b items-center">
@@ -16,15 +19,13 @@ const Header = () => {
         <div className="flex items-center gap-5">
           <SidebarTrigger className="flex" />
           <p className="hidden sm:inline">
-            Good morning, {userInfo?.firstName}
+            {greeting}, {userInfo?.firstName}
           </p>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-5">
           <ModeToggle />
-          <Button variant="ghost" className="w-10 h-10">
-            <Bell className="w-5 h-5" />
-          </Button>
+          <NotificationBell />
           <div className="relative w-10 h-10">
             <div className="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
               <img
