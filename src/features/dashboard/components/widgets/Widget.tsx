@@ -43,6 +43,7 @@ const WidgetLayout = ({
   data,
   segments,
   icon,
+  tourId,
 }: commonWidgetProps) => {
   const [showBalance, setShowBalance] = useState<boolean>(() => {
     const saved = localStorage.getItem(`showBalance:${title}`);
@@ -51,7 +52,6 @@ const WidgetLayout = ({
 
   const date = formatDateDisplay();
   const mode = formatMode();
-  console.log(segments);
   const balance =
     title === "Expense"
       ? data?.expense
@@ -111,14 +111,14 @@ const WidgetLayout = ({
   };
 
   const toggleBalanceVisibility = () => {
-    setShowBalance((prev) => {
-      localStorage.setItem(`showBalance:${title}`, JSON.stringify(!prev));
-      return !prev;
-    });
+    const next = !showBalance;
+    localStorage.setItem(`showBalance:${title}`, JSON.stringify(next));
+    setShowBalance(next);
   };
 
   return (
     <Card
+      data-tour={tourId}
       onMouseMove={handleMouseMove}
       className={cn(
         `relative overflow-hidden border border-border/60 bg-card
@@ -196,23 +196,39 @@ const WidgetLayout = ({
                       <span className="text-muted-foreground font-normal">
                         ₱
                       </span>
-                      {showBalance ? (
-                        <span className="transition-all duration-300">
+                      {/* Both layers stay mounted and share one grid cell, so the
+                          count-up doesn't restart and the width never jumps. */}
+                      <span className="grid items-center">
+                        <span
+                          aria-hidden={!showBalance}
+                          className={cn(
+                            "col-start-1 row-start-1 transition-all duration-300 ease-out",
+                            showBalance
+                              ? "opacity-100 blur-0 scale-100"
+                              : "opacity-0 blur-md scale-95 pointer-events-none select-none",
+                          )}
+                        >
                           <AnimateNumber duration={2} value={balance ?? 0} />
                         </span>
-                      ) : (
                         <span
-                          className="flex items-center gap-1.5 py-1 select-none"
+                          role="img"
                           aria-label="Balance hidden"
+                          className={cn(
+                            "col-start-1 row-start-1 flex items-center gap-1.5 select-none transition-all duration-300 ease-out",
+                            showBalance
+                              ? "opacity-0 scale-95 pointer-events-none"
+                              : "opacity-100 scale-100",
+                          )}
                         >
                           {Array.from({ length: 7 }).map((_, i) => (
                             <span
                               key={i}
                               className="w-2 h-2 rounded-full bg-foreground/70"
+                              style={{ transitionDelay: `${i * 25}ms` }}
                             />
                           ))}
                         </span>
-                      )}
+                      </span>
                     </div>
 
                     <Button

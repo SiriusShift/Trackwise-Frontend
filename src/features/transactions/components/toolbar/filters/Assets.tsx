@@ -20,7 +20,7 @@ const Assets = ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-sm font-semibold">Asset</h1>
+      <span className="block text-sm font-semibold">Asset</span>
 
       <Collapsible>
         <CollapsibleTrigger asChild>

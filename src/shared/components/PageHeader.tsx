@@ -19,7 +19,7 @@ function PageHeader({
     <div {...props}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xl font-semibold">{pageName}</p>
+          <h1 className="text-xl font-semibold">{pageName}</h1>
           <p className="text-sm text-gray-400">{description}</p>
         </div>
 

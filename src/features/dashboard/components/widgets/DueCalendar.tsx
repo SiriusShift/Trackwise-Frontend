@@ -107,6 +107,7 @@ export default function DueCalendar() {
     p-5 flex flex-col rounded-2xl shadow-xs  col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
     transition-shadow hover:shadow-md group`,
         )}
+        data-tour="due"
       >
         {/* Spotlight fill */}
         <div
@@ -131,9 +132,9 @@ export default function DueCalendar() {
         {/* Header */}
         <CardHeader className="flex flex-row w-full justify-between p-0">
           <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground flex flex-row gap-1 items-center">
-            <h1 className="text-sm font-semibold uppercase tracking-widest">
+            <span className="block text-sm font-semibold uppercase tracking-widest">
               Transactions Due
-            </h1>
+            </span>
             {isLoading ? (
               <Skeleton className="w-20 h-3 mt-1" />
             ) : (

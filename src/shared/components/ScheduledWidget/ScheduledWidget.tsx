@@ -19,6 +19,7 @@ import {
 } from "../ui/carousel";
 import ScheduleCard from "./ScheduleCard";
 import ScheduleSkeleton from "./ScheduleSkeleton";
+import ScheduleCardEmpty from "./ScheduleCardEmpty";
 
 // Number of fully visible cards at each breakpoint
 const VISIBLE_CARDS: { minWidth: number; count: number }[] = [
@@ -72,7 +73,7 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
   const emptyCount = Math.max(0, visibleCount - itemCount);
 
   return (
-    <Card className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
+    <Card className="relative w-full flex flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 right-0 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
@@ -80,7 +81,7 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent)]" />
       </div>
 
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 flex flex-col flex-1 space-y-4">
         {/* header */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -101,15 +102,15 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
         </div>
 
         {/* carousel */}
-        <div className="relative">
+        <div className="relative h-full">
           <Carousel
             opts={{
               align: "start",
               watchDrag: width < 768,
             }}
-            className="w-full"
+            className="w-full h-full"
           >
-            <CarouselContent className="-ml-2">
+            <CarouselContent className="-ml-2 h-full">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
                     <ScheduleSkeleton key={i} count={itemCount} />
@@ -125,7 +126,7 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
 
               {!isLoading &&
                 [...Array(emptyCount)].map((_, i) => (
-                  <TrackerCardEmpty key={`empty-${i}`} />
+                  <ScheduleCardEmpty key={`empty-${i}`} />
                 ))}
             </CarouselContent>
 

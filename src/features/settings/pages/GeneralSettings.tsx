@@ -97,7 +97,7 @@ const GeneralSettings = () => {
       >
         {/* Date & Time Header */}
         <div className="space-y-2">
-          <h1 className="text-lg font-semibold">Date & Time</h1>
+          <span className="block text-lg font-semibold">Date & Time</span>
           <Separator />
         </div>
 
@@ -196,7 +196,7 @@ const GeneralSettings = () => {
 
         {/* Currency Header */}
         <div className="space-y-2 pt-4">
-          <h1 className="text-lg font-semibold">Currency</h1>
+          <span className="block text-lg font-semibold">Currency</span>
           <Separator />
         </div>
 

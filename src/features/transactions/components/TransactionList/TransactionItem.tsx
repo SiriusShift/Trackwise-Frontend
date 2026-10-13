@@ -56,14 +56,14 @@ const TransactionItem = React.memo(function TransactionItem({
         {/* Details */}
         <div className="ml-3 flex-1 min-w-0">
           <div className="flex justify-between items-start">
-            <h1
-              className="truncate text-semibold text-base "
+            <span
+              className="block truncate text-semibold text-base "
               title={item?.description}
             >
               {item?.description}
-            </h1>
-            <h1
-              className={`${
+            </span>
+            <span
+              className={`block ${
                 item?.type === "Expense"
                   ? "text-destructive"
                   : item?.type === "Income"
@@ -72,7 +72,7 @@ const TransactionItem = React.memo(function TransactionItem({
               } font-semibold text-base whitespace-nowrap ml-2`}
             >
               {formatCurrency(item.amount, currency)}
-            </h1>
+            </span>
           </div>
 
           <div className="flex justify-between items-center mt-1">

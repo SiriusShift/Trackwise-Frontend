@@ -20,23 +20,23 @@ const ConfirmDialog = ({ open, setOpen, data }: ConfirmDialogProps) => {
         className="w-full flex flex-col max-w-full h-dvh sm:max-w-md sm:h-auto sm:max-h-[90%] sm:min-h-lg sm:w-md"
       >
         <div>
-          <h1 className="font-semibold">Confirm scheduled transaction</h1>
+          <span className="block font-semibold">Confirm scheduled transaction</span>
           <p className="text-muted-foreground text-sm">
             These are due today. Edit if needed, then log them
           </p>
         </div>
         <div className="flex flex-row justify-between">
-          <h1 className="text-sm font-semibold">Description</h1>
+          <span className="block text-sm font-semibold">Description</span>
           <p className="text-sm text-muted-foreground">{data?.description}</p>
         </div>{" "}
         <Separator />
         <div className="flex flex-row justify-between">
-          <h1 className="text-sm font-semibold">Amount</h1>
+          <span className="block text-sm font-semibold">Amount</span>
           <p className="text-sm text-muted-foreground">{data?.amount}</p>
         </div>
         <Separator />
         <div className="flex flex-row justify-between">
-          <h1 className="text-sm font-semibold">Account</h1>
+          <span className="block text-sm font-semibold">Account</span>
           <p className="text-sm text-muted-foreground">{data?.asset?.name}</p>
         </div>
         <div className="w-full gap-2 grid grid-cols-2">

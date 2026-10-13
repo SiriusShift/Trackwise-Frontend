@@ -69,13 +69,13 @@ const NotificationSettings = () => {
     <FormProvider {...form}>
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
-          <h1 className="text-lg font-semibold">Settings</h1>
+          <span className="block text-lg font-semibold">Settings</span>
           <Separator />
         </div>
         {/* Email Notification */}
         <div className="flex flex-row justify-between items-center">
           <div>
-            <h1 className="text-base font-medium">Email</h1>
+            <span className="block text-base font-medium">Email</span>
             <p className="text-sm text-muted-foreground hidden sm:inline">
               Receive updates, reminders, and reports directly in your email.
             </p>
@@ -97,7 +97,7 @@ const NotificationSettings = () => {
         {/* Mobile Notification */}
         <div className="flex flex-row justify-between items-center">
           <div>
-            <h1 className="text-base font-medium">Mobile</h1>
+            <span className="block text-base font-medium">Mobile</span>
             <p className="text-sm text-muted-foreground hidden sm:inline">
               Enable to receive instant alerts and reminders via your mobile
               device.
@@ -131,7 +131,7 @@ const NotificationSettings = () => {
         </div>
 
         {/* <div className="space-y-2">
-          <h1 className="text-lg font-semibold">Transactions</h1>
+          <span className="block text-lg font-semibold">Transactions</span>
           <Separator />
         </div> */}
 
@@ -139,7 +139,7 @@ const NotificationSettings = () => {
         {/* Scheduled Transaction Notifications */}
         <div className="flex flex-row justify-between items-center border-border last:border-0">
           <div className="space-y-1">
-            <h1 className="font-medium">Scheduled transactions</h1>
+            <span className="block font-medium">Scheduled transactions</span>
             <p className="text-sm text-muted-foreground hidden sm:block">
               Set how many days in advance you'd like to receive a reminder
               before a scheduled transaction occurs.

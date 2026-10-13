@@ -154,7 +154,7 @@ export function UpcomingSchedulesSidebar({
   return (
     <>
       <div className="w-full lg:w-72 shrink-0 p-4 lg:border-l order-1 lg:order-2 lg:overflow-y-auto">
-        <h1 className="font-bold">Scheduled</h1>
+        <span className="block font-bold">Scheduled</span>
 
         {/* Mobile */}
         <div className="mt-4 lg:hidden">

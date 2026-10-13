@@ -83,9 +83,9 @@ const RecurringScheduleDetails = ({
               <Icon className="h-6 w-6" />
             </div>
             <div className="text-center space-y-1">
-              <h1 className="text-3xl font-bold">
+              <span className="block text-3xl font-bold">
                 {formatCurrency(schedule?.amount ?? item.amount, currency)}
-              </h1>
+              </span>
               <p className="text-sm text-muted-foreground">
                 {schedule?.description ?? item.description}
               </p>

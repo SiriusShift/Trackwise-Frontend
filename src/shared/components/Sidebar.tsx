@@ -1,4 +1,6 @@
 import { useLazyGetSignoutQuery } from "@/features/auth/api/signinApi";
+import { api } from "@/shared/services/api";
+import { useDispatch } from "react-redux";
 import {
   Sidebar,
   SidebarContent,
@@ -34,14 +36,23 @@ export function AppSidebar() {
   console.log(active);
   const router = useNavigate();
   const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
   const screenWidth = useScreenWidth();
 
   const [logoutTrigger] = useLazyGetSignoutQuery({});
+  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    logoutTrigger({});
-    removeCookie("user", { path: "/" });
-    router("/sign-in");
+  const handleLogout = async () => {
+    try {
+      await logoutTrigger({}).unwrap();
+    } catch (err) {
+      console.error("Logout request failed", err);
+    } finally {
+      removeCookie("user", { path: "/" });
+      // Drop all cached API data (incl. stale auth-status) and cancel in-flight requests
+      dispatch(api.util.resetApiState());
+      router("/sign-in", { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -65,8 +76,8 @@ export function AppSidebar() {
           className={`flex justify-start md:justify-center lg:justify-start lg:date-[state=collapsed]:justify-center items-center gap-2 w-full lg:ms-1  mt-2`}
         >
           <WalletMinimal className="text-primary shrink-0 w-6 h-6" />
-          <h1
-            className="
+          <span
+            className="block 
     font-bold text-lg
     transition-all duration-300
     whitespace-nowrap
@@ -80,7 +91,7 @@ export function AppSidebar() {
   "
           >
             Trackwise
-          </h1>
+          </span>
         </div>
       </SidebarHeader>
 
@@ -90,12 +101,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {navigationData.map((item) => {
-                const isCollapsed = state === "collapsed";
-
                 return (
                   <SidebarMenuItem
                     className="flex justify-center lg:justify-start lg:ms-1"
                     key={item.name}
+                    data-tour={`nav-${item.name.toLowerCase()}`}
                   >
                     {screenWidth > 767 && screenWidth < 1024 ? (
                       <TooltipProvider>
@@ -182,34 +192,76 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+              <SidebarMenuItem
+                className="flex justify-center lg:justify-start lg:ms-1"
+                key="nav-logout"
+              >
+                {screenWidth > 767 && screenWidth < 1024 ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton
+                          className="hidden md:block w-10 h-10 lg:hidden"
+                          variant="ghost"
+                          onClick={handleLogout}
+                        >
+                          <LogOut style={{ width: "24px", height: "24px" }} />
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="right"
+                        sideOffset={5}
+                        className="p-2 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
+                      >
+                        <p className="tracking-wide">Logout</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton
+                          variant="ghost"
+                          onClick={handleLogout}
+                          className="lg:ms-1 flex items-center rounded transition-all duration-300 justify-start data-[state=collapsed]:justify-center"
+                        >
+                          <LogOut style={{ width: "17px", height: "17px" }} />
+                          <span
+                            className="
+                      ml-2
+                      transition-all duration-300
+                      whitespace-nowrap
+                      overflow-hidden
+                      max-w-[160px]
+                      data-[state=collapsed]:max-w-0
+                      data-[state=collapsed]:opacity-0
+                    "
+                          >
+                            Logout
+                          </span>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      {isCollapsed && (
+                        <TooltipContent
+                          side="right"
+                          sideOffset={5}
+                          className="p-1 px-4 rounded-lg shadow-md bg-primary text-primary-foreground"
+                        >
+                          <p className="tracking-wide">Logout</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       {/* Sidebar Footer */}
-      <SidebarFooter className="p-3">
-        <SidebarMenuButton
-          variant="ghost"
-          className="lg:flex ms-1 justify-start lg:w-full rounded w-full"
-          onClick={handleLogout}
-        >
-          <LogOut />
-          <span
-            className="
-                ml-2
-                transition-all duration-300
-                whitespace-nowrap
-                overflow-hidden
-                max-w-[120px]
-                data-[state=collapsed]:max-w-0
-                data-[state=collapsed]:opacity-0
-              "
-          >
-            Logout
-          </span>
-        </SidebarMenuButton>
-      </SidebarFooter>
+      <SidebarFooter className="p-3 items-center"></SidebarFooter>
     </Sidebar>
   );
 }

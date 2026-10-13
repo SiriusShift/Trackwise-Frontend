@@ -30,7 +30,7 @@ const Header = () => {
             <div className="h-10 w-10 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
               <img
                 src={userInfo?.profileImage || DefaultProfile}
-                alt="Profile"
+                alt="Your profile picture"
                 className="h-full w-full object-cover"
               />
             </div>

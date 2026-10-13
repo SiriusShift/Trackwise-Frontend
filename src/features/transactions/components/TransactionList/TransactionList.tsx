@@ -63,8 +63,8 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
         />
       ) : (
         <Card className="flex flex-col h-64 items-center justify-center">
-          <img src={NoData} width={250} />
-          <h1 className="font-semibold">No transactions found</h1>
+          <img src={NoData} width={250} alt="" />
+          <span className="block font-semibold">No transactions found</span>
         </Card>
       )}
     </motion.div>

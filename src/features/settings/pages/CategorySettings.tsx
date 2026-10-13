@@ -57,7 +57,11 @@ const CategorySettings = () => {
         id="category_toolbar"
         className="flex flex-row flex-wrap items-center justify-between gap-2"
       >
-        <div id="button_list" className="flex flex-row gap-2">
+        <div
+          id="button_list"
+          data-tour="category-filter"
+          className="flex flex-row gap-2"
+        >
           {TABS.map((t) => (
             <Button
               key={t}
@@ -77,7 +81,9 @@ const CategorySettings = () => {
             placeholder="Search categories..."
             className="w-[200px]"
           />
-          <Button onClick={handleAdd}>Add Category</Button>
+          <Button data-tour="category-add" onClick={handleAdd}>
+            Add Category
+          </Button>
         </div>
       </div>
 

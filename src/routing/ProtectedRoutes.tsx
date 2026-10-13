@@ -14,20 +14,16 @@ function ProtectedRoutes() {
   const navigate = useNavigate();
   const [authTrigger, { data, error, isLoading }] = useLazyGetAuthStatusQuery();
   const dispatch = useDispatch();
-  console.log(data);
   const [cookies, setCookie] = useCookies(["user"]);
   const userInfo = useSelector((state: IRootState) => state?.userDetails?.id)
-  console.log(userInfo);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      console.log("hello")
       try {
         const response = await authTrigger({}).unwrap();
         if(!response && error){
           navigate("/sign-in");
         }else if(!userInfo || !cookies.user){
-          console.log("NO COOKIE");
           dispatch(
             setUserInfo({
               id: response?.user?.id,
@@ -38,7 +34,8 @@ function ProtectedRoutes() {
               role: response?.user?.role,
               phoneNumber: response?.user?.phoneNumber,
               profileImage: response?.user?.profileImage,
-              google_id: response?.user?.google_id
+              google_id: response?.user?.google_id,
+              hasSeenTour: response?.user?.hasSeenTour
             })
           );
           dispatch(

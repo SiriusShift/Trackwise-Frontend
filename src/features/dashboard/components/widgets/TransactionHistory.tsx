@@ -70,6 +70,7 @@ const TransactionHistory = () => {
 
   return (
     <Card
+      data-tour="recent-transactions"
       className="relative border border-border/60 p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
       // style={{
       //   backgroundImage: `

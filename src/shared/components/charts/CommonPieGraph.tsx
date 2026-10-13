@@ -123,7 +123,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
                   </Pie>
                 </PieChart>
               ) : (
-                <img src={noChartData} width={50} />
+                <img src={noChartData} width={50} alt="" />
               )}
             </ResponsiveContainer>
           ) : (

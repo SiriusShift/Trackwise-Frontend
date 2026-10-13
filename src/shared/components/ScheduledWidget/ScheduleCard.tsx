@@ -136,7 +136,7 @@ const TrackerCard = memo(
         <CarouselItem
           className={`${count > 1 ? "basis-[90%]" : "basis-full"} 2xl:basis-1/2`}
         >
-          <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-[120px]">
+          <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-full min-h-[120px]">
             {/* ── Left accent bar ───────────────────────────────────── */}
             {/* <span
               className={cn("absolute inset-y-0 left-0 w-1", accent)}

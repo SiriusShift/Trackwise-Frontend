@@ -4,18 +4,22 @@ import TransactionHistory from "@/features/dashboard/components/widgets/Transact
 import { useGetStatisticsQuery } from "@/features/transactions/api/transaction";
 import { navigationData } from "@/routing/navigationData";
 import PageHeader from "@/shared/components/PageHeader";
+import usePageTour from "@/shared/tour/usePageTour";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import BudgetWidget from "../components/widgets/BudgetWidget";
 import DueCalendar from "../components/widgets/DueCalendar";
 import ExpenseWidget from "../components/widgets/ExpenseWidget";
 import IncomeWidget from "../components/widgets/IncomeWidget";
 import SavingsPlan from "../components/widgets/SavingsWidget";
-import BudgetWidget from "../components/widgets/BudgetWidget";
 export const description = "Loan Payment Progress Chart";
 
 const Dashboard = () => {
+  const { Tour } = usePageTour("dashboard");
   const location = useLocation();
+  const navigate = useNavigate();
+
   const active = useSelector((state: IRootState) => state.active.active);
 
   const currentPageName = navigationData.find(
@@ -28,11 +32,11 @@ const Dashboard = () => {
     mode: formatMode(),
   });
 
-  // const totalVisitors = chartData1[0].bills + chartData1[0].food;
-
   return (
     <div className="space-y-5 p-5">
+      {Tour}
       <PageHeader
+        data-tour="page-header"
         pageName={currentPageName?.name}
         description={`Overview of Dashboard for this ${formatMode()}`}
         monthPicker={true}

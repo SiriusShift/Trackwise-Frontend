@@ -355,6 +355,7 @@ export interface commonWidgetProps extends statisticsWidgetProps {
   title: string;
   segments?: StackedBarSegment[];
   icon?: string;
+  tourId?: string;
 }
 
 export interface commonDialogProps {

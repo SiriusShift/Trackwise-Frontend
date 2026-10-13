@@ -2,11 +2,13 @@ import { navigationData } from "@/routing/navigationData";
 import { Button } from "@/shared/components/ui/button";
 import useLocationHook from "@/shared/hooks/useLocation";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import usePageTour from "@/shared/tour/usePageTour";
 import { ArrowLeft, ArrowRightIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 const SettingsLayout = () => {
+  const { Tour } = usePageTour("settings");
   const location = useLocationHook();
   const navigate = useNavigate();
   const width = useScreenWidth();
@@ -18,9 +20,12 @@ const SettingsLayout = () => {
     (item) => item?.name === "Settings",
   )?.sub;
 
-  const Tabs = () => {
+  const renderTabs = () => {
     return (
-      <div className="sm:flex flex-col gap-2 sm:flex-row sm:pb-1">
+      <div
+        data-tour="settings-tabs"
+        className="sm:flex flex-col gap-2 sm:flex-row sm:pb-1"
+      >
         {subNavigation?.map((item, index) => {
           return (
             <Link
@@ -48,6 +53,7 @@ const SettingsLayout = () => {
 
   return (
     <div className="flex flex-col h-full gap-4 p-5 sm:gap-8">
+      {Tour}
       {/* Settings Header */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
@@ -73,14 +79,16 @@ const SettingsLayout = () => {
         <div className="h-full">
           {width < 640 ? (
             location?.location?.pathname === "/settings" ? (
-              <Tabs />
+              renderTabs()
             ) : null
           ) : (
-            <Tabs />
+            renderTabs()
           )}
         </div>
       </div>
-      <Outlet />
+      <div data-tour="settings-content">
+        <Outlet />
+      </div>
     </div>
   );
 };

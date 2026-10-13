@@ -86,14 +86,13 @@ const TransactionToolbar = ({
     <>
       <div className="flex flex-col gap-5">
         <div className="p-1 flex gap-2 overflow-x-auto items-center justify-between">
-          <div className="flex gap-2">
             <TypeSelect />
-          </div>
           <div className="flex gap-2">
             <Button
               onClick={() => setDialogOpen(true)}
               size="sm"
               variant="outline"
+                    data-tour="add"
             >
               <Plus className="lg:mr-2" />
               <span className="hidden md:inline">Add</span>
@@ -102,6 +101,7 @@ const TransactionToolbar = ({
               size="sm"
               variant="outline"
               onClick={() => setReportOpen(true)}
+                                  data-tour="export"
             >
               <Download className="lg:mr-2" />
               <span className="hidden md:inline">Export</span>
@@ -111,6 +111,7 @@ const TransactionToolbar = ({
               variant="outline"
               className="flex items-center gap-2"
               onClick={() => setFilterOpen(true)}
+                                  data-tour="filter"
             >
               <Filter />
               <span className="hidden md:inline">Filter</span>
@@ -132,9 +133,9 @@ const TransactionToolbar = ({
             >
               <div className="flex flex-col py-3 gap-5">
                 <div className="flex flex-col gap-2">
-                  <h1 className="text-sm font-semibold">
+                  <span className="block text-sm font-semibold">
                     Search by description
-                  </h1>
+                  </span>
                   <Input
                     value={search}
                     placeholder="Search.."
@@ -145,7 +146,7 @@ const TransactionToolbar = ({
                 <Separator />
 
                 <div className="flex flex-col gap-2">
-                  <h1 className="text-sm font-semibold">Category</h1>
+                  <span className="block text-sm font-semibold">Category</span>
                   <Collapsible>
                     {/* Trigger */}
                     <CollapsibleTrigger asChild>

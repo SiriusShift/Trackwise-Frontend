@@ -8,7 +8,7 @@ const IncomeWidget = ({ data, isLoading }: statisticsWidgetProps) => {
     color: item.color
   }))
   return (
-    <Widget title="Income" isLoading={isLoading} data={data} segments={formattedData} icon={"ArrowUpFromLine"}/>
+    <Widget title="Income" isLoading={isLoading} data={data} segments={formattedData} icon={"ArrowUpFromLine"} tourId="income"/>
   );
 };
 

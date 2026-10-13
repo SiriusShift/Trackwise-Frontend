@@ -9,7 +9,7 @@ const Status = ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-sm font-semibold">Status</h1>
+      <span className="block text-sm font-semibold">Status</span>
       <RadioGroup
         value={status}
         onValueChange={(value) => setStatus(value)} // Ensure value is updated

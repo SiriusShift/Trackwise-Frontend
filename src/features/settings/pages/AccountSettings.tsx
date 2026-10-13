@@ -341,7 +341,7 @@ const AccountSettings = () => {
           disabled={isUnlinkingGoogle}
           onClick={user.google_id ? handleDisconnectGoogle : handleConnectGoogle}
         >
-          <img src={Google} alt="brand-logo" className="h-3 w-3 me-2" />
+          <img src={Google} alt="" className="h-3 w-3 me-2" />
           {isUnlinkingGoogle
             ? "Disconnecting..."
             : user.google_id

@@ -74,7 +74,7 @@ function Tracker() {
   };
 
   return (
-    <Card className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
+    <Card data-tour="budget" className="relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 right-0 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
@@ -82,13 +82,13 @@ function Tracker() {
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent)]" />
       </div>
 
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 flex flex-1 flex-col gap-4">
         {/* header */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="text-sm font-semibold tracking-wide text-foreground">
+            <span className="block text-sm font-semibold tracking-wide text-foreground">
               Budget limit
-            </h1>
+            </span>
 
             <p className="text-xs text-muted-foreground">
               Track and manage your active entries
@@ -105,15 +105,15 @@ function Tracker() {
         </div>
 
         {/* carousel */}
-        <div className="relative">
+        <div className="relative flex-1">
           <Carousel
             opts={{
               align: "start",
               watchDrag: width < 768,
             }}
-            className="w-full"
+            className="h-full w-full"
           >
-            <CarouselContent className="-ml-2">
+            <CarouselContent className="-ml-2 h-full">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
                     <TrackerSkeleton key={i} count={itemCount} />

@@ -8,7 +8,7 @@ const ExpenseWidget = ({ data, isLoading }: statisticsWidgetProps) => {
     color: item.color
   }))
   return (
-    <Widget title="Expense" data={data} isLoading={isLoading} segments={formattedData} icon={"ArrowDownToLine"}/>
+    <Widget title="Expense" data={data} isLoading={isLoading} segments={formattedData} icon={"ArrowDownToLine"} tourId="expense"/>
   );
 };
 

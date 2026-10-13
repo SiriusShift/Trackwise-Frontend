@@ -9,7 +9,9 @@ const initialState = {
   role: "",
   phoneNumber: "",
   profileImage: "",
-  google_id: ""
+  google_id: "",
+  // null until /auth-status loads, so the tour doesn't start before we know
+  hasSeenTour: null as boolean | null,
 };
 
 export const signFormSlice = createSlice({
@@ -26,9 +28,13 @@ export const signFormSlice = createSlice({
       state.phoneNumber = action.payload.phoneNumber;
       state.profileImage = action.payload.profileImage;
       state.google_id = action.payload.google_id;
+      state.hasSeenTour = action.payload.hasSeenTour ?? state.hasSeenTour;
+    },
+    setHasSeenTour: (state, action) => {
+      state.hasSeenTour = action.payload;
     },
   },
 });
 
-export const { setUserInfo } =
+export const { setUserInfo, setHasSeenTour } =
   signFormSlice.actions;

@@ -7,7 +7,7 @@ import TransactionToolbar from "@/features/transactions/components/toolbar/Trans
 import { navigationData } from "@/routing/navigationData";
 import PageHeader from "@/shared/components/PageHeader";
 import { DataTable } from "@/shared/components/Table/CommonTable";
-import CommonTracker from "@/shared/components/Tracker/Tracker";
+import CommonTracker from "@/shared/components/Tracker/TrackerWidget";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -31,7 +31,11 @@ import {
   TransactionDetails,
   TransactionRow,
 } from "@/shared/types";
+import usePageTour from "@/shared/tour/usePageTour";
+
 const TransactionPage = () => {
+  const { Tour } = usePageTour("transactions");
+
   const {
     type,
     active,
@@ -66,28 +70,31 @@ const TransactionPage = () => {
   const { columns } =
     transactionConfig[type as keyof typeof transactionConfig] || {};
   // Expense
-  const { data: expenseData, isFetching: expenseFetching, refetch } =
-    useGetExpensesQuery(
-      {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        pageSize,
-        pageIndex,
-        ...(filter?.status && { status: filter?.status }),
-        ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
-        ...(selectedCategories.length && {
-          Categories: JSON.stringify(
-            selectedCategories.map((category) => category.id),
-          ),
-        }),
-        ...(selectedAssets.length && {
-          Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
-        }),
-      },
-      {
-        skip: type !== "Expense",
-      },
-    );
+  const {
+    data: expenseData,
+    isFetching: expenseFetching,
+    refetch,
+  } = useGetExpensesQuery(
+    {
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
+      pageSize,
+      pageIndex,
+      ...(filter?.status && { status: filter?.status }),
+      ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
+      ...(selectedCategories.length && {
+        Categories: JSON.stringify(
+          selectedCategories.map((category) => category.id),
+        ),
+      }),
+      ...(selectedAssets.length && {
+        Assets: JSON.stringify(selectedAssets.map((asset) => asset.id)), // Add array of IDs
+      }),
+    },
+    {
+      skip: type !== "Expense",
+    },
+  );
 
   const { data: expenseGraphData, isFetching: expenseGraphFetching } =
     useGetGraphExpenseQuery(
@@ -257,7 +264,10 @@ const TransactionPage = () => {
     }
     setTransactions((prev) => {
       const seen = new Set(prev.map((row) => row.id));
-      return [...prev, ...tableData.data.filter((row: TransactionRow) => !seen.has(row.id))];
+      return [
+        ...prev,
+        ...tableData.data.filter((row: TransactionRow) => !seen.has(row.id)),
+      ];
     });
   }, [tableData]);
 
@@ -286,6 +296,7 @@ const TransactionPage = () => {
 
   return (
     <>
+          {Tour}
       <CommonToolbar />
       <div className="flex p-5 flex-col gap-5">
         <PageHeader
@@ -306,7 +317,8 @@ const TransactionPage = () => {
         />
         <div className="flex w-full flex-col gap-5 lg:flex-row">
           {/* Table */}
-          <div className="w-full overflow-hidden">
+          <div className="w-full overflow-hidden"                                   data-tour="table"
+>
             <DataTable
               columns={tableColumn}
               setPageIndex={setPageIndex}
@@ -323,7 +335,7 @@ const TransactionPage = () => {
 
           {/* Chart */}
           {type !== "Transfer" && (
-            <div>
+            <div data-tour="graph">
               <CommonPieGraph
                 total={graphData?.total}
                 trend={graphData?.trend}
@@ -336,8 +348,14 @@ const TransactionPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <CommonTracker />{" "}
+          <div data-tour="budget" className="flex flex-col *:flex-1">
+            <CommonTracker />
+          </div>
+                    <div data-tour="schedule" className="flex flex-col *:flex-1">
+
           <ScheduledWidget type={type} />
+                    </div>
+
         </div>
 
         <ViewDetailed

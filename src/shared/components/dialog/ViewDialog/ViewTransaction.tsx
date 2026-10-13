@@ -135,10 +135,10 @@ const ViewTransaction = ({ transaction, open, setOpen }: ViewTransactionProps) =
             </div>
 
             <div className="text-center">
-              <h1 className={`text-3xl font-bold ${type.text}`}>
+              <span className={`block text-3xl font-bold ${type.text}`}>
                 {type.prefix}
                 {formatCurrency(transaction.amount)}
-              </h1>
+              </span>
 
               {status && (
                 <Badge

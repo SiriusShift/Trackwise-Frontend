@@ -11,8 +11,8 @@ const TransactionListSkeleton = () => {
             <Skeleton className="h-5 w-36" />
             <Skeleton className="h-5 w-24" />
 
-            {/* <h1
-                      className={`${
+            {/* <span
+                      className={`block ${
                         item?.type === "Expense"
                           ? "text-destructive"
                           : item?.type === "Income"
@@ -24,7 +24,7 @@ const TransactionListSkeleton = () => {
                       {item?.amount.toLocaleString("en-PH", {
                         minimumFractionDigits: 2,
                       })}
-                    </h1> */}
+                    </span> */}
           </div>
 
           <div className="flex justify-between items-center mt-1">

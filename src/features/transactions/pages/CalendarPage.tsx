@@ -85,7 +85,7 @@ const CalendarPage = () => {
       {/* Calendar */}
       <div className="flex flex-1 flex-col p-4 ">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-xl font-bold">{title}</h2>
+          <h1 className="text-xl font-bold">{title}</h1>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigateCalendar("prev")}>
               <LucideIcon.ChevronLeft className="h-4 w-4" />

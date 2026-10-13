@@ -53,7 +53,7 @@ export const InfoRow = ({
       ) : (
         <Card className="text-sm text-muted-foreground w-full h-52 flex flex-col items-center justify-center">
           <Icon.ImageOff />
-          <h1>No image</h1>
+          <span className="block">No image</span>
         </Card>
       )
     ) : label === "Schedule" ? (
