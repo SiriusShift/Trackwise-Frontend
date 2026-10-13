@@ -1,8 +1,6 @@
 import { IRootState } from "@/app/store";
-import CryptoJS from "crypto-js";
 import moment from "moment";
 import { useSelector } from "react-redux";
-import { saltkey } from "./saltkey";
 export const formatDate = (dateString?: Date | string) => {
   if (dateString === undefined) return "Invalid Date";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -79,23 +77,6 @@ export const numberInput = (
   if (/^-?\d*\.?\d{0,2}$/.test(value)) {
     field.onChange(value); // store as string
   }
-};
-
-export const decryptString = (data: any) => {
-  if (!data) return null;
-
-  const bytes = CryptoJS.AES.decrypt(data, saltkey);
-  const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  return decryptedData;
-};
-
-export const encryptString = (data: any) => {
-  if (!data) return null;
-  const ciphertext = CryptoJS.AES.encrypt(
-    JSON.stringify(data),
-    saltkey,
-  ).toString();
-  return ciphertext;
 };
 
 //Error Handling

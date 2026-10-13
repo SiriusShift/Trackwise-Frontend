@@ -82,6 +82,7 @@ const ForgotPassword = () => {
         // id: parseInt(id || ""),
         token: watch("code"),
         password: watch("password"),
+        email: email
       }).unwrap();
       toast.success("Password reset successful");
       setTimeout(() => {

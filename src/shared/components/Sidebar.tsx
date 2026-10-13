@@ -224,7 +224,7 @@ export function AppSidebar() {
                         <SidebarMenuButton
                           variant="ghost"
                           onClick={handleLogout}
-                          className="lg:ms-1 flex items-center rounded transition-all duration-300 justify-start data-[state=collapsed]:justify-center"
+                          className=" flex items-center rounded transition-all duration-300 justify-start data-[state=collapsed]:justify-center"
                         >
                           <LogOut style={{ width: "17px", height: "17px" }} />
                           <span

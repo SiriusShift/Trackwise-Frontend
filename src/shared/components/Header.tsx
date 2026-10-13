@@ -4,7 +4,6 @@ import { Button } from "./ui/button";
 import ModeToggle from "@/shared/components/ModeToggle";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useCookies } from "react-cookie";
-import { decryptString } from "@/shared/utils/CustomFunctions";
 import { IRootState } from "@/app/store";
 import { useSelector } from "react-redux";
 

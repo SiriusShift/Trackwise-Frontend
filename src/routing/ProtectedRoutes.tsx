@@ -3,7 +3,6 @@ import { useLazyGetAuthStatusQuery } from "../features/auth/api/signinApi";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import { useCookies } from "react-cookie";
-import { encryptString } from "@/shared/utils/CustomFunctions";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserInfo } from "@/shared/slices/userSlice";
 import { setSettings } from "@/shared/slices/settingsSlice";
@@ -47,8 +46,7 @@ function ProtectedRoutes() {
           )
         }
         if(!cookies.user){
-          const encryptedInfo = encryptString(response?.user);
-          setCookie("user", encryptedInfo, {path: "/", maxAge: 7 * 24 * 60 * 60});
+          setCookie("user", "1", {path: "/", maxAge: 7 * 24 * 60 * 60});
         }
       } catch (err) {
         console.error("Error fetching auth status:", err);

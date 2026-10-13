@@ -17,7 +17,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
-  encryptString,
   handleCatchErrorMessage,
 } from "../../../shared/utils/CustomFunctions";
 import { signupSchema } from "../schema/authSchema";
@@ -49,7 +48,6 @@ const signUp = () => {
   const [countdown, setCountdown] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState(false);
   const [code, setCode] = useState("");
-  // const device = encryptString(getBrowserInfo());
   const router = useNavigate();
   const tz = moment.tz.guess();
 const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
@@ -75,14 +73,13 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const submitSignup = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const encryptedPassword = encryptString(getValues("password"));
     try {
       const response = await postSignup({
         firstName: getValues("firstName"),
         lastName: getValues("lastName"),
         username: getValues("username"),
         email: getValues("email"),
-        password: encryptedPassword || "",
+        password: getValues("password"),
         timezone: tz,
         otp: code || "",
       }).unwrap();
