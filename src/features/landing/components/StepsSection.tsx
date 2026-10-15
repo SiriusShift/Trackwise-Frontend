@@ -3,7 +3,7 @@ import { Card } from "@/shared/components/ui/card";
 const steps = [
   {
     title: "Add your accounts",
-    desc: "Add bank accounts, e-wallets, and credit cards with their starting balances.",
+    desc: "Add bank accounts, e-wallets, and cash with their starting balances.",
   },
   {
     title: "Record or schedule",

@@ -42,7 +42,7 @@ const features = [
 ];
 
 const FeaturesSection = () => (
-  <section id="features" className="scroll-mt-16 border-b border-border/60 py-20 lg:py-24">
+  <section id="features" className="scroll-mt-16 pt-20 pb-4 lg:pt-24">
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       <h2 className="text-3xl font-bold tracking-tight">Everything in one place</h2>
       <p className="mt-3 max-w-lg text-muted-foreground">

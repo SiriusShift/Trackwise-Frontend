@@ -1,19 +1,20 @@
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 import { useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
-import CreditCardSection from "../components/CreditCardSection";
 import CtaSection from "../components/CtaSection";
 import FeaturesSection from "../components/FeaturesSection";
 import HeroSection from "../components/HeroSection";
+import HighlightsSection from "../components/HighlightsSection";
 import LandingFooter from "../components/LandingFooter";
 import LandingNavbar from "../components/LandingNavbar";
+import StatementsSection from "../components/StatementsSection";
 import StepsSection from "../components/StepsSection";
 
 const LandingPage = () => {
   usePageMeta({
     title: "Trackwise | Personal finance tracker",
     description:
-      "Track expenses, income, and transfers in one place. Schedule recurring transactions and keep your credit card billing under control.",
+      "Track expenses, income, and transfers in one place. Schedule recurring transactions and download statements for any account.",
   });
   const [cookies] = useCookies(["user"]);
 
@@ -29,7 +30,8 @@ const LandingPage = () => {
       <main>
         <HeroSection />
         <FeaturesSection />
-        <CreditCardSection />
+        <HighlightsSection />
+        <StatementsSection />
         <StepsSection />
         <CtaSection />
       </main>
