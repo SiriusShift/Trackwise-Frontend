@@ -65,7 +65,6 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
     },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      console.log(amount);
       return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
     },
     meta: {
@@ -157,11 +156,9 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
       const [confirmOpen, setConfirmOpen] = useState(false);
       const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
-      console.log(open);
       const expense = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
-      console.log(expense);
 
       const [deleteExpense] = useArchiveTransactionMutation();
 

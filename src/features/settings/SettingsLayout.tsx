@@ -14,7 +14,6 @@ const SettingsLayout = () => {
   const width = useScreenWidth();
   const [activeTab, setActiveTab] = useState("Settings");
 
-  console.log(location);
 
   const subNavigation = navigationData?.find(
     (item) => item?.name === "Settings",

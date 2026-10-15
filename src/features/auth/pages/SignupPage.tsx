@@ -74,7 +74,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
   const submitSignup = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const response = await postSignup({
+      await postSignup({
         firstName: getValues("firstName"),
         lastName: getValues("lastName"),
         username: getValues("username"),
@@ -83,7 +83,6 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
         timezone: tz,
         otp: code || "",
       }).unwrap();
-      console.log(response);
       router("/dashboard");
     } catch (err) {
       let errorMessage = handleCatchErrorMessage(err); // Default message
@@ -93,14 +92,12 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const onSubmit = async (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
-    console.log("test");
     if (isValid) {
       try {
-        const response = await postVerify({
+        await postVerify({
           email: [watch("email")] as Array<string>,
           username: watch("username"),
         }).unwrap();
-        console.log(response);
         resendCode();
         setIsVerifying(true);
       } catch (err) {
@@ -112,7 +109,6 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
         toast.error(errorMessage);
       }
     } else {
-      console.log(errors);
     }
   };
 

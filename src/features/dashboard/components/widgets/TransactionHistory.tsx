@@ -65,7 +65,6 @@ const TransactionHistory = () => {
 
   const transactions: RecentTransaction[] = data?.data ?? [];
 
-  console.log(data);
   const isEmpty = !isFetching && transactions.length === 0;
 
   return (

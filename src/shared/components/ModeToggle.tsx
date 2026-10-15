@@ -9,7 +9,6 @@ const ModeToggle = () => {
   const { setTheme, theme } = useTheme();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  console.log(theme)
   const changeTheme = async () => {
     await document.startViewTransition(() => {
       flushSync(() => {

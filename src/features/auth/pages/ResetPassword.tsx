@@ -33,10 +33,8 @@ const ResetPassword = () => {
     resolver: zodResolver(resetPasswordSchema.schema),
     mode: "onChange",
   });
-  console.log(watch());
 
   const onSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("hello");
     event.preventDefault();
     try {
       await resetTrigger({

@@ -92,7 +92,6 @@ function TrackerDialog({
     formState: { isValid, isDirty },
   } = form;
 
-  console.log(watch());
 
   function handleCloseIntent() {
     if (!isDirty) {
@@ -113,7 +112,6 @@ function TrackerDialog({
   }
 
   const onSubmit = async (data: trackerFormType) => {
-    console.log(data);
     try {
       if (data?.id) {
         await confirm({

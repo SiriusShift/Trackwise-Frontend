@@ -40,7 +40,7 @@ const CategoryDialog = ({ open, setOpen, mode }: CategoryDialogProps) => {
     defaultValues: categorySchema.defaultValues,
   });
 
-  const { control, formState, watch } = form;
+  const { control, formState } = form;
   const isEdit = mode === "Edit";
 
   // Sync form with the category being edited (or reset to defaults for
@@ -50,13 +50,11 @@ const CategoryDialog = ({ open, setOpen, mode }: CategoryDialogProps) => {
     form.reset(isEdit && category ? category : categorySchema.defaultValues);
   }, [open, isEdit, category, form]);
 
-  const onSubmit = form.handleSubmit((data) => {
+  const onSubmit = form.handleSubmit(() => {
     // TODO: wire to createCategory / updateCategory RTK Query mutations
-    console.log(data);
     setOpen(false);
   });
 
-  console.log(watch());
 
   return (
     <CommonDialog

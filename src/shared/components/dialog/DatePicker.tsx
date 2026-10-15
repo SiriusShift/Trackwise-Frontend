@@ -23,7 +23,6 @@ const DatePicker = ({
   disableFuture?: boolean;
 }) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
-  console.log(disablePast, open);
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -45,7 +44,6 @@ const DatePicker = ({
                     field.value ? new Date(field.value).getMinutes() : 0,
                   ),
                 );
-                console.log("Selected Date:", newDate);
                 if (setDate) {
                   setDate(field, newDate);
                 }

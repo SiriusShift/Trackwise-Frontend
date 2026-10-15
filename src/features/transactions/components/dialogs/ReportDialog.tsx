@@ -128,7 +128,6 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
         return;
       }
 
-      console.log(data);
 
       const accountName =
         rawAssetData?.data?.find((a: AssetData) => a.id === account)?.name ??

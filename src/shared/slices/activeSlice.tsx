@@ -35,7 +35,6 @@ export const active = createSlice({
       state.mode = action.payload;
     },
     setActionShow: (state, action: PayloadAction<boolean>) => {
-      console.log(action, "testing");
       state.action = action.payload;
     },
     setType: (state, action: PayloadAction<string>) => {

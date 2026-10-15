@@ -29,11 +29,9 @@ import { navigationData } from "../../routing/navigationData";
 export function AppSidebar() {
   const location = useLocationHook();
   const parent = `/${location?.location?.pathname?.split("/")[1]}`;
-  console.log(parent);
 
   const [, , removeCookie] = useCookies(["user"]);
-  const [active, setActive] = useState(location?.location?.pathname);
-  console.log(active);
+  const [, setActive] = useState(location?.location?.pathname);
   const router = useNavigate();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";

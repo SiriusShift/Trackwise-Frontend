@@ -64,7 +64,6 @@ const TransactionPage = () => {
   const selectedCategories = filter?.selectedCategories ?? [];
   const selectedAssets = filter?.selectedAssets ?? [];
 
-  console.log(selectedAssets, selectedCategories);
   // Queries
 
   const { columns } =
@@ -228,7 +227,6 @@ const TransactionPage = () => {
 
   const tableFetching = expenseFetching || incomeFetching || transferFetching;
 
-  console.log(tableFetching);
   const graphData =
     type === "Expense"
       ? expenseGraphData
@@ -236,7 +234,6 @@ const TransactionPage = () => {
         ? incomeGraphData
         : null;
 
-  console.log(graphData, "graph data");
 
   const graphFetching = expenseGraphFetching || incomeGraphFetching;
 

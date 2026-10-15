@@ -78,14 +78,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
           }
         },
       });
-      google.accounts.id.prompt((n: any) => {
-        console.log("[OneTap]", {
-          displayed: n.isDisplayed?.(),
-          notDisplayed: n.isNotDisplayed?.() && n.getNotDisplayedReason?.(),
-          skipped: n.isSkippedMoment?.() && n.getSkippedReason?.(),
-          dismissed: n.isDismissedMoment?.() && n.getDismissedReason?.(),
-        });
-      });
+      google.accounts.id.prompt();
     };
 
     if ((window as any).google?.accounts?.id) {

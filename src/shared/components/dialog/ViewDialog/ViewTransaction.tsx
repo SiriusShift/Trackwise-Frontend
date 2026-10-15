@@ -117,7 +117,6 @@ const ViewTransaction = ({ transaction, open, setOpen }: ViewTransactionProps) =
   const title = transaction?.interval
     ? "Recurring Transaction"
     : "Transaction Details";
-  console.log(mode);
   return (
     <>
       <CommonDialog

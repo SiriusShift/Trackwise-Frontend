@@ -178,11 +178,9 @@ export const incomeColumns: ColumnDef<TransactionRow>[] = [
       const [dialogOpen, setDialogOpen] = useState(false);
       const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
-      console.log(open);
       const income = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
-      console.log(row);
 
       const [deleteIncome] = useDeleteIncomeMutation();
 

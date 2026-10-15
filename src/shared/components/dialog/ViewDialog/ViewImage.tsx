@@ -11,7 +11,6 @@ const ViewImage = ({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) => {
-  console.log(image);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-4xl p-2 border-none bg-transparent shadow-none" removeClose>

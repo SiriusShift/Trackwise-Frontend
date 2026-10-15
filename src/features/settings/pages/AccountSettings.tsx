@@ -108,7 +108,6 @@ const AccountSettings = () => {
     },
   });
 
-  console.log(watch());
 
   const profileImageFile = watch("profile_image");
 

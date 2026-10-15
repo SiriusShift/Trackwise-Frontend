@@ -27,12 +27,10 @@ const TransactionItem = React.memo(function TransactionItem({
     : null;
 
   const longPressProps = useLongPress(() => {
-    console.log("test");
     dispatch(setActionShow(true));
   }, 1000); // hold 1.5 seconds
 
   const handleClick = () => {
-    console.log("test");
     dispatch(setActiveRow(item));
     dispatch(setActionShow(true));
     // dispatch(setOpenDialog(true));

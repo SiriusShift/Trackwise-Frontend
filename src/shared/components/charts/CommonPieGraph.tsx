@@ -48,10 +48,8 @@ const chartConfig: ChartConfig = {};
 function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
   const [showChart, setShowChart] = useState(false);
 
-  console.log(total)
   const modeDisplay = formatMode();
 
-  console.log(data, "trend")
 
   // Delay chart rendering for smooth animation
   useEffect(() => {

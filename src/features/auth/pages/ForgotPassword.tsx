@@ -39,7 +39,6 @@ const ForgotPassword = () => {
     resolver: zodResolver(resetPasswordSchema.schema),
     mode: "onChange",
   });
-  console.log(watch());
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;

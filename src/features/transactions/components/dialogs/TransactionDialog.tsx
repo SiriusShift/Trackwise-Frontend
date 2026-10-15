@@ -72,11 +72,9 @@ export function TransactionDialog({
     handleSubmit,
     reset,
     watch,
-    formState: { isDirty, isValid, errors },
+    formState: { isDirty, isValid },
   } = form;
 
-  console.log(errors)
-  console.log(watch())
 
   // Schedules use the recurring endpoints; everything else uses the per-type ones.
   // Both hooks are always called (hook order must not change when "recurring" toggles).

@@ -11,8 +11,6 @@ export const api = createApi({
     },
     credentials: "include", // Include credentials such as cookies
     fetchFn: async (url, options) => {
-      console.log("Making request to:", url);
-      console.log("Request options:", options);
       return fetch(url, options);
     },
   }),

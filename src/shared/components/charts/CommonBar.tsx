@@ -65,7 +65,6 @@ export function StackedBar({
 
   const segments = groupSegments(rawSegments, maxLegendItems);
 
-  console.log(segments);
 
   useEffect(() => {
     setAnimated(false);

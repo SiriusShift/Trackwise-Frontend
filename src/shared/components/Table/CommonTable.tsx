@@ -94,7 +94,6 @@ export function DataTable<TData, TValue>({
   );
   const width = useScreenWidth();
 
-  console.log(data);
   const table = useReactTable({
     data,
     columns,

@@ -85,7 +85,6 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
     },
     cell: ({ getValue }) => {
       const amount = getValue() as number | undefined;
-      console.log(amount);
       return <span>₱{Number(amount).toFixed(2) || "0"}</span>;
     },
     meta: {
@@ -185,11 +184,9 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
       const [dialogOpen, setDialogOpen] = useState(false);
       const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
-      console.log(open);
       const transfer = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
-      console.log(transfer);
 
       const [deleteTransfer] = useDeleteTransferMutation();
       // const [payAuto] = usePostAutoPaymentMutation();

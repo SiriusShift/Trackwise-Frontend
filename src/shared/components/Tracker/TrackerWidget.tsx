@@ -49,7 +49,6 @@ function Tracker() {
   const visibleCount = getVisibleCount(width);
   const itemCount = data?.length ?? 0;
 
-  console.log(visibleCount);
   // Show nav arrows only when there are more items than visible slots
   const shouldShowNav = itemCount > visibleCount;
 

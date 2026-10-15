@@ -46,9 +46,8 @@ const CategorySettings = () => {
     setDialogOpen(true);
   };
 
-  const handleArchiveToggle = (category: CategoryType) => {
+  const handleArchiveToggle = (_category: CategoryType) => {
     // TODO: wire to archive/restore mutation once available
-    console.log("toggle archive for", category.id);
   };
 
   return (
