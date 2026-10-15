@@ -2,7 +2,8 @@ import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import moment, { Moment } from "moment";
 
-const BRAND = "#0f6e56";
+// Matches --primary in index.css (react-pdf can't read CSS variables).
+const BRAND = "#3b82f6";
 const INK = "#111827";
 const MUTED = "#6b7280";
 const LINE = "#e5e7eb";
