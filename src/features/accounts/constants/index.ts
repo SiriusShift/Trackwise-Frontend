@@ -25,7 +25,7 @@ import {
 export const ACCOUNT_TYPES = [
   { value: "CASH", label: "Cash" },
   { value: "BANK", label: "Bank Account" },
-  // { value: "CREDIT", label: "Credit" },
+  { value: "CREDIT", label: "Credit" },
   // { value: "LOAN", label: "Loan" },
   // { value: "INVESTMENT", label: "Investment" },
 ] as const;

@@ -65,7 +65,6 @@ export interface CreditDetail {
   creditLimit: number;
   statementDate: number;
   dueDate: number;
-  minimumPayment: number;
 }
 
 export interface LoanDetail {

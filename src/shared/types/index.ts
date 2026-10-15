@@ -268,7 +268,6 @@ export interface ScheduledItem {
   status?: string | null;
   statementDate?: string;
   statementBalance?: number;
-  minimumPaymentDue?: number;
   amountPaid?: number;
   // A future cycle shown for planning; it can't be paid/skipped yet
   projected: boolean;
@@ -310,9 +309,6 @@ export interface CreditStatementDetail extends ScheduledItem {
   id: number;
   currentBalance?: number | null;
   creditLimit: number;
-  interestCharged: number;
-  lateFeeCharged: number;
-  fees: { id: number; label: string; amount: number }[];
   payments: {
     id: number;
     amount: number;
@@ -341,6 +337,9 @@ export interface DashboardStatistics {
   expenseTrend?: number;
   incomeTrend?: number;
   balanceTrend?: number;
+  netWorth?: number;
+  netWorthTrend?: number;
+  liabilitiesChange?: number;
   expenseBreakdown?: BreakdownItem[];
   incomeBreakdown?: BreakdownItem[];
   assetBreakdown?: { name: string; balance: number; color: string }[];

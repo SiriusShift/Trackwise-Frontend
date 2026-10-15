@@ -148,7 +148,6 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountType]);
 
-  console.log(currencyCodes);
   // Reset form with account data when opening in edit mode.
   useEffect(() => {
     if (!open) {
@@ -238,7 +237,6 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
         }),
       };
 
-      console.log(payload);
 
       if (isEdit && account) {
         await updateAccount({ id: account.id, ...payload }).unwrap();
@@ -482,7 +480,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
             {accountType === "CREDIT" && (
               <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Credit Card Details
+                  Credit Details
                 </p>
 
                 <FormField
@@ -526,7 +524,10 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                     name="statementDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Statement Date</FormLabel>
+                        <FormLabel>
+                          Statement Date
+                          <RequiredMark />
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -553,7 +554,10 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Due Date</FormLabel>
+                        <FormLabel>
+                          Due Date
+                          <RequiredMark />
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"

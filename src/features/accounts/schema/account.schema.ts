@@ -31,8 +31,6 @@ export const accountSchema = z
     creditLimit: z.number().positive().optional(),
     statementDate: z.number().int().min(1).max(31).optional().nullable(),
     dueDate: z.number().int().min(1).max(31).optional().nullable(),
-    // minimumPaymentPercent: z.number().nonnegative().optional(),
-    // minimumPayment: z.number().nonnegative().optional(),
     includeNetWorth: z.boolean(),
     targetAmount: z.number().positive().optional().nullable(),
     targetDate: z.date().optional().nullable(),
@@ -52,6 +50,19 @@ export const accountSchema = z
         path: ["creditLimit"],
         message: "Credit limit is required",
       });
+    }
+
+    // Statements and bill reminders are generated from these two days.
+    if (data.type === "CREDIT") {
+      for (const field of ["statementDate", "dueDate"] as const) {
+        if (data[field] == null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [field],
+            message: field === "dueDate" ? "Due date is required" : "Statement date is required",
+          });
+        }
+      }
     }
 
     const hasGoal = data.targetAmount != null;

@@ -50,6 +50,7 @@ const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) =>
         amount: statement.amount,
         dueDate: statement.dueDate,
         toAsset: statement.toAsset,
+        maxAmount: Math.max(statement.currentBalance ?? statement.amount, 0),
       }
     : null;
 
@@ -124,16 +125,6 @@ const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) =>
                 label="Current Card Balance"
                 value={formatCurrency(statement.currentBalance ?? 0, currency)}
               />
-              {statement.fees.map((fee) => (
-                <div key={fee.id} className="flex flex-col gap-3">
-                  <Separator />
-                  <InfoRow
-                    icon={LucideIcons.BadgeAlert}
-                    label={fee.label}
-                    value={formatCurrency(fee.amount, currency)}
-                  />
-                </div>
-              ))}
             </>
           )}
         </div>

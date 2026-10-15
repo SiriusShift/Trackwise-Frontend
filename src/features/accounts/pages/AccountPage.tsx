@@ -108,7 +108,6 @@ const AccountPage = () => {
   const excludedAccountsLength =
     accountsData?.data?.filter((item) => !item.includeInNetWorth)?.length ?? 0;
 
-  console.log(excludedAccountsLength);
 
   const statistics = stats.map((item) => {
     switch (item.key) {

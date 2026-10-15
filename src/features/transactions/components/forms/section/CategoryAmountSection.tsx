@@ -48,17 +48,23 @@ export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
     field: any,
   ) => {
     const value = Number(e.target.value);
-    const accountBalance = watch("account")?.remainingBalance;
+    const account = watch("account");
+    const isCredit = account?.category === "CREDIT";
+    // A card's remainingBalance is what's owed; what can be spent is the credit left.
+    const accountBalance = isCredit
+      ? account?.remainingCredit
+      : account?.remainingBalance;
     const remainingBalance =
       Number(watch("balance") || 0) + Number(watch("initialAmount") || 0);
 
     if (
-      accountBalance &&
+      accountBalance !== undefined &&
+      accountBalance !== null &&
       type !== "Income" &&
       !watch("recurring") &&
       value > accountBalance
     ) {
-      toast.error("Insufficient balance");
+      toast.error(isCredit ? "Exceeds available credit" : "Insufficient balance");
       e.target.value = String(accountBalance);
       return;
     }

@@ -52,6 +52,8 @@ export interface PayTarget {
   toAsset?: ScheduleAccount | null;
   interval?: number;
   unit?: string;
+  // Most that can be paid (a card can't be paid past what it owes)
+  maxAmount?: number | null;
 }
 
 interface PayDialogType extends commonDialogProps {
@@ -126,6 +128,18 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
       | { remainingBalance?: number; category?: string }
       | undefined;
     const accountBalance = account?.remainingBalance;
+
+    if (
+      data?.maxAmount !== undefined &&
+      data.maxAmount !== null &&
+      value > data.maxAmount
+    ) {
+      toast.error(
+        `Amount exceeds the ${data.maxAmount.toFixed(2)} owed on this card`,
+      );
+      e.target.value = String(data.maxAmount);
+      return;
+    }
 
     // Credit accounts can go "negative" (charges increase what's owed).
     if (
@@ -275,6 +289,8 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                 assets={assetData ?? []}
                 control={control}
                 excludeId={data?.toAsset?.id}
+                // A card bill is paid from cash or bank, not from another card.
+                categories={isCredit ? ["CASH", "BANK"] : undefined}
               />
             </div>
             {!isCredit && (

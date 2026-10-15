@@ -23,11 +23,15 @@ import {
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { Check, ChevronsUpDown } from "lucide-react";
 
+const ALLOWED_CATEGORIES = ["CASH", "BANK", "CREDIT", "INVESTMENT"];
+
 interface Asset {
   currency: string | undefined;
   id: number;
   name: string;
   remainingBalance: number;
+  remainingCredit?: number;
+  category: string;
 }
 
 interface AccountSelectProps {
@@ -37,6 +41,7 @@ interface AccountSelectProps {
   control: any;
   disabled?: boolean;
   excludeId?: number; // filters out one asset (e.g. the "from" account in a transfer)
+  categories?: string[]; // narrows the selectable account categories
 }
 
 export const AccountSelect = ({
@@ -46,17 +51,18 @@ export const AccountSelect = ({
   control,
   disabled,
   excludeId,
+  categories = ALLOWED_CATEGORIES,
 }: AccountSelectProps) => {
-  const filtered = excludeId
-    ? assets.filter((a) => a.id !== excludeId)
-    : assets;
+  const filtered = assets.filter(
+    (asset) => categories.includes(asset.category) && asset.id !== excludeId,
+  );
 
   return (
     <FormField
       name={name}
       control={control}
       render={({ field: { value, onChange } }) => {
-        const account = filtered.find((a) => a.id === value?.id)
+        const account = filtered.find((a) => a.id === value?.id);
 
         return (
           <FormItem className="flex flex-col">
@@ -103,30 +109,40 @@ export const AccountSelect = ({
                   <CommandList>
                     <CommandEmpty>No accounts found.</CommandEmpty>
                     <CommandGroup>
-                      {filtered.map((asset) => (
-                        <CommandItem
-                          value={asset.name}
-                          key={asset.id}
-                          onSelect={() => onChange(asset)}
-                          className="flex justify-between flex-row items-center"
-                        >
-                          <span>{asset.name}</span>
-                          <div className="flex flex-row">
-                            <span className="text-muted-foreground text-xs mr-2">
-                              {formatCurrency(asset.remainingBalance, asset.currency, "symbol")}
-                              {/* ₱{asset.remainingBalance.toFixed(2)} */}
-                            </span>
-                            <Check
-                              className={cn(
-                                "h-4 w-4",
-                                asset.id === value?.id
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                          </div>
-                        </CommandItem>
-                      ))}
+                      {filtered.map((asset) => {
+                        const balance =
+                          (asset.category === "CREDIT"
+                            ? asset.remainingCredit
+                            : asset.remainingBalance) ?? 0;
+                        return (
+                          <CommandItem
+                            value={asset.name}
+                            key={asset.id}
+                            onSelect={() => onChange(asset)}
+                            className="flex justify-between flex-row items-center"
+                          >
+                            <span>{asset.name}</span>
+                            <div className="flex flex-row">
+                              <span className="text-muted-foreground text-xs mr-2">
+                                {formatCurrency(
+                                  balance,
+                                  asset.currency,
+                                  "symbol",
+                                )}
+                                {/* ₱{asset.remainingBalance.toFixed(2)} */}
+                              </span>
+                              <Check
+                                className={cn(
+                                  "h-4 w-4",
+                                  asset.id === value?.id
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                            </div>
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   </CommandList>
                 </Command>

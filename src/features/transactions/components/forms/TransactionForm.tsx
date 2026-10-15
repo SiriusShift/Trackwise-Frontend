@@ -34,10 +34,17 @@ import { BehaviourSelector } from "./section/BehaviourSelector";
 import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 
+// Account categories each transaction type can use (LOAN isn't supported yet).
+const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
+const INCOME_CATEGORIES = ["CASH", "BANK"];
+const TRANSFER_CATEGORIES = ["CASH", "BANK", "CREDIT", "INVESTMENT"];
+
 interface Asset {
   id: number;
   name: string;
+  category: string;
   remainingBalance: number;
+  remainingCredit?: number;
   currency: string | undefined;
 }
 
@@ -61,6 +68,11 @@ const TransactionForm = ({
 
   const isRecurring = watch("recurring");
   const isTransfer = type === "Transfer";
+  const accountCategories = isTransfer
+    ? TRANSFER_CATEGORIES
+    : type === "Income"
+      ? INCOME_CATEGORIES
+      : EXPENSE_CATEGORIES;
 
   // Recurring toggle is only available when adding a non-transfer. When editing, the
   // record already is (or isn't) a schedule, and switching would hit the wrong endpoint.
@@ -215,6 +227,7 @@ const TransactionForm = ({
         label={fromLabel}
         assets={assetData ?? []}
         control={control}
+        categories={accountCategories}
       />
 
       {/* Swap button + To account — Transfer only */}
@@ -241,6 +254,7 @@ const TransactionForm = ({
             assets={assetData ?? []}
             control={control}
             excludeId={fromAccountId} // prevents selecting the same account
+            categories={TRANSFER_CATEGORIES}
           />
         </>
       )}
