@@ -36,7 +36,7 @@ const StatementPreview = () => (
       </p>
     </div>
 
-    <div className="mt-4 flex justify-between rounded-md bg-muted px-3 py-2.5">
+    <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-2 rounded-md bg-muted px-3 py-2.5">
       <div>
         <p className="text-[8px] uppercase tracking-wider text-muted-foreground">
           Account
@@ -116,7 +116,7 @@ const StatementPreview = () => (
       </div>
     </div>
 
-    <div className="mt-4 flex justify-between border-t border-border pt-2 text-[8px] text-muted-foreground">
+    <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-border pt-2 text-[8px] text-muted-foreground">
       <span>Generated automatically by Trackwise · Main Checking</span>
       <span>Page 1 of 1</span>
     </div>

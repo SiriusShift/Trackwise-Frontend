@@ -41,7 +41,7 @@ const StatementsSection = () => {
       id="statements"
       className="scroll-mt-16 border-b border-border/60 bg-card/30 py-20 lg:py-24"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 *:min-w-0">
         <StatementPreview />
         <div>
           <motion.div
