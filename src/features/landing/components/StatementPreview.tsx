@@ -1,6 +1,7 @@
 // Themed HTML mock of the PDF in features/transactions/components/reports/TransactionStatement.tsx.
 // Sample data only; keep the layout in sync with the PDF.
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import ScrollReveal from "./ScrollReveal";
 
 const money = (n: number) => formatCurrency(n);
 
@@ -17,6 +18,7 @@ const rows = [
 ]
 
 const StatementPreview = () => (
+<ScrollReveal fromScale={0.96} fromOpacity={0.3} fromY={24}>
   <div
     role="img"
     aria-label="Sample Trackwise transaction statement showing opening and closing balances and transactions"
@@ -119,6 +121,7 @@ const StatementPreview = () => (
       <span>Page 1 of 1</span>
     </div>
   </div>
+  </ScrollReveal>
 );
 
 export default StatementPreview;

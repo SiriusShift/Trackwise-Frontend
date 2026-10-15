@@ -7,6 +7,7 @@ import {
   Repeat,
   TrendingUp,
 } from "lucide-react";
+import ScrollReveal from "./ScrollReveal";
 
 const features = [
   {
@@ -51,16 +52,21 @@ const FeaturesSection = () => (
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {features.map(({ icon: Icon, title, desc }) => (
-          <Card
+          <ScrollReveal
             key={title}
-            className="p-6 transition-colors hover:border-primary/50 hover:bg-card/80"
+            className="h-full"
+            fromScale={0.96}
+            fromOpacity={0.3}
+            fromY={24}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Icon className="h-5 w-5" />
-            </div>
-            <h3 className="mt-4 font-semibold">{title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
-          </Card>
+            <Card className="h-full p-6 transition-colors hover:border-primary/50 hover:bg-card/80">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 font-semibold">{title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+            </Card>
+          </ScrollReveal>
         ))}
       </div>
     </div>
