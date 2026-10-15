@@ -25,7 +25,7 @@ const LandingPage = () => {
 
   // The `dark` class scopes the app's dark theme tokens to this page regardless of the user's theme
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <LandingNavbar />
       <main>
         <HeroSection />
