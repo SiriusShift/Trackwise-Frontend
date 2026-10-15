@@ -23,7 +23,6 @@ export const formatString = (str: string) => {
 
 export const formatDateDisplay = (): string => {
   const active = useSelector((state: IRootState) => state.active.active);
-  console.log(active);
   const mode = useSelector((state: IRootState) => state.active.mode);
   if (!active) return "Select Date";
 
@@ -55,6 +54,9 @@ export const formatCurrency = (
     currencyDisplay,
   }).format(amount);
 };
+
+export const formatPeso = (v: number) =>
+  `₱${v.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
 export const numberInput = (
   e: React.ChangeEvent<HTMLInputElement>,

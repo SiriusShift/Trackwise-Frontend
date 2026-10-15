@@ -8,7 +8,7 @@ const OverviewWidget = ({ data, isLoading }: statisticsWidgetProps) => {
     color: item.color
   }))
   return (
-    <Widget title="Overview" data={data} isLoading={isLoading} segments={formattedData} icon="Banknote" tourId="overview-widget"/>
+    <Widget title="Overview" data={data} isLoading={isLoading} icon="Banknote" tourId="overview-widget"/>
   );
 };
 

@@ -7,16 +7,13 @@ import { Separator } from "@/shared/components/ui/separator";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { commonWidgetProps, StackedBarSegment } from "@/shared/types";
 import { getLucideIcon } from "@/shared/utils/icons";
-import { formatDateDisplay, formatMode } from "@/shared/utils/CustomFunctions";
+import { formatDateDisplay, formatMode, formatPeso } from "@/shared/utils/CustomFunctions";
 import * as Icons from "lucide-react";
 import { useState } from "react";
 
 // ─── Empty state for the stacked bar ────────────────────────────────────────
 function BarEmptyState({ title }: { title: string }) {
-  const label =
-    title === "Overview"
-      ? "No accounts added yet"
-      : title === "Income"
+  const label = title === "Income"
         ? "No income recorded"
         : "No expenses recorded";
 
@@ -57,7 +54,7 @@ const WidgetLayout = ({
       ? data?.expense
       : title === "Income"
         ? data?.income
-        : data?.balance;
+        : data?.netWorth;
 
   const trend =
     (title === "Expense"
@@ -67,6 +64,9 @@ const WidgetLayout = ({
         : data?.balanceTrend) ?? NaN;
 
   const isOverview = title === "Overview";
+  const netCashFlow = (data?.income ?? 0) - (data?.expense ?? 0);
+  const liabilitiesChange = data?.liabilitiesChange ?? 0;
+
 
   const IconComponent = getLucideIcon(icon, Icons.Banknote);
 
@@ -173,7 +173,7 @@ const WidgetLayout = ({
               </div>
               <Skeleton className="w-11 h-11 rounded-xl" />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Skeleton className="h-2.5 w-full rounded-full" />
               <Skeleton className="h-3 w-24" />
             </div>
@@ -183,15 +183,17 @@ const WidgetLayout = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col justify-between h-full gap-2">
+          <div className="flex flex-col justify-between h-full gap-4">
             <div className="space-y-4">
               {/* Amount + icon row */}
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
-                    {title === "Overview" ? "Balance" : `Total ${title}`}
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">
+                    {title === "Overview"
+                      ? "Net worth"
+                      : `Total ${title}`}
                   </p>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2">
                     <div className="text-3xl font-semibold tracking-tight flex items-center gap-2">
                       <span className="text-muted-foreground font-normal">
                         ₱
@@ -254,22 +256,59 @@ const WidgetLayout = ({
               </div>
 
               {/* Stacked bar or empty state */}
-              {hasData(segments) ? (
-                <StackedBar
-                  segments={segments}
-                  formatValue={(v) =>
-                    `₱${v.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
-                  }
-                />
-              ) : (
-                <BarEmptyState title={title} />
+              {!isOverview &&
+                (hasData(segments) ? (
+                  <StackedBar
+                    segments={segments}
+                    formatValue={(v) =>
+                      `₱${v.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
+                    }
+                  />
+                ) : (
+                  <BarEmptyState title={title} />
+                ))}
+
+              {/* Overview-only secondary stats */}
+              {isOverview && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2">
+                    <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                      Debt Change
+                    </p>
+                    <p
+                      className={`text-sm font-semibold ${liabilitiesChange > 0 ? "text-destructive-500" : liabilitiesChange < 0 ? "text-success-500" : ""}`}
+                    >
+                      {showBalance
+                        ? `${liabilitiesChange > 0 ? "+" : liabilitiesChange < 0 ? "-" : ""}${formatPeso(Math.abs(liabilitiesChange))}`
+                        : "••••••"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      This {mode}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2">
+                    <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                      Net Cash Flow
+                    </p>
+                    <p
+                      className={`text-sm font-semibold ${netCashFlow < 0 ? "text-destructive-500" : "text-success-500"}`}
+                    >
+                      {showBalance
+                        ? `${netCashFlow > 0 ? "+" : netCashFlow < 0 ? "-" : ""}${formatPeso(Math.abs(netCashFlow))}`
+                        : "••••••"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      This {mode}
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
 
             {/* Trend row */}
             <div className="flex gap-2 flex-col">
               <Separator />
-              <div className="flex gap-1">
+              <div className="flex">
                 {isNaN(trend) || (trend === 0 && !data) ? (
                   <p className="text-sm text-muted-foreground">
                     No data last {mode}
