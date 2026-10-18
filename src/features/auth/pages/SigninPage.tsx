@@ -1,6 +1,6 @@
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
 // app/components/SignInForm.tsx
-"use client";
+("use client");
 import Google from "@/assets/images/Google.svg";
 import {
   useGetAuthStatusQuery,
@@ -21,7 +21,6 @@ import { toast } from "sonner";
 import { loginSchema } from "../schema/authSchema";
 
 const SignInPage = () => {
-
   usePageMeta({
     title: "Sign in | Trackwise",
     description:
@@ -36,7 +35,7 @@ const SignInPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const errorStatus = searchParams.get("error");
   const message = searchParams.get("message");
-const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
+  const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const { error, data, isLoading } = useGetAuthStatusQuery({});
 
@@ -72,7 +71,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
         callback: async ({ credential }: { credential: string }) => {
           try {
             await postGoogleOneTap({ credential }).unwrap();
-            window.location.href = "/dashboard";
+            router("/dashboard");
           } catch (err) {
             toast.error(handleCatchErrorMessage(err));
           }
@@ -120,9 +119,9 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
     }
   };
 
-const handleGoogleLogin = () => {
-  window.location.href = `${API_URL}/auth/google/sign-in`;
-};
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google/sign-in`;
+  };
   return (
     <>
       {!isLoading && (!data?.authenticated || !cookies.user) && (
