@@ -1,15 +1,12 @@
 import {
-  LayoutGrid,
-  ChartNoAxesCombined,
-  HandCoins,
-  Settings,
-  CreditCard,
-  User,
-  FolderCog,
-  Palette,
   Bell,
-  ShieldCheck,
-  CloudUpload,
+  ChartNoAxesCombined,
+  CreditCard,
+  FolderCog,
+  LayoutGrid,
+  Palette,
+  Settings,
+  User,
 } from "lucide-react";
 
 export const navigationData = [
@@ -25,7 +22,7 @@ export const navigationData = [
       { name: "General", path: "/settings/general", icon: Settings },
       { name: "Account", path: "/settings/account", icon: User },
       { name: "Category", path: "/settings/category", icon: FolderCog },
-      // { name: "Theme", path: "/settings/theme", icon: Palette },
+      { name: "Theme", path: "/settings/theme", icon: Palette },
       { name: "Notifications", path: "/settings/notifications", icon: Bell },
       // { name: "Security", path: "/settings/security", icon: ShieldCheck },
       // { name: "Backup", path: "/settings/backup", icon: CloudUpload },

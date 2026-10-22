@@ -18,32 +18,39 @@ import { createBrowserRouter } from "react-router-dom";
 import SigninPage from "../features/auth/pages/SigninPage";
 import SignupPage from "../features/auth/pages/SignupPage";
 import PageNotFound from "../pages/PageNotFound";
+import DefaultBranding from "./DefaultBranding";
 import ProtectedRoutes from "./ProtectedRoutes";
 
 export const router = createBrowserRouter([
   {
-    path: "/sign-up",
-    element: <SignupPage />,
+    // Public pages always use the default look, not the user's saved palette.
+    element: <DefaultBranding />,
+    children: [
+      {
+        path: "/sign-up",
+        element: <SignupPage />,
+      },
+      {
+        path: "/sign-in",
+        element: <SigninPage />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "/",
+        element: <LandingPage />,
+      },
+    ],
   },
   {
     path: "*",
     element: <PageNotFound />,
-  },
-  {
-    path: "/sign-in",
-    element: <SigninPage />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPassword />,
-  },
-  {
-    path: "/",
-    element: <LandingPage />,
   },
   {
     element: <ProtectedRoutes />,
@@ -89,10 +96,10 @@ export const router = createBrowserRouter([
             path: "/settings/category",
             element: <CategorySettings />,
           },
-          // {
-          //   path: "/settings/theme",
-          //   element: <ThemeSettings />,
-          // },
+          {
+            path: "/settings/theme",
+            element: <ThemeSettings />,
+          },
           {
             path: "/settings/notifications",
             element: <NotificationSettings />,
