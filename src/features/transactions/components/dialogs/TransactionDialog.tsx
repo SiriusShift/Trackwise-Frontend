@@ -105,6 +105,8 @@ export function TransactionDialog({
     setOpen,
   });
 
+  console.log(watch())
+
   // ── Helpers ───────────────────────────────────────────────────────────────────
   const isRecurring = watch("recurring");
 

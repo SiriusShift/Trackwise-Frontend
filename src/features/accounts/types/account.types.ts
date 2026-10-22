@@ -64,7 +64,9 @@ export interface AccountPayload {
 export interface CreditDetail {
   creditLimit: number;
   statementDate: number;
-  dueDate: number;
+  // Either a day of the month or days after the statement date
+  dueDate?: number | null;
+  dueDaysAfterStatement?: number | null;
 }
 
 export interface LoanDetail {

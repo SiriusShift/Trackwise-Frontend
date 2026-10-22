@@ -146,6 +146,16 @@ export interface payRecurringForm {
   account: AssetData;
 }
 
+export interface payStatementForm {
+  amount: number;
+  date: string;
+  source: object;
+  account: AssetData;
+  interest: number;
+  lateFee: number;
+  otherFees: number;
+}
+
 interface NamedRef {
   id?: number;
   name: string;
@@ -249,6 +259,18 @@ export interface ScheduleCategory {
   icon?: string;
 }
 
+// One installment payment on a credit card statement, e.g. "iPhone 3 of 12".
+export interface StatementInstallment {
+  planId: number;
+  description: string;
+  installmentNo: number;
+  termMonths: number;
+  // Only ACTIVE or PAID_OFF plans can still be cancelled
+  planStatus?: string;
+  amount: number;
+  dueDate?: string;
+}
+
 export interface ScheduledItem {
   key: string;
   source: ScheduleSource;
@@ -268,7 +290,11 @@ export interface ScheduledItem {
   status?: string | null;
   statementDate?: string;
   statementBalance?: number;
+  // Interest and fees recorded on the statement, owed on top of its balance
+  feesCharged?: number;
   amountPaid?: number;
+  // Installments included in this statement (or expected in a projected one)
+  installments?: StatementInstallment[];
   // A future cycle shown for planning; it can't be paid/skipped yet
   projected: boolean;
   // Needs the user to pay/skip it (REMIND, or a failed AUTO_LOG)
@@ -309,6 +335,10 @@ export interface CreditStatementDetail extends ScheduledItem {
   id: number;
   currentBalance?: number | null;
   creditLimit: number;
+  // Copied from the bank statement when the bill was paid; 0 until then
+  interestCharged?: number;
+  lateFeeCharged?: number;
+  otherFees?: number;
   payments: {
     id: number;
     amount: number;
@@ -409,4 +439,5 @@ export interface filterProps {
   search?: string;
   selectedCategories?: CategoryType[];
   selectedAssets?: { id: number; name: string }[];
+  active: boolean;
 }

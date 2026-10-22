@@ -4,11 +4,11 @@ import {
 } from "@/features/transactions/api/transaction/schedulesApi";
 import { AccountSelect } from "@/features/transactions/components/forms/section/AccountSelect";
 import { cn } from "@/lib/utils";
-import { payRecurringSchema } from "@/schema/schema";
+import { payRecurringSchema, payStatementSchema } from "@/schema/schema";
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import {
   commonDialogProps,
-  payRecurringForm,
+  payStatementForm,
   ScheduleAccount,
   ScheduleCategory,
   ScheduleSource,
@@ -28,7 +28,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as LucideIcons from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import {
+  Controller,
+  FormProvider,
+  Resolver,
+  useForm,
+} from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { FormControl, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -54,6 +59,8 @@ export interface PayTarget {
   unit?: string;
   // Most that can be paid (a card can't be paid past what it owes)
   maxAmount?: number | null;
+  // Credit statements: fees already recorded on the statement
+  fees?: { interest: number; lateFee: number; otherFees: number };
 }
 
 interface PayDialogType extends commonDialogProps {
@@ -77,8 +84,12 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
   // Income adds to the account, so there's no balance to run out of.
   const checksBalance = data?.type !== "Income";
 
-  const form = useForm<payRecurringForm>({
-    resolver: zodResolver(payRecurringSchema.schema),
+  // The statement form is the recurring one plus the fee fields, so it types
+  // both; the fee fields stay empty for recurring payments.
+  const form = useForm<payStatementForm>({
+    resolver: zodResolver(
+      isCredit ? payStatementSchema.schema : payRecurringSchema.schema,
+    ) as Resolver<payStatementForm>,
     mode: "onChange",
     defaultValues: {
       amount: data?.amount ?? 0,
@@ -89,6 +100,8 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
     handleSubmit,
     control,
     watch,
+    getValues,
+    setValue,
     reset,
     formState: { isSubmitting, isValid },
   } = form;
@@ -97,26 +110,59 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
   const Icon = getScheduleIcon(data);
   const color = getScheduleColor(data);
 
-  const onSubmit = async (values: payRecurringForm) => {
+  const onSubmit = async (values: payStatementForm) => {
     if (!data) return;
-    const { date, account, amount } = values;
+    const { date, account, amount, interest, lateFee, otherFees } = values;
     const payload = {
       id: data.id,
       data: {
         amount: Number(amount),
         date: moment(date).toISOString(),
         account: (account as { id?: number })?.id,
+        ...(isCredit && {
+          interestCharged: Number(interest || 0),
+          lateFeeCharged: Number(lateFee || 0),
+          otherFees: Number(otherFees || 0),
+        }),
       },
     };
 
     try {
       if (isCredit) await payCredit(payload).unwrap();
       else await payRecurring(payload).unwrap();
-      toast.success(`${data.description} marked as ${labels.done.toLowerCase()}.`);
+      toast.success(
+        `${data.description} marked as ${labels.done.toLowerCase()}.`,
+      );
       setOpen(false);
     } catch (err) {
       toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
     }
+  };
+
+  const recordedFees = data?.fees
+    ? data.fees.interest + data.fees.lateFee + data.fees.otherFees
+    : 0;
+  const newFeesFor = (interest: number, lateFee: number, otherFees: number) =>
+    Math.max(interest + lateFee + otherFees - recordedFees, 0);
+
+  // The bank bills fees on top of the statement balance, so entering them
+  // raises the amount to pay by the same total (still editable afterwards).
+  const handleFeeChange = (
+    name: "interest" | "lateFee" | "otherFees",
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: any,
+  ) => {
+    numberInput(e, field);
+    const typed = {
+      interest: Number(getValues("interest") || 0),
+      lateFee: Number(getValues("lateFee") || 0),
+      otherFees: Number(getValues("otherFees") || 0),
+      [name]: Number(e.target.value || 0),
+    };
+    const extra = newFeesFor(typed.interest, typed.lateFee, typed.otherFees);
+    setValue("amount", Number(((data?.amount ?? 0) + extra).toFixed(2)), {
+      shouldValidate: true,
+    });
   };
 
   const handleAmountChange = (
@@ -129,15 +175,23 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
       | undefined;
     const accountBalance = account?.remainingBalance;
 
-    if (
-      data?.maxAmount !== undefined &&
-      data.maxAmount !== null &&
-      value > data.maxAmount
-    ) {
-      toast.error(
-        `Amount exceeds the ${data.maxAmount.toFixed(2)} owed on this card`,
-      );
-      e.target.value = String(data.maxAmount);
+    // Fees not yet recorded on the statement are added to the card balance
+    // when paid, so they raise the most that can be paid.
+    const fees = isCredit
+      ? newFeesFor(
+          Number(watch("interest") || 0),
+          Number(watch("lateFee") || 0),
+          Number(watch("otherFees") || 0),
+        )
+      : 0;
+    const maxPayable =
+      data?.maxAmount !== undefined && data.maxAmount !== null
+        ? data.maxAmount + fees
+        : null;
+
+    if (maxPayable !== null && value > maxPayable) {
+      toast.error(`Amount exceeds the ${maxPayable.toFixed(2)} owed on this card`);
+      e.target.value = String(maxPayable);
       return;
     }
 
@@ -166,6 +220,9 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
       ),
       amount: Number(data?.amount ?? 0),
       date: moment().toLocaleString(),
+      interest: data?.fees?.interest ?? 0,
+      lateFee: data?.fees?.lateFee ?? 0,
+      otherFees: data?.fees?.otherFees ?? 0,
     });
   }, [data, open, assetData, reset]);
 
@@ -293,6 +350,100 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                 categories={isCredit ? ["CASH", "BANK"] : undefined}
               />
             </div>
+
+            {isCredit && (
+              <>
+                {" "}
+                <div className="grid grid-cols-3 gap-2">
+                  <Controller
+                    name="interest"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Interest Charged</FormLabel>
+
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                              ₱
+                            </span>
+
+                            <Input
+                              {...field}
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              placeholder="0.00"
+                              className="pl-8"
+                              onChange={(e) => handleFeeChange("interest", e, field)}
+                            />
+                          </div>
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Controller
+                    name="lateFee"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Late Fee</FormLabel>
+
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                              ₱
+                            </span>
+
+                            <Input
+                              {...field}
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              placeholder="0.00"
+                              className="pl-8"
+                              onChange={(e) => handleFeeChange("lateFee", e, field)}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Controller
+                    name="otherFees"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Other Fees</FormLabel>
+
+                        <FormControl>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                              ₱
+                            </span>
+
+                            <Input
+                              {...field}
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              placeholder="0.00"
+                              className="pl-8"
+                              onChange={(e) => handleFeeChange("otherFees", e, field)}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>{" "}
+              </>
+            )}
+
             {!isCredit && (
               <div className="rounded-lg border p-3">
                 <div className="flex flex-row justify-between gap-3">
@@ -301,7 +452,11 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                     <p className="text-xs font-bold">Next due after this</p>
                   </div>
                   <p className="text-xs font-bold">
-                    {getNextDuePreview(data?.dueDate, data?.interval, data?.unit)}
+                    {getNextDuePreview(
+                      data?.dueDate,
+                      data?.interval,
+                      data?.unit,
+                    )}
                   </p>
                 </div>
               </div>

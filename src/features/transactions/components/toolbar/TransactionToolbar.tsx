@@ -20,6 +20,8 @@ import { TransactionDialog } from "../dialogs/TransactionDialog";
 import Assets from "./filters/Assets";
 import Status from "./filters/Status";
 import TypeSelect from "./TypeSelect";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+
 const TransactionToolbar = ({
   onSubmit,
   onClear,
@@ -46,6 +48,7 @@ const TransactionToolbar = ({
   );
   const [selectedAssets, setSelectedAssets] = useState<AssetData[]>([]);
   const [search, setSearch] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("active");
 
   const type = useSelector((state: IRootState) => state.active.type);
 
@@ -57,11 +60,13 @@ const TransactionToolbar = ({
   const clearFilter = () => {
     setSearch("");
     setSelectedCategories([]);
+    setSelectedAssets([]);
     setStatus("");
+    setActiveTab("active");
     onClear();
   };
 
-  const handleCheckboxChange = (category: CategoryType) => {
+  const handleCheckboxChange =(category: CategoryType) => {
     setSelectedCategories((prevSelected) => {
       // If category already exists in selected, remove it (uncheck)
       if (prevSelected.some((selected) => selected.id === category.id)) {
@@ -86,32 +91,29 @@ const TransactionToolbar = ({
     <>
       <div className="flex flex-col gap-5">
         <div className="p-1 flex gap-2 overflow-x-auto items-center justify-between">
-            <TypeSelect />
+          <TypeSelect />
           <div className="flex gap-2">
             <Button
               onClick={() => setDialogOpen(true)}
-              size="sm"
               variant="outline"
-                    data-tour="add"
+              data-tour="add"
             >
               <Plus className="lg:mr-2" />
               <span className="hidden md:inline">Add</span>
             </Button>
             <Button
-              size="sm"
               variant="outline"
               onClick={() => setReportOpen(true)}
-                                  data-tour="export"
+              data-tour="export"
             >
               <Download className="lg:mr-2" />
               <span className="hidden md:inline">Export</span>
             </Button>
             <Button
-              size="sm"
               variant="outline"
               className="flex items-center gap-2"
               onClick={() => setFilterOpen(true)}
-                                  data-tour="filter"
+              data-tour="filter"
             >
               <Filter />
               <span className="hidden md:inline">Filter</span>
@@ -119,30 +121,32 @@ const TransactionToolbar = ({
             <FilterSheet
               setClear={clearFilter}
               setOpen={setFilterOpen}
-              onSubmit={() =>
+              onSubmit={() =>{
                 onSubmit({
                   search: search,
                   status: status,
                   selectedCategories: selectedCategories,
                   selectedAssets: selectedAssets,
+                  active: activeTab === "active" ? true : false,
                 })
+                setFilterOpen(false)
+              }
               }
               title="Filter"
               icon={"Filter"}
               open={filterOpen}
             >
               <div className="flex flex-col py-3 gap-5">
-                <div className="flex flex-col gap-2">
-                  <span className="block text-sm font-semibold">
-                    Search by description
-                  </span>
-                  <Input
-                    value={search}
-                    placeholder="Search.."
-                    className="w-full"
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
+                <Tabs
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="active">Active</TabsTrigger>
+                    <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                  </TabsList>
+                </Tabs>
                 <Separator />
 
                 <div className="flex flex-col gap-2">

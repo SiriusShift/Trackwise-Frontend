@@ -36,6 +36,7 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Portal } from "@radix-ui/react-tooltip";
 import { useState } from "react";
 import { accountsApi } from "@/shared/api/accountsApi";
+import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const transferColumns: ColumnDef<TransactionRow>[] = [
@@ -188,7 +189,7 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
 
-      const [deleteTransfer] = useDeleteTransferMutation();
+      const [deleteTransfer] = useArchiveTransactionMutation();
       // const [payAuto] = usePostAutoPaymentMutation();
       // const [cancelRecurring] = useCancelRecurringExpenseMutation();
 
@@ -204,7 +205,7 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
             try {
               await deleteTransfer({
                 data: {
-                  delete: true,
+                  type: "transfer",
                 },
                 id: transfer.id,
               }).unwrap();

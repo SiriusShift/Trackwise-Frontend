@@ -63,7 +63,10 @@ export const AccountSelect = ({
       control={control}
       render={({ field: { value, onChange } }) => {
         const account = filtered.find((a) => a.id === value?.id);
-
+        const balance =
+          (account?.category === "CREDIT"
+            ? account.remainingCredit
+            : account?.remainingBalance) ?? 0;
         return (
           <FormItem className="flex flex-col">
             <FormLabel>
@@ -90,7 +93,7 @@ export const AccountSelect = ({
                         <span className="text-muted-foreground shrink-0">
                           {account &&
                             formatCurrency(
-                              account.remainingBalance,
+                              balance,
                               account.currency,
                               "symbol",
                             )}

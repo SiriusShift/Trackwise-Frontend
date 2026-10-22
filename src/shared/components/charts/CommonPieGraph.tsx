@@ -149,7 +149,7 @@ function CommonPieGraph({ data, total, trend, type, graphLoading }: any) {
               <span className="truncate">
                 {trend > 0
                   ? `Up by ${trend}% this ${modeDisplay}`
-                  : `Down by ${trend}% this ${modeDisplay}`}
+                  : `Down by ${Math.abs(Number(trend))}% this ${modeDisplay}`}
               </span>
               {trend > 0 ? (
                 <TrendingUp

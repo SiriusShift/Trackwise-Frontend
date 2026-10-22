@@ -1,24 +1,25 @@
-import { Card, CardContent } from "../ui/card";
+import { Card } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import { Skeleton } from "../ui/skeleton";
 
 const ScheduleSkeleton = ({ count }: { count: number }) => {
   return (
     <CarouselItem
-      className={`${count > 1 ? "basis-[90%]" : "basis-full"} xl:basis-1/2 flex-1`}
+      className={`${count > 1 ? "basis-[90%]" : "basis-full"} pl-4 2xl:basis-1/2`}
     >
-      <Card className="h-full">
-        {" "}
-        <Skeleton className="absolute top-4 right-4 h-6 w-3" />
-        <CardContent className="flex h-full min-h-[120px] items-center p-3 gap-3">
-          {/* Circle placeholder for radial chart */}
-          <Skeleton className="h-12 w-12 rounded-full ml-5" />
-          {/* Text placeholders */}
-          <div className="flex flex-col gap-2 flex-1">
-            <Skeleton className="h-4 w-24" />
+      <Card className="flex h-28 flex-col justify-between rounded-lg bg-muted/20 p-4 shadow-none">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+          <div className="flex flex-1 flex-col gap-1.5">
             <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
           </div>
-        </CardContent>
+          <Skeleton className="h-4 w-20" />
+        </div>
+        <div className="flex justify-between border-t border-border/50 pt-3">
+          <Skeleton className="h-3.5 w-28" />
+          <Skeleton className="h-3.5 w-16" />
+        </div>
       </Card>
     </CarouselItem>
   );

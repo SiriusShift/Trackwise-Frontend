@@ -73,7 +73,9 @@ export interface GeneralSettingsFormValues {
 export const notificationSettings = {
   schema: z
     .object({
-      notifyDays: numberField(requiredNumber("Notify expense days is required")),
+      notifyDays: numberField(
+        requiredNumber("Notify expense days is required"),
+      ),
       emailNotification: z.boolean({
         required_error: "Email Notification is required",
       }),
@@ -94,8 +96,40 @@ export const payRecurringSchema = {
     .object({
       amount: numberField(requiredNumber("Amount is required")),
       // Holds either a date string or a Date from the picker
-      date: z.custom<string | Date>((value) => !isEmpty(value), "Date is required"),
+      date: z.custom<string | Date>(
+        (value) => !isEmpty(value),
+        "Date is required",
+      ),
       account: requiredObject("Account is required"),
+    })
+    .passthrough(),
+};
+
+export const payStatementSchema = {
+  schema: z
+    .object({
+      amount: numberField(requiredNumber("Amount is required")),
+      // Holds either a date string or a Date from the picker
+      date: z.custom<string | Date>(
+        (value) => !isEmpty(value),
+        "Date is required",
+      ),
+      account: requiredObject("Account is required"),
+      interest: numberField(
+        requiredNumber("Enter a valid amount")
+          .min(0, "Fees can't be negative")
+          .optional(),
+      ),
+      lateFee: numberField(
+        requiredNumber("Enter a valid amount")
+          .min(0, "Fees can't be negative")
+          .optional(),
+      ),
+      otherFees: numberField(
+        requiredNumber("Enter a valid amount")
+          .min(0, "Fees can't be negative")
+          .optional(),
+      ),
     })
     .passthrough(),
 };

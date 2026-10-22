@@ -420,3 +420,52 @@ body {
   .animate-loading-fade-in { animation: none; opacity: 1; }
   .loading-dots span { animation: none; opacity: 1; }
 }
+
+/* Table: shimmer sweep for skeleton cells */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--foreground) / 0.06),
+    transparent
+  );
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Table: brief accent flash on newly added rows */
+@keyframes row-flash {
+  0%, 30% { background-color: hsl(var(--primary) / 0.14); }
+  100% { background-color: transparent; }
+}
+
+.animate-row-flash {
+  animation: row-flash 1.6s ease-out;
+}
+
+/* Table: fade rows in after loading */
+@keyframes rows-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-rows-fade-in {
+  animation: rows-fade-in 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer::after { animation: none; display: none; }
+  .animate-row-flash { animation: none; }
+  .animate-rows-fade-in { animation: none; }
+}

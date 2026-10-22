@@ -194,6 +194,19 @@ const CalendarPage = () => {
                     <LucideIcon.ArrowLeftRight className="h-3 w-3 shrink-0" />
                   )}
                   <span className="truncate">{arg.event.title}</span>
+                  {!!item.installments?.length && (
+                    <span
+                      className="ml-auto shrink-0 rounded-full bg-background/60 px-1.5 text-[10px] leading-4"
+                      title={item.installments
+                        .map(
+                          (i) =>
+                            `${i.description} ${i.installmentNo}/${i.termMonths}`,
+                        )
+                        .join(", ")}
+                    >
+                      {item.installments.length} inst.
+                    </span>
+                  )}
                 </div>
               );
             }}

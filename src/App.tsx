@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/shared/provider/ThemeProvider";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { router } from "./routing/router";
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <ConfirmProvider>
         <RouterProvider router={router} />
         <Toaster visibleToasts={1} />
+        <Analytics />
       </ConfirmProvider>
     </ThemeProvider>
   );

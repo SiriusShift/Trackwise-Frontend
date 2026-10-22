@@ -1,10 +1,18 @@
 import { IRootState } from "@/app/store";
-import { useGetCreditStatementQuery } from "@/features/transactions/api/transaction/schedulesApi";
+import {
+  useCancelInstallmentPlanMutation,
+  useGetCreditStatementQuery,
+} from "@/features/transactions/api/transaction/schedulesApi";
 import { ScheduledItem } from "@/shared/types";
-import { formatCurrency, getStatus } from "@/shared/utils/CustomFunctions";
+import {
+  formatCurrency,
+  getStatus,
+  handleCatchErrorMessage,
+} from "@/shared/utils/CustomFunctions";
 import * as LucideIcons from "lucide-react";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Separator } from "../../ui/separator";
@@ -26,7 +34,10 @@ const STATUS_LABELS: Record<string, string> = {
   UPCOMING: "Estimated",
 };
 
-const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) => {
+const CreditStatementDetails = ({
+  item,
+  onPay,
+}: CreditStatementDetailsProps) => {
   const currency = useSelector((state: IRootState) => state.settings.currency);
   // Projected statements haven't closed yet, so there's nothing to fetch/pay.
   const statementId = item?.projected ? null : item?.sourceId;
@@ -35,6 +46,31 @@ const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) =>
     statementId ?? 0,
     { skip: !statementId },
   );
+  const [cancelPlan, { isLoading: cancelling }] =
+    useCancelInstallmentPlanMutation();
+
+  const handleCancelPlan = async (planId: number, description: string) => {
+    if (
+      !window.confirm(
+        `Cancel the "${description}" installment plan? The plan and its purchase are removed as if they never happened. Payments you already made are not reversed.`,
+      )
+    )
+      return;
+
+    try {
+      await cancelPlan(planId).unwrap();
+      toast.success(`${description} installment plan cancelled.`);
+    } catch (err) {
+      toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
+    }
+  };
+
+  // Only the charges that were actually recorded on the bank statement
+  const fees = [
+    { label: "Interest", amount: statement?.interestCharged ?? 0 },
+    { label: "Late fee", amount: statement?.lateFeeCharged ?? 0 },
+    { label: "Other fees", amount: statement?.otherFees ?? 0 },
+  ].filter((fee) => fee.amount > 0);
 
   const shown = statement ?? item;
   const status = getStatus(shown?.dueDate);
@@ -51,6 +87,11 @@ const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) =>
         dueDate: statement.dueDate,
         toAsset: statement.toAsset,
         maxAmount: Math.max(statement.currentBalance ?? statement.amount, 0),
+        fees: {
+          interest: statement.interestCharged ?? 0,
+          lateFee: statement.lateFeeCharged ?? 0,
+          otherFees: statement.otherFees ?? 0,
+        },
       }
     : null;
 
@@ -129,6 +170,79 @@ const CreditStatementDetails = ({ item, onPay }: CreditStatementDetailsProps) =>
           )}
         </div>
       </div>
+
+      {!!shown?.installments?.length && (
+        <div className="p-4 pt-0">
+          <h2 className="mb-3 text-sm font-bold">
+            Installments
+            {item?.projected && (
+              <span className="ml-2 font-normal text-muted-foreground">
+                expected
+              </span>
+            )}
+          </h2>
+          <div className="space-y-2">
+            {shown.installments.map((installment) => (
+              <div
+                key={`${installment.planId}-${installment.installmentNo}`}
+                className="flex items-center justify-between gap-3 rounded-xl border p-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">
+                    {installment.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {installment.installmentNo} of {installment.termMonths}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <p className="text-sm font-medium tabular-nums">
+                    {formatCurrency(installment.amount, currency)}
+                  </p>
+                  {installment.planStatus !== "CANCELLED" && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      title="Cancel plan"
+                      aria-label={`Cancel ${installment.description} plan`}
+                      disabled={cancelling}
+                      onClick={() =>
+                        handleCancelPlan(
+                          installment.planId,
+                          installment.description,
+                        )
+                      }
+                    >
+                      <LucideIcons.X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {fees.length > 0 && (
+        <div className="p-4 pt-0">
+          <h2 className="mb-3 text-sm font-bold">Interest and fees</h2>
+          <div className="flex flex-col gap-2 text-sm">
+            {fees.map((fee) => (
+              <div
+                key={fee.label}
+                className="flex items-center justify-between"
+              >
+                <span className="text-muted-foreground">{fee.label}</span>
+                <span className="tabular-nums">
+                  {formatCurrency(fee.amount, currency)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {statement && (
         <div className="p-4">

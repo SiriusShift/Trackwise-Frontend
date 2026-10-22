@@ -55,6 +55,7 @@ const TransactionPage = () => {
   const [pageIndex, setPageIndex] = useState<number>(0);
   const [filter, setFilter] = useState<filterProps>();
 
+  console.log(filter);
   const location = useLocation();
   const dispatch = useDispatch();
   const toolbarRef = useRef<HTMLDivElement | null>(null);
@@ -63,6 +64,8 @@ const TransactionPage = () => {
 
   const selectedCategories = filter?.selectedCategories ?? [];
   const selectedAssets = filter?.selectedAssets ?? [];
+  // Archived transactions have no meaningful breakdown, so the graph is hidden
+  const showGraph = type !== "Transfer" && filter?.active !== false;
 
   // Queries
 
@@ -79,6 +82,7 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
       pageSize,
       pageIndex,
+      isActive: filter?.active,
       ...(filter?.status && { status: filter?.status }),
       ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
       ...(selectedCategories.length && {
@@ -101,6 +105,7 @@ const TransactionPage = () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         mode,
+        isActive: filter?.active,
         ...(filter?.status && { status: filter?.status }),
         ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
         ...(selectedCategories.length && {
@@ -113,7 +118,7 @@ const TransactionPage = () => {
         }),
       },
       {
-        skip: type !== "Expense",
+        skip: type !== "Expense" || !showGraph,
       },
     );
 
@@ -123,6 +128,7 @@ const TransactionPage = () => {
       endDate: endDate?.toISOString(),
       pageSize,
       pageIndex,
+      isActive: filter?.active,
       ...(filter?.status && { status: filter?.status }),
       ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
       ...(selectedCategories.length && {
@@ -145,6 +151,7 @@ const TransactionPage = () => {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         mode,
+        isActive: filter?.active,
         ...(filter?.status && { status: filter?.status }),
         ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
         ...(selectedCategories.length && {
@@ -157,7 +164,7 @@ const TransactionPage = () => {
         }),
       },
       {
-        skip: type !== "Income",
+        skip: type !== "Income" || !showGraph,
       },
     );
 
@@ -169,6 +176,7 @@ const TransactionPage = () => {
         endDate: endDate?.toISOString(),
         pageSize,
         pageIndex,
+        isActive: filter?.active,
         ...(filter?.status && { status: filter?.status }),
         ...(filter?.search && { search: filter?.search }), // Add `Search` only if truthy
         ...(selectedCategories.length && {
@@ -191,12 +199,15 @@ const TransactionPage = () => {
       selectedCategories,
       selectedAssets,
       status,
+      active,
     }: Required<filterProps>) => {
+      console.log(status);
       setFilter({
         search,
         selectedCategories,
         selectedAssets,
         status,
+        active,
       });
     },
     [],
@@ -208,6 +219,7 @@ const TransactionPage = () => {
       status: "",
       selectedCategories: [],
       selectedAssets: [],
+      active: true,
     });
   }, []);
 
@@ -233,7 +245,6 @@ const TransactionPage = () => {
       : type === "Income"
         ? incomeGraphData
         : null;
-
 
   const graphFetching = expenseGraphFetching || incomeGraphFetching;
 
@@ -293,12 +304,12 @@ const TransactionPage = () => {
 
   return (
     <>
-          {Tour}
+      {Tour}
       <CommonToolbar />
       <div className="flex p-5 flex-col gap-5">
         <PageHeader
           pageName={currentPageName?.name}
-          description={`Overview of ${type.toLocaleLowerCase()} for this ${formatMode()}`}
+          description={`Overview of ${filter?.active === false ? "archived " : ""}${type.toLocaleLowerCase()} for this ${formatMode()}`}
           monthPicker={true}
         />
         {/* Toolbar */}
@@ -314,8 +325,7 @@ const TransactionPage = () => {
         />
         <div className="flex w-full flex-col gap-5 lg:flex-row">
           {/* Table */}
-          <div className="w-full overflow-hidden"                                   data-tour="table"
->
+          <div className="w-full overflow-hidden" data-tour="table">
             <DataTable
               columns={tableColumn}
               setPageIndex={setPageIndex}
@@ -325,13 +335,14 @@ const TransactionPage = () => {
               pageSize={pageSize}
               isLoading={tableFetching}
               onLoadMore={handleLoadMore}
+              resetKey={`${type}|${startDate?.getTime()}|${endDate?.getTime()}|${JSON.stringify(filter ?? {})}`}
               graphData={graphData}
               data={width > 639 ? tableData?.data : transaction || []}
             />
           </div>
 
           {/* Chart */}
-          {type !== "Transfer" && (
+          {showGraph && (
             <div data-tour="graph">
               <CommonPieGraph
                 total={graphData?.total}
@@ -345,14 +356,12 @@ const TransactionPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div data-tour="budget" className="flex flex-col *:flex-1">
+          <div data-tour="budget" className="flex min-w-0">
             <CommonTracker />
           </div>
-                    <div data-tour="schedule" className="flex flex-col *:flex-1">
-
-          <ScheduledWidget type={type} />
-                    </div>
-
+          <div data-tour="schedule" className="flex min-w-0">
+            <ScheduledWidget type={type} />
+          </div>
         </div>
 
         <ViewDetailed
