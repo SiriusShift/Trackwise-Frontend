@@ -1,6 +1,9 @@
+import { IRootState } from "@/app/store";
 import VirtualizedInfiniteList from "@/shared/components/VirtualizedInfiniteList";
-import { forwardRef } from "react";
+import { clearRemoving } from "@/shared/slices/activeSlice";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/shared/components/ui/card";
 import NoData from "@/assets/images/noData.svg";
 import TransactionListSkeleton from "./TransactionListSkeleton";
@@ -17,6 +20,40 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
   { transactions, isFetching, onLoadMore },
   ref
 ) {
+  const dispatch = useDispatch();
+  const removingIds = useSelector(
+    (state: IRootState) => state.active.removingIds,
+  );
+  // Archived rows whose exit animation has finished
+  const [exitedIds, setExitedIds] = useState<Set<number>>(new Set());
+
+  const handleExited = useCallback((id: number) => {
+    setExitedIds((prev) => new Set(prev).add(id));
+  }, []);
+
+  // Hide exited rows until the refetch drops them from the data
+  const visibleTransactions = useMemo(
+    () =>
+      transactions?.filter(
+        (row) => !(removingIds.includes(row.id) && exitedIds.has(row.id)),
+      ),
+    [transactions, removingIds, exitedIds],
+  );
+
+  // Once the server data no longer has an archived row, forget about it
+  useEffect(() => {
+    if (!transactions || !removingIds.length) return;
+    const present = new Set(transactions.map((row) => row.id));
+    const gone = removingIds.filter((id) => !present.has(id));
+    if (!gone.length) return;
+    dispatch(clearRemoving(gone));
+    setExitedIds((prev) => {
+      const next = new Set(prev);
+      gone.forEach((id) => next.delete(id));
+      return next;
+    });
+  }, [transactions, removingIds, dispatch]);
+
   // const dispatch = useDispatch();
   // const containerVariants = {
   //   hidden: { opacity: 0 },
@@ -43,22 +80,26 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
 
   return (
     <motion.div initial="hidden" animate="visible">
-      {isFetching && !transactions?.length ? (
+      {isFetching && !visibleTransactions?.length ? (
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
             <TransactionListSkeleton key={i} />
           ))}
         </div>
-      ) : transactions && transactions.length > 0 ? (
+      ) : visibleTransactions && visibleTransactions.length > 0 ? (
         <VirtualizedInfiniteList
-          items={transactions}
+          items={visibleTransactions}
           itemSize={130}
-          height={Math.min(transactions.length * 130, 520)}
+          height={Math.min(visibleTransactions.length * 130, 520)}
           ref={ref}
           isFetching={isFetching}
           onLoadMore={onLoadMore}
           renderRow={(item, index) => (
-            <TransactionItem item={item} index={index} />
+            <TransactionItem
+              item={item}
+              index={index}
+              onExited={handleExited}
+            />
           )}
         />
       ) : (

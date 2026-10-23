@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import useNewRowHighlight from "@/shared/hooks/useNewRowHighlight";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import {
   ColumnDef,
@@ -48,7 +49,12 @@ interface DataTableProps<TData, TValue> {
   graphData: any;
   isLoading: boolean;
   onLoadMore?: () => void; // Mobile infinite scroll trigger
+  resetKey?: string; // Changes when the query changes (type, dates, filters)
 }
+
+// Rows that fit in the fixed-height table container
+const MAX_SKELETON_ROWS = 7;
+const SKELETON_WIDTHS = ["w-full", "w-4/5", "w-3/5", "w-11/12", "w-2/3"];
 
 // const chartConfig = {
 //   width: "100%", // Full width of the container
@@ -87,6 +93,7 @@ export function DataTable<TData, TValue>({
   setPageIndex,
   setPageSize,
   onLoadMore,
+  resetKey = "",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -112,6 +119,12 @@ export function DataTable<TData, TValue>({
     },
     // Remove pagination handling from here
   });
+
+  const newRowIds = useNewRowHighlight(
+    data as { id?: string | number }[] | undefined,
+    isLoading,
+    `${resetKey}|${pageIndex}|${pageSize}`,
+  );
 
   return (
     <div className="flex flex-col sm:gap-5">
@@ -144,12 +157,20 @@ export function DataTable<TData, TValue>({
             <TableBody className="font-semibold">
               {isLoading ? (
                 // Skeleton rows when data is loading
-                Array.from({ length: 5 }).map((_, rowIndex) => (
-                  <TableRow key={rowIndex}>
+                Array.from({
+                  length: Math.min(pageSize, MAX_SKELETON_ROWS),
+                }).map((_, rowIndex) => (
+                  <TableRow key={rowIndex} className="hover:bg-transparent">
                     {Array.from({ length: columns?.length - 1 || 5 }).map(
                       (_, colIndex) => (
                         <TableCell key={colIndex}>
-                          <Skeleton className="h-6 w-full rounded" />
+                          <Skeleton
+                            className={`animate-shimmer h-6 rounded ${
+                              SKELETON_WIDTHS[
+                                (rowIndex + colIndex) % SKELETON_WIDTHS.length
+                              ]
+                            }`}
+                          />
                         </TableCell>
                       ),
                     )}
@@ -161,6 +182,13 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className={
+                      newRowIds.has(
+                        (row.original as { id?: string | number }).id ?? "",
+                      )
+                        ? "animate-row-flash"
+                        : "animate-rows-fade-in"
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell

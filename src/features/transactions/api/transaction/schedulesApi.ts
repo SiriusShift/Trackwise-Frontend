@@ -23,6 +23,10 @@ export interface PaySchedulePayload {
   account?: number;
   category?: number;
   description?: string;
+  // Credit statement payments only, copied from the bank statement
+  interestCharged?: number;
+  lateFeeCharged?: number;
+  otherFees?: number;
 }
 
 // Paying or skipping changes balances, transaction lists and the schedule itself.
@@ -115,6 +119,14 @@ export const schedulesApi = api
         }),
         invalidatesTags: [...AFTER_PAYMENT_TAGS],
       }),
+
+      cancelInstallmentPlan: builder.mutation<unknown, number>({
+        query: (planId) => ({
+          url: `/transactions/schedules/credit/installments/${planId}/cancel`,
+          method: "PATCH",
+        }),
+        invalidatesTags: [...AFTER_PAYMENT_TAGS],
+      }),
     }),
   });
 
@@ -127,4 +139,5 @@ export const {
   useSkipRecurringScheduleMutation,
   useGetCreditStatementQuery,
   usePayCreditStatementMutation,
+  useCancelInstallmentPlanMutation,
 } = schedulesApi;

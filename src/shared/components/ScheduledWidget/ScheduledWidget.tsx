@@ -6,7 +6,8 @@ import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { Schedule } from "@/shared/types";
 import { toast } from "sonner";
-import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
+import { CalendarClock, ChevronRight } from "lucide-react";
+import moment from "moment";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -72,45 +73,55 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
   // Empty placeholder cards to fill remaining visible slots
   const emptyCount = Math.max(0, visibleCount - itemCount);
 
-  return (
-    <Card className="relative w-full flex flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
-      {/* ambient glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 right-0 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-28 left-0 h-52 w-52 rounded-full bg-blue-400/10 blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent)]" />
-      </div>
+  const weekEnd = moment().add(7, "days").endOf("day");
+  const dueSoonCount =
+    data?.filter(
+      (s) => s.nextDueDate && moment(s.nextDueDate).isSameOrBefore(weekEnd),
+    ).length ?? 0;
 
-      <div className="relative z-10 flex flex-col flex-1 space-y-4">
+  return (
+    <Card className="flex h-full w-full flex-col gap-4 p-5">
+      <div className="flex flex-1 flex-col gap-4">
         {/* header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-sm font-semibold tracking-wide text-foreground">
-              Scheduled {type}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              Track your active schedules
-            </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <CalendarClock className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold leading-tight text-foreground">
+                Scheduled {type}
+              </h2>
+              <p className="truncate text-xs text-muted-foreground">
+                {isLoading
+                  ? "Loading schedules…"
+                  : itemCount === 0
+                    ? "No active schedules"
+                    : dueSoonCount > 0
+                      ? `${itemCount} active · ${dueSoonCount} due this week`
+                      : `${itemCount} active`}
+              </p>
+            </div>
           </div>
           <Button
-            size={"sm"}
-            variant={"ghost"}
+            size="sm"
+            variant="ghost"
+            className="h-8 shrink-0 gap-1 px-2.5 text-xs"
             onClick={() => navigate("/transactions/schedules")}
           >
-            View Schedule
+            View all
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
 
         {/* carousel */}
-        <div className="relative h-full">
+        <div className="relative">
           <Carousel
             opts={{
               align: "start",
               watchDrag: width < 768,
             }}
-            className="w-full h-full"
+            className="w-full"
           >
-            <CarouselContent className="-ml-2 h-full">
+            <CarouselContent className="-ml-4">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
                     <ScheduleSkeleton key={i} count={itemCount} />
@@ -132,9 +143,9 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
 
             {shouldShowNav && (
               <>
-                <CarouselPrevious className="absolute -left-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 rounded-full border border-border/60 bg-background/80 shadow-md backdrop-blur-md transition-all hover:scale-105 sm:flex" />
+                <CarouselPrevious className="absolute -left-3 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 rounded-full bg-background shadow-sm sm:flex" />
 
-                <CarouselNext className="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 rounded-full border border-border/60 bg-background/80 shadow-md backdrop-blur-md transition-all hover:scale-105 sm:flex" />
+                <CarouselNext className="absolute -right-3 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 rounded-full bg-background shadow-sm sm:flex" />
               </>
             )}
           </Carousel>

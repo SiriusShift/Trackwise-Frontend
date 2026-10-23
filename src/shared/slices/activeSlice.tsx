@@ -12,6 +12,7 @@ const initialState: {
   action: boolean;
   activeRow: object | null;
   openDialog: boolean;
+  removingIds: number[]; // Rows playing their exit animation after archive
 } = {
   active: {
     from: moment().startOf("month").toISOString(),
@@ -22,6 +23,7 @@ const initialState: {
   type: "Expense",
   activeRow: null,
   openDialog: false,
+  removingIds: [],
 };
 
 export const active = createSlice({
@@ -46,6 +48,16 @@ export const active = createSlice({
     setOpenDialog: (state, action: PayloadAction<boolean>) => {
       state.openDialog = action.payload;
     },
+    markRemoving: (state, action: PayloadAction<number>) => {
+      if (!state.removingIds.includes(action.payload)) {
+        state.removingIds.push(action.payload);
+      }
+    },
+    clearRemoving: (state, action: PayloadAction<number[]>) => {
+      state.removingIds = state.removingIds.filter(
+        (id) => !action.payload.includes(id),
+      );
+    },
   },
 });
 
@@ -57,4 +69,6 @@ export const {
   setActionShow,
   setActiveRow,
   setOpenDialog,
+  markRemoving,
+  clearRemoving,
 } = active.actions;

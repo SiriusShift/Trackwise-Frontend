@@ -7,6 +7,7 @@ import TrackerCard from "@/shared/components/Tracker/TrackerCard";
 import TrackerCardEmpty from "@/shared/components/Tracker/TrackerCardEmpty";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import { Gauge, Plus } from "lucide-react";
 import moment from "moment";
 import { CategoryLimit } from "@/shared/types";
 import { useState } from "react";
@@ -55,6 +56,10 @@ function Tracker() {
   // Empty placeholder cards to fill remaining visible slots
   const emptyCount = Math.max(0, visibleCount - itemCount);
 
+  const overCount =
+    data?.filter((item: CategoryLimit) => Number(item.total ?? 0) > (item.value ?? 0))
+      .length ?? 0;
+
   const handleDelete = (item: CategoryLimit) => {
     confirm({
       title: "Delete budget",
@@ -73,46 +78,49 @@ function Tracker() {
   };
 
   return (
-    <Card data-tour="budget" className="relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md">
-      {/* ambient glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 right-0 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-28 left-0 h-52 w-52 rounded-full bg-blue-400/10 blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent)]" />
-      </div>
-
-      <div className="relative z-10 flex flex-1 flex-col gap-4">
+    <Card data-tour="budget" className="flex h-full w-full flex-col gap-4 p-5">
+      <div className="flex flex-1 flex-col gap-4">
         {/* header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="block text-sm font-semibold tracking-wide text-foreground">
-              Budget limit
-            </span>
-
-            <p className="text-xs text-muted-foreground">
-              Track and manage your active entries
-            </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <Gauge className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold leading-tight text-foreground">
+                Budget limits
+              </h2>
+              <p className="truncate text-xs text-muted-foreground">
+                {isLoading
+                  ? "Loading budgets…"
+                  : itemCount === 0
+                    ? "Set limits to keep spending in check"
+                    : overCount > 0
+                      ? `${itemCount} active · ${overCount} over limit`
+                      : `${itemCount} active · all on track`}
+              </p>
+            </div>
           </div>
 
           <Button
-            className="shadow-xs h-9 transition-all hover:scale-[1.02]"
-            onClick={() => setOpen(true)}
+            size="sm"
             variant="ghost"
+            className="h-8 shrink-0 gap-1 px-2.5 text-xs"
+            onClick={() => setOpen(true)}
           >
+            <Plus className="h-4 w-4" />
             Add
           </Button>
         </div>
 
         {/* carousel */}
-        <div className="relative flex-1">
+        <div className="relative">
           <Carousel
             opts={{
               align: "start",
               watchDrag: width < 768,
             }}
-            className="h-full w-full"
+            className="w-full"
           >
-            <CarouselContent className="-ml-2 h-full">
+            <CarouselContent className="-ml-4">
               {isLoading
                 ? [...Array(visibleCount)].map((_, i) => (
                     <TrackerSkeleton key={i} count={itemCount} />
@@ -128,15 +136,18 @@ function Tracker() {
 
               {!isLoading &&
                 [...Array(emptyCount)].map((_, i) => (
-                  <TrackerCardEmpty key={`empty-${i}`} />
+                  <TrackerCardEmpty
+                    key={`empty-${i}`}
+                    onAdd={() => setOpen(true)}
+                  />
                 ))}
             </CarouselContent>
 
             {shouldShowNav && (
               <>
-                <CarouselPrevious className="absolute -left-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 rounded-full border border-border/60 bg-background/80 shadow-md backdrop-blur-md transition-all hover:scale-105 sm:flex" />
+                <CarouselPrevious className="absolute -left-3 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 rounded-full bg-background shadow-sm sm:flex" />
 
-                <CarouselNext className="absolute -right-4 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 rounded-full border border-border/60 bg-background/80 shadow-md backdrop-blur-md transition-all hover:scale-105 sm:flex" />
+                <CarouselNext className="absolute -right-3 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 rounded-full bg-background shadow-sm sm:flex" />
               </>
             )}
           </Carousel>

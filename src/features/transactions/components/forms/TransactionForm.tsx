@@ -33,6 +33,7 @@ import { AccountSelect } from "./section/AccountSelect";
 import { BehaviourSelector } from "./section/BehaviourSelector";
 import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
+import { InstallmentSection } from "./section/InstallmentSection";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -76,7 +77,17 @@ const TransactionForm = ({
 
   // Recurring toggle is only available when adding a non-transfer. When editing, the
   // record already is (or isn't) a schedule, and switching would hit the wrong endpoint.
-  const canToggleRecurring = mode === "add" && !isTransfer;
+  // Credit card purchases can't be scheduled, so the toggle goes away once a
+  // credit account is picked (and credit accounts are hidden once recurring is on).
+  const isCreditAccount = watch("account")?.category === "CREDIT";
+  const canToggleRecurring = mode === "add" && !isTransfer && !isCreditAccount;
+
+  // Installments only apply to a new one-off purchase on a credit card.
+  const canConvertToInstallment =
+    type === "Expense" &&
+    mode === "add" &&
+    !isRecurring &&
+    watch("account")?.category === "CREDIT";
 
   // Show attachment for past transactions being added/edited
   const showAttachment =
@@ -147,7 +158,7 @@ const TransactionForm = ({
               <Textarea
                 {...field}
                 placeholder="Enter description"
-                className="text-sm resize-none"
+                className="text-sm resize-none min-h-14"
                 rows={2}
               />
             </FormControl>
@@ -211,6 +222,8 @@ const TransactionForm = ({
                       handleRecurringToggle(pressed);
                     }}
                     aria-label="Toggle recurring"
+                    title={value ? "Make one-time" : "Make recurring"}
+                    className="h-10 min-w-10"
                   >
                     <Repeat className="h-4 w-4" />
                   </Toggle>
@@ -227,7 +240,11 @@ const TransactionForm = ({
         label={fromLabel}
         assets={assetData ?? []}
         control={control}
-        categories={accountCategories}
+        categories={
+          isRecurring
+            ? accountCategories.filter((c) => c !== "CREDIT")
+            : accountCategories
+        }
       />
 
       {/* Swap button + To account — Transfer only */}
@@ -261,6 +278,9 @@ const TransactionForm = ({
 
       {/* Category + Amount */}
       <CategoryAmountSection mode={mode} />
+
+      {/* Installment conversion — new, non-recurring credit card expenses only */}
+      {canConvertToInstallment && <InstallmentSection />}
 
       {/* Recurring schedule fields */}
       {isRecurring && (

@@ -1,9 +1,11 @@
 import * as Icons from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
+import { IRootState } from "@/app/store";
 import TrackerDialog from "@/shared/components/Tracker/TrackerDialog";
 import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
+import { Card } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import {
   DropdownMenu,
@@ -14,8 +16,8 @@ import {
 
 import { cn } from "@/lib/utils";
 import { CategoryLimit } from "@/shared/types";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { getLucideIcon } from "@/shared/utils/icons";
-import { StackedBar } from "../charts/CommonBar";
 
 interface TrackerCardProps {
   item: CategoryLimit;
@@ -23,150 +25,128 @@ interface TrackerCardProps {
   count: number;
 }
 
-const TrackerCard = ({
-  item,
-  onDelete,
-  count,
-}: TrackerCardProps) => {
+// Usage at or above this ratio is flagged as "near limit"
+const WARNING_THRESHOLD = 80;
+
+// Colour treatment per budget health
+const STATUS_TONES = {
+  ok: { bar: "bg-primary", text: "text-muted-foreground" },
+  warning: { bar: "bg-warning", text: "text-warning" },
+  over: { bar: "bg-destructive", text: "text-destructive" },
+};
+
+const TrackerCard = ({ item, onDelete, count }: TrackerCardProps) => {
   const [open, setOpen] = useState(false);
+  const currency = useSelector((state: IRootState) => state.settings.currency);
 
   const limit = item?.value ?? 0;
   const spent = Number(item?.total ?? 0);
-  const percentage = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
-  const isOverBudget = spent > limit;
+  const usage = limit > 0 ? (spent / limit) * 100 : 0;
   const remaining = limit - spent;
+  const isOverBudget = spent > limit;
+
+  const tone =
+    STATUS_TONES[
+      isOverBudget ? "over" : usage >= WARNING_THRESHOLD ? "warning" : "ok"
+    ];
 
   const Icon = getLucideIcon(item?.category?.icon ?? "BusFront");
 
-  const segment = useMemo(
-    () => [
-      {
-        label: "Spent",
-        value: spent,
-        color: isOverBudget ? "hsl(var(--destructive))" : "hsl(var(--primary))",
-      },
-    ],
-    [spent, isOverBudget],
-  );
   return (
     <>
       <CarouselItem
         className={cn(
           count > 1 ? "basis-[90%]" : "basis-full",
-          "2xl:basis-1/2",
+          "pl-4 2xl:basis-1/2",
         )}
       >
-        <Card className="relative bg-muted/30 overflow-hidden h-[120px]">
-          {/* Top accent line — destructive when over budget */}
-          {/* <div
-            className={cn(
-              "absolute inset-x-0 top-0 h-[2px]",
-              isOverBudget ? "bg-destructive" : "bg-primary/40",
-            )}
-          /> */}
+        <Card className="group flex h-28 flex-col justify-between rounded-lg bg-muted/20 p-4 shadow-none transition-colors hover:bg-muted/40">
+          {/* Row 1: icon · name · spent/limit · menu */}
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground/70"
+              aria-hidden="true"
+            >
+              <Icon className="h-5 w-5" />
+            </div>
 
-          {/* Actions menu */}
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="absolute top-2.5 right-2 h-6 w-6 p-0"
-                variant="ghost"
-                type="button"
-                aria-label="Card options"
-              >
-                <Icons.EllipsisVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setOpen(true);
-                }}
-              >
-                <Icons.Pencil className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(item)}>
-                <Icons.Trash2 className="mr-2 h-4 w-4" /> Delete
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem disabled>
-                <Icons.Eye className="mr-2 h-4 w-4" /> View
-              </DropdownMenuItem> */}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold leading-tight">
+                {item.category.name}
+              </p>
+              <p className="mt-1 text-xs capitalize leading-tight text-muted-foreground">
+                {item.period}
+              </p>
+            </div>
 
-          <CardContent className="flex flex-col gap-3 p-4 pr-9 pt-5">
-            {/* Header row: icon + name/period + spent/limit */}
-            <div className="flex items-center gap-3">
-              {/* Category icon */}
+            <div className="shrink-0 text-right leading-tight">
+              <p className="text-[15px] font-semibold tabular-nums">
+                {formatCurrency(spent, currency)}
+              </p>
+              <p className="mt-1 text-xs tabular-nums text-muted-foreground">
+                of {formatCurrency(limit, currency)}
+              </p>
+            </div>
+
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className="-mr-2 h-8 w-7 shrink-0 p-0 text-muted-foreground"
+                  variant="ghost"
+                  type="button"
+                  aria-label="Budget options"
+                >
+                  <Icons.EllipsisVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setOpen(true);
+                  }}
+                >
+                  <Icons.Pencil className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDelete(item)}
+                >
+                  <Icons.Trash2 className="mr-2 h-4 w-4" /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Row 2: progress bar · remaining */}
+          <div className="flex items-center gap-3 border-t border-border/50 pt-3">
+            <div
+              className="h-2 flex-1 overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.min(Math.round(usage), 100)}
+              aria-label={`${item.category.name} budget used`}
+            >
               <div
                 className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border bg-muted",
+                  "h-full rounded-full transition-[width] duration-500 ease-out",
+                  tone.bar,
                 )}
-                aria-hidden="true"
-              >
-                <Icon className="h-4 w-4" />
-              </div>
-
-              {/* Name + period */}
-              <div className="flex flex-col min-w-0 flex-1">
-                <p className="font-semibold text-sm leading-tight truncate">
-                  {item.category.name}
-                </p>
-                <p className="text-xs text-muted-foreground capitalize leading-tight mt-0.5">
-                  {item.period} budget
-                </p>
-              </div>
-
-              {/* Spent / limit + over-budget badge */}
-              <div className="flex flex-col items-end shrink-0">
-                <p
-                  className={cn(
-                    "text-sm font-semibold tabular-nums leading-tight",
-                    isOverBudget ? "text-destructive" : "text-foreground",
-                  )}
-                >
-                  ₱{spent.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
-                </p>
-                <p className="text-xs text-muted-foreground tabular-nums leading-tight">
-                  / ₱
-                  {limit.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-            </div>
-
-            {/* Progress section */}
-            <div className="flex flex-col gap-1.5">
-              <StackedBar
-                mode="progress"
-                maxValue={item.value}
-                segments={segment}
-                formatValue={(v) => `₱${v.toLocaleString()}`}
+                style={{ width: `${Math.min(usage, 100)}%` }}
               />
-
-              {/* Percentage + remaining label */}
-              <div className="flex justify-between items-center">
-                <span
-                  className={cn(
-                    "text-xs font-medium tabular-nums",
-                    "text-muted-foreground",
-                  )}
-                >
-                  {percentage.toFixed(0)}% used
-                </span>
-                <span
-                  className={cn(
-                    "text-xs tabular-nums",
-                    "text-muted-foreground",
-                  )}
-                >
-                  {isOverBudget
-                    ? `₱${Math.abs(remaining).toLocaleString("en-PH", { minimumFractionDigits: 2 })} over`
-                    : `₱${remaining.toLocaleString("en-PH", { minimumFractionDigits: 2 })} left`}
-                </span>
-              </div>
             </div>
-          </CardContent>
+            <span
+              className={cn(
+                "shrink-0 text-xs font-medium tabular-nums",
+                tone.text,
+              )}
+            >
+              {isOverBudget
+                ? `${formatCurrency(Math.abs(remaining), currency)} over`
+                : `${formatCurrency(remaining, currency)} left`}
+            </span>
+          </div>
         </Card>
       </CarouselItem>
 

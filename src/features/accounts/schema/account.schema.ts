@@ -31,6 +31,8 @@ export const accountSchema = z
     creditLimit: z.number().positive().optional(),
     statementDate: z.number().int().min(1).max(31).optional().nullable(),
     dueDate: z.number().int().min(1).max(31).optional().nullable(),
+    // Alternative to dueDate: due this many days after the statement date
+    dueDaysAfterStatement: z.number().int().min(1).max(60).optional().nullable(),
     includeNetWorth: z.boolean(),
     targetAmount: z.number().positive().optional().nullable(),
     targetDate: z.date().optional().nullable(),
@@ -52,14 +54,24 @@ export const accountSchema = z
       });
     }
 
-    // Statements and bill reminders are generated from these two days.
+    // Statements and bill reminders are generated from the statement day plus
+    // one due rule: a day of the month, or days after the statement date.
     if (data.type === "CREDIT") {
-      for (const field of ["statementDate", "dueDate"] as const) {
-        if (data[field] == null) {
+      if (data.statementDate == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["statementDate"],
+          message: "Statement date is required",
+        });
+      }
+
+      if (data.dueDate == null && data.dueDaysAfterStatement == null) {
+        // Reported on both fields; only the one for the chosen rule is shown.
+        for (const path of ["dueDate", "dueDaysAfterStatement"]) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: [field],
-            message: field === "dueDate" ? "Due date is required" : "Statement date is required",
+            path: [path],
+            message: "Due date is required",
           });
         }
       }

@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { categoryApi } from "../api/categoryApi";
 import useScreenWidth from "../hooks/useScreenWidth";
 import { useConfirm } from "../provider/ConfirmProvider";
-import { setActionShow } from "../slices/activeSlice";
+import { markRemoving, setActionShow } from "../slices/activeSlice";
 import ViewTransaction from "./dialog/ViewDialog/ViewTransaction";
 
 const CommonToolbar = () => {
@@ -60,6 +60,11 @@ const CommonToolbar = () => {
             },
             id: selectedData?.id,
           }).unwrap();
+          // Close the overlay so the row's exit animation is visible
+          dispatch(setActionShow(false));
+          if (selectedData?.id !== undefined) {
+            dispatch(markRemoving(selectedData.id));
+          }
           if (selectedData?.category?.type === "Expense") {
             dispatch(
               expensesApi.util.invalidateTags(["Expenses", "Recurring"]),

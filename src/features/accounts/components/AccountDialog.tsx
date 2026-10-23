@@ -7,7 +7,7 @@ import {
   Loader2,
   Wallet,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import CommonDialog from "@/shared/components/dialog/CommonDialog";
@@ -88,6 +88,10 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
   );
   const isEdit = mode === "Edit";
 
+  // How the card sets its due date: a day of the month, or a number of days
+  // after the statement date (e.g. 20 days for some digital banks).
+  const [dueMode, setDueMode] = useState<"DAY" | "DAYS_AFTER">("DAY");
+
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
   const [updateAccount, { isLoading: isUpdating }] = useUpdateAccountMutation();
   const isSubmitting = isCreating || isUpdating;
@@ -144,6 +148,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
       setValue("creditLimit", undefined);
       setValue("statementDate", undefined);
       setValue("dueDate", undefined);
+      setValue("dueDaysAfterStatement", undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountType]);
@@ -151,6 +156,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
   // Reset form with account data when opening in edit mode.
   useEffect(() => {
     if (!open) {
+      setDueMode("DAY");
       form.reset({
         name: "",
         type: undefined,
@@ -169,7 +175,9 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
         creditLimit?: number;
         statementDate?: number;
         dueDate?: number;
+        dueDaysAfterStatement?: number;
       };
+      setDueMode(creditAccount?.dueDaysAfterStatement ? "DAYS_AFTER" : "DAY");
 
       form.reset({
         name: account.name,
@@ -188,7 +196,8 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
         ...(account.category === "CREDIT" && {
           creditLimit: Number(creditAccount.creditLimit),
           statementDate: creditAccount.statementDate,
-          dueDate: creditAccount.dueDate,
+          dueDate: creditAccount.dueDate ?? undefined,
+          dueDaysAfterStatement: creditAccount.dueDaysAfterStatement ?? undefined,
         }),
       });
     } else {
@@ -205,12 +214,20 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
     }
   }, [open, mode, account]);
 
+  // Only one due rule is kept, so switching clears the other field.
+  const handleDueModeChange = (value: "DAY" | "DAYS_AFTER") => {
+    setDueMode(value);
+    setValue("dueDate", undefined, { shouldValidate: true });
+    setValue("dueDaysAfterStatement", undefined, { shouldValidate: true });
+  };
+
   const onSubmit = async (values: AccountFormValues) => {
     try {
       const {
         creditLimit,
         statementDate,
         dueDate,
+        dueDaysAfterStatement,
         targetDate,
         targetAmount,
         ...rest
@@ -227,6 +244,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
             creditLimit,
             statementDate,
             dueDate,
+            dueDaysAfterStatement,
           },
         }),
         ...(values.sub_type === "SAVINGS" && {
@@ -518,6 +536,32 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                   )}
                 />
 
+                <div className="space-y-2">
+                  <span className="text-sm font-medium">Bill is due</span>
+                  <Select
+                    value={dueMode}
+                    onValueChange={(value) =>
+                      handleDueModeChange(value as "DAY" | "DAYS_AFTER")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DAY">On a day of the month</SelectItem>
+                      <SelectItem value="DAYS_AFTER">
+                        A set number of days after the statement
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {dueMode === "DAYS_AFTER" && (
+                    <p className="text-xs text-muted-foreground">
+                      A due date that falls on a weekend moves to the nearest
+                      weekday.
+                    </p>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={control}
@@ -551,20 +595,20 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
 
                   <FormField
                     control={control}
-                    name="dueDate"
+                    name={dueMode === "DAY" ? "dueDate" : "dueDaysAfterStatement"}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Due Date
+                          {dueMode === "DAY" ? "Due Date" : "Days to Pay"}
                           <RequiredMark />
                         </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min={1}
-                            max={31}
-                            placeholder="e.g. 5"
-                            value={field.value ?? ""}
+                            max={dueMode === "DAY" ? 31 : 60}
+                            placeholder={dueMode === "DAY" ? "e.g. 5" : "e.g. 20"}
+                            value={(field.value as number | null | undefined) ?? ""}
                             onChange={(e) =>
                               field.onChange(
                                 e.target.value === ""

@@ -1,8 +1,9 @@
 import * as Icons from "lucide-react";
 import { memo, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
+import { Card } from "../ui/card";
 import { CarouselItem } from "../ui/carousel";
 import {
   DropdownMenu,
@@ -11,16 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+import { IRootState } from "@/app/store";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { cn } from "@/lib/utils";
 import { frequencies } from "@/shared/constants/dateConstants";
 import { Schedule, ScheduleType } from "@/shared/types";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import { getLucideIcon } from "@/shared/utils/icons";
 import moment from "moment";
-import { Badge } from "../ui/badge";
-import { Separator } from "../ui/separator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
 
 interface ScheduleCardProps {
   schedule: Schedule;
@@ -30,127 +31,100 @@ interface ScheduleCardProps {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const TYPE_CONFIG: Record<
-  ScheduleType,
-  {
-    container: string;
-    text: string;
-    badge: string;
-    accent: string;
-    icon: React.ElementType;
-    prefix: string;
-  }
-> = {
-  Expense: {
-    container:
-      "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
-    text: "text-destructive",
-    badge:
-      "bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 border-0",
-    accent: "bg-red-500",
-    icon: Icons.ArrowUp,
-    prefix: "−",
-  },
-  Income: {
-    container:
-      "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800",
-    text: "text-emerald-600 dark:text-emerald-400",
-    badge:
-      "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-0",
-    accent: "bg-emerald-500",
-    icon: Icons.ArrowDown,
-    prefix: "+",
-  },
-  Transfer: {
-    container:
-      "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800",
-    text: "text-blue-600 dark:text-blue-400",
-    badge:
-      "bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border-0",
-    accent: "bg-blue-500",
-    icon: Icons.ArrowRightLeft,
-    prefix: "",
-  },
+// Amount colour + sign per schedule type — mirrors TransactionItem
+const TYPE_TONES: Record<ScheduleType, { text: string; prefix: string }> = {
+  Expense: { text: "text-foreground", prefix: "−" },
+  Income: { text: "text-success", prefix: "+" },
+  Transfer: { text: "text-primary", prefix: "" },
 };
+
+// Days ahead at which an upcoming due date is highlighted
+const DUE_SOON_DAYS = 3;
+
+function getDueInfo(date?: string | Date | number) {
+  if (!date) return { label: "No upcoming date", tone: "text-muted-foreground" };
+
+  const days = moment(date).startOf("day").diff(moment().startOf("day"), "days");
+
+  if (days < 0) return { label: `Overdue ${Math.abs(days)}d`, tone: "text-destructive" };
+  if (days === 0) return { label: "Due today", tone: "text-warning" };
+  if (days === 1) return { label: "Tomorrow", tone: "text-warning" };
+  if (days <= DUE_SOON_DAYS) return { label: `In ${days} days`, tone: "text-warning" };
+  return {
+    label: moment(date).format("MMM D"),
+    tone: "text-muted-foreground",
+  };
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const TrackerCard = memo(
-  ({
-    schedule,
-    onDelete,
-    count,
-  }: ScheduleCardProps) => {
-    const [open, setOpen] = useState(false);
+const ScheduleCard = memo(({ schedule, onDelete, count }: ScheduleCardProps) => {
+  const [open, setOpen] = useState(false);
+  const currency = useSelector((state: IRootState) => state.settings.currency);
 
-    const config = useMemo(
-      () => TYPE_CONFIG[schedule.type as ScheduleType] ?? TYPE_CONFIG.Transfer,
-      [schedule.type],
+  const tone = TYPE_TONES[schedule.type as ScheduleType] ?? TYPE_TONES.Transfer;
+  const CategoryIcon = getLucideIcon(schedule.category?.icon);
+
+  const due = useMemo(() => getDueInfo(schedule.nextDueDate), [schedule.nextDueDate]);
+
+  const frequencyLabel = useMemo(() => {
+    const preset = frequencies.find(
+      (f) => f.unit === schedule.unit && f.interval === schedule.interval,
     );
-
-    const { icon: TypeIcon, prefix, container, text } = config;
-
-    const nextDue = useMemo(
-      () =>
-        schedule.nextDueDate
-          ? moment(schedule.nextDueDate).format("MMM DD, YYYY")
-          : "N/A",
-      [schedule.nextDueDate],
-    );
-
-    const formattedAmount = useMemo(
-      () =>
-        Number(schedule.amount).toLocaleString("en-PH", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-      [schedule.amount],
-    );
-
-    const frequency = useMemo(
-      () =>
-        frequencies.find(
-          (f) => f.unit === schedule.unit && f.interval === schedule.interval,
-        ),
-      [schedule.unit, schedule.interval],
-    );
-
-    const behaviour = useMemo(
-      () =>
-        schedule.behaviour
-          ? schedule.behaviour.charAt(0).toUpperCase() +
-            schedule.behaviour.slice(1).toLowerCase()
-          : undefined,
-      [schedule.behaviour],
-    );
-
+    if (preset) return preset.name;
     const unit =
       schedule.interval === 1
         ? schedule.unit?.toLowerCase()
         : `${schedule.unit?.toLowerCase()}s`;
+    return `Every ${schedule.interval} ${unit}`;
+  }, [schedule.unit, schedule.interval]);
 
-    const frequencyLabel =
-      frequency?.name ?? `Every ${schedule.interval} ${unit}`;
-    return (
-      <>
-        <CarouselItem
-          className={`${count > 1 ? "basis-[90%]" : "basis-full"} 2xl:basis-1/2`}
-        >
-          <Card className="relative overflow-hidden bg-muted/30 transition-shadow hover:shadow-md h-full min-h-[120px]">
-            {/* ── Left accent bar ───────────────────────────────────── */}
-            {/* <span
-              className={cn("absolute inset-y-0 left-0 w-1", accent)}
+  const isAuto = schedule.behaviour === "AUTO_LOG";
+
+  return (
+    <>
+      <CarouselItem
+        className={`${count > 1 ? "basis-[90%]" : "basis-full"} pl-4 2xl:basis-1/2`}
+      >
+        <Card className="flex h-28 flex-col justify-between rounded-lg bg-muted/20 p-4 shadow-none transition-colors hover:bg-muted/40">
+          {/* Row 1: icon · description · amount · menu */}
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground/70"
               aria-hidden="true"
-            /> */}
+            >
+              <CategoryIcon className="h-5 w-5" />
+            </div>
 
-            {/* ── Actions menu ──────────────────────────────────────── */}
+            <div className="min-w-0 flex-1">
+              <p
+                className="truncate text-sm font-semibold leading-tight"
+                title={schedule.description}
+              >
+                {schedule.description}
+              </p>
+              <p className="mt-1 truncate text-xs leading-tight text-muted-foreground">
+                {schedule.category?.name}
+              </p>
+            </div>
+
+            <p
+              className={cn(
+                "shrink-0 text-[15px] font-semibold tabular-nums",
+                tone.text,
+              )}
+            >
+              {tone.prefix}
+              {formatCurrency(Number(schedule.amount ?? 0), currency)}
+            </p>
+
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
-                  className="absolute top-2 right-2 h-7 w-7 shrink-0 p-0"
+                  className="-mr-2 h-8 w-7 shrink-0 p-0 text-muted-foreground"
                   variant="ghost"
                   type="button"
-                  aria-label="Card options"
+                  aria-label="Schedule options"
                 >
                   <Icons.EllipsisVertical className="h-4 w-4" />
                 </Button>
@@ -177,118 +151,40 @@ const TrackerCard = memo(
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
 
-            {/* ── Card body ─────────────────────────────────────────── */}
-            {/*
-              pr-9  reserves space for the absolutely-positioned ⋮ button.
-              pl-5  offsets the left accent bar.
-            */}
-            <CardContent className="flex flex-col gap-2 p-3 pl-5 pr-9 justify-center h-full">
-              {/* ── Row 1: type icon · text block · amount ─────────── */}
-              <div className="flex items-center gap-2.5">
-                {/* Type icon — fixed size, never shrinks */}
-                <div
-                  className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
-                    container,
-                    text,
-                  )}
-                  aria-hidden="true"
-                >
-                  <TypeIcon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium leading-tight">
-                    {schedule.description}
-                  </p>
+          {/* Row 2: frequency · behaviour · next due */}
+          <div className="flex items-center justify-between gap-3 border-t border-border/50 pt-3 text-xs text-muted-foreground">
+            <span className="flex min-w-0 items-center gap-1.5">
+              <Icons.Repeat className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="truncate">{frequencyLabel}</span>
+              <span aria-hidden>·</span>
+              <span className="shrink-0">{isAuto ? "Auto" : "Remind"}</span>
+            </span>
+            <span
+              className={cn(
+                "flex shrink-0 items-center gap-1 font-medium tabular-nums",
+                due.tone,
+              )}
+            >
+              <Icons.CalendarClock className="h-3.5 w-3.5" aria-hidden />
+              {due.label}
+            </span>
+          </div>
+        </Card>
+      </CarouselItem>
 
-                  {/* Asset · Category — both truncate independently */}
-                  <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                    {schedule.fromAsset?.name && (
-                      <>
-                        <span className="truncate" style={{ maxWidth: "5rem" }}>
-                          {schedule.fromAsset.name}
-                        </span>
-                        <span aria-hidden="true" className="shrink-0">
-                          ·
-                        </span>
-                      </>
-                    )}
-                    <span className="truncate">{schedule.category.name}</span>
-                  </div>
-                </div>
+      {/* ── Edit dialog ───────────────────────────────────────────── */}
+      <TransactionDialog
+        open={open}
+        setOpen={setOpen}
+        mode="edit"
+        rowData={schedule}
+      />
+    </>
+  );
+});
 
-                {/*
-                  Amount: shrink-0 + whitespace-nowrap ensures it
-                  NEVER wraps or gets pushed off-screen on small cards.
-                */}
-                <p
-                  className={cn(
-                    "shrink-0 whitespace-nowrap tabular-nums text-sm font-semibold",
-                    text,
-                  )}
-                  aria-label={`${schedule.type}: ₱${formattedAmount}`}
-                >
-                  {prefix}₱{formattedAmount}
-                </p>
-              </div>
-              <Separator />
+ScheduleCard.displayName = "ScheduleCard";
 
-              {/* ── Row 2: badges (left) · next-due (right) ────────── */}
-              <div className="flex items-center justify-between gap-2">
-                {/*
-                  Badges: overflow-hidden + flex-nowrap stops them stacking.
-                  They'll clip if there's truly no room rather than wrap.
-                */}
-                <div className="flex min-w-0 shrink items-center gap-1 overflow-hidden">
-                  <Badge
-                    className={cn(
-                      "shrink-0 text-xs font-semibold capitalize tracking-wide",
-                    )}
-                    variant={"outline"}
-                  >
-                    {frequencyLabel}
-                  </Badge>
-
-                  {behaviour && (
-                    <Badge
-                      className={cn(
-                        "shrink-0 text-xs font-semibold capitalize tracking-wide",
-                      )}
-                      variant={"outline"}
-                    >
-                      {behaviour}
-                    </Badge>
-                  )}
-                </div>
-
-                {/*
-                  Date: shrink-0 + whitespace-nowrap keeps it on one line.
-                */}
-                <p className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs text-muted-foreground">
-                  <Icons.CalendarClock
-                    className="h-3 w-3 shrink-0"
-                    aria-hidden="true"
-                  />
-                  {nextDue}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </CarouselItem>
-
-        {/* ── Edit dialog ───────────────────────────────────────────── */}
-        <TransactionDialog
-          open={open}
-          setOpen={setOpen}
-          mode="edit"
-          rowData={schedule}
-        />
-      </>
-    );
-  },
-);
-
-TrackerCard.displayName = "TrackerCard";
-
-export default TrackerCard;
+export default ScheduleCard;

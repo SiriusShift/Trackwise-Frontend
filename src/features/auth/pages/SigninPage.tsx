@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { loginSchema } from "../schema/authSchema";
+import LoadingScreen from "@/shared/components/LoadingScreen";
 
 const SignInPage = () => {
   usePageMeta({
@@ -124,7 +125,7 @@ const SignInPage = () => {
   };
   return (
     <>
-      {!isLoading && (!data?.authenticated || !cookies.user) && (
+      {isLoading ? <LoadingScreen /> : (!data?.authenticated || !cookies.user) && (
         <>
           {" "}
           <LayoutAuth
