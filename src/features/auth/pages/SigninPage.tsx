@@ -25,7 +25,7 @@ const SignInPage = () => {
   usePageMeta({
     title: "Sign in | Trackwise",
     description:
-      "Sign in to Trackwise to manage your expenses, income, transfers, and credit card billing.",
+      "Sign in to Trackwise, your personal finance tracker for expenses, income, transfers, recurring payments, and credit card billing.",
   });
   const router = useNavigate();
   const location = useLocation();

@@ -9,12 +9,13 @@ import LandingFooter from "../components/LandingFooter";
 import LandingNavbar from "../components/LandingNavbar";
 import StatementsSection from "../components/StatementsSection";
 import StepsSection from "../components/StepsSection";
+import CreditCardSection from "../components/CreditCardSection";
 
 const LandingPage = () => {
   usePageMeta({
     title: "Trackwise | Personal finance tracker",
     description:
-      "Track expenses, income, and transfers in one place. Schedule recurring transactions and download statements for any account.",
+      "Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and download statements.",
   });
   const [cookies] = useCookies(["user"]);
 
@@ -31,6 +32,7 @@ const LandingPage = () => {
         <HeroSection />
         <FeaturesSection />
         <HighlightsSection />
+        <CreditCardSection />
         <StatementsSection />
         <StepsSection />
         <CtaSection />
