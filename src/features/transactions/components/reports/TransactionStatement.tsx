@@ -9,7 +9,7 @@ const MUTED = "#6b7280";
 const LINE = "#e5e7eb";
 const SOFT = "#f3f4f6";
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   page: {
     paddingTop: 36,
     paddingHorizontal: 36,

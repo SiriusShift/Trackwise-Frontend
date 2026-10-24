@@ -54,6 +54,8 @@ export interface AssetData {
   totalIncomes: number;
   totalTransferIn: number;
   totalTransferOut: number;
+  category?: string;
+  currency?: string;
 }
 
 export interface RecurringTemplate {
@@ -345,6 +347,65 @@ export interface CreditStatementDetail extends ScheduledItem {
     date: string;
     description?: string | null;
     fromAsset?: ScheduleAccount | null;
+  }[];
+}
+
+// A closed billing cycle, as listed for exporting its statement
+export interface CreditStatementOption {
+  id: number;
+  statementDate: string;
+  dueDate: string;
+  statementBalance: number;
+  status: "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
+}
+
+export interface CreditCardStatementData {
+  card: { id: number; name: string; institution?: string | null; currency: string };
+  statementId: number;
+  status: CreditStatementOption["status"];
+  periodStart: string;
+  statementDate: string;
+  dueDate: string;
+  summary: {
+    previousBalance: number;
+    paymentsAndCredits: number;
+    purchases: number;
+    installmentsBilled: number;
+    adjustments: number;
+    statementBalance: number;
+    interestCharged: number;
+    lateFeeCharged: number;
+    otherFees: number;
+    totalAmountDue: number;
+    amountPaid: number;
+    remainingDue: number;
+    creditLimit: number;
+    availableCredit: number;
+  };
+  // `amount` is + for charges, - for payments and credits
+  transactions: {
+    id: string;
+    type: "Purchase" | "Cash advance" | "Credit" | "Payment";
+    date: string;
+    description: string;
+    category: string | null;
+    counterpart: string | null;
+    amount: number;
+  }[];
+  installments: {
+    planId: number;
+    description: string;
+    installmentNo: number;
+    termMonths: number;
+    totalAmount: number;
+    amount: number;
+  }[];
+  payments: {
+    id: number;
+    date: string;
+    description: string;
+    from: string | null;
+    amount: number;
   }[];
 }
 
