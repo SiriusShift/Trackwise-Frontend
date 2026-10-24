@@ -1,4 +1,4 @@
-import SavingsPage from "@/features/accounts/pages/AccountPage";
+import AccountPage from "@/features/accounts/pages/AccountPage";
 import ForgotPassword from "@/features/auth/pages/ForgotPassword";
 import ResetPassword from "@/features/auth/pages/ResetPassword";
 import Dashboard from "@/features/dashboard/pages/Dashboard";
@@ -76,20 +76,16 @@ export const router = createBrowserRouter([
             index: true,
             element: <TransactionPage />,
           },
-          {
-            path: "schedules",
-            element: <CalendarPage />,
-          },
         ],
       },
       {
-        path: "/accounts",
-        element: <SavingsPage />,
+        path: "calendar",
+        element: <CalendarPage />,
       },
-      // {
-      //   path: "/loans",
-      //   element: <LoanPage />,
-      // },
+      {
+        path: "/accounts",
+        element: <AccountPage />,
+      },
       {
         path: "/settings",
         element: <SettingsLayout />,
