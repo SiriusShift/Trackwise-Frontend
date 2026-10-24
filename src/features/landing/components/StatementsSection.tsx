@@ -1,13 +1,28 @@
 import { Check } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
+import CreditStatementPreview from "./CreditStatementPreview";
+import MoneyFlowPreview from "./MoneyFlowPreview";
+import ScrollReveal from "./ScrollReveal";
 import StatementPreview from "./StatementPreview";
 
 const points = [
-  "Opening and closing balance for the period",
-  "Every credit and debit, with descriptions",
-  "Per-account statements, generated in seconds",
-  "Ready to print, file, or share",
+  "Account statements with opening and closing balances",
+  "Credit card statements with the amount due and installments",
+  "Money flow reports across all your cash and bank accounts",
+  "Clean PDFs, ready to print, file, or share",
+];
+
+const reports = [
+  { value: "account", label: "Account", preview: <StatementPreview /> },
+  { value: "credit", label: "Credit card", preview: <CreditStatementPreview /> },
+  { value: "flow", label: "Money flow", preview: <MoneyFlowPreview /> },
 ];
 
 const list = {
@@ -41,9 +56,37 @@ const StatementsSection = () => {
       id="statements"
       className="scroll-mt-16 border-b border-border/60 bg-card/30 py-20 lg:py-24"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 *:min-w-0">
-        <StatementPreview />
-        <div>
+      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 *:min-w-0">
+        <ScrollReveal
+          className="order-2 lg:order-1"
+          fromScale={0.96}
+          fromOpacity={0.3}
+          fromY={24}
+        >
+          <Tabs defaultValue="account">
+            <TabsList className="mb-4">
+              {reports.map((r) => (
+                <TabsTrigger key={r.value} value={r.value}>
+                  {r.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {/* All previews share one grid cell, so switching tabs never changes the height */}
+            <div className="grid">
+              {reports.map((r) => (
+                <TabsContent
+                  key={r.value}
+                  value={r.value}
+                  forceMount
+                  className="col-start-1 row-start-1 mt-0 transition-opacity duration-300 data-[state=inactive]:invisible data-[state=inactive]:opacity-0 content-center"
+                >
+                  {r.preview}
+                </TabsContent>
+              ))}
+            </div>
+          </Tabs>
+        </ScrollReveal>
+        <div className="lg:order-2">
           <motion.div
             initial={
               reduceMotion
@@ -55,10 +98,10 @@ const StatementsSection = () => {
             transition={{ type: "spring", bounce: 0, duration: 0.7 }}
           >
             <h2 className="text-3xl font-bold tracking-tight">
-              Statements you can download
+              Reports you can download
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Pick an account and a date range, and get a clean PDF statement of
+              Pick an account or card and a date range, and get a clean PDF of
               everything that moved in and out.
             </p>
           </motion.div>

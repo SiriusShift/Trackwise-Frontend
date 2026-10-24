@@ -2,11 +2,13 @@ import { usePageMeta } from "@/shared/hooks/usePageMeta";
 import { useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
 import CtaSection from "../components/CtaSection";
+import FaqSection from "../components/FaqSection";
 import FeaturesSection from "../components/FeaturesSection";
 import HeroSection from "../components/HeroSection";
 import HighlightsSection from "../components/HighlightsSection";
 import LandingFooter from "../components/LandingFooter";
 import LandingNavbar from "../components/LandingNavbar";
+import PrivacySection from "../components/PrivacySection";
 import StatementsSection from "../components/StatementsSection";
 import StepsSection from "../components/StepsSection";
 import CreditCardSection from "../components/CreditCardSection";
@@ -35,6 +37,8 @@ const LandingPage = () => {
         <CreditCardSection />
         <StatementsSection />
         <StepsSection />
+        <PrivacySection />
+        <FaqSection />
         <CtaSection />
       </main>
       <LandingFooter />

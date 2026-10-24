@@ -1,7 +1,6 @@
 // Themed HTML mock of the PDF in features/transactions/components/reports/TransactionStatement.tsx.
 // Sample data only; keep the layout in sync with the PDF.
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import ScrollReveal from "./ScrollReveal";
 
 const money = (n: number) => formatCurrency(n);
 
@@ -18,11 +17,10 @@ const rows = [
 ]
 
 const StatementPreview = () => (
-<ScrollReveal fromScale={0.96} fromOpacity={0.3} fromY={24}>
   <div
     role="img"
     aria-label="Sample Trackwise transaction statement showing opening and closing balances and transactions"
-    className="overflow-hidden rounded-xl border border-border bg-card p-5 text-[11px] text-card-foreground shadow-2xl shadow-primary/10 sm:p-7"
+    className="overflow-hidden rounded-xl border border-border bg-card p-4 text-[11px] text-card-foreground shadow-2xl shadow-primary/10 sm:p-5"
   >
     <div className="flex items-end justify-between border-b-2 border-primary pb-3">
       <div>
@@ -36,7 +34,7 @@ const StatementPreview = () => (
       </p>
     </div>
 
-    <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-2 rounded-md bg-muted px-3 py-2.5">
+    <div className="mt-3 flex flex-wrap justify-between gap-x-4 gap-y-2 rounded-md bg-muted px-3 py-2.5">
       <div>
         <p className="text-[8px] uppercase tracking-wider text-muted-foreground">
           Account
@@ -81,7 +79,7 @@ const StatementPreview = () => (
       ))}
     </div>
 
-    <div className="mt-4 overflow-x-auto">
+    <div className="mt-3 overflow-x-auto">
       <div className="min-w-[440px]">
         <div className="grid grid-cols-[16fr_38fr_15fr_15fr_16fr] rounded-sm bg-primary px-2 py-1.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground">
           <span>Date</span>
@@ -116,12 +114,11 @@ const StatementPreview = () => (
       </div>
     </div>
 
-    <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-border pt-2 text-[8px] text-muted-foreground">
+    <div className="mt-3 flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-border pt-2 text-[8px] text-muted-foreground">
       <span>Generated automatically by Trackwise · Main Checking</span>
       <span>Page 1 of 1</span>
     </div>
   </div>
-  </ScrollReveal>
 );
 
 export default StatementPreview;

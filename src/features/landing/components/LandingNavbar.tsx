@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Features", href: "#features" },
   { label: "Statements", href: "#statements" },
   { label: "How it works", href: "#how-it-works" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const LandingNavbar = () => {
