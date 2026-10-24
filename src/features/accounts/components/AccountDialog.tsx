@@ -626,7 +626,7 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
               </div>
             )}
 
-            {accountSubType === "SAVINGS" && (
+            {(accountSubType === "SAVINGS" && !isEdit) && (
               <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
                 <p className="text-sm font-medium text-muted-foreground">
                   Savings Details
