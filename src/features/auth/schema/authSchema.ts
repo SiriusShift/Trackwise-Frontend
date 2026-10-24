@@ -17,6 +17,9 @@ export const signupSchema = {
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       ),
+    acceptTerms: z.boolean().refine((v) => v, {
+      message: "You must accept the Terms of Service and Privacy Policy",
+    }),
   }),
 
   defaultValues: {
@@ -25,6 +28,7 @@ export const signupSchema = {
     username: "",
     email: "",
     password: "",
+    acceptTerms: false,
   },
 };
 

@@ -3,6 +3,8 @@ import ForgotPassword from "@/features/auth/pages/ForgotPassword";
 import ResetPassword from "@/features/auth/pages/ResetPassword";
 import Dashboard from "@/features/dashboard/pages/Dashboard";
 import LandingPage from "@/features/landing/pages/LandingPage";
+import PrivacyPolicyPage from "@/features/legal/pages/PrivacyPolicyPage";
+import TermsPage from "@/features/legal/pages/TermsPage";
 import SettingsLayout from "@/features/settings/SettingsLayout";
 import AccountSettings from "@/features/settings/pages/AccountSettings";
 import BackupSettings from "@/features/settings/pages/BackupSettings";
@@ -41,6 +43,14 @@ export const router = createBrowserRouter([
       {
         path: "/reset-password",
         element: <ResetPassword />,
+      },
+      {
+        path: "/privacy",
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: "/terms",
+        element: <TermsPage />,
       },
       {
         path: "/",

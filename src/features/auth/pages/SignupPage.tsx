@@ -3,6 +3,7 @@ import { usePageMeta } from "@/shared/hooks/usePageMeta";
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../../shared/components/ui/button";
+import { Checkbox } from "../../../shared/components/ui/checkbox";
 import { Input } from "../../../shared/components/ui/input";
 import {
   InputOTP,
@@ -13,8 +14,8 @@ import {
 // import Logo from "../assets/images/Logo.svg";
 import Google from "@/assets/images/Google.svg";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   handleCatchErrorMessage,
@@ -58,6 +59,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const {
     register,
+    control,
     getValues,
     formState: { errors, isValid },
     watch,
@@ -70,6 +72,7 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
   const [passwordFocused, setPasswordFocused] = useState(false);
   const passwordField = register("password");
   const passwordValue = watch("password") || "";
+  const acceptedTerms = watch("acceptTerms");
 
   const submitSignup = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -209,6 +212,42 @@ const handleGoogleSignup = () => {
                   </p>
                 )}
               </div>
+              <Controller
+                name="acceptTerms"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-start gap-2 w-full sm:w-96">
+                    <Checkbox
+                      id="acceptTerms"
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      onBlur={field.onBlur}
+                      className="mt-0.5"
+                      aria-invalid={errors.acceptTerms ? "true" : "false"}
+                    />
+                    <label htmlFor="acceptTerms" className="text-sm leading-snug">
+                      I agree to the{" "}
+                      <Link
+                        to="/terms"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold underline-offset-4 hover:underline"
+                      >
+                        Terms of Service
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold underline-offset-4 hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
+                )}
+              />
               <Button
                 type="submit"
                 disabled={!isValid || isLoading}
@@ -227,6 +266,7 @@ const handleGoogleSignup = () => {
                 variant={"outline"}
                 type="button"
                 onClick={handleGoogleSignup}
+                disabled={!acceptedTerms}
                 className="w-full sm:w-96 shadow-md"
               >
                 <img src={Google} alt="" className="h-3 w-3 me-2" />
