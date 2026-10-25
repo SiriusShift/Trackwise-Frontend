@@ -4,10 +4,12 @@ import {
   ChartNoAxesCombined,
   CreditCard,
   FolderCog,
+  Goal,
   LayoutGrid,
   Palette,
   PiggyBank,
   Settings,
+  Target,
   User,
 } from "lucide-react";
 
@@ -16,6 +18,7 @@ export const navigationData = [
   { name: "Transactions", path: "/transactions", icon: ChartNoAxesCombined },
   { name: "Accounts", path: "/accounts", icon: CreditCard },
   { name: "Calendar", path: "/calendar", icon: Calendar },
+  { name: "Savings", path: "/savings", icon: Goal },
   {
     name: "Settings",
     path: "/settings",

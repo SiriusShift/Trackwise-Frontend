@@ -6,7 +6,7 @@ import {
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import StatCard from "@/features/accounts/components/StatCard";
 import {
   formatCurrency,
   handleCatchErrorMessage,
@@ -161,57 +161,25 @@ const AccountPage = () => {
           data-tour="account-stats"
           className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
         >
-          {statistics.map((stat) => {
-            const Icon = stat.icon;
-
-            return (
-              <Card
-                key={stat.title}
-                className="group relative overflow-hidden p-5 transition-all border border-border/50 bg-muted/40 hover:bg-muted/60"
-              >
-                {/* <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-3 top-3 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <EllipsisVertical className="h-4 w-4" />
-                </Button> */}
-
-                <div className="flex items-center gap-4 h-full">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.color}`}
-                  >
-                    <Icon className="h-6 w-6" />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">
-                      {stat.title}
-                    </span>
-
-                    {accountsLoading ? (
-                      <Skeleton className="mt-1 h-7 w-28" />
-                    ) : (
-                      <span className="text-2xl font-bold tracking-tight">
-                        {stat.key !== "count"
-                          ? formatCurrency(stat.value, currency, "symbol")
-                          : stat.value}
-                      </span>
-                    )}
-
-                    {!accountsLoading &&
-                      stat.key === "count" &&
-                      excludedAccountsLength > 0 && (
-                      <span className="text-xs text-muted-f">
-                        ⓘ Excluded {excludedAccountsLength} account
-                        {excludedAccountsLength > 1 ? "s" : ""}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+          {statistics.map((stat) => (
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              icon={stat.icon}
+              color={stat.color}
+              loading={accountsLoading}
+              value={
+                stat.key !== "count"
+                  ? formatCurrency(stat.value, currency, "symbol")
+                  : stat.value
+              }
+              footer={
+                stat.key === "count" &&
+                excludedAccountsLength > 0 &&
+                `ⓘ Excluded ${excludedAccountsLength} account${excludedAccountsLength > 1 ? "s" : ""}`
+              }
+            />
+          ))}
         </div>
         {/* <h2 className="text-lg font-medium tracking-tight">Accounts</h2> */}
         <div

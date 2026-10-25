@@ -47,11 +47,14 @@ export const formatCurrency = (
   amount: number,
   currency = "PHP",
   currencyDisplay: Intl.NumberFormatOptions["currencyDisplay"] = "symbol",
+  fractionDigits?: number,
 ) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
     currencyDisplay,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   }).format(amount);
 };
 

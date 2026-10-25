@@ -22,6 +22,7 @@ import SignupPage from "../features/auth/pages/SignupPage";
 import PageNotFound from "../pages/PageNotFound";
 import DefaultBranding from "./DefaultBranding";
 import ProtectedRoutes from "./ProtectedRoutes";
+import SavingsPage from "@/features/savings/pages/SavingsPage";
 
 export const router = createBrowserRouter([
   {
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
       {
         path: "/accounts",
         element: <AccountPage />,
+      },
+                  {
+        path: "savings",
+        element: <SavingsPage />,
       },
       {
         path: "/settings",
