@@ -1,7 +1,14 @@
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
-import { ArrowDownToLine, Plus } from "lucide-react";
-import React, { useState } from "react";
+import {
+  ArrowDownToLine,
+  ChartPie,
+  Gauge,
+  PiggyBank,
+  Plus,
+  Target,
+} from "lucide-react";
+import { useState } from "react";
 import { useGetSavingsQuery } from "../api/savingsApi";
 import StatsCard from "../components/StatsCard";
 
@@ -11,30 +18,51 @@ const SavingsPage = () => {
     isActive: isActive,
   });
 
+  // Pace, progress and health only cover goals with a target date
+  const deadlineScope = {
+    datedGoals: data?.summary.datedGoals,
+    excludedGoals:
+      (data?.summary.activeGoals ?? 0) - (data?.summary.datedGoals ?? 0),
+  };
+
   const stats = [
     {
       title: "Total saved",
       key: "saved-total",
       value: data?.summary.totalSaved,
-      additional: data?.summary.activeGoals,
+      additional: data?.summary.savedThisMonth,
+      icon: PiggyBank,
+      graph: data?.summary.trend.saved ?? [],
     },
     {
-      title: "Saved this month",
-      key: "saved-current",
-      value: data?.summary.savedThisMonth,
-      additional: data?.summary.monthOverMonthChange,
+      title: "Monthly pace needed",
+      key: "monthly-pace",
+      value: data?.summary.neededPace,
+      additional: data?.summary.currentPace,
+      icon: Gauge,
+      graph: data?.summary.trend.pace ?? [],
+      ...deadlineScope,
     },
     {
       title: "Overall progress",
       key: "progress",
       value: data?.summary.overallProgress,
       additional: data?.summary.totalTarget,
+      change: data?.summary.progressChange,
+      icon: ChartPie,
+      graph: data?.summary.trend.progress ?? [],
+      ...deadlineScope,
     },
     {
       title: "Goal Health",
       key: "count",
       value: data?.summary.onTrack,
       additional: data?.summary.behindSchedule,
+      icon: Target,
+      // Goal health shows status dots, not a sparkline
+      graph: [],
+      health: data?.summary.trend.health ?? [],
+      ...deadlineScope,
     },
   ];
 
