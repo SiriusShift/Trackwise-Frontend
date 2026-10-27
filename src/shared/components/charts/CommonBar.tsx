@@ -1,10 +1,10 @@
-import { StackedBarSegment } from "@/shared/types";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { StackedBarSegment } from "@/shared/types";
 import { useEffect, useState } from "react";
 
 interface GroupedSegment extends StackedBarSegment {
@@ -16,6 +16,7 @@ interface StackedBarProps {
   formatValue?: (value: number) => string;
   mode?: "stacked" | "progress";
   maxValue?: number;
+  maxColor: string;
   /** Max number of individual legend/bar segments before the rest get bucketed into "Others" */
   maxLegendItems?: number;
 }
@@ -59,18 +60,18 @@ export function StackedBar({
   formatValue = defaultFormat,
   mode = "stacked",
   maxValue,
+  maxColor,
   maxLegendItems = 10,
 }: StackedBarProps) {
   const [animated, setAnimated] = useState(false);
 
   const segments = groupSegments(rawSegments, maxLegendItems);
 
-
+  // Grow from 0 on mount only; later data changes animate via the width transition
   useEffect(() => {
-    setAnimated(false);
     const t = setTimeout(() => setAnimated(true), 50);
     return () => clearTimeout(t);
-  }, [rawSegments]);
+  }, []);
 
   const total = segments?.reduce((sum, s) => sum + s.value, 0) ?? 0;
   const denominator = mode === "progress" ? (maxValue ?? total) : total;
@@ -110,8 +111,8 @@ export function StackedBar({
                             : "0",
                         backgroundColor:
                           total > denominator
-                            ? "hsl(var(--destructive))"
-                            : "hsl(var(--primary))",
+                            ? (maxColor ?? "hsl(var(--destructive))")
+                            : seg.color,
                       }}
                     />
                   );
