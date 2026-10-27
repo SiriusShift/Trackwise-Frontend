@@ -1,11 +1,11 @@
 import { IRootState } from "@/app/store";
 import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
+import { IconBadge } from "@/shared/components/IconBadge";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import * as Icons from "lucide-react";
+import { FileX } from "lucide-react";
 import moment from "moment";
-import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -18,25 +18,7 @@ interface RecentTransaction {
   category?: { name: string; icon?: string };
 }
 
-function TransactionIcon({ icon }: { icon?: string }) {
-  const LucidIcon = (icon && Icons[icon as keyof typeof Icons]) as
-    | React.ElementType
-    | undefined;
-  if (!LucidIcon) return null;
-  return (
-    <div className="w-9 h-9 rounded-lg shrink-0 flex justify-center items-center bg-muted border border-border/60">
-      <LucidIcon className="text-muted-foreground" width={16} height={16} />
-    </div>
-  );
-}
-
-function AmountLabel({
-  type,
-  amount,
-}: {
-  type: string;
-  amount: number;
-}) {
+function AmountLabel({ type, amount }: { type: string; amount: number }) {
   const currency = useSelector((state: IRootState) => state.settings.currency);
   const colorClass =
     type === "Income"
@@ -112,7 +94,7 @@ const TransactionHistory = () => {
         ) : isEmpty ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/20 p-8 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-              <Icons.FileX className="text-muted-foreground" size={22} />
+              <FileX className="text-muted-foreground" size={22} />
             </div>
 
             <div className="space-y-1">
@@ -131,7 +113,7 @@ const TransactionHistory = () => {
                 key={`${item.id}-${index}`}
                 className="flex items-center p-2 gap-2 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border"
               >
-                <TransactionIcon icon={item?.category?.icon} />
+                <IconBadge icon={item?.category?.icon} />
 
                 <div className="flex-1 min-w-0">
                   <p
@@ -146,10 +128,7 @@ const TransactionHistory = () => {
                 </div>
 
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  <AmountLabel
-                    type={item?.type}
-                    amount={item?.amount}
-                  />
+                  <AmountLabel type={item?.type} amount={item?.amount} />
                   <p className="text-[11px] text-muted-foreground">
                     {moment(item?.date).format("MMM DD, h:mm A")}
                   </p>
