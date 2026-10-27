@@ -10,13 +10,18 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useGetSavingsQuery } from "../api/savingsApi";
+import GoalList from "../components/GoalList";
 import StatsCard from "../components/StatsCard";
 
 const SavingsPage = () => {
   const [isActive, setIsActive] = useState(true);
+  const [activeGoal, setActiveGoal] = useState<number | undefined>();
   const { data, isLoading } = useGetSavingsQuery({
     isActive: isActive,
   });
+
+  console.log(data);
+  const savings = data?.data || [];
 
   // Pace, progress and health only cover goals with a target date
   const deadlineScope = {
@@ -89,6 +94,15 @@ const SavingsPage = () => {
           {stats.map((item) => (
             <StatsCard key={item.key} data={item} isLoading={isLoading} />
           ))}
+        </div>
+        <div className="grid grid-cols-4 gap-3 h-full">
+          <GoalList
+            data={savings}
+            active={activeGoal}
+            setActive={setActiveGoal}
+            isLoading={isLoading}
+          />
+          <div className="col-span-1 flex flex-col"></div>
         </div>
       </div>
     </>

@@ -13,6 +13,8 @@ export interface SavingsData {
   currentAmount: string;
   targetDate: string | null;
   isActive: boolean;
+  // Lucide icon name, e.g. "Plane"
+  icon: string;
   assetId: number | null;
   asset: {
     id: number;
