@@ -391,6 +391,7 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
                 mode="range"
                 selected={range}
                 onSelect={handleCustomRange}
+                onClear={() => handleCustomRange(undefined)}
                 numberOfMonths={2}
                 initialFocus
               />
