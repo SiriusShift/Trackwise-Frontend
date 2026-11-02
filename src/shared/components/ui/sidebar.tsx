@@ -100,6 +100,11 @@ const SidebarProvider = React.forwardRef<
         : setOpen((open) => !open);
     }, [isMobile, setOpen, setOpenMobile]);
 
+    // Close the mobile sheet when the viewport grows past the mobile breakpoint.
+    React.useEffect(() => {
+      if (!isMobile) setOpenMobile(false);
+    }, [isMobile]);
+
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -202,7 +207,8 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground shadow-xl [&>button]:hidden ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=open]:duration-300 data-[state=closed]:duration-200 motion-reduce:animate-none"
+            overlayClassName="bg-black/40 backdrop-blur-[2px] data-[state=open]:duration-300 data-[state=closed]:duration-200"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -232,7 +238,7 @@ const Sidebar = React.forwardRef<
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            "duration-200 relative h-svh w-(--sidebar-width) md:w-20 lg:w-(--sidebar-width) bg-transparent transition-[width] ease-linear",
+            "relative h-svh w-(--sidebar-width) md:w-20 lg:w-(--sidebar-width) bg-transparent transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
@@ -242,7 +248,7 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "duration-200 fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] ease-linear md:flex",
+            "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none md:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width)"
               : "right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width)",
