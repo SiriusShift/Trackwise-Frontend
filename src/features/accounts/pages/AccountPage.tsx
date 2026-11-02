@@ -152,7 +152,7 @@ const AccountPage = () => {
               Transfer
             </Button> */}
             <Button data-tour="add-account" onClick={handleAdd}>
-              <Plus /> Add
+              <Plus /> <span className="hidden sm:inline">Add</span>
             </Button>
           </div>
         </PageHeader>
