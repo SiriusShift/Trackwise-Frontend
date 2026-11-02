@@ -237,6 +237,7 @@ export interface Schedule {
   behaviour?: string;
   unit?: string;
   interval?: number | string;
+  daysOfMonth?: number[];
   nextDueDate?: string | Date | number;
   isActive?: boolean;
   endedAt?: string | Date | null;
@@ -285,6 +286,8 @@ export interface ScheduledItem {
   behaviour?: "AUTO_LOG" | "REMIND";
   interval?: number;
   unit?: string;
+  daysOfMonth?: number[];
+  startDate?: string;
   category?: ScheduleCategory | null;
   fromAsset?: ScheduleAccount | null;
   toAsset?: ScheduleAccount | null;
@@ -317,6 +320,7 @@ export interface RecurringScheduleDetail {
   endDate?: string | null;
   interval: number;
   unit: string;
+  daysOfMonth?: number[];
   behaviour: "AUTO_LOG" | "REMIND";
   category?: ScheduleCategory | null;
   account?: ScheduleAccount | null;

@@ -8,6 +8,7 @@
     "start": "vite --host --port 5011",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview"
   },
   "dependencies": {
