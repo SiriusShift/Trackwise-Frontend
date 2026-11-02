@@ -2,10 +2,7 @@ import { IRootState } from "@/app/store";
 import { cn } from "@/lib/utils";
 import { Card } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import {
-  formatCompactCurrency,
-  formatCurrency,
-} from "@/shared/utils/CustomFunctions";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { ArrowDown, ArrowUp, LucideIcon } from "lucide-react";
 import { useSelector } from "react-redux";
 import { GoalHealth } from "../types/savings.types";
@@ -80,6 +77,8 @@ const StatsCard = ({
   const Icon = data.icon;
   // A deadline-only card with no dated goals has nothing to measure
   const noDeadlines = data.datedGoals === 0;
+  // Goal health counts unfinished goals only: on track (value) + behind (additional)
+  const pendingGoals = amount + additional;
   const excludedNote = data.excludedGoals
     ? `Excludes ${data.excludedGoals} goal${data.excludedGoals > 1 ? "s" : ""} without a deadline`
     : undefined;
@@ -93,7 +92,7 @@ const StatsCard = ({
       case "progress":
         return `${Math.round(amount * 100)}%`;
       default:
-        return `${amount}/${data.datedGoals ?? 0}`;
+        return pendingGoals > 0 ? `${amount}/${pendingGoals}` : "—";
     }
   };
 
@@ -135,12 +134,14 @@ const StatsCard = ({
       case "progress": {
         const pts = Math.round((data.change ?? 0) * 100);
         return {
-          text: `${pts > 0 ? "+" : ""}${pts} pts`,
+          text: `${pts > 0 ? "+" : ""}${pts} pts this month`,
           tooltip: excludedNote,
           tone: pts > 0 ? "positive" : pts < 0 ? "negative" : undefined,
         };
       }
       default:
+        if (pendingGoals === 0)
+          return { text: "All goals reached", tone: "positive" };
         // Behind schedule is a warning, matching the pace shortfall
         return additional > 0
           ? {
@@ -157,8 +158,8 @@ const StatsCard = ({
     ? {}
     : {
         "monthly-pace": "/ mo",
-        progress: `of ${formatCompactCurrency(additional, currency)}`,
-        count: "on track",
+        progress: `of ${formatCurrency(additional, currency, "symbol", 0)}`,
+        ...(pendingGoals > 0 && { count: "on track" }),
       };
 
   const badge = formatBadge();
