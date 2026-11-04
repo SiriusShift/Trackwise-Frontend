@@ -13,9 +13,9 @@ interface GoalDetailsEmptyProps {
 }
 
 // Fills the details panel when the selected tab has no goals, so the space
-// beside the list doesn't read as a rendering bug. It's the only empty state
-// for the tab; the list stays blank so the message isn't shown twice. The
-// min height stops the page collapsing when a tab is empty
+// beside the list doesn't read as a rendering bug. The list only shows a
+// one-line placeholder, so the explanation and actions live here. The min
+// height stops the page collapsing when a tab is empty
 const GoalDetailsEmpty = ({
   tab,
   hasGoals,
@@ -63,7 +63,7 @@ const GoalDetailsEmpty = ({
   const ActionIcon = action?.icon;
 
   return (
-    <Card className="flex min-h-80 flex-1 flex-col items-center justify-center gap-4 border-dashed p-8 text-center shadow-none">
+    <Card className="flex min-h-80 flex-1 animate-in fade-in-0 duration-200 flex-col items-center justify-center gap-4 border-dashed p-8 text-center shadow-none">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
         <Icon className="text-muted-foreground" size={22} />
       </div>

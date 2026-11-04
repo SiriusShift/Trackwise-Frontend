@@ -24,7 +24,7 @@ export interface SavingsData {
   } | null;
   createdAt: string;
   updatedAt: string;
-
+  archivedAt: string;
   savedAmount: number;
   remainingAmount: number;
   progress: number;

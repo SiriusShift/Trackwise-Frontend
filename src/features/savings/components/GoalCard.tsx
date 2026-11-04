@@ -34,9 +34,15 @@ export const statusStyles = {
     badge: "bg-muted text-muted-foreground",
     bar: "hsl(var(--muted-foreground))",
   },
+  archived: {
+    label: "Archived",
+    badge: "bg-muted text-muted-foreground",
+    bar: "hsl(var(--muted-foreground))",
+  },
 };
 
 export const getStatus = (data: SavingsData): keyof typeof statusStyles => {
+  if (!data.isActive) return "archived";
   if (data.isCompleted) return "completed";
   if (!data.targetDate) return "noDeadline";
   if (moment(data.targetDate).isBefore(moment(), "day")) return "overdue";
@@ -89,6 +95,7 @@ const GoalCard = ({
     behind: `Needs ${format(data.requiredMonthlyPace ?? 0)}/mo by ${dueDate}`,
     overdue: `${format(data.remainingAmount)} left`,
     noDeadline: `${format(data.remainingAmount)} left`,
+    archived: `${format(data.remainingAmount)} left`,
   }[status];
 
   return (

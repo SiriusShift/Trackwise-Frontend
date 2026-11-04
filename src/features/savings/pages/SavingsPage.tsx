@@ -1,31 +1,25 @@
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
-import {
-  ChartPie,
-  Gauge,
-  PiggyBank,
-  Plus,
-  Target,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { ChartPie, Gauge, PiggyBank, Plus, Target } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   useDeleteGoalMutation,
   useGetSavingsQuery,
   useUpdateGoalMutation,
 } from "../api/savingsApi";
-import GoalList from "../components/GoalList";
-import StatsCard from "../components/StatsCard";
-import GoalsInfoCard from "../components/GoalsInfoCard";
 import GoalContributionChart from "../components/GoalContributionChart";
-import RecentContributions from "../components/RecentContributions";
-import GoalTransferDialog from "../components/GoalTransferDialog";
-import GoalDialog from "../components/GoalDialog";
 import GoalDetailsEmpty from "../components/GoalDetailsEmpty";
-import { GoalTab, isInTab } from "../utils/goalTabs";
+import GoalDialog from "../components/GoalDialog";
+import GoalList from "../components/GoalList";
+import GoalsInfoCard from "../components/GoalsInfoCard";
+import GoalTransferDialog from "../components/GoalTransferDialog";
+import RecentContributions from "../components/RecentContributions";
+import StatsCard from "../components/StatsCard";
 import { GoalTransferDirection, SavingsData } from "../types/savings.types";
+import { GoalTab, isInTab } from "../utils/goalTabs";
 
 const SavingsPage = () => {
   const [activeGoal, setActiveGoal] = useState<number | null>(null);
@@ -34,7 +28,11 @@ const SavingsPage = () => {
   // counts active ones
   const { data, isLoading } = useGetSavingsQuery({});
   const savings = data?.data || [];
-  const activeSaving = savings.find((saving) => saving.id === activeGoal);
+  // Only a goal in the open tab counts, so a stale selection (e.g. right after
+  // archiving) never shows the details of a goal from another tab
+  const activeSaving = savings.find(
+    (saving) => saving.id === activeGoal && isInTab(saving, goalTab),
+  );
 
   // Contribute / withdraw dialog. The goal is kept separately so the dialog
   // keeps its content while closing
@@ -87,11 +85,12 @@ const SavingsPage = () => {
         try {
           await updateGoal({
             id: goal.id,
-            data: { isActive: !archiving },
+            data: {
+              isActive: !archiving,
+              ...(archiving && { currentAmount: goal.savedAmount }),
+            },
           }).unwrap();
-          toast.success(
-            `${goal.name} ${archiving ? "archived" : "restored"}.`,
-          );
+          toast.success(`${goal.name} ${archiving ? "archived" : "restored"}.`);
         } catch (err) {
           toast.error(handleCatchErrorMessage(err) ?? "Something went wrong.");
         }
@@ -197,7 +196,11 @@ const SavingsPage = () => {
             tab={goalTab}
             setTab={setGoalTab}
           />
-          <div className="flex-1 min-w-0 flex flex-col gap-3">
+          {/* Reserves the height of a linked goal (details card plus the
+              charts row), so manual goals, empty tabs and loading all keep the
+              same size. Below lg the charts stack and the panel is under the
+              list, so the height is left to the content */}
+          <div className="flex-1 min-w-0 flex flex-col gap-3 lg:min-h-[34rem]">
             <GoalsInfoCard
               data={activeSaving}
               isLoading={isLoading}

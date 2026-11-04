@@ -91,8 +91,10 @@ const Stat = ({
     >
       {value}
     </span>
-    {/* Always rendered so tiles keep their height when switching goals */}
-    <span className="truncate text-xs text-muted-foreground">
+    {/* Always rendered so tiles keep their height when switching goals.
+        Phone tiles are too narrow for one line, so it wraps there instead of
+        cutting off notes like "Not tracked for manual goals" */}
+    <span className="text-xs text-muted-foreground sm:truncate">
       {sub ?? " "}
     </span>
   </div>
@@ -122,6 +124,7 @@ const GoalsInfoCard = ({
   const progress = Math.floor(data.progress * 100);
   const target = Number(data.targetAmount);
   const isLinked = data.assetId != null;
+  const isActive = data.isActive;
 
   const now = moment();
   const due = data.targetDate ? moment(data.targetDate) : null;
@@ -140,7 +143,9 @@ const GoalsInfoCard = ({
       .diff(moment(data.createdAt).startOf("month"), "months") + 1;
   const paceWindow = Math.min(3, Math.max(ageMonths, 1));
   const paceLabel =
-    paceWindow === 3 ? "Last 3 months" : `Since ${moment(data.createdAt).format("MMM")}`;
+    paceWindow === 3
+      ? "Last 3 months"
+      : `Since ${moment(data.createdAt).format("MMM")}`;
 
   const paceTone: Tone =
     data.isCompleted || required == null
@@ -166,10 +171,17 @@ const GoalsInfoCard = ({
     const dueText = due?.format("MMM YYYY");
     switch (status) {
       case "completed":
-        return {
-          text: "Target reached. Archive this goal once you've used the money, or raise the target to keep saving.",
-          tone: "positive",
-        };
+      case "archived":
+        return data.isCompleted
+          ? {
+              text: `Reached ${format(target)} before you archived it. Restore it if you want to keep saving.`,
+              tone: "positive",
+            }
+          : {
+              text: `Archived at ${progress}% of ${format(target)}. Restore it to keep saving.`,
+              tone: "neutral",
+            };
+
       case "overdue":
         return {
           text: `This goal passed its due date with ${format(data.remainingAmount)} left. Set a new date, or finish it with a final contribution.`,
@@ -238,12 +250,14 @@ const GoalsInfoCard = ({
 
   return (
     <Card className={cn("flex flex-col gap-4 p-4", className)}>
-      {/* Header */}
-      <div className={`flex ${isLinked ? "flex-col" : "flex-row"} gap-3 lg:flex-row ${isLinked ? "lg:justify-between" : "justify-between"} `}>
-        <div className="flex min-w-0 flex-row items-center gap-4">
+      {/* Header. Below lg the icon buttons share the title's row and the main
+          actions wrap onto a full-width row of their own; from lg it's all
+          one row, reordered so the icon buttons come last */}
+      <div className="flex flex-wrap items-start gap-3 lg:flex-nowrap lg:items-center">
+        <div className="flex min-w-0 flex-1 flex-row items-center gap-3 sm:gap-4">
           <IconBadge icon={data.icon} size="lg" />
           <div className="min-w-0">
-            <div className="flex flex-row flex-wrap items-center gap-x-2">
+            <div className="flex flex-row flex-wrap items-center gap-x-2 gap-y-1">
               <h2 className="min-w-0 wrap-break-word font-bold">{data.name}</h2>
               <span
                 className={cn(
@@ -254,37 +268,46 @@ const GoalsInfoCard = ({
                 {label}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {isLinked
-                ? `Linked to ${data.asset?.name ?? "an account"}`
-                : "Saved amount entered by hand"}
-              {" · "}
-              {due ? `Due ${due.format("MMM D, YYYY")}` : "No due date"}
+            {/* Two lines on phones, where the dot would land at a line end */}
+            <p className="flex flex-col text-xs text-muted-foreground sm:block">
+              <span>
+                {isLinked
+                  ? `Linked to ${data.asset?.name ?? "an account"}`
+                  : "Saved amount entered by hand"}
+              </span>
+              <span className="hidden sm:inline">{" · "}</span>
+              <span>
+                {isActive
+                  ? due
+                    ? `Due ${due.format("MMM D, YYYY")}`
+                    : "No due date"
+                  : `Archived ${moment(data.archivedAt).format("MMM DD, YYYY")}`}
+              </span>
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:flex-nowrap">
+        <div
+          className={cn(
+            "order-last grid w-full gap-2 lg:order-none lg:flex lg:w-auto lg:shrink-0",
+            isLinked ? "grid-cols-2" : "grid-cols-1",
+          )}
+        >
           {/* Manual goals are kept up to date by hand, through the edit dialog */}
           {!isLinked && (
-            <Button disabled={!data.isActive} onClick={() => onEdit?.(data)}>
+            <Button disabled={!isActive} onClick={() => onEdit?.(data)}>
               <PenLine />
               Update balance
             </Button>
           )}
           {isLinked && (
             <>
-              <Button
-                className="flex-1 lg:flex-none"
-                disabled={!data.isActive}
-                onClick={() => onContribute?.(data)}
-              >
+              <Button disabled={!isActive} onClick={() => onContribute?.(data)}>
                 <Plus />
                 Contribute
               </Button>
               <Button
-                className="flex-1 lg:flex-none"
                 variant="outline"
-                disabled={!data.isActive}
+                disabled={!isActive}
                 onClick={() => onWithdraw?.(data)}
               >
                 <Minus />
@@ -292,6 +315,8 @@ const GoalsInfoCard = ({
               </Button>
             </>
           )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
           {isLinked && (
             <Button
               size="icon"
@@ -311,7 +336,7 @@ const GoalsInfoCard = ({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onArchive?.(data)}>
                 <Archive />
-                {data.isActive ? "Archive goal" : "Restore goal"}
+                {isActive ? "Archive goal" : "Restore goal"}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
@@ -332,7 +357,9 @@ const GoalsInfoCard = ({
             <span className="text-2xl lg:text-3xl font-bold tabular-nums">
               {format(data.savedAmount)}
             </span>
-            <span className="text-sm lg:text-base text-muted-foreground">of {format(target)}</span>
+            <span className="text-sm lg:text-base text-muted-foreground">
+              of {format(target)}
+            </span>
           </div>
           <span className="font-semibold tabular-nums">{progress}%</span>
         </div>
@@ -356,7 +383,9 @@ const GoalsInfoCard = ({
         <Stat
           label="Needed pace"
           value={
-            data.isCompleted || required == null ? "—" : `${format(required)}/mo`
+            data.isCompleted || required == null
+              ? "—"
+              : `${format(required)}/mo`
           }
           sub={
             data.isCompleted
@@ -370,8 +399,14 @@ const GoalsInfoCard = ({
             not zero */}
         <Stat
           label="Your pace"
-          value={isLinked ? `${format(recent)}/mo` : "—"}
-          sub={isLinked ? paceLabel : "Not tracked for manual goals"}
+          value={isLinked && isActive ? `${format(recent)}/mo` : "—"}
+          sub={
+            isActive
+              ? isLinked
+                ? paceLabel
+                : "Not tracked for manual goals"
+              : ""
+          }
           tone={isLinked ? paceTone : "neutral"}
         />
         <Stat
@@ -411,7 +446,12 @@ const GoalsInfoCard = ({
           <p className="text-sm text-muted-foreground">
             Link an account to track contributions and see your monthly history.
           </p>
-          <Button size="sm" variant="outline" onClick={() => onEdit?.(data)}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => onEdit?.(data)}
+          >
             <Link2 />
             Link account
           </Button>
@@ -420,6 +460,5 @@ const GoalsInfoCard = ({
     </Card>
   );
 };
-
 
 export default GoalsInfoCard;

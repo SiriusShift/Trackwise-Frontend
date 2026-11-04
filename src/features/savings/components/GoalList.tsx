@@ -15,11 +15,12 @@ import {
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { ArrowUpDown } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SavingsData } from "../types/savings.types";
+import { GoalTab, isInTab } from "../utils/goalTabs";
 import GoalCard from "./GoalCard";
 import GoalCardSkeleton from "./GoalCardSkeleton";
-import { GoalTab, isInTab } from "../utils/goalTabs";
+import GoalListEmpty from "./GoalListEmpty";
 
 const sortList = [
   {
@@ -100,6 +101,25 @@ const GoalList = ({
     }
   }, [tabs, tab, active, setActive]);
 
+  // Last goal picked in each tab, so switching back returns to it
+  const lastPicked = useRef<Partial<Record<GoalTab, number>>>({});
+  const pick = (id: number) => {
+    lastPicked.current[tab] = id;
+    setActive(id);
+  };
+
+  // Picks the goal in the same update as the tab change. Leaving it to the
+  // effect above renders the old tab's goal for a frame first, which flashes
+  // next to the empty state when the new tab has no goals
+  const changeTab = (next: GoalTab) => {
+    const goals = tabs.find((item) => item.value === next)?.goals ?? [];
+    const remembered = goals.find(
+      (saving) => saving.id === lastPicked.current[next],
+    );
+    setActive((remembered ?? goals[0])?.id ?? null);
+    setTab(next);
+  };
+
   const activeCount = tabs[0].goals.length;
   // isOnTrack is only false for unfinished goals past their expected pace
   const attentionCount = tabs[0].goals.filter(
@@ -107,7 +127,10 @@ const GoalList = ({
   ).length;
 
   return (
-    <Card className="md:h-auto 2xl:w-98 2xl:shrink-0 col-span-1 flex flex-col p-4 gap-3">
+    // Size containment at 2xl stops the goals from setting the row's height:
+    // the card stretches to the details panel and the list scrolls inside it,
+    // so a long or empty tab doesn't resize the page
+    <Card className="md:h-auto 2xl:w-98 2xl:shrink-0 2xl:contain-[size] col-span-1 flex flex-col p-4 gap-3">
       <div className="flex flex-row justify-between items-center gap-2">
         <div className="flex flex-col min-w-0">
           <span className="font-bold">Goals</span>
@@ -146,7 +169,7 @@ const GoalList = ({
       </div>
       <Tabs
         value={tab}
-        onValueChange={(value) => setTab(value as GoalTab)}
+        onValueChange={(value) => changeTab(value as GoalTab)}
         className="flex flex-col flex-1 min-h-0"
       >
         <TabsList className="grid w-full grid-cols-3 shrink-0">
@@ -169,23 +192,25 @@ const GoalList = ({
             value={value}
             // A row from md to 2xl, where the list sits above the goal details.
             // Padding keeps the selected card's ring from being clipped by the
-            // scroll area; the stable gutter stops cards resizing when it scrolls
-            className={`flex-1 min-h-0 flex flex-col gap-2 p-1 overflow-x-hidden overflow-y-auto data-[state=inactive]:hidden *:shrink-0 md:flex-row md:overflow-x-auto md:overflow-y-hidden 2xl:flex-col 2xl:overflow-x-hidden 2xl:overflow-y-auto ${isLoading || goals.length > 0 ? "md:*:w-72 2xl:*:w-full" : "*:w-full"} ${goals.length > 3 ? "[scrollbar-gutter:stable] md:[scrollbar-gutter:auto] 2xl:[scrollbar-gutter:stable]" : ""}`}
+            // scroll area; the stable gutter stops cards resizing when it scrolls.
+            // The min height keeps one card's space so an empty tab doesn't collapse
+            className={`flex-1 min-h-32 flex flex-col gap-2 p-1 overflow-x-hidden overflow-y-auto data-[state=inactive]:hidden *:shrink-0 md:flex-row md:overflow-x-auto md:overflow-y-hidden 2xl:flex-col 2xl:overflow-x-hidden 2xl:overflow-y-auto ${isLoading || goals.length > 0 ? "md:*:w-72 2xl:*:w-full" : "*:w-full"} ${goals.length > 3 ? "[scrollbar-gutter:stable] md:[scrollbar-gutter:auto] 2xl:[scrollbar-gutter:stable]" : ""}`}
           >
             {isLoading ? (
               Array.from({ length: 3 }).map((_, index) => (
                 <GoalCardSkeleton key={`${value}-skeleton-${index}`} />
               ))
-            ) : (
-              // An empty tab is explained by the details panel instead
+            ) : goals.length > 0 ? (
               goals.map((saving) => (
                 <GoalCard
                   key={saving.id}
                   data={saving}
-                  setActive={setActive}
+                  setActive={pick}
                   active={active}
                 />
               ))
+            ) : (
+              <GoalListEmpty tab={tab} />
             )}
           </TabsContent>
         ))}

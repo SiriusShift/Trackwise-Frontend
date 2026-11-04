@@ -27,7 +27,7 @@ const RecentContributions = ({
     formatCurrency(amount, currency, "symbol", 0);
 
   return (
-    <Card className="flex max-h-56 min-w-0 flex-col gap-2 p-4">
+    <Card className="flex max-h-58 min-w-0 flex-col gap-2 p-4">
       <h3 className="text-sm font-semibold">Recent activity</h3>
       {contributions.isLoading ? (
         <div className="flex flex-col gap-2">
@@ -36,7 +36,9 @@ const RecentContributions = ({
           ))}
         </div>
       ) : contributions.data?.data.length ? (
-        <ul className="flex flex-col divide-y  overflow-auto">
+        <ul
+          className={`flex flex-col divide-y overflow-auto ${contributions.data?.data.length > 3 ? "pr-1" : ""}`}
+        >
           {contributions.data.data.map((t) => {
             const isWithdrawal = t.type === "withdrawal";
             const kind = isWithdrawal ? "Withdrawal" : "Contribution";

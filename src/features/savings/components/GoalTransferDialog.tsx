@@ -83,6 +83,8 @@ interface Account {
   currency: string | undefined;
 }
 
+const ALLOWED_CONTRIBUTE_CATEGORIES = ["CASH", "BANK", "INVESTMENT"];
+
 interface GoalTransferDialogProps extends commonDialogProps {
   // Must be a linked goal: the other side of the transfer is its account
   goal: SavingsData | null;
@@ -283,6 +285,7 @@ const GoalTransferDialog = ({
                 label={text.account}
                 assets={assets}
                 control={control}
+                categories={ALLOWED_CONTRIBUTE_CATEGORIES}
                 // Default categories match the backend's transfer rules; a
                 // withdrawal into a card pays it down
                 excludeId={goal?.assetId ?? undefined}
