@@ -47,11 +47,24 @@ export const formatCurrency = (
   amount: number,
   currency = "PHP",
   currencyDisplay: Intl.NumberFormatOptions["currencyDisplay"] = "symbol",
+  fractionDigits?: number,
 ) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
     currencyDisplay,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(amount);
+};
+
+// Short form for large amounts, e.g. 310000 -> ₱310K, 1250000 -> ₱1.3M
+export const formatCompactCurrency = (amount: number, currency = "PHP") => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    notation: "compact",
+    maximumFractionDigits: 1,
   }).format(amount);
 };
 

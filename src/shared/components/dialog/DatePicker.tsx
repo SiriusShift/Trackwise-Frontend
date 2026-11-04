@@ -13,6 +13,7 @@ const DatePicker = ({
   removeTime,
   disablePast,
   disableFuture,
+  clearable,
 }: {
   field: Field;
   setDate?: (field: Field, date: Date) => void;
@@ -21,6 +22,7 @@ const DatePicker = ({
   removeTime?: boolean;
   disablePast?: boolean;
   disableFuture?: boolean;
+  clearable?: boolean;
 }) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
   return (
@@ -49,6 +51,7 @@ const DatePicker = ({
                 }
                 field.onChange(newDate);
               }}
+              onClear={clearable ? () => field.onChange(null) : undefined}
               initialFocus
               disabled={(date) => {
                 if (disablePast) {

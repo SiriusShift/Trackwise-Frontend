@@ -5,6 +5,8 @@ import {
   requiredObject,
   requiredString,
   requireFields,
+  requireScheduleFields,
+  scheduleDefaults,
 } from "@/shared/schema/fields";
 import { z } from "zod";
 
@@ -29,6 +31,13 @@ export const transferSchema = {
       if (data.recurring === true || data.category.name === "Internal") {
         requireFields(data, ctx, { to: "Destination is required" });
       }
+      if (data.recurring === true) {
+        requireFields(data, ctx, {
+          account: "Source is required",
+          behaviour: "Mode is required",
+        });
+        requireScheduleFields(data, ctx, { frequencyRequired: true });
+      }
     }),
   defaultValues: {
     category: null,
@@ -40,5 +49,7 @@ export const transferSchema = {
     image: null,
     from: null,
     to: null,
+    behaviour: null,
+    ...scheduleDefaults,
   },
 };

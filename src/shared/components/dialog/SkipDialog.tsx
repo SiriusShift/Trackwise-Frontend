@@ -77,7 +77,7 @@ const SkipDialog = ({ open, setOpen, data }: SkipDialogProps) => {
           <LucideIcons.Calendar width={15} />
           <p>
             Next due date moves to{" "}
-            {getNextDuePreview(data?.dueDate, data?.interval, data?.unit)}
+            {getNextDuePreview(data?.dueDate, data ?? undefined)}
           </p>
         </div>
         <div className="flex text-sm text-muted-foreground items-center gap-1">

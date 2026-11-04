@@ -6,6 +6,7 @@ import { accountsApi } from "@/shared/api/accountsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { buildScheduleFields } from "@/shared/utils/schedule";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -90,7 +91,7 @@ export function useTransactionSubmit({
 
   function buildJsonData(data: any) {
     return {
-      ...data,
+      ...buildScheduleFields(data),
       category: data.category?.id,
       ...(data.account && { account: data.account.id }),
       ...(data.to && { to: data.to.id }),

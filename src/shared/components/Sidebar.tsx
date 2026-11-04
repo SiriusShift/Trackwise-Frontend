@@ -1,4 +1,5 @@
 import { useLazyGetSignoutQuery } from "@/features/auth/api/signinApi";
+import { cn } from "@/lib/utils";
 import { api } from "@/shared/services/api";
 import { useDispatch } from "react-redux";
 import {
@@ -26,6 +27,11 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { navigationData } from "../../routing/navigationData";
+
+// Labels fade and shrink in sync with the sidebar's width transition when collapsed to icons.
+const LABEL_CLASSES =
+  "ml-2 whitespace-nowrap overflow-hidden max-w-[160px] opacity-100 transition-[max-width,opacity,margin] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 motion-reduce:transition-none";
+
 export function AppSidebar() {
   const location = useLocationHook();
   const parent = `/${location?.location?.pathname?.split("/")[1]}`;
@@ -33,7 +39,7 @@ export function AppSidebar() {
   const [, , removeCookie] = useCookies(["user"]);
   const [, setActive] = useState(location?.location?.pathname);
   const router = useNavigate();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const screenWidth = useScreenWidth();
 
@@ -53,41 +59,27 @@ export function AppSidebar() {
     }
   };
 
+  const pathname = location?.location?.pathname;
+
   useEffect(() => {
-    setActive(location?.location?.pathname);
-  }, [location]);
+    setActive(pathname);
+    // Close the mobile sheet after any navigation (incl. back/forward).
+    // Keyed on the pathname string: useLocationHook returns a new object every render.
+    if (isMobile) setOpenMobile(false);
+  }, [pathname, isMobile, setOpenMobile]);
 
   return (
     <Sidebar
       collapsible={screenWidth < 1024 ? "offcanvas" : "icon"}
-      className="
-    transition-all duration-300 ease-in-out
-    w-[240px]
-    data-[state=collapsed]:w-[64px]
-    overflow-hidden
-    z-50
-  "
+      className="overflow-hidden z-50"
     >
       {/* Sidebar Header */}
       <SidebarHeader className="p-4 flex">
         <div
-          className={`flex justify-start md:justify-center lg:justify-start lg:date-[state=collapsed]:justify-center items-center gap-2 w-full lg:ms-1  mt-2`}
+          className={`flex justify-start md:justify-center lg:justify-start items-center gap-2 w-full lg:ms-1  mt-2`}
         >
           <WalletMinimal className="text-primary shrink-0 w-6 h-6" />
-          <span
-            className="block 
-    font-bold text-lg
-    transition-all duration-300
-    whitespace-nowrap
-    overflow-hidden
-    max-w-[160px]
-    data-[state=collapsed]:max-w-0
-    data-[state=collapsed]:opacity-0
-    inline
-    md:hidden
-    lg:inline
-  "
-          >
+          <span className={cn(LABEL_CLASSES, "ml-0 font-bold text-lg inline md:hidden lg:inline")}>
             Trackwise
           </span>
         </div>
@@ -148,28 +140,16 @@ export function AppSidebar() {
                             >
                               <Link
                                 to={item.path}
-                                onClick={() => setActive(item.path)}
-                                className="
-                                  flex items-center rounded
-                                  transition-all duration-300
-                                  justify-start
-                                  data-[state=collapsed]:justify-center
-                                "
+                                onClick={() => {
+                                  setActive(item.path);
+                                  if (isMobile) setOpenMobile(false);
+                                }}
+                                className="flex items-center rounded justify-start"
                               >
                                 <item.icon
                                   style={{ width: "17px", height: "17px" }}
                                 />
-                                <span
-                                  className="
-                              ml-2
-                              transition-all duration-300
-                              whitespace-nowrap
-                              overflow-hidden
-                              max-w-[160px]
-                              data-[state=collapsed]:max-w-0
-                              data-[state=collapsed]:opacity-0
-                            "
-                                >
+                                <span className={LABEL_CLASSES}>
                                   {item.name}
                                 </span>
                               </Link>
@@ -222,20 +202,10 @@ export function AppSidebar() {
                         <SidebarMenuButton
                           variant="ghost"
                           onClick={handleLogout}
-                          className=" flex items-center rounded transition-all duration-300 justify-start data-[state=collapsed]:justify-center"
+                          className="flex items-center rounded justify-start"
                         >
                           <LogOut style={{ width: "17px", height: "17px" }} />
-                          <span
-                            className="
-                      ml-2
-                      transition-all duration-300
-                      whitespace-nowrap
-                      overflow-hidden
-                      max-w-[160px]
-                      data-[state=collapsed]:max-w-0
-                      data-[state=collapsed]:opacity-0
-                    "
-                          >
+                          <span className={LABEL_CLASSES}>
                             Logout
                           </span>
                         </SidebarMenuButton>

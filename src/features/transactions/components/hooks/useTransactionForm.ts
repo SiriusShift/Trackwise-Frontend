@@ -1,4 +1,5 @@
 import { frequencies } from "@/shared/constants/dateConstants";
+import { scheduleDefaults } from "@/shared/schema/fields";
 import { zodResolver } from "@hookform/resolvers/zod";
 import moment from "moment";
 import { useEffect } from "react";
@@ -29,6 +30,11 @@ function buildResetData(type: string, mode: string, rowData: any) {
       category: rowData.category,
       frequency: rowData.unit,
       every: rowData.interval,
+      ...scheduleDefaults,
+      ...(rowData.daysOfMonth?.length && {
+        repeatBy: "days",
+        daysOfMonth: rowData.daysOfMonth,
+      }),
       repeat: frequencies?.find(
         (f) => f.interval === rowData.interval && f.unit === rowData.unit,
       ) ?? {

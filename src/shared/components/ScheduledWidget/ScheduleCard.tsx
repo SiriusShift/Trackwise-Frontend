@@ -15,10 +15,10 @@ import {
 import { IRootState } from "@/app/store";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { cn } from "@/lib/utils";
-import { frequencies } from "@/shared/constants/dateConstants";
 import { Schedule, ScheduleType } from "@/shared/types";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { getLucideIcon } from "@/shared/utils/icons";
+import { getFrequencyLabel } from "@/shared/utils/schedule";
 import moment from "moment";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -67,17 +67,15 @@ const ScheduleCard = memo(({ schedule, onDelete, count }: ScheduleCardProps) => 
 
   const due = useMemo(() => getDueInfo(schedule.nextDueDate), [schedule.nextDueDate]);
 
-  const frequencyLabel = useMemo(() => {
-    const preset = frequencies.find(
-      (f) => f.unit === schedule.unit && f.interval === schedule.interval,
-    );
-    if (preset) return preset.name;
-    const unit =
-      schedule.interval === 1
-        ? schedule.unit?.toLowerCase()
-        : `${schedule.unit?.toLowerCase()}s`;
-    return `Every ${schedule.interval} ${unit}`;
-  }, [schedule.unit, schedule.interval]);
+  const frequencyLabel = useMemo(
+    () =>
+      getFrequencyLabel(
+        Number(schedule.interval),
+        schedule.unit,
+        schedule.daysOfMonth,
+      ),
+    [schedule.unit, schedule.interval, schedule.daysOfMonth],
+  );
 
   const isAuto = schedule.behaviour === "AUTO_LOG";
 
