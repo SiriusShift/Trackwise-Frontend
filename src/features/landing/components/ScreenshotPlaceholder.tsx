@@ -7,10 +7,14 @@ interface ScreenshotPlaceholderProps {
 }
 
 // Stand-in frame until real app captures are available
-const ScreenshotPlaceholder = ({ label, hint, className }: ScreenshotPlaceholderProps) => (
+const ScreenshotPlaceholder = ({
+  label,
+  hint,
+  className,
+}: ScreenshotPlaceholderProps) => (
   <div
     className={cn(
-      "flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border bg-card/60 p-6 text-center shadow-2xl shadow-primary/5",
+      "flex aspect-4/3 w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border bg-card/60 p-6 text-center shadow-2xl shadow-primary/5",
       className,
     )}
   >

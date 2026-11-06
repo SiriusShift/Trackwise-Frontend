@@ -11,7 +11,7 @@ import LandingNavbar from "../components/LandingNavbar";
 import PrivacySection from "../components/PrivacySection";
 import StatementsSection from "../components/StatementsSection";
 import StepsSection from "../components/StepsSection";
-import CreditCardSection from "../components/CreditCardSection";
+import CalendarSection from "../components/CalendarSection";
 
 const LandingPage = () => {
   usePageMeta({
@@ -34,7 +34,7 @@ const LandingPage = () => {
         <HeroSection />
         <FeaturesSection />
         <HighlightsSection />
-        <CreditCardSection />
+        <CalendarSection />
         <StatementsSection />
         <StepsSection />
         <PrivacySection />
