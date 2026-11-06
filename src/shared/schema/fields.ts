@@ -54,6 +54,40 @@ export const requiredObject = (message: string) =>
 
 export const optionalObject = z.object({}).passthrough().nullish();
 
+export const scheduleDefaults = {
+  repeatBy: "frequency",
+  dayPeriod: "month",
+  weekday: null,
+  daysOfMonth: [],
+};
+
+// Required fields depend on how the schedule repeats.
+export function requireScheduleFields(
+  data: Record<string, any>,
+  ctx: z.RefinementCtx,
+  { frequencyRequired }: { frequencyRequired: boolean },
+) {
+  if (data.repeatBy === "days") {
+    if (data.dayPeriod === "week") {
+      // isEmpty keeps 0 (Sunday) as a real value.
+      requireFields(data, ctx, { weekday: "Select a day" });
+    } else if (!data.daysOfMonth?.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["daysOfMonth"],
+        message: "Select at least one day",
+      });
+    }
+    return;
+  }
+  if (frequencyRequired) {
+    requireFields(data, ctx, {
+      frequency: "Repeat is required",
+      every: "Unit is required",
+    });
+  }
+}
+
 // Adds a "required" issue for each listed field that is empty
 export function requireFields(
   data: Record<string, unknown>,

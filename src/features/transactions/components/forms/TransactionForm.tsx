@@ -1,7 +1,7 @@
 import { ArrowUpDown, CalendarIcon, Repeat } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import DatePicker from "@/shared/components/dialog/DatePicker";
@@ -13,18 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { Input } from "@/shared/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { Separator } from "@/shared/components/ui/separator";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Toggle } from "@/shared/components/ui/toggle";
-import { frequencyList } from "@/shared/constants/dateConstants";
+import { scheduleDefaults } from "@/shared/schema/fields";
 import { Field } from "@/shared/types";
 
 import { IRootState } from "@/app/store";
@@ -34,6 +26,7 @@ import { BehaviourSelector } from "./section/BehaviourSelector";
 import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 import { InstallmentSection } from "./section/InstallmentSection";
+import { RepeatBySection } from "./section/RepeatBySection";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -75,12 +68,12 @@ const TransactionForm = ({
       ? INCOME_CATEGORIES
       : EXPENSE_CATEGORIES;
 
-  // Recurring toggle is only available when adding a non-transfer. When editing, the
+  // Recurring toggle is only available when adding. When editing, the
   // record already is (or isn't) a schedule, and switching would hit the wrong endpoint.
   // Credit card purchases can't be scheduled, so the toggle goes away once a
   // credit account is picked (and credit accounts are hidden once recurring is on).
   const isCreditAccount = watch("account")?.category === "CREDIT";
-  const canToggleRecurring = mode === "add" && !isTransfer && !isCreditAccount;
+  const canToggleRecurring = mode === "add" && !isCreditAccount;
 
   // Installments only apply to a new one-off purchase on a credit card.
   const canConvertToInstallment =
@@ -112,6 +105,10 @@ const TransactionForm = ({
   const handleRecurringToggle = (pressed: boolean) => {
     setValue("frequency", null);
     setValue("every", null);
+    setValue("repeatBy", scheduleDefaults.repeatBy);
+    setValue("dayPeriod", scheduleDefaults.dayPeriod);
+    setValue("weekday", scheduleDefaults.weekday);
+    setValue("daysOfMonth", scheduleDefaults.daysOfMonth);
     setValue("endDate", null);
     setValue("account", null);
     setValue("image", null);
@@ -288,56 +285,7 @@ const TransactionForm = ({
           <Separator />
           <p className="text-sm font-semibold">Schedule</p>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Controller
-              name="every"
-              control={control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Every</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      min={1}
-                      placeholder="1"
-                      className="text-sm"
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value === "" ? null : Number(e.target.value),
-                        )
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Controller
-              name="frequency"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <FormItem>
-                  <FormLabel>Frequency</FormLabel>
-                  <FormControl>
-                    <Select value={value ?? ""} onValueChange={onChange}>
-                      <SelectTrigger className="h-10 text-sm">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {frequencyList.map((freq) => (
-                          <SelectItem key={freq} value={freq}>
-                            {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <RepeatBySection mode={mode} />
 
           <FormField
             control={control}
@@ -369,6 +317,7 @@ const TransactionForm = ({
                   setOpen={setOpenEndDate}
                   disablePast
                   removeTime
+                  clearable
                   field={field}
                 />
               </FormItem>

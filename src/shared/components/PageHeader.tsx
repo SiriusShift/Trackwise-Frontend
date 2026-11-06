@@ -18,7 +18,7 @@ function PageHeader({
 }: PageHeaderProps) {
   return (
     <div {...props}>
-      <div className="flex items-center justify-between">
+      <div className="flex gap-3 flex-row items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">{pageName}</h1>
           <p className="text-sm text-gray-400">{description}</p>

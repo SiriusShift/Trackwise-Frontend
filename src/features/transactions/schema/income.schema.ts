@@ -7,6 +7,8 @@ import {
   requiredObject,
   requiredString,
   requireFields,
+  requireScheduleFields,
+  scheduleDefaults,
 } from "@/shared/schema/fields";
 import moment from "moment";
 import { z } from "zod";
@@ -32,9 +34,8 @@ export const incomeSchema = {
       if (data.recurring !== true) return;
       requireFields(data, ctx, {
         behaviour: "Mode is required",
-        frequency: "Repeat is required",
-        every: "Unit is required",
       });
+      requireScheduleFields(data, ctx, { frequencyRequired: true });
     }),
   defaultValues: {
     category: null,
@@ -46,5 +47,6 @@ export const incomeSchema = {
     account: null,
     image: null,
     behaviour: null,
+    ...scheduleDefaults,
   },
 };

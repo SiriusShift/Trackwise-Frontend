@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils";
 import ScheduleDialog from "@/shared/components/dialog/ScheduleDialog/ScheduleDialog";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import * as Icons from "lucide-react";
-import moment from "moment";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { ScheduledItem } from "@/shared/types";
 import {
   getAmountPrefix,
   getScheduleIcon,
   getScheduleSubtitle,
 } from "@/shared/utils/schedule";
+import * as Icons from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const PESO_LOCALE = "en-PH";
 
@@ -148,7 +148,7 @@ export default function DueCalendar() {
             )}
           </CardTitle>
           <Link
-            to="/transactions/schedules"
+            to="/calendar"
             className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
           >
             See All →

@@ -69,6 +69,8 @@ const RecurringScheduleDetails = ({
         toAsset: schedule.type === "Transfer" ? schedule.toAsset : null,
         interval: schedule.interval,
         unit: schedule.unit,
+        startDate: schedule.startDate,
+        daysOfMonth: schedule.daysOfMonth,
       }
     : null;
 
@@ -167,7 +169,11 @@ const RecurringScheduleDetails = ({
               label="Schedule"
               value={{
                 behaviour: schedule?.behaviour,
-                label: getFrequencyLabel(schedule?.interval, schedule?.unit),
+                label: getFrequencyLabel(
+                  schedule?.interval,
+                  schedule?.unit,
+                  schedule?.daysOfMonth,
+                ),
               }}
             />
             <Separator />
@@ -181,11 +187,7 @@ const RecurringScheduleDetails = ({
               value={
                 item.projected
                   ? moment(schedule?.nextDueDate).format("MMMM DD, YYYY")
-                  : getNextDuePreview(
-                      schedule?.nextDueDate,
-                      schedule?.interval,
-                      schedule?.unit,
-                    )
+                  : getNextDuePreview(schedule?.nextDueDate, schedule)
               }
             />
             {schedule?.endDate && (

@@ -44,6 +44,8 @@ import DatePicker from "./DatePicker";
 // What is being paid: the current cycle of a recurring schedule, or a credit
 // card statement.
 export interface PayTarget {
+  startDate?: string;
+  daysOfMonth?: number[];
   source: ScheduleSource;
   id: number;
   type: ScheduleType;
@@ -454,8 +456,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                   <p className="text-xs font-bold">
                     {getNextDuePreview(
                       data?.dueDate,
-                      data?.interval,
-                      data?.unit,
+                      data ?? undefined,
                     )}
                   </p>
                 </div>
