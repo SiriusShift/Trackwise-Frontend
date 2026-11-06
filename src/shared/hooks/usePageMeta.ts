@@ -2,12 +2,6 @@ import { useEffect } from "react";
 
 const SITE_URL = "https://trackwise.hygen.live";
 
-const defaultTitle = document.title;
-const defaultDescription =
-  document
-    .querySelector<HTMLMetaElement>('meta[name="description"]')
-    ?.getAttribute("content") ?? "";
-
 interface PageMeta {
   title: string;
   description: string;
@@ -19,9 +13,13 @@ interface PageMeta {
  */
 export function usePageMeta({ title, description }: PageMeta) {
   useEffect(() => {
-    document.title = title;
+    const prevTitle = document.title;
+    let descTag = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]',
+    );
+    const prevDescription = descTag?.getAttribute("content") ?? "";
 
-    let descTag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    document.title = title;
     if (!descTag) {
       descTag = document.createElement("meta");
       descTag.name = "description";
@@ -29,7 +27,9 @@ export function usePageMeta({ title, description }: PageMeta) {
     }
     descTag.content = description;
 
-    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    let canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
     if (!canonical) {
       canonical = document.createElement("link");
       canonical.rel = "canonical";
@@ -38,8 +38,8 @@ export function usePageMeta({ title, description }: PageMeta) {
     canonical.href = `${SITE_URL}${window.location.pathname}`;
 
     return () => {
-      document.title = defaultTitle;
-      if (descTag) descTag.content = defaultDescription;
+      document.title = prevTitle;
+      if (descTag) descTag.content = prevDescription;
       canonical?.remove();
     };
   }, [title, description]);

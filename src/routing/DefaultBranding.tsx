@@ -1,11 +1,11 @@
 import { useTheme } from "@/shared/provider/ThemeProvider";
-import { useLayoutEffect } from "react";
+import { useIsomorphicLayoutEffect } from "@/shared/hooks/useIsomorphicLayoutEffect";
 import { Outlet } from "react-router-dom";
 
 const DefaultBranding = () => {
   const { setDefaultBranding } = useTheme();
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setDefaultBranding(true);
     return () => setDefaultBranding(false);
   }, [setDefaultBranding]);

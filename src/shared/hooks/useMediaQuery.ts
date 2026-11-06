@@ -11,5 +11,10 @@ export function useMediaQuery(query: string) {
     [query],
   );
 
-  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches);
+  // No window during prerender: assume no match, the client corrects it after hydration.
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
 }

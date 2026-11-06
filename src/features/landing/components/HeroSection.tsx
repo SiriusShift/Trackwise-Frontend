@@ -8,6 +8,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { Link } from "react-router-dom";
 import HeroPhone from "./HeroPhone";
 import Parallax from "./Parallax";
+import ScribbledWord from "./ScribbledWord";
 import ScrollReveal from "./ScrollReveal";
 
 const container = {
@@ -23,10 +24,6 @@ const item = {
     transition: { type: "spring" as const, bounce: 0, duration: 0.7 },
   },
 };
-
-// Left-to-right reveal for the headline strokes. Negative insets leave room for the round caps and stroke width
-const hiddenLine = "inset(-100% 100% -100% -10%)";
-const shownLine = "inset(-100% -10% -100% -10%)";
 
 const HeroSection = () => {
   const reduceMotion = useReducedMotion();
@@ -68,55 +65,29 @@ const HeroSection = () => {
             className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
           >
             Stop{" "}
-            <motion.span
-              initial={reduceMotion ? false : { opacity: 1 }}
-              animate={{ opacity: 0.45 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="relative inline-block"
+            <ScribbledWord
+              mark="strike"
+              delay={0.7}
+              strokeClassName="stroke-red-600"
             >
-              guessing
-              {/* Drawn with a clip reveal, not pathLength: with non-scaling-stroke the dash is measured
-                  in viewBox units, so the line stops short once the word is wider than 200px */}
-              <motion.svg
-                aria-hidden
-                viewBox="0 0 200 20"
-                preserveAspectRatio="none"
-                className="pointer-events-none absolute inset-x-0 top-1/2 h-[0.35em] w-full -translate-y-1/2 overflow-visible"
-                initial={reduceMotion ? false : { clipPath: hiddenLine }}
-                animate={{ clipPath: shownLine }}
+              {/* Fades with opacity, not color, so it works in every theme; only the text dims, not the line */}
+              <motion.span
+                initial={reduceMotion ? false : { opacity: 1 }}
+                animate={{ opacity: 0.45 }}
                 transition={{ delay: 0.7, duration: 0.5, ease: "easeInOut" }}
               >
-                <path
-                  d="M3 13 C 50 5, 110 17, 197 7"
-                  fill="none"
-                  // Sized in em so the line keeps the same weight relative to the text at every breakpoint
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                  className="stroke-destructive stroke-[0.11em]"
-                />
-              </motion.svg>
-            </motion.span>
+                guessing
+              </motion.span>
+            </ScribbledWord>
             . Start{" "}
-            <span className="relative inline-block text-primary">
+            <ScribbledWord
+              mark="underline"
+              delay={1.25}
+              className="text-primary"
+              strokeClassName="stroke-primary"
+            >
               tracking
-              <motion.svg
-                aria-hidden
-                viewBox="0 0 200 20"
-                preserveAspectRatio="none"
-                className="pointer-events-none absolute inset-x-0 bottom-[-0.18em] h-[0.3em] w-full overflow-visible"
-                initial={reduceMotion ? false : { clipPath: hiddenLine }}
-                animate={{ clipPath: shownLine }}
-                transition={{ delay: 1.25, duration: 0.6, ease: "easeOut" }}
-              >
-                <path
-                  d="M3 15 Q 100 3, 197 12"
-                  fill="none"
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                  className="stroke-primary stroke-[0.14em]"
-                />
-              </motion.svg>
-            </span>
+            </ScribbledWord>
             .
           </motion.h1>
           <motion.p
