@@ -2,8 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import {
   Calendar as CalendarIcon,
-  Check,
-  ChevronsUpDown,
   Loader2,
   Wallet,
 } from "lucide-react";
@@ -42,14 +40,7 @@ import {
 } from "@/shared/components/FormColorPicker";
 import { Calendar } from "@/shared/components/ui/calendar";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
+import { Combobox } from "@/shared/components/Combobox";
 import {
   Popover,
   PopoverContent,
@@ -381,54 +372,25 @@ const AccountDialog = ({ open, setOpen, mode }: AccountDialogProps) => {
                       <RequiredMark />
                     </FormLabel>
                     <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !value && "text-muted-foreground",
-                              )}
-                              disabled={isEdit}
-                            >
-                              {value?.currency || "Select currency"}
-                              <ChevronsUpDown className="opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-0">
-                          <Command>
-                            <CommandInput
-                              placeholder="Search currency..."
-                              className="h-9"
-                            />
-                            <CommandList>
-                              <CommandEmpty>No results found.</CommandEmpty>
-                              <CommandGroup>
-                                {currencyCodes?.data?.map((currency) => (
-                                  <CommandItem
-                                    value={`${currency?.currency} ${currency?.code}`}
-                                    key={currency?.code}
-                                    onSelect={() => onChange(currency)}
-                                  >
-                                    {`${currency?.currency} (${currency?.code})`}
-                                    <Check
-                                      className={cn(
-                                        "ml-auto",
-                                        currency?.code === value?.code
-                                          ? "opacity-100"
-                                          : "opacity-0",
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                      <Combobox
+                        className="w-full"
+                        disabled={isEdit}
+                        items={currencyCodes?.data}
+                        value={currencyCodes?.data?.find(
+                          (c) => c.code === value?.code,
+                        )}
+                        onChange={onChange}
+                        getKey={(currency) => currency.code}
+                        getLabel={(currency) => currency.currency}
+                        getSearchValue={(currency) =>
+                          `${currency.currency} ${currency.code}`
+                        }
+                        renderItem={(currency) =>
+                          `${currency.currency} (${currency.code})`
+                        }
+                        placeholder="Select currency"
+                        searchPlaceholder="Search currency..."
+                      />
                     </FormControl>
                   </FormItem>
                 )}

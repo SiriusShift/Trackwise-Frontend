@@ -20,14 +20,7 @@ import { toast } from "sonner";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
+import { Combobox } from "@/shared/components/Combobox";
 import {
   Dialog,
   DialogClose,
@@ -45,7 +38,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 function TrackerDialog({
   title,
@@ -87,7 +79,6 @@ function TrackerDialog({
     handleSubmit,
     control,
     reset,
-    watch,
     setValue,
     formState: { isValid, isDirty },
   } = form;
@@ -208,93 +199,57 @@ function TrackerDialog({
                         <FormLabel>
                           Category <span className="text-destructive">*</span>
                         </FormLabel>
-                        <Popover modal>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                className={cn(
-                                  "justify-between",
-                                  !value && "text-muted-foreground",
-                                )}
-                              >
-                                {value
-                                  ? categoryData?.find(
-                                      (category) => category.id === value?.id,
-                                    )?.name
-                                  : "Select category"}
-                                <Icons.ChevronsUpDown className="opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent full className="w-[200px] h-52 p-0">
-                            <Command>
-                              <CommandInput
-                                placeholder="Search category..."
-                                className="h-9"
-                              />
-                              <CommandList>
-                                <CommandEmpty>No category found.</CommandEmpty>
-                                <CommandGroup>
-                                  {categoryData?.map((category) => {
-                                    const LucidIcon = getLucideIcon(category?.icon);
-
-                                    return (
-                                      <CommandItem
-                                        value={category.name}
-                                        key={category.id}
-                                        onSelect={() => {
-                                          onChange(category);
-                                        }}
-                                        className="flex p-2 justify-between"
-                                        disabled={
-                                          category?.hasTracker &&
-                                          watch("category")?.name !==
-                                            category?.name
-                                        }
-                                      >
-                                        <div className="flex flex-row items-center gap-3">
-                                          <Card
-                                            className={`p-2 rounded-lg border`}
-                                            style={{
-                                              backgroundColor: hexToRgba(
-                                                category.color,
-                                                0.2,
-                                              ),
-                                              color: category?.color,
-                                            }}
-                                          >
-                                            <LucidIcon />
-                                          </Card>
-                                          <p> {category.name}</p>
-                                        </div>
-                                        <div className="flex flex-row items-center gap-2">
-                                          {category?.hasTracker && (
-                                            <Badge
-                                              variant={"outline"}
-                                              className="bg-red-200 text-red-500"
-                                            >
-                                              Existing
-                                            </Badge>
-                                          )}
-                                          <Icons.Check
-                                            className={cn(
-                                              "ml-auto",
-                                              category.id === value?.id
-                                                ? "opacity-100"
-                                                : "opacity-0",
-                                            )}
-                                          />
-                                        </div>
-                                      </CommandItem>
-                                    );
-                                  })}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <Combobox
+                            modal
+                            contentFull
+                            contentClassName="w-[200px] h-52"
+                            itemClassName="p-2"
+                            items={categoryData}
+                            value={categoryData?.find((c) => c.id === value?.id)}
+                            onChange={onChange}
+                            getKey={(category) => category.id}
+                            getLabel={(category) => category.name}
+                            placeholder="Select category"
+                            searchPlaceholder="Search category..."
+                            emptyText="No category found."
+                            // one active budget per category
+                            isItemDisabled={(category) =>
+                              !!category?.hasTracker &&
+                              value?.id !== category?.id
+                            }
+                            renderItem={(category) => {
+                              const LucidIcon = getLucideIcon(category?.icon);
+                              return (
+                                <div className="flex flex-1 flex-row items-center justify-between gap-2">
+                                  <div className="flex flex-row items-center gap-3">
+                                    <Card
+                                      className="p-2 rounded-lg border"
+                                      style={{
+                                        backgroundColor: hexToRgba(
+                                          category.color,
+                                          0.2,
+                                        ),
+                                        color: category?.color,
+                                      }}
+                                    >
+                                      <LucidIcon />
+                                    </Card>
+                                    <p>{category.name}</p>
+                                  </div>
+                                  {category?.hasTracker && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-red-200 text-red-500"
+                                    >
+                                      Existing
+                                    </Badge>
+                                  )}
+                                </div>
+                              );
+                            }}
+                          />
+                        </FormControl>
                         <p className="text-xs text-muted-foreground">
                           Each category can only have one active budget at a
                           time.

@@ -1,6 +1,3 @@
-import { usePageMeta } from "@/shared/hooks/usePageMeta";
-// app/components/SignInForm.tsx
-("use client");
 import Google from "@/assets/images/Google.svg";
 import {
   useGetAuthStatusQuery,
@@ -8,8 +5,10 @@ import {
   usePostSigninMutation,
 } from "@/features/auth/api/signinApi";
 import LayoutAuth from "@/layout/AuthLayout";
+import LoadingScreen from "@/shared/components/LoadingScreen";
 import { Button } from "@/shared/components/ui/button";
 import { Input, PasswordInput } from "@/shared/components/ui/input";
+import { usePageMeta } from "@/shared/hooks/usePageMeta";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -19,7 +18,8 @@ import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { loginSchema } from "../schema/authSchema";
-import LoadingScreen from "@/shared/components/LoadingScreen";
+// app/components/SignInForm.tsx
+("use client");
 
 const SignInPage = () => {
   usePageMeta({
@@ -125,70 +125,74 @@ const SignInPage = () => {
   };
   return (
     <>
-      {isLoading ? <LoadingScreen /> : (!data?.authenticated || !cookies.user) && (
-        <>
-          {" "}
-          <LayoutAuth
-            title="Welcome back"
-            desc="Let's get started to track your finances"
-            submit={onSubmit}
-          >
-            <div className="mt-5 w-full gap-5 sm:w-96 flex-col flex">
-              <Input
-                placeholder="Email"
-                className="w-full sm:w-96"
-                {...register("email")}
-                required
-              />
-              <PasswordInput
-                placeholder="Password"
-                className="w-full sm:w-96"
-                {...register("password")}
-                required
-              />
-              <div className="flex justify-end">
-                <p
-                  className="text-sm text-right -mt-4"
-                  onClick={() => router("/forgot-password")}
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        (!data?.authenticated || !cookies.user) && (
+          <>
+            {" "}
+            <LayoutAuth
+              title="Welcome back"
+              desc="Let's get started to track your finances"
+              submit={onSubmit}
+            >
+              <div className="mt-5 w-full gap-5 sm:w-96 flex-col flex">
+                <Input
+                  placeholder="Email"
+                  className="w-full sm:w-96"
+                  {...register("email")}
+                  required
+                />
+                <PasswordInput
+                  placeholder="Password"
+                  className="w-full sm:w-96"
+                  {...register("password")}
+                  required
+                />
+                <div className="flex justify-end">
+                  <p
+                    className="text-sm text-right -mt-4 cursor-pointer"
+                    onClick={() => router("/forgot-password")}
+                  >
+                    Forgot Password?
+                  </p>
+                </div>
+                <Button
+                  className="w-full sm:w-96 text-right"
+                  disabled={!isValid || signinLoading}
+                  type="submit"
                 >
-                  Forgot Password?
-                </p>
+                  {signinLoading && <Loader2 className="animate-spin" />}Login
+                </Button>
+              </div>
+              <div className="relative flex py-3 w-full sm:w-full items-center">
+                <div className="grow border-t border-gray-400"></div>
+                <span className="shrink text-xs mx-4 text-gray-400">
+                  OR CONTINUE WITH
+                </span>
+                <div className="grow border-t border-gray-400"></div>
               </div>
               <Button
-                className="w-full sm:w-96 text-right"
-                disabled={!isValid || signinLoading}
-                type="submit"
+                type="button"
+                onClick={handleGoogleLogin}
+                variant={"outline"}
+                className="w-full sm:w-96 shadow-md cursor-pointer"
               >
-                {signinLoading && <Loader2 className="animate-spin" />}Login
+                <img src={Google} alt="" className="h-3 w-3 me-2" />
+                Continue with Google
               </Button>
-            </div>
-            <div className="relative flex py-3 w-full sm:w-full items-center">
-              <div className="grow border-t border-gray-400"></div>
-              <span className="shrink text-xs mx-4 text-gray-400">
-                OR CONTINUE WITH
-              </span>
-              <div className="grow border-t border-gray-400"></div>
-            </div>
-            <Button
-              type="button"
-              onClick={handleGoogleLogin}
-              variant={"outline"}
-              className="w-full sm:w-96 shadow-md"
-            >
-              <img src={Google} alt="" className="h-3 w-3 me-2" />
-              Continue with Google
-            </Button>
-            <p className="mt-2 text-sm text-center">
-              Don't have an account?{" "}
-              <a
-                className="font-bold cursor-pointer"
-                onClick={() => router("/sign-up")}
-              >
-                Sign Up
-              </a>
-            </p>
-          </LayoutAuth>
-        </>
+              <p className="mt-2 text-sm text-center">
+                Don't have an account?{" "}
+                <a
+                  className="font-bold cursor-pointer"
+                  onClick={() => router("/sign-up")}
+                >
+                  Sign Up
+                </a>
+              </p>
+            </LayoutAuth>
+          </>
+        )
       )}
     </>
   );

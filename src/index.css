@@ -70,6 +70,40 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-caret-blink: caret-blink 1s linear infinite;
+
+  /* Error shake: alternating, shrinking, starts and ends at rest */
+  @keyframes shake {
+    0%,
+    100% {
+      translate: 0;
+    }
+    20% {
+      translate: -8px 0;
+    }
+    40% {
+      translate: 6px 0;
+    }
+    60% {
+      translate: -4px 0;
+    }
+    80% {
+      translate: 2px 0;
+    }
+  }
+
+  /* Fake caret: instant on/off, visible a little longer than hidden */
+  @keyframes caret-blink {
+    0%,
+    60% {
+      opacity: 1;
+    }
+    61%,
+    100% {
+      opacity: 0;
+    }
+  }
 
   @keyframes accordion-down {
     from {
@@ -670,7 +704,9 @@ body {
 
 /* Table: shimmer sweep for skeleton cells */
 @keyframes shimmer {
-  100% { transform: translateX(100%); }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .animate-shimmer {
@@ -693,8 +729,13 @@ body {
 
 /* Table: brief accent flash on newly added rows */
 @keyframes row-flash {
-  0%, 30% { background-color: hsl(var(--primary) / 0.14); }
-  100% { background-color: transparent; }
+  0%,
+  30% {
+    background-color: hsl(var(--primary) / 0.14);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .animate-row-flash {
@@ -703,8 +744,12 @@ body {
 
 /* Table: fade rows in after loading */
 @keyframes rows-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-rows-fade-in {
@@ -712,7 +757,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-shimmer::after { animation: none; display: none; }
-  .animate-row-flash { animation: none; }
-  .animate-rows-fade-in { animation: none; }
+  .animate-shimmer::after {
+    animation: none;
+    display: none;
+  }
+  .animate-row-flash {
+    animation: none;
+  }
+  .animate-rows-fade-in {
+    animation: none;
+  }
 }

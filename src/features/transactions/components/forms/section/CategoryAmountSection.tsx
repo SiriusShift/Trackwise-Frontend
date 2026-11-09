@@ -1,19 +1,9 @@
-import { Check, ChevronsUpDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
 import { IRootState } from "@/app/store";
-import { cn } from "@/lib/utils";
 import { useGetCategoryQuery } from "@/shared/api/categoryApi";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
+import { Combobox } from "@/shared/components/Combobox";
 import {
   FormControl,
   FormField,
@@ -22,11 +12,6 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
 import { numberInput } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
 
@@ -88,58 +73,21 @@ export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
             <FormLabel>
               Category <span className="text-destructive">*</span>
             </FormLabel>
-            <Popover modal>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "justify-between",
-                      !value && "text-muted-foreground",
-                    )}
-                  >
-                    {value
-                      ? categoryData?.find((c) => c.id === value?.id)?.name
-                      : "Select category"}
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent full className="w-[200px] h-52 p-0">
-                <Command>
-                  <CommandInput
-                    placeholder="Search category..."
-                    className="h-9"
-                  />
-                  <CommandList>
-                    <CommandEmpty>No category found.</CommandEmpty>
-                    <CommandGroup>
-                      {categoryData?.map((category) => (
-                        <CommandItem
-                          value={category.name}
-                          key={category.id}
-                          onSelect={() => {
-                            // if (type === "Transfer") setValue("to", null);
-                            onChange(category);
-                          }}
-                        >
-                          {category.name}
-                          <Check
-                            className={cn(
-                              "ml-auto",
-                              category.id === value?.id
-                                ? "opacity-100"
-                                : "opacity-0",
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <FormControl>
+              <Combobox
+                modal
+                contentFull
+                contentClassName="w-[200px] h-52"
+                items={categoryData}
+                value={value}
+                onChange={onChange}
+                getKey={(category) => category.id}
+                getLabel={(category) => category.name}
+                placeholder="Select category"
+                searchPlaceholder="Search category..."
+                emptyText="No category found."
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}

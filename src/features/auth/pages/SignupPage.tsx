@@ -1,6 +1,4 @@
 import { usePageMeta } from "@/shared/hooks/usePageMeta";
-// app/components/SignUpForm.tsx
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../../shared/components/ui/button";
 import { Checkbox } from "../../../shared/components/ui/checkbox";
@@ -8,18 +6,17 @@ import { Input } from "../../../shared/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "../../../shared/components/ui/input-otp";
+// app/components/SignUpForm.tsx
+("use client");
 // import Logo from "../assets/images/Logo.svg";
 import Google from "@/assets/images/Google.svg";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  handleCatchErrorMessage,
-} from "../../../shared/utils/CustomFunctions";
+import { handleCatchErrorMessage } from "../../../shared/utils/CustomFunctions";
 import { signupSchema } from "../schema/authSchema";
 // import { setSignup } from "../feature/authentication/reducers/signupSlice";
 import { Check, Loader2, X } from "lucide-react";
@@ -39,7 +36,6 @@ const passwordChecks = [
 ];
 
 const signUp = () => {
-
   usePageMeta({
     title: "Create account | Trackwise",
     description:
@@ -51,11 +47,19 @@ const signUp = () => {
   const [code, setCode] = useState("");
   const router = useNavigate();
   const tz = moment.tz.guess();
-const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
+  const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
 
   const [postVerify, { isLoading }] = usePostVerifyMutation();
-  const [postSignup, { isLoading: postSignupLoading }] =
-    usePostSignupMutation();
+  const [
+    postSignup,
+    { isLoading: postSignupLoading, error: signupError, reset },
+  ] = usePostSignupMutation();
+
+  const invalidOTP =
+    !!signupError &&
+    "data" in signupError &&
+    (signupError.data as { message?: string } | undefined)?.message ===
+      "Invalid OTP";
 
   const {
     register,
@@ -115,10 +119,11 @@ const API_URL = import.meta.env.VITE_PUBLIC_BASEURL;
     }
   };
 
+  console.log(errors);
 
-const handleGoogleSignup = () => {
-  window.location.href = `${API_URL}/auth/google/sign-up`;
-};
+  const handleGoogleSignup = () => {
+    window.location.href = `${API_URL}/auth/google/sign-up`;
+  };
 
   const resendCode = () => {
     setIsDisabled(true); // ⬅️ disable resend immediately
@@ -220,12 +225,17 @@ const handleGoogleSignup = () => {
                     <Checkbox
                       id="acceptTerms"
                       checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
                       onBlur={field.onBlur}
                       className="mt-0.5"
                       aria-invalid={errors.acceptTerms ? "true" : "false"}
                     />
-                    <label htmlFor="acceptTerms" className="text-sm leading-snug">
+                    <label
+                      htmlFor="acceptTerms"
+                      className="text-sm leading-snug"
+                    >
                       I agree to the{" "}
                       <Link
                         to="/terms"
@@ -251,7 +261,7 @@ const handleGoogleSignup = () => {
               <Button
                 type="submit"
                 disabled={!isValid || isLoading}
-                className="w-full sm:w-96"
+                className="w-full sm:w-96 cursor-pointer"
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : "Signup"}
               </Button>
@@ -267,55 +277,60 @@ const handleGoogleSignup = () => {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={!acceptedTerms}
-                className="w-full sm:w-96 shadow-md"
+                className="w-full sm:w-96 shadow-md cursor-pointer"
               >
                 <img src={Google} alt="" className="h-3 w-3 me-2" />
                 Continue with Google
               </Button>
               <p className="text-center text-sm">
                 Already have an account?{" "}
-                <a
+                <button
                   className="font-bold cursor-pointer"
                   onClick={() => router("/sign-in")}
                 >
                   Login
-                </a>
+                </button>
               </p>
             </div>
           </>
         ) : (
           <div className="gap-5 w-full sm:w-96 items-center flex-col flex">
             <div className="gap-3 flex flex-col items-center">
-              <InputOTP maxLength={6} onChange={(e) => setCode(e)}>
+              <InputOTP
+                maxLength={6}
+                onChange={(e) => {
+                  setCode(e);
+                  reset();
+                }}
+                aria-invalid={invalidOTP ? true : false}
+                aria-label="Verification Code"
+                aria-labelledby="6-digit verification code."
+              >
                 <InputOTPGroup>
-                  <InputOTPSlot index={0} className="sm:h-12 sm:w-14" />
-                  <InputOTPSlot index={1} className="sm:h-12 sm:w-14" />
-                  <InputOTPSlot index={2} className="sm:h-12 sm:w-14" />
-                </InputOTPGroup>
-                <InputOTPSeparator />
-                <InputOTPGroup>
-                  <InputOTPSlot index={3} className="sm:h-12 sm:w-14" />
-                  <InputOTPSlot index={4} className="sm:h-12 sm:w-14" />
-                  <InputOTPSlot index={5} className="sm:h-12 sm:w-14" />
+                  <InputOTPSlot index={0} className="sm:h-12 sm:w-12" />
+                  <InputOTPSlot index={1} className="sm:h-12 sm:w-12" />
+                  <InputOTPSlot index={2} className="sm:h-12 sm:w-12" />
+                  <InputOTPSlot index={3} className="sm:h-12 sm:w-12" />
+                  <InputOTPSlot index={4} className="sm:h-12 sm:w-12" />
+                  <InputOTPSlot index={5} className="sm:h-12 sm:w-12" />
                 </InputOTPGroup>
               </InputOTP>
-              <a
+              <button
                 className={`cursor-pointer ${
-                  isDisabled
-                    ? "text-gray-400 pointer-events-none"
-                    : "text-blue-500"
+                  isDisabled ? "text-gray-400" : "text-blue-600"
                 }`}
                 onClick={!isDisabled ? onSubmit : undefined}
+                disabled={isDisabled}
               >
                 {isDisabled
                   ? `Resend in ${countdown}s`
                   : "Didn't receive a code? Resend"}
-              </a>
+              </button>
             </div>
             <div className="gap-3 flex flex-col items-center">
               <Button
                 type="submit"
-                className="w-full sm:w-96"
+                className="w-full sm:w-96 cursor-pointer"
                 onClick={submitSignup}
                 disabled={postSignupLoading}
               >

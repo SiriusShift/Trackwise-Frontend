@@ -10,23 +10,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
+import { Combobox } from "@/shared/components/Combobox";
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/lib/utils";
 import moment from "moment-timezone";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { useDispatch } from "react-redux";
 import currency from "currency-codes";
 import { toast } from "sonner";
@@ -114,53 +100,19 @@ const GeneralSettings = () => {
             control={control}
             render={({ field: { value, onChange } }) => (
               <FormItem className="flex flex-col">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !value && "text-muted-foreground"
-                        )}
-                      >
-                        {value || "Select timezone"}
-                        <ChevronsUpDown className="opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search timezone..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No results found.</CommandEmpty>
-                        <CommandGroup>
-                          {timezones.map((timezone, index) => (
-                            <CommandItem
-                              value={timezone}
-                              key={index}
-                              onSelect={() => onChange(timezone)}
-                            >
-                              {timezone}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  timezone === value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <Combobox
+                    className="w-[200px]"
+                    contentClassName="w-[200px]"
+                    items={timezones}
+                    value={value}
+                    onChange={onChange}
+                    getKey={(timezone) => timezone}
+                    getLabel={(timezone) => timezone}
+                    placeholder="Select timezone"
+                    searchPlaceholder="Search timezone..."
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -213,53 +165,23 @@ const GeneralSettings = () => {
             render={({ field: { onChange, value } }) => (
               <FormItem>
                 <FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "w-[200px] justify-between",
-                            !value && "text-muted-foreground"
-                          )}
-                        >
-                          {value?.currency || "Select currency"}
-                          <ChevronsUpDown className="opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandInput
-                          placeholder="Search currency..."
-                          className="h-9"
-                        />
-                        <CommandList>
-                          <CommandEmpty>No results found.</CommandEmpty>
-                          <CommandGroup>
-                            {currency?.data?.map((currency, index) => (
-                              <CommandItem
-                                value={`${currency?.currency} ${currency?.code}`}
-                                key={index}
-                                onSelect={() => onChange(currency)}
-                              >
-                                {`${currency?.currency} (${currency?.code})`}
-                                <Check
-                                  className={cn(
-                                    "ml-auto",
-                                    currency?.currency === value?.currency
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <Combobox
+                    className="w-[200px]"
+                    contentClassName="w-[200px]"
+                    items={currency?.data}
+                    value={value}
+                    onChange={onChange}
+                    getKey={(currency) => currency.currency}
+                    getLabel={(currency) => currency.currency}
+                    getSearchValue={(currency) =>
+                      `${currency.currency} ${currency.code}`
+                    }
+                    renderItem={(currency) =>
+                      `${currency.currency} (${currency.code})`
+                    }
+                    placeholder="Select currency"
+                    searchPlaceholder="Search currency..."
+                  />
                 </FormControl>
               </FormItem>
             )}

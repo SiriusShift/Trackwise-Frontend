@@ -1,7 +1,5 @@
 import { useLazyGetSignoutQuery } from "@/features/auth/api/signinApi";
 import { cn } from "@/lib/utils";
-import { api } from "@/shared/services/api";
-import { useDispatch } from "react-redux";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +14,7 @@ import {
 } from "@/shared/components/ui/sidebar";
 import useLocationHook from "@/shared/hooks/useLocation";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { api } from "@/shared/services/api";
 import {
   Tooltip,
   TooltipContent,
@@ -25,6 +24,7 @@ import {
 import { LogOut, WalletMinimal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { navigationData } from "../../routing/navigationData";
 
@@ -40,7 +40,7 @@ export function AppSidebar() {
   const [, setActive] = useState(location?.location?.pathname);
   const router = useNavigate();
   const { state, isMobile, setOpenMobile } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = !isMobile && state === "collapsed";
   const screenWidth = useScreenWidth();
 
   const [logoutTrigger] = useLazyGetSignoutQuery({});
@@ -79,7 +79,12 @@ export function AppSidebar() {
           className={`flex justify-start md:justify-center lg:justify-start items-center gap-2 w-full lg:ms-1  mt-2`}
         >
           <WalletMinimal className="text-primary shrink-0 w-6 h-6" />
-          <span className={cn(LABEL_CLASSES, "ml-0 font-bold text-lg inline md:hidden lg:inline")}>
+          <span
+            className={cn(
+              LABEL_CLASSES,
+              "ml-0 font-bold text-lg inline md:hidden lg:inline",
+            )}
+          >
             Trackwise
           </span>
         </div>
@@ -205,9 +210,7 @@ export function AppSidebar() {
                           className="flex items-center rounded justify-start"
                         >
                           <LogOut style={{ width: "17px", height: "17px" }} />
-                          <span className={LABEL_CLASSES}>
-                            Logout
-                          </span>
+                          <span className={LABEL_CLASSES}>Logout</span>
                         </SidebarMenuButton>
                       </TooltipTrigger>
                       {isCollapsed && (

@@ -1,13 +1,4 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/shared/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
+import { Combobox } from "@/shared/components/Combobox";
 import {
   FormControl,
   FormField,
@@ -15,15 +6,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import { Check, ChevronsUpDown } from "lucide-react";
 
 const ALLOWED_CATEGORIES = ["CASH", "BANK", "CREDIT", "INVESTMENT"];
+
+const getBalance = (asset: Asset) =>
+  (asset.category === "CREDIT"
+    ? asset.remainingCredit
+    : asset.remainingBalance) ?? 0;
 
 interface Asset {
   currency: string | undefined;
@@ -62,95 +52,60 @@ export const AccountSelect = ({
       name={name}
       control={control}
       render={({ field: { value, onChange } }) => {
-        const account = filtered.find((a) => a.id === value?.id);
-        const balance =
-          (account?.category === "CREDIT"
-            ? account.remainingCredit
-            : account?.remainingBalance) ?? 0;
         return (
           <FormItem className="flex flex-col">
             <FormLabel>
               {label} <span className="text-destructive">*</span>
             </FormLabel>
-            <Popover modal>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    disabled={disabled}
-                    className={cn(
-                      "justify-between w-full font-normal",
-                      !value && "text-muted-foreground",
-                    )}
-                  >
-                    {value ? (
-                      <span className="flex gap-2 min-w-0">
-                        <span className="truncate">
-                          {account?.name ??
-                            assets.find((a) => a.id === value?.id)?.name}
-                        </span>
-                        <span className="text-muted-foreground shrink-0">
-                          {account &&
-                            formatCurrency(
-                              balance,
-                              account.currency,
-                              "symbol",
-                            )}
-                        </span>
+            <FormControl>
+              <Combobox
+                modal
+                contentFull
+                disabled={disabled}
+                className="w-full"
+                items={filtered}
+                value={value}
+                onChange={onChange}
+                getKey={(asset) => asset.id}
+                getLabel={(asset) => asset.name}
+                placeholder="Select account..."
+                searchPlaceholder="Search account..."
+                emptyText="No accounts found."
+                renderValue={(asset) => {
+                  // value may be an account outside the filtered list
+                  const inList = filtered.some((a) => a.id === asset.id);
+                  return (
+                    <span className="flex gap-2 min-w-0">
+                      <span className="truncate">
+                        {asset.name ??
+                          assets.find((a) => a.id === asset.id)?.name}
                       </span>
-                    ) : (
-                      "Select account..."
-                    )}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50 shrink-0" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent full className="p-0">
-                <Command>
-                  <CommandInput placeholder="Search account..." />
-                  <CommandList>
-                    <CommandEmpty>No accounts found.</CommandEmpty>
-                    <CommandGroup>
-                      {filtered.map((asset) => {
-                        const balance =
-                          (asset.category === "CREDIT"
-                            ? asset.remainingCredit
-                            : asset.remainingBalance) ?? 0;
-                        return (
-                          <CommandItem
-                            value={asset.name}
-                            key={asset.id}
-                            onSelect={() => onChange(asset)}
-                            className="flex justify-between flex-row items-center"
-                          >
-                            <span>{asset.name}</span>
-                            <div className="flex flex-row">
-                              <span className="text-muted-foreground text-xs mr-2">
-                                {formatCurrency(
-                                  balance,
-                                  asset.currency,
-                                  "symbol",
-                                )}
-                                {/* ₱{asset.remainingBalance.toFixed(2)} */}
-                              </span>
-                              <Check
-                                className={cn(
-                                  "h-4 w-4",
-                                  asset.id === value?.id
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                            </div>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                      {inList && (
+                        <span className="text-muted-foreground shrink-0">
+                          {formatCurrency(
+                            getBalance(asset),
+                            asset.currency,
+                            "symbol",
+                          )}
+                        </span>
+                      )}
+                    </span>
+                  );
+                }}
+                renderItem={(asset) => (
+                  <span className="flex flex-1 justify-between items-center gap-2 min-w-0">
+                    <span className="truncate">{asset.name}</span>
+                    <span className="text-muted-foreground text-xs shrink-0">
+                      {formatCurrency(
+                        getBalance(asset),
+                        asset.currency,
+                        "symbol",
+                      )}
+                    </span>
+                  </span>
+                )}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         );
