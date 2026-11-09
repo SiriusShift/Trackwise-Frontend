@@ -12,8 +12,8 @@ const summary = [
 ];
 
 const rows = [
-  { date: "Sep 1, 2026", desc: "Salary", cat: "Income", credit: 3200, debit: 0, balance: 5650 },
-  { date: "Sep 3, 2026", desc: "Rent", cat: "Housing", credit: 0, debit: 1200, balance: 4450 },
+  { date: "Sep 1", desc: "Salary", cat: "Income", credit: 3200, debit: 0, balance: 5650 },
+  { date: "Sep 3", desc: "Rent", cat: "Housing", credit: 0, debit: 1200, balance: 4450 },
 ]
 
 const StatementPreview = () => (

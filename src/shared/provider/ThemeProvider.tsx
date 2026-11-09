@@ -1,5 +1,6 @@
-import { createContext, useContext, useLayoutEffect, useState } from "react";
 import { buildAccentVars, isHexColor } from "@/shared/utils/accentTheme";
+import { createContext, useContext, useState } from "react";
+import { useIsomorphicLayoutEffect } from "@/shared/hooks/useIsomorphicLayoutEffect";
 
 type Theme = "dark" | "light" | "system";
 
@@ -33,6 +34,9 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+const read = (key: string) =>
+  typeof window === "undefined" ? null : localStorage.getItem(key);
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
@@ -42,21 +46,21 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => (read(storageKey) as Theme) || defaultTheme,
   );
   const [accent, setAccent] = useState<string | null>(() => {
-    const stored = localStorage.getItem(accentStorageKey);
+    const stored = read(accentStorageKey);
     return stored && isHexColor(stored) ? stored : null;
   });
 
   const [palette, setPalette] = useState<string | null>(() =>
-    localStorage.getItem(paletteStorageKey)
+    read(paletteStorageKey),
   );
 
   // Public pages (sign-in, landing...) ignore the saved palette and accent.
   const [defaultBranding, setDefaultBranding] = useState(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const root = window.document.documentElement;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     let appliedVars: string[] = [];
@@ -77,12 +81,12 @@ export function ThemeProvider({
       appliedVars = [];
 
       if (activeAccent) {
-        Object.entries(buildAccentVars(activeAccent, isDark ? "dark" : "light")).forEach(
-          ([key, value]) => {
-            root.style.setProperty(`--${key}`, value);
-            appliedVars.push(`--${key}`);
-          }
-        );
+        Object.entries(
+          buildAccentVars(activeAccent, isDark ? "dark" : "light"),
+        ).forEach(([key, value]) => {
+          root.style.setProperty(`--${key}`, value);
+          appliedVars.push(`--${key}`);
+        });
       }
     };
 

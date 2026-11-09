@@ -1,42 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trackwise | Personal Finance Tracker</title>
-    <meta name="description" content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check." />
+    <meta
+      name="description"
+      content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check."
+    />
     <meta name="robots" content="index, follow" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Trackwise" />
     <meta property="og:title" content="Trackwise | Personal Finance Tracker" />
-    <meta property="og:description" content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check." />
+    <meta
+      property="og:description"
+      content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check."
+    />
     <meta property="og:url" content="https://trackwise.hygen.live/" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Trackwise | Personal Finance Tracker" />
-    <meta name="twitter:description" content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check." />
+    <meta
+      name="twitter:description"
+      content="Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check."
+    />
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Trackwise",
-      "url": "https://trackwise.hygen.live/",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "description": "Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check."
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Trackwise",
+        "url": "https://trackwise.hygen.live/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "description": "Trackwise is a personal finance tracker. Log expenses, income, and transfers across your accounts, schedule recurring payments, and keep credit card billing in check."
+      }
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" sizes="48x48" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/favicon-192.png" />
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Trackwise",
-      "alternateName": "Trackwise Personal Finance Tracker",
-      "url": "https://trackwise.hygen.live/"
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Trackwise",
+        "alternateName": "Trackwise Personal Finance Tracker",
+        "url": "https://trackwise.hygen.live/"
+      }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,12 +57,14 @@
   <body>
     <noscript>
       <p>
-        Trackwise is a web app for tracking expenses, income, transfers, recurring
-        transactions, and credit card billing. Please enable JavaScript to use it.
-        <a href="/sign-in">Sign in</a> or <a href="/sign-up">create an account</a>.
+        Trackwise is a web app for tracking expenses, income, transfers,
+        recurring transactions, and credit card billing. Please enable
+        JavaScript to use it.
+        <a href="/sign-in">Sign in</a> or
+        <a href="/sign-up">create an account</a>.
       </p>
     </noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/entry-client.tsx"></script>
   </body>
 </html>
