@@ -1,10 +1,10 @@
-import { StackedBarSegment } from "@/shared/types";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { StackedBarSegment } from "@/shared/types";
 import { useEffect, useState } from "react";
 
 interface GroupedSegment extends StackedBarSegment {
@@ -16,6 +16,7 @@ interface StackedBarProps {
   formatValue?: (value: number) => string;
   mode?: "stacked" | "progress";
   maxValue?: number;
+  maxColor?: string;
   /** Max number of individual legend/bar segments before the rest get bucketed into "Others" */
   maxLegendItems?: number;
 }
@@ -64,7 +65,6 @@ export function StackedBar({
   const [animated, setAnimated] = useState(false);
 
   const segments = groupSegments(rawSegments, maxLegendItems);
-
 
   useEffect(() => {
     setAnimated(false);

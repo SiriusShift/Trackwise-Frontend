@@ -9,10 +9,10 @@ import { formatMode } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import BudgetWidget from "../components/widgets/BudgetWidget";
-import DueCalendar from "../components/widgets/DueCalendar";
+import CalendarEvents from "../components/widgets/CalendarWidget";
 import ExpenseWidget from "../components/widgets/ExpenseWidget";
 import IncomeWidget from "../components/widgets/IncomeWidget";
-import SavingsPlan from "../components/widgets/SavingsWidget";
+import LoanWidget from "../components/widgets/LoanWidget";
 export const description = "Loan Payment Progress Chart";
 
 const Dashboard = () => {
@@ -48,11 +48,11 @@ const Dashboard = () => {
               <OverviewWidget data={data} isLoading={isFetching} />
               <ExpenseWidget data={data} isLoading={isFetching} />
               <IncomeWidget data={data} isLoading={isFetching} />
-              <DueCalendar />
+              <LoanWidget />
             </div>
             <div className="gap-5 space-y-5 sm:space-y-0 sm:grid-rows-2 md:grid-rows-2 xl:grid-rows-1 sm:grid grid-cols-4 xl:grid-cols-3">
               <BudgetWidget />
-              <SavingsPlan />
+              <CalendarEvents />
               <TransactionHistory />
             </div>
           </div>
