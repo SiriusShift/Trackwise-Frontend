@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import moment from "moment";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useGetLastEntryQuery } from "../../api/transaction";
 
 interface UseTransactionFormProps {
   open: boolean;
@@ -108,6 +109,31 @@ export function useTransactionForm({
     const resetData = buildResetData(type, mode, rowData);
     form.reset({ ...resetData, mode });
   }, [open, type, rowData, mode]);
+
+  // New entries start from the last entry's account and category. Refetched on
+  // every open so it reflects what was just saved.
+  const isNew = open && !rowData;
+  const { data: lastEntry } = useGetLastEntryQuery(type, {
+    skip: !isNew || !type,
+    refetchOnMountOrArgChange: true,
+  });
+
+  useEffect(() => {
+    if (!isNew || !lastEntry) return;
+
+    const accountField = type === "Transfer" ? "from" : "account";
+    const prefill = {
+      ...(lastEntry.category && { category: lastEntry.category }),
+      ...(lastEntry.account && { [accountField]: lastEntry.account }),
+    };
+
+    // Becomes the form's baseline (so it doesn't count as a user edit), and
+    // keepDirtyValues leaves anything the user already changed untouched.
+    form.reset(
+      { ...form.getValues(), ...prefill },
+      { keepDirtyValues: true },
+    );
+  }, [isNew, lastEntry, type]);
 
   return form;
 }

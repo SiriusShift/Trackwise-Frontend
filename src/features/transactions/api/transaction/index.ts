@@ -21,6 +21,15 @@ export const transactionApi = api
         }),
         providesTags: ["Stats"],
       }),
+      // Account + category of the latest entry of a type, for prefilling the add form.
+      getLastEntry: builder.query({
+        query: (type: string) => ({
+          url: "/transactions/last",
+          method: "GET",
+          params: { type: type.toLowerCase() },
+        }),
+        transformResponse: (response: any) => response.data,
+      }),
       archiveTransaction: builder.mutation({
         query: ({ id, data }) => ({
           url: `/transactions/${id}`,
@@ -35,5 +44,6 @@ export const transactionApi = api
 export const {
   useGetTransactionHistoryQuery,
   useGetStatisticsQuery,
+  useGetLastEntryQuery,
   useArchiveTransactionMutation,
 } = transactionApi;
