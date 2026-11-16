@@ -205,7 +205,10 @@ export interface TransactionHistoryEntry {
 }
 
 // Extra fields present when a transaction is opened for viewing
-export interface TransactionDetails extends Omit<TransactionRow, "recurringTemplate"> {
+export interface TransactionDetails extends Omit<
+  TransactionRow,
+  "recurringTemplate"
+> {
   interval?: number;
   unit?: string;
   startDate?: string;
@@ -364,7 +367,12 @@ export interface CreditStatementOption {
 }
 
 export interface CreditCardStatementData {
-  card: { id: number; name: string; institution?: string | null; currency: string };
+  card: {
+    id: number;
+    name: string;
+    institution?: string | null;
+    currency: string;
+  };
   statementId: number;
   status: CreditStatementOption["status"];
   periodStart: string;

@@ -1,6 +1,7 @@
 import { IRootState } from "@/app/store";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { ScheduledItem } from "../types";
 export const formatDate = (dateString?: Date | string) => {
   if (dateString === undefined) return "Invalid Date";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -56,6 +57,25 @@ export const formatCurrency = (
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(amount);
+};
+// The first item due on or after `selected` (same day counts), or null.
+export const findNextScheduled = (
+  selected: moment.MomentInput,
+  list: ScheduledItem[],
+): ScheduledItem | null => {
+  const target = moment(selected).startOf("day");
+  let next: ScheduledItem | null = null;
+  let nextDiff = Infinity;
+
+  for (const item of list) {
+    const diff = moment(item.dueDate).startOf("day").diff(target, "days");
+    if (diff >= 0 && diff < nextDiff) {
+      next = item;
+      nextDiff = diff;
+    }
+  }
+
+  return next;
 };
 
 // Short form for large amounts, e.g. 310000 -> ₱310K, 1250000 -> ₱1.3M

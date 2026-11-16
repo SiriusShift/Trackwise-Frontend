@@ -16,7 +16,7 @@ interface StackedBarProps {
   formatValue?: (value: number) => string;
   mode?: "stacked" | "progress";
   maxValue?: number;
-  maxColor: string;
+  maxColor?: string;
   /** Max number of individual legend/bar segments before the rest get bucketed into "Others" */
   maxLegendItems?: number;
 }
@@ -67,7 +67,6 @@ export function StackedBar({
 
   const segments = groupSegments(rawSegments, maxLegendItems);
 
-  // Grow from 0 on mount only; later data changes animate via the width transition
   useEffect(() => {
     const t = setTimeout(() => setAnimated(true), 50);
     return () => clearTimeout(t);

@@ -43,32 +43,15 @@ function SavingsPlan() {
   return (
     <Card
       className=" relative overflow-hidden border border-border/60 bg-card
-        flex flex-col p-5 rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
+        flex flex-col p-4 sm:p-5 rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
         transition-shadow hover:shadow-md"
-  //     style={{
-  //       backgroundImage: `
-  //   radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-  //   radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-  // `,
-  //     }}
     >
       <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
         <CardTitle>
           <span className="block text-sm font-semibold uppercase tracking-widest">
-            Savings Plan
+            Calendar
           </span>
-
-          {/* <p className="text-xs text-muted-foreground mt-0.5">
-              {savingsPlans?.length} active plan
-              {savingsPlans?.length !== 1 ? "s" : ""}
-            </p> */}
         </CardTitle>
-        {/* <Link
-          to="/funds"
-          className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
-        >
-          See All →
-        </Link> */}
       </CardHeader>
 
       <CardContent className="p-0 flex-col hidden gap-0">
