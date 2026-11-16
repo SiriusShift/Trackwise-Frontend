@@ -33,7 +33,7 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="space-y-5 p-5">
+    <div className="space-y-5 p-3 sm:p-5">
       {Tour}
       <PageHeader
         data-tour="page-header"
@@ -43,14 +43,14 @@ const Dashboard = () => {
       />
       <div className="flex flex-col 2xl:flex-row gap-5">
         <div className="gap-5 flex 2xl:w-full flex-col 2xl:flex-row">
-          <div className="flex w-full flex-col gap-5">
-            <div className="grid grid-cols-2 xl:grid-cols-4 md:grid-rows-1 lg:grid-rows-1 gap-5 ">
+          <div className="flex w-full flex-col gap-3 sm:gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
               <OverviewWidget data={data} isLoading={isFetching} />
               <ExpenseWidget data={data} isLoading={isFetching} />
               <IncomeWidget data={data} isLoading={isFetching} />
               <LoanWidget />
             </div>
-            <div className="gap-5 space-y-5 sm:space-y-0 sm:grid-rows-2 md:grid-rows-2 xl:grid-rows-1 sm:grid grid-cols-4 xl:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-3 gap-3 sm:gap-5">
               <BudgetWidget />
               <CalendarEvents />
               <TransactionHistory />

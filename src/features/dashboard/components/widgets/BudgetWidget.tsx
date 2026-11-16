@@ -14,6 +14,7 @@ import {
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { CategoryLimit } from "@/shared/types";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import { PiggyBank } from "lucide-react";
 import moment from "moment";
 import { useId, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
@@ -166,16 +167,16 @@ function BudgetWidget() {
   const overall = getStatus(totals.percent);
 
   return (
-    <Card data-tour="budget" className="gap-4 relative overflow-hidden border border-border/60 bg-card p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1 transition-shadow hover:shadow-md">
+    <Card data-tour="budget" className="gap-4 relative overflow-hidden border border-border/60 bg-card p-4 sm:p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1 transition-shadow hover:shadow-md">
       <CardHeader className="space-y-0 p-0">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-base font-semibold uppercase tracking-widest">
+          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground">
             Budget overview
           </CardTitle>
           {hiddenCount > 0 && (
             <Link
               to="/transactions"
-              className="text-sm text-blue-400 hover:underline"
+              className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80 shrink-0 -my-2 py-2 -mx-1 px-1"
             >
               +{hiddenCount} more
             </Link>
@@ -190,19 +191,39 @@ function BudgetWidget() {
             <Skeleton className="h-[180px] w-full" />
           </>
         ) : chartData.length === 0 ? (
-          <p className="m-auto text-sm text-muted-foreground">
-            No budgets set for this period
-          </p>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/20 p-6 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+              <PiggyBank className="text-muted-foreground" size={20} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">
+                No budgets for this period
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Set spending limits on your categories to track them here.
+              </p>
+            </div>
+            <Link
+              to="/settings/category"
+              className="text-xs font-medium text-primary hover:underline underline-offset-4 py-2 -my-2 px-1"
+            >
+              Set a budget →
+            </Link>
+          </div>
         ) : (
           <>
             {/* Summary: remaining + striped progress */}
             <div className="flex flex-col gap-2">
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">
-                    {totals.remaining < 0 ? "Over budget" : "Budget remaining"}
+                  <p
+                    className={`text-xs ${totals.remaining < 0 ? "text-destructive font-medium" : "text-muted-foreground"}`}
+                  >
+                    {totals.remaining < 0 ? "Over budget by" : "Budget remaining"}
                   </p>
-                  <p className="text-2xl font-semibold tabular-nums leading-tight">
+                  <p
+                    className={`text-2xl font-semibold tabular-nums leading-tight ${totals.remaining < 0 ? "text-destructive" : ""}`}
+                  >
                     {formatCurrency(Math.abs(totals.remaining))}
                   </p>
                 </div>
@@ -211,7 +232,14 @@ function BudgetWidget() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-3 flex-1 overflow-hidden  bg-muted">
+                <div
+                  className="h-3 flex-1 overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Budget used"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(Math.min(totals.percent, 100))}
+                >
                   <div
                     className="h-full transition-all"
                     style={{

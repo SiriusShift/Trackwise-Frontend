@@ -122,7 +122,7 @@ const WidgetLayout = ({
       onMouseMove={handleMouseMove}
       className={cn(
         `relative overflow-hidden border border-border/60 bg-card
-    p-5 flex flex-col rounded-2xl shadow-xs col-span-full
+    p-4 sm:p-5 flex flex-col rounded-2xl shadow-xs col-span-full
     ${isOverview ? "md:col-span-2" : "md:col-span-1"}
     xl:col-span-2 2xl:col-span-1
     transition-shadow hover:shadow-md group`,
@@ -186,15 +186,15 @@ const WidgetLayout = ({
           <div className="flex flex-col justify-between h-full gap-4">
             <div className="space-y-4">
               {/* Amount + icon row */}
-              <div className="flex justify-between items-center">
-                <div>
+              <div className="flex justify-between items-center gap-3">
+                <div className="min-w-0">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">
                     {title === "Overview"
                       ? "Net worth"
                       : `Total ${title}`}
                   </p>
-                  <div className="flex items-center gap-2">
-                    <div className="text-3xl font-semibold tracking-tight flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="text-2xl sm:text-3xl font-semibold tracking-tight tabular-nums flex items-center gap-1.5 sm:gap-2 min-w-0">
                       <span className="text-muted-foreground font-normal">
                         ₱
                       </span>
@@ -270,7 +270,7 @@ const WidgetLayout = ({
 
               {/* Overview-only secondary stats */}
               {isOverview && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4">
                   <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2">
                     <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
                       Debt Change
@@ -316,9 +316,9 @@ const WidgetLayout = ({
                 ) : (
                   <div className="flex justify-between w-full">
                     <p className="text-sm text-muted-foreground">
-                      Compare to last {mode}
+                      vs. last {mode}
                     </p>
-                    <p className={`text-sm font-medium ${trendColor}`}>
+                    <p className={`text-sm font-medium tabular-nums ${trendColor}`}>
                       {trend > 0 ? "↑ +" : trend < 0 ? "↓ " : ""}
                       {trend ?? 0}%
                     </p>

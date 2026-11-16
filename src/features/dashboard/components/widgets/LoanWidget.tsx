@@ -15,7 +15,7 @@ import { Construction } from "lucide-react";
 const UnderDevelopment = () => (
   <CardContent className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-border/50 text-center h-full">
     {/* Background */}
-    <div className="absolute inset-0 opacity-20 animate-[moveBg_6s_linear_infinite]">
+    <div className="absolute inset-0 opacity-20 animate-[moveBg_6s_linear_infinite] motion-reduce:animate-none">
       <div
         className="absolute inset-0 blur-[2px]"
         style={{
@@ -51,13 +51,13 @@ const LoanWidget = () => {
   return (
     <Card
       className="relative overflow-hidden border border-border/60 bg-card
-        p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
+        p-4 sm:p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 xl:col-span-2 2xl:col-span-1
         transition-shadow hover:shadow-md"
     >
       <Tabs defaultValue="owe" className="flex flex-col gap-4 h-full">
         <CardHeader className="space-y-0 p-0">
           <div className="flex flex-row justify-between items-center gap-2">
-            <CardTitle className="uppercase font-semibold text-xs text-foreground tracking-widest">
+            <CardTitle className="uppercase font-semibold text-sm text-foreground tracking-widest">
               Loans
             </CardTitle>
             <TabsList className="h-8">

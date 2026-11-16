@@ -124,8 +124,6 @@ export default function CalendarWidget() {
     ? Math.floor(moment(selectedDay).diff(stripDays[0], "days") / 7)
     : 0;
 
-  console.log(selectedDay);
-
   // The feed only holds outstanding items (paid ones drop out), so an empty
   // day means "nothing left to do", not "nothing was ever due".
   const daySummary = useMemo(() => {
@@ -182,7 +180,6 @@ export default function CalendarWidget() {
     [selectedDay, data],
   );
 
-  console.log(nearestEvent, selectedDay);
   const filteredItems =
     filter === "all"
       ? dayItems
@@ -215,24 +212,12 @@ export default function CalendarWidget() {
     setSelectedDay(moment(nearestEvent?.dueDate));
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty(
-      "--mouse-x",
-      `${e.clientX - rect.left}px`,
-    );
-    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-  };
-
   return (
     <>
       <Card
-        onMouseMove={handleMouseMove}
-        className={cn(
-          `relative overflow-hidden border border-border/60 bg-card
-    p-5 flex flex-col rounded-2xl shadow-xs  col-span-2 lg:col-span-full xl:col-span-2 2xl:col-span-1
-    transition-shadow hover:shadow-md group`,
-        )}
+        className="relative overflow-hidden border border-border/60 bg-card
+    p-4 sm:p-5 flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-2 xl:col-span-1
+    transition-shadow hover:shadow-md"
         data-tour="due"
       >
         {/* Header */}
@@ -244,7 +229,7 @@ export default function CalendarWidget() {
           </CardTitle>
           <Link
             to="/calendar"
-            className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80"
+            className="text-xs font-medium text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-80 shrink-0 -my-2 py-2 -mx-1 px-1"
           >
             See All →
           </Link>
@@ -288,7 +273,7 @@ export default function CalendarWidget() {
                         }}
                         disabled={notInMonth}
                         className={cn(
-                          "w-full flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl border border-transparent transition-colors",
+                          "w-full flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                           isSelected
                             ? "bg-foreground text-background"
                             : !notInMonth && "hover:bg-muted/60",
@@ -304,7 +289,7 @@ export default function CalendarWidget() {
                               : "text-muted-foreground",
                           )}
                         >
-                          {isToday ? "Today" : day.format("ddd")}
+                          {isToday ? "Now" : day.format("ddd")}
                         </span>
                         <span className="text-lg font-bold leading-tight tabular-nums">
                           {day.format("D")}
@@ -400,8 +385,8 @@ export default function CalendarWidget() {
 
           {/* Items for the selected day */}
           {isLoading ? (
-            Array.from({ length: 3 }).map((key) => (
-              <Skeleton className="h-10 w-full rounded-xl" />
+            Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full rounded-xl" />
             ))
           ) : dayItems?.length > 0 ? (
             <div className="space-y-2 max-h-64 overflow-y-auto -mx-1 px-1">
@@ -422,7 +407,7 @@ export default function CalendarWidget() {
                       type="button"
                       key={item.key}
                       onClick={() => handleOpenBill(item)}
-                      className="w-full flex items-center gap-3 p-2 border-b border-border/50 hover:bg-muted/30 text-left"
+                      className="w-full flex items-center gap-3 p-2 rounded-lg border-b border-border/50 last:border-b-0 hover:bg-muted/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                     >
                       {/* <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-background border border-border/60">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />
@@ -476,22 +461,25 @@ export default function CalendarWidget() {
                 </span>
               </div>
               {nearestEvent && (
-                <div
+                <button
+                  type="button"
                   onClick={handleNextEvent}
-                  className="flex flex-row justify-between border border-dashed items-center p-2 rounded-xl px-4 cursor-pointer"
+                  className="w-full flex flex-row justify-between gap-3 border border-dashed items-center p-2 rounded-xl px-4 text-left hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0">
                     <span className="text-muted-foreground text-xs">
                       Next up ·{" "}
                       {moment(nearestEvent.dueDate).format("dddd, MMM D")}
                     </span>
-                    <span className="text-sm">{nearestEvent.description}</span>
+                    <span className="text-sm truncate">
+                      {nearestEvent.description}
+                    </span>
                   </div>
-                  <span className="font-bold text-sm inline-flex items-center">
+                  <span className="font-bold text-sm tabular-nums inline-flex items-center shrink-0">
                     {formatCurrency(nearestEvent.amount, currency, "symbol")}
                     <Icons.ChevronRight className="h-4 w-4 text-muted-foreground ms-3" />
                   </span>
-                </div>
+                </button>
               )}
             </div>
           )}

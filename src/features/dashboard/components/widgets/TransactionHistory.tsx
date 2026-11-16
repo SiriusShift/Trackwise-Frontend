@@ -18,11 +18,18 @@ interface RecentTransaction {
   category?: { name: string; icon?: string };
 }
 
-function TransactionIcon({ icon }: { icon?: string }) {
-  const LucidIcon = (icon && Icons[icon as keyof typeof Icons]) as
-    | React.ElementType
-    | undefined;
-  if (!LucidIcon) return null;
+function TransactionIcon({ icon, type }: { icon?: string; type?: string }) {
+  // Fall back to a type icon so rows without a category icon stay aligned.
+  const fallback =
+    type === "Income"
+      ? Icons.ArrowDownLeft
+      : type === "Transfer"
+        ? Icons.ArrowLeftRight
+        : Icons.ArrowUpRight;
+  const LucidIcon =
+    ((icon && Icons[icon as keyof typeof Icons]) as
+      | React.ElementType
+      | undefined) ?? fallback;
   return (
     <div className="w-9 h-9 rounded-lg shrink-0 flex justify-center items-center bg-muted border border-border/60">
       <LucidIcon className="text-muted-foreground" width={16} height={16} />
@@ -70,17 +77,8 @@ const TransactionHistory = () => {
   return (
     <Card
       data-tour="recent-transactions"
-      className="relative border border-border/60 p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
-      // style={{
-      //   backgroundImage: `
-      //     radial-gradient(circle at 80% 120%, rgba(96, 165, 250, 0.25) 0%, transparent 60%),
-      //     radial-gradient(circle at 20% 120%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
-      //   `,
-      // }}
+      className="relative border border-border/60 p-4 sm:p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
     >
-      {/* Top accent */}
-      {/* <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" /> */}
-
       <CardHeader className="p-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground">
@@ -88,7 +86,7 @@ const TransactionHistory = () => {
           </CardTitle>
           <Link
             to="/transactions"
-            className="text-xs text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-70"
+            className="text-xs text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-70 shrink-0 -my-2 py-2 -mx-1 px-1"
           >
             See All →
           </Link>
@@ -117,21 +115,27 @@ const TransactionHistory = () => {
 
             <div className="space-y-1">
               <p className="text-sm font-medium text-foreground">
-                No data available
+                No transactions yet
               </p>
               <p className="text-xs text-muted-foreground">
-                There’s nothing to display right now.
+                Your latest income, expenses and transfers will show up here.
               </p>
             </div>
+            <Link
+              to="/transactions"
+              className="text-xs font-medium text-primary hover:underline underline-offset-4 py-2 -my-2 px-1"
+            >
+              Add a transaction →
+            </Link>
           </div>
         ) : (
           <div className="space-y-2">
             {transactions.map((item, index) => (
               <div
                 key={`${item.id}-${index}`}
-                className="flex items-center p-2 gap-2 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border"
+                className="flex items-center p-2 gap-3 rounded-lg border border-border/50 bg-muted/30"
               >
-                <TransactionIcon icon={item?.category?.icon} />
+                <TransactionIcon icon={item?.category?.icon} type={item?.type} />
 
                 <div className="flex-1 min-w-0">
                   <p

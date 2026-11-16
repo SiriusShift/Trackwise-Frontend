@@ -43,7 +43,7 @@ function SavingsPlan() {
   return (
     <Card
       className=" relative overflow-hidden border border-border/60 bg-card
-        flex flex-col p-5 rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
+        flex flex-col p-4 sm:p-5 rounded-2xl shadow-xs col-span-full md:col-span-2 lg:col-span-2 xl:col-span-1
         transition-shadow hover:shadow-md"
     >
       <CardHeader className="flex flex-row w-full justify-between p-0 mb-5">
