@@ -26,32 +26,41 @@ function StatCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden p-5 transition-all border border-border/50 bg-muted/40 hover:bg-muted/60",
+        "group relative overflow-hidden border border-border/50 bg-muted/40 p-3 transition-all hover:bg-muted/60 sm:p-5",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-4 h-full">
+      <div className="flex h-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
         <div
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl",
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 sm:rounded-xl",
             color,
           )}
         >
-          <Icon className="h-6 w-6" />
+          <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground">{title}</span>
+        <div className="flex min-w-0 flex-col">
+          <span className="text-xs text-muted-foreground sm:text-sm">
+            {title}
+          </span>
 
           {loading ? (
-            <Skeleton className="mt-1 h-7 w-28" />
+            <Skeleton className="mt-1 h-6 w-20 sm:h-7 sm:w-28" />
           ) : (
-            <span className="text-2xl font-bold tracking-tight">{value}</span>
+            <span
+              className="truncate text-lg font-bold tracking-tight tabular-nums sm:text-2xl"
+              title={typeof value === "string" ? value : undefined}
+            >
+              {value}
+            </span>
           )}
 
           {!loading && footer && (
-            <span className="text-xs text-muted-foreground">{footer}</span>
+            <span className="truncate text-[11px] text-muted-foreground sm:text-xs">
+              {footer}
+            </span>
           )}
         </div>
       </div>

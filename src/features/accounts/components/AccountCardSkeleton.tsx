@@ -4,17 +4,17 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const AccountCardSkeleton = () => {
   return (
-    <Card className="flex flex-col gap-4 overflow-hidden p-5">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-11 w-11 rounded-xl" />
+    <Card className="flex min-h-44 flex-col justify-between gap-4 overflow-hidden p-4 sm:min-h-48 sm:p-5">
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-xl sm:h-11 sm:w-11" />
 
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-16" />
+          <div className="flex flex-col gap-1.5">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-1">
         <Skeleton className="h-7 w-32" />
       </div>
 

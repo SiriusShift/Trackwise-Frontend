@@ -1,4 +1,5 @@
 import { IRootState } from "@/app/store";
+import StatCard from "@/features/accounts/components/StatCard";
 import {
   useArchiveAccountMutation,
   useGetAccountsQuery,
@@ -6,28 +7,20 @@ import {
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
-import StatCard from "@/features/accounts/components/StatCard";
+import { useConfirm } from "@/shared/provider/ConfirmProvider";
+import usePageTour from "@/shared/tour/usePageTour";
 import {
   formatCurrency,
   handleCatchErrorMessage,
 } from "@/shared/utils/CustomFunctions";
-import {
-  ArrowLeftRight,
-  ArrowUpDown,
-  CreditCard,
-  Landmark,
-  Plus,
-  Wallet,
-} from "lucide-react";
+import { ArrowUpDown, CreditCard, Landmark, Plus, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 import AccountCard from "../components/AccountCard";
 import AccountCardSkeleton from "../components/AccountCardSkeleton";
 import AccountDialog from "../components/AccountDialog";
 import { Account } from "../types/account.types";
-import { useConfirm } from "@/shared/provider/ConfirmProvider";
-import { toast } from "sonner";
-import usePageTour from "@/shared/tour/usePageTour";
 
 const stats = [
   {
@@ -74,7 +67,7 @@ const AccountPage = () => {
       dateTo: endDate,
     });
 
-  const [archive, { isLoading }] = useArchiveAccountMutation();
+  const [archive] = useArchiveAccountMutation();
   const handleAdd = () => {
     setMode("Add");
     setOpen(true);
@@ -85,7 +78,7 @@ const AccountPage = () => {
     setOpen(true);
   };
 
-  const handleArchive = (id : number) => {
+  const handleArchive = (id: number) => {
     confirm({
       description: `Are you sure you want to archive this account?`,
       title: `Archive account`,
@@ -107,7 +100,6 @@ const AccountPage = () => {
   const assetsLength = accountsData?.data?.length ?? 0;
   const excludedAccountsLength =
     accountsData?.data?.filter((item) => !item.includeInNetWorth)?.length ?? 0;
-
 
   const statistics = stats.map((item) => {
     switch (item.key) {
@@ -140,26 +132,25 @@ const AccountPage = () => {
   return (
     <>
       {Tour}
-      <div className="flex flex-col gap-5 p-5">
+      <div className="flex flex-col gap-4 p-4 sm:gap-5 sm:p-5">
         <PageHeader
           pageName="Accounts"
           description="Manage and track your accounts"
           monthPicker={true}
         >
-          <div className="flex flex-row gap-2">
-            {/* <Button variant={"ghost"}>
-              <ArrowLeftRight />
-              Transfer
-            </Button> */}
-            <Button data-tour="add-account" onClick={handleAdd}>
-              <Plus /> <span className="hidden sm:inline">Add</span>
-            </Button>
-          </div>
+          <Button
+            data-tour="add-account"
+            onClick={handleAdd}
+            aria-label="Add account"
+            className="px-2.5 sm:px-4"
+          >
+            <Plus /> <span className="hidden sm:inline">Add account</span>
+          </Button>
         </PageHeader>
 
         <div
           data-tour="account-stats"
-          className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4 xl:gap-5"
         >
           {statistics.map((stat) => (
             <StatCard
@@ -181,41 +172,52 @@ const AccountPage = () => {
             />
           ))}
         </div>
-        {/* <h2 className="text-lg font-medium tracking-tight">Accounts</h2> */}
+        {!accountsLoading && assetsLength > 0 && (
+          <div className="-mb-1 flex items-baseline justify-between gap-2 pt-1">
+            <h2 className="text-base font-medium tracking-tight">
+              Your accounts
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {assetsLength} total
+              {excludedAccountsLength > 0 &&
+                ` · ${excludedAccountsLength} excluded`}
+            </span>
+          </div>
+        )}
         <div
           data-tour="account-list"
-          className="grid grid-cols-1  sm:grid-cols-2  xl:grid-cols-4 gap-5"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:gap-5 2xl:grid-cols-4"
         >
-          {accountsLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <AccountCardSkeleton key={i} />
-              ))
-            : assetsLength === 0
-              ? (
-                <Card className="col-span-full flex flex-col items-center justify-center gap-3 border-dashed p-10 text-center">
-                  <div className="rounded-full bg-primary/10 p-3 text-primary">
-                    <Wallet className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="font-medium">No accounts yet</p>
-                    <p className="text-sm text-muted-foreground">
-                      Add a bank account, e-wallet, cash or credit card to get
-                      started.
-                    </p>
-                  </div>
-                  <Button onClick={handleAdd}>
-                    <Plus className="h-4 w-4" /> Add account
-                  </Button>
-                </Card>
-              )
-              : accountsData?.data?.map((account: Account) => (
-                <AccountCard
-                  key={account.id}
-                  account={account}
-                  openDialog={handleEdit}
-                  onArchive={() => handleArchive(account.id)}
-                />
-              ))}
+          {accountsLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <AccountCardSkeleton key={i} />
+            ))
+          ) : assetsLength === 0 ? (
+            <Card className="col-span-full flex flex-col items-center justify-center gap-3 border-dashed p-6 text-center sm:p-10">
+              <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <Wallet className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="font-medium">No accounts yet</p>
+                <p className="mx-auto max-w-sm text-sm text-muted-foreground">
+                  Add a bank account, e-wallet, cash or credit card to get
+                  started.
+                </p>
+              </div>
+              <Button onClick={handleAdd}>
+                <Plus className="h-4 w-4" /> Add account
+              </Button>
+            </Card>
+          ) : (
+            accountsData?.data?.map((account: Account) => (
+              <AccountCard
+                key={account.id}
+                account={account}
+                openDialog={handleEdit}
+                onArchive={() => handleArchive(account.id)}
+              />
+            ))
+          )}
         </div>
       </div>
       <AccountDialog open={open} setOpen={setOpen} mode={mode} />

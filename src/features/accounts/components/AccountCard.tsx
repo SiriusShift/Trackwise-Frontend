@@ -59,12 +59,10 @@ const getAccountConfig = (
 
 const AccountCard = ({
   account,
-  key,
   openDialog,
   onArchive,
 }: {
   account: Account;
-  key: number;
   openDialog: () => void;
   onArchive: () => void;
 }) => {
@@ -80,12 +78,21 @@ const AccountCard = ({
     dispatch(setActiveRow(account));
   };
 
+  const isLiability = isLiabilityCategory(account.category);
+  const sign =
+    account.remainingBalance === 0 ? "" : isLiability ? "-" : "+";
+  const balance = `${sign}${formatCurrency(
+    Number(account.remainingBalance),
+    account.currency,
+    "symbol",
+  )}`;
+
+  // Always visible on touch devices; reveal on hover/focus for mouse users.
+  const actionVisibility =
+    "opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100 transition-opacity duration-200";
+
   return (
-    <Card
-      className="group relative flex h-48 flex-col justify-between overflow-hidden p-5 transition-all hover:shadow-md"
-      key={key}
-    >
-      {" "}
+    <Card className="group relative flex min-h-44 flex-col justify-between gap-4 overflow-hidden p-4 transition-all hover:shadow-md sm:min-h-48 sm:p-5">
       {/* background gradient blob */}
       <div
         aria-hidden
@@ -96,68 +103,84 @@ const AccountCard = ({
       <Icon
         aria-hidden
         style={ghostStyle}
-        className="pointer-events-none absolute -bottom-6 -right-6 h-32 w-32 -rotate-12 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"
+        className="pointer-events-none absolute -bottom-6 -right-6 h-28 w-28 -rotate-12 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105 sm:h-32 sm:w-32"
         strokeWidth={1.5}
       />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-3 top-3 z-20 h-8 w-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        onClick={handleEdit}
+
+      <div
+        className={`absolute right-2 top-2 z-20 flex items-center gap-0.5 sm:right-3 sm:top-3 ${actionVisibility}`}
       >
-        <Pencil className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-12 top-3 z-20 h-8 w-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        onClick={onArchive}
-      >
-        <Archive className="h-4 w-4" />
-      </Button>
-      <div className="space-y-2">
-        <div className="relative z-10 flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 sm:h-8 sm:w-8"
+          onClick={onArchive}
+          aria-label={`Archive ${account.name}`}
+          title="Archive"
+        >
+          <Archive className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 sm:h-8 sm:w-8"
+          onClick={handleEdit}
+          aria-label={`Edit ${account.name}`}
+          title="Edit"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="relative z-10 flex min-w-0 items-center gap-3 pr-20">
           <div
             style={badgeStyle}
-            className="flex h-11 w-11 items-center justify-center rounded-xl"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11"
           >
             <Icon className="h-5 w-5" />
           </div>
 
-          <div className="flex flex-col">
-            <span className="font-semibold leading-tight">{account.name}</span>
-            <span className="text-xs capitalize text-muted-foreground">
+          <div className="flex min-w-0 flex-col">
+            <span
+              className="truncate font-semibold leading-tight"
+              title={account.name}
+            >
+              {account.name}
+            </span>
+            <span className="truncate text-xs capitalize text-muted-foreground">
               {account.category.toLowerCase()} • {account.currency}
             </span>
           </div>
         </div>
 
-        <div className="relative z-10 flex flex-col gap-1">
-          <span className="text-2xl font-bold tracking-tight">
-            <span>
-              {account.remainingBalance === 0
-                ? ""
-                : isLiabilityCategory(account.category)
-                  ? "-"
-                  : "+"}
-            </span>
-            {formatCurrency(
-              Number(account.remainingBalance),
-              account.currency,
-              "symbol",
-            )}
+        <div className="relative z-10 flex flex-col items-start gap-1.5">
+          <span
+            className={`max-w-full truncate text-xl font-bold tracking-tight tabular-nums sm:text-2xl ${
+              isLiability && account.remainingBalance !== 0
+                ? "text-red-600"
+                : ""
+            }`}
+            title={balance}
+          >
+            {balance}
           </span>
           {!account.includeInNetWorth && (
             <Badge variant="outline" className="w-fit text-[10px] font-normal">
-              Excluded
+              Excluded from net worth
             </Badge>
-          )}{" "}
+          )}
         </div>
       </div>
+
       <div className="relative z-10 grid grid-cols-2 gap-2 border-t pt-3 text-xs">
-        <div className="flex items-center gap-1.5 text-emerald-600">
-          <ArrowUpRight className="h-3.5 w-3.5" />
-          <span className="truncate">
+        <div
+          className="flex min-w-0 items-center gap-1.5 text-emerald-600"
+          title="Income this period"
+        >
+          <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
+          <span className="sr-only">Income</span>
+          <span className="truncate tabular-nums">
             {formatCurrency(
               account.rangeIncome ?? 0,
               account.currency,
@@ -166,9 +189,13 @@ const AccountCard = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 text-red-600">
-          <ArrowDownRight className="h-3.5 w-3.5" />
-          <span className="truncate">
+        <div
+          className="flex min-w-0 items-center gap-1.5 text-red-600"
+          title="Expenses this period"
+        >
+          <ArrowDownRight className="h-3.5 w-3.5 shrink-0" />
+          <span className="sr-only">Expenses</span>
+          <span className="truncate tabular-nums">
             {formatCurrency(
               account.rangeExpense ?? 0,
               account.currency,
