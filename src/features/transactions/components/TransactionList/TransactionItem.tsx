@@ -1,40 +1,53 @@
 import { IRootState } from "@/app/store";
-import { StatusIcon } from "@/features/transactions/components/StatusIcon";
-import { Badge } from "@/shared/components/ui/badge";
+import { cn } from "@/lib/utils";
 import useLongPress from "@/shared/hooks/useLongPress";
 import { setActionShow, setActiveRow } from "@/shared/slices/activeSlice";
+import type { TransactionRow } from "@/shared/types";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
-import * as Icons from "lucide-react";
+import { getLucideIcon } from "@/shared/utils/icons";
+import { CircleAlert, Clock, Repeat } from "lucide-react";
 import moment from "moment";
 import { motion, useReducedMotion } from "motion/react";
 import React from "react";
-import type { TransactionRow } from "@/shared/types";
-import { getLucideIcon } from "@/shared/utils/icons";
 import { useDispatch, useSelector } from "react-redux";
+import { isCardPurchase } from "../PostingStatusBadge";
 
-// Colour treatment per transaction type
-const TYPE_TONES = {
-  Expense: {
-    text: "text-destructive",
-    tile: "bg-destructive/10 text-destructive",
-    badge: "bg-destructive text-destructive-foreground",
-    stripe: "bg-destructive",
-    icon: Icons.ArrowUpRight,
-  },
-  Income: {
-    text: "text-success",
-    tile: "bg-success/10 text-success",
-    badge: "bg-success text-success-foreground",
-    stripe: "bg-success",
-    icon: Icons.ArrowDownLeft,
-  },
-  Transfer: {
-    text: "text-primary",
-    tile: "bg-primary/10 text-primary",
-    badge: "bg-primary text-primary-foreground",
-    stripe: "bg-primary",
-    icon: Icons.ArrowLeftRight,
-  },
+// Statuses that need no label: the normal, finished state
+const SETTLED_STATUSES = new Set(["Completed", "Paid", "Received"]);
+
+type RowAlert = {
+  label: string;
+  className: string;
+  icon: typeof Clock;
+};
+
+const ALERT_TONES = {
+  waiting: "bg-warning/15 text-warning-foreground",
+  problem: "bg-destructive/10 text-destructive",
+  muted: "bg-muted text-muted-foreground",
+};
+
+// A status label is shown only when the user may need to act on the row
+const getRowAlert = (item: TransactionRow): RowAlert | null => {
+  if (isCardPurchase(item) && item.isPending) {
+    return { label: "Pending", className: ALERT_TONES.waiting, icon: Clock };
+  }
+  const status = item.status;
+  if (!status || SETTLED_STATUSES.has(status)) return null;
+  switch (status) {
+    case "Pending":
+    case "Partial":
+      return { label: status, className: ALERT_TONES.waiting, icon: Clock };
+    case "Overdue":
+    case "Failed":
+      return {
+        label: status,
+        className: ALERT_TONES.problem,
+        icon: CircleAlert,
+      };
+    default:
+      return { label: status, className: ALERT_TONES.muted, icon: CircleAlert };
+  }
 };
 
 const TransactionItem = React.memo(function TransactionItem({
@@ -53,132 +66,128 @@ const TransactionItem = React.memo(function TransactionItem({
   );
   const reduceMotion = useReducedMotion();
 
-  const LucidIcon = getLucideIcon(item?.category?.icon);
-  const statusIcon = item?.status
-    ? StatusIcon[item.status as keyof typeof StatusIcon]
-    : null;
+  const CategoryIcon = getLucideIcon(item?.category?.icon);
+  const categoryColor = item?.category?.color;
+  const rowAlert = getRowAlert(item);
+  const AlertIcon = rowAlert?.icon;
+  const isCancelled = item?.status === "Cancelled";
 
   const isTransfer = item?.type === "Transfer";
-  const tone = TYPE_TONES[item?.type as keyof typeof TYPE_TONES] ?? TYPE_TONES.Transfer;
-  const TypeIcon = tone.icon;
-  const sign = item?.type === "Expense" ? "−" : item?.type === "Income" ? "+" : "";
+  const isIncome = item?.type === "Income";
+  const sign = item?.type === "Expense" ? "−" : isIncome ? "+" : "";
   const accountLabel = isTransfer
     ? [item?.fromAsset?.name, item?.toAsset?.name].filter(Boolean).join(" → ")
     : item?.asset?.name;
 
+  const subtitle = [
+    item?.category?.name,
+    accountLabel,
+    moment(item?.date).format("h:mm A"),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   const longPressProps = useLongPress(() => {
     dispatch(setActionShow(true));
-  }, 1000); // hold 1.5 seconds
+  }, 1000);
 
-  const handleClick = () => {
+  const handleOpen = () => {
     dispatch(setActiveRow(item));
     dispatch(setActionShow(true));
-    // dispatch(setOpenDialog(true));
   };
 
   return (
     <motion.div
       key={`${item.id}-${index}`}
-      // variants={itemVariants}
+      role="button"
+      tabIndex={isRemoving ? -1 : 0}
+      aria-label={`${item?.description}, ${sign}${formatCurrency(item.amount, currency)}`}
       initial={false}
       animate={
         isRemoving
-          ? { opacity: 0, x: reduceMotion ? 0 : -48, scale: reduceMotion ? 1 : 0.96 }
+          ? {
+              opacity: 0,
+              x: reduceMotion ? 0 : -48,
+              scale: reduceMotion ? 1 : 0.96,
+            }
           : { opacity: 1, x: 0, scale: 1 }
       }
       transition={{ duration: 0.25, ease: [0.4, 0, 1, 1] }}
       onAnimationComplete={() => {
         if (isRemoving) onExited?.(item.id);
       }}
-      onClick={handleClick}
-      className={`group relative flex flex-col overflow-hidden border rounded-xl shadow-xs hover:shadow-md active:scale-[0.99] transition-[box-shadow,background-color,transform] duration-200 cursor-pointer bg-card hover:bg-muted/40 p-3 pl-4 ${
-        isRemoving ? "pointer-events-none" : ""
-      }`}
+      onClick={handleOpen}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleOpen();
+        }
+      }}
+      className={cn(
+        "flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left outline-hidden transition-colors",
+        "hover:bg-muted/40 active:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+        isRemoving && "pointer-events-none",
+      )}
       {...longPressProps}
     >
-      {/* Type accent stripe */}
+      {/* Category tile, tinted with the category colour */}
       <span
         aria-hidden
-        className={`absolute inset-y-0 left-0 w-1 ${tone.stripe}`}
-      />
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-muted text-muted-foreground"
+        style={
+          categoryColor
+            ? {
+                backgroundColor: `color-mix(in srgb, ${categoryColor} 15%, transparent)`,
+                color: categoryColor,
+              }
+            : undefined
+        }
+      >
+        <CategoryIcon width={20} height={20} />
+      </span>
 
-      {/* Top row: icon + main info */}
-      <div className="flex items-center w-full gap-3">
-        {/* Icon */}
-        <div
-          className={`relative w-11 h-11 shrink-0 rounded-xl flex justify-center items-center ${tone.tile}`}
-        >
-          <LucidIcon width={22} height={22} />
-          <span
-            className={`absolute -bottom-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 border-card ${tone.badge}`}
-          >
-            <TypeIcon className="h-2.5 w-2.5" strokeWidth={3} />
-          </span>
-        </div>
-
-        {/* Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-baseline gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="flex min-w-0 items-center gap-1.5">
             <span
-              className="block truncate font-semibold text-[15px] leading-tight"
+              className="truncate text-sm font-semibold leading-tight"
               title={item?.description}
             >
               {item?.description}
             </span>
-            <span
-              className={`block ${tone.text} font-bold text-base tabular-nums whitespace-nowrap`}
-            >
-              {sign}
-              {formatCurrency(item.amount, currency)}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground min-w-0">
-            <span className="truncate shrink-0 max-w-[45%]">
-              {item?.category?.name}
-            </span>
-            {accountLabel && (
-              <>
-                <span aria-hidden className="h-1 w-1 rounded-full bg-muted-foreground/50 shrink-0" />
-                <span className="flex items-center gap-1 truncate">
-                  {/* {isTransfer ? (
-                    <Icons.ArrowLeftRight className="h-3 w-3 shrink-0" />
-                  ) : (
-                    <Icons.Wallet className="h-3 w-3 shrink-0" />
-                  )} */}
-                  <span className="truncate">{accountLabel}</span>
-                </span>
-              </>
+            {item?.recurringTemplate && (
+              <Repeat
+                role="img"
+                aria-label="Recurring"
+                className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
+              />
             )}
-          </div>
+          </span>
+          <span
+            className={cn(
+              "whitespace-nowrap text-sm font-semibold tabular-nums",
+              isIncome && "text-success",
+              isCancelled && "text-muted-foreground line-through",
+            )}
+          >
+            {sign}
+            {formatCurrency(item.amount, currency)}
+          </span>
         </div>
-      </div>
 
-      {/* Bottom row: date, status, recurring */}
-      <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-dashed">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-          <Icons.CalendarDays className="h-3.5 w-3.5" />
-          {moment(item?.date).format("MMM DD · h:mm A")}
-        </span>
-
-        <div className="ml-auto flex items-center gap-1.5">
-          {item?.recurringTemplate && (
+        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+          <span className="min-w-0 truncate">{subtitle}</span>
+          {rowAlert && AlertIcon && (
             <span
-              className="flex items-center gap-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium px-2 py-0.5"
-              title="Recurring"
+              className={cn(
+                "ml-auto flex shrink-0 items-center gap-1 rounded-full px-2 py-px text-[11px] font-semibold",
+                rowAlert.className,
+              )}
             >
-              <Icons.Repeat className="h-3 w-3" />
-              <span className="hidden min-[380px]:inline">Recurring</span>
+              <AlertIcon className="h-3 w-3" aria-hidden />
+              {rowAlert.label}
             </span>
-          )}
-          {item?.status && (
-            <Badge
-              variant="outline"
-              className="flex items-center gap-1 rounded-full text-[11px] px-2 py-0.5 [&_svg]:mr-0 [&_svg]:size-3"
-            >
-              {statusIcon}
-              {item?.status}
-            </Badge>
           )}
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { ComponentProps, ReactNode } from "react";
 import MonthPicker from "./datePicker";
-import { boolean } from "zod";
 
 type PageHeaderProps = ComponentProps<"div"> & {
   pageName?: string;
@@ -21,7 +20,9 @@ function PageHeader({
       <div className="flex gap-3 flex-row items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">{pageName}</h1>
-          <p className="text-sm text-gray-400">{description}</p>
+          <p className="hidden sm:inline text-sm text-gray-400">
+            {description}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

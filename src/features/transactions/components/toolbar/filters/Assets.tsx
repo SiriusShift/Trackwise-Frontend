@@ -1,13 +1,6 @@
 import { Account } from "@/features/accounts/types/account.types";
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/shared/components/ui/collapsible";
 import { AssetData } from "@/shared/types";
-import { ChevronDown } from "lucide-react";
+import FilterChip from "./FilterChip";
 
 const Assets = ({
   selectedAssets,
@@ -19,51 +12,34 @@ const Assets = ({
   onChange: (asset: AssetData) => void;
 }) => {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="block text-sm font-semibold">Asset</span>
+    <fieldset className="flex flex-col gap-2">
+      <legend className="mb-2 flex w-full items-baseline justify-between text-sm font-semibold">
+        Account
+        {selectedAssets.length > 0 && (
+          <span className="text-xs font-normal text-muted-foreground">
+            {selectedAssets.length} selected
+          </span>
+        )}
+      </legend>
 
-      <Collapsible>
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-full relative flex justify-between overflow-hidden items-center"
-          >
-            <div className="overflow-x-hidden flex w-4/5">
-              <span>
-                {selectedAssets.length > 0
-                  ? selectedAssets.map((asset) => asset.name).join(", ")
-                  : "Filter by Asset"}
-              </span>
-            </div>
-
-            <ChevronDown className="absolute right-5 h-5 w-5" />
-          </Button>
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <div className="flex flex-col gap-2 mt-1 p-2 max-h-[200px] overflow-y-auto">
-            {assets?.map((asset: Account) => (
-              <div key={asset.id} className="flex items-center gap-2">
-                <Checkbox
-                  id={`asset-${asset.id}`}
-                  checked={selectedAssets.some(
-                    (selected) => selected.id === asset.id,
-                  )}
-                  onCheckedChange={() => onChange(asset)}
-                />
-
-                <label
-                  htmlFor={`asset-${asset.id}`}
-                  className="text-sm font-medium capitalize cursor-pointer"
-                >
-                  {asset.name}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
+      {assets?.length ? (
+        <div className="flex flex-wrap gap-2">
+          {assets.map((asset: Account) => (
+            <FilterChip
+              key={asset.id}
+              selected={selectedAssets.some(
+                (selected) => selected.id === asset.id,
+              )}
+              onToggle={() => onChange(asset)}
+            >
+              {asset.name}
+            </FilterChip>
+          ))}
+        </div>
+      ) : (
+        <span className="text-sm text-muted-foreground">No accounts yet</span>
+      )}
+    </fieldset>
   );
 };
 

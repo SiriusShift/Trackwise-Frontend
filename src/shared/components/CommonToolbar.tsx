@@ -3,15 +3,16 @@ import { useArchiveTransactionMutation } from "@/features/transactions/api/trans
 import { expensesApi } from "@/features/transactions/api/transaction/expensesApi";
 import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { transferApi } from "@/features/transactions/api/transaction/transferApi";
+import MarkPostedDialog from "@/features/transactions/components/dialogs/MarkPostedDialog";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
 import { Button } from "@/shared/components/ui/button";
-import { Archive, Banknote, Check, Eye, Pencil, X } from "lucide-react";
+import type { TransactionDetails } from "@/shared/types";
+import { Archive, Check, Eye, Pencil, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import type { TransactionDetails } from "@/shared/types";
-import { accountsApi } from "../api/accountsApi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
+import { accountsApi } from "../api/accountsApi";
 import { categoryApi } from "../api/categoryApi";
 import useScreenWidth from "../hooks/useScreenWidth";
 import { useConfirm } from "../provider/ConfirmProvider";
@@ -21,6 +22,7 @@ import ViewTransaction from "./dialog/ViewDialog/ViewTransaction";
 const CommonToolbar = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [viewOpen, setViewOpen] = useState<boolean>(false);
+  const [markPostedOpen, setMarkPostedOpen] = useState<boolean>(false);
   const [mode, setMode] = useState<"edit" | "transact">("edit");
 
   const showActionTab = useSelector((state: IRootState) => state.active.action);
@@ -33,8 +35,15 @@ const CommonToolbar = () => {
 
   const [archive] = useArchiveTransactionMutation();
 
+  const isPending =
+    selectedData?.type === "Expense" && !!selectedData?.isPending;
+
   const onView = () => {
     setViewOpen(true);
+  };
+
+  const onMark = () => {
+    setMarkPostedOpen(true);
   };
 
   // Auto-pay for expenses is disabled on the API (postAutoPayment is commented
@@ -127,6 +136,20 @@ const CommonToolbar = () => {
               <Check className="w-4 h-4" />
             </Button>
           )} */}
+          {isPending && (
+            <>
+              <Button
+                variant={"outline"}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMarkPostedOpen(true);
+                }}
+              >
+                <Check className="h-3 w-3" />
+              </Button>
+            </>
+          )}
           <Button variant="outline" onClick={onView}>
             <Eye className="w-4 h-4" />
           </Button>
@@ -159,6 +182,12 @@ const CommonToolbar = () => {
         open={viewOpen}
         setOpen={setViewOpen}
         transaction={selectedData}
+      />
+
+      <MarkPostedDialog
+        open={markPostedOpen}
+        setOpen={setMarkPostedOpen}
+        purchase={selectedData}
       />
     </>
   );

@@ -1,37 +1,37 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { setType } from "@/shared/slices/activeSlice";
-import { type } from "@/features/transactions/constants/constants";
-import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/app/store";
+import { type } from "@/features/transactions/constants/constants";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { setType } from "@/shared/slices/activeSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const TypeSelect = () => {
+// Expense / Income / Transfer as tabs: one tap to switch, all options visible
+const TypeSelect = ({ fullWidth = false }: { fullWidth?: boolean }) => {
   const dispatch = useDispatch();
   const activeType = useSelector((state: IRootState) => state.active.type);
 
   return (
-    <Select
+    <Tabs
       value={activeType}
-      onValueChange={(value) => {
-        dispatch(setType(value))
-      }}
+      onValueChange={(value) => dispatch(setType(value))}
+      className={cn(fullWidth && "w-full")}
     >
-      <SelectTrigger className="w-32" data-tour="type">
-        <SelectValue placeholder="Type" />
-      </SelectTrigger>
-      <SelectContent>
-        {type?.map((item, key) => (
-          <SelectItem key={item.id + key} value={item.name}>
+      <TabsList
+        aria-label="Transaction type"
+        data-tour="type"
+        className={cn(fullWidth && "grid h-11 w-full grid-cols-3")}
+      >
+        {type?.map((item) => (
+          <TabsTrigger
+            key={item.id}
+            value={item.name}
+            className={cn("px-2.5 @sm:px-3", fullWidth && "h-full")}
+          >
             {item.name}
-          </SelectItem>
+          </TabsTrigger>
         ))}
-      </SelectContent>
-    </Select>
+      </TabsList>
+    </Tabs>
   );
 };
 

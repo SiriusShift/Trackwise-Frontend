@@ -2,7 +2,11 @@ import { IRootState } from "@/app/store";
 import {
   useCancelInstallmentPlanMutation,
   useGetCreditStatementQuery,
+  useGetProjectedCreditStatementQuery,
 } from "@/features/transactions/api/transaction/schedulesApi";
+import MarkPostedDialog, {
+  PendingPurchase,
+} from "@/features/transactions/components/dialogs/MarkPostedDialog";
 import { ScheduledItem } from "@/shared/types";
 import {
   formatCurrency,
@@ -11,6 +15,7 @@ import {
 } from "@/shared/utils/CustomFunctions";
 import * as LucideIcons from "lucide-react";
 import moment from "moment";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { Badge } from "../../ui/badge";
@@ -34,6 +39,10 @@ const STATUS_LABELS: Record<string, string> = {
   UPCOMING: "Estimated",
 };
 
+// Most card purchases post within 1 to 3 business days; past this, the user
+// should check whether the bank posted it (or dropped it).
+const PENDING_TOO_LONG_DAYS = 5;
+
 const CreditStatementDetails = ({
   item,
   onPay,
@@ -48,6 +57,14 @@ const CreditStatementDetails = ({
   );
   const [cancelPlan, { isLoading: cancelling }] =
     useCancelInstallmentPlanMutation();
+
+  // The open cycle's pending purchases, which aren't in the estimate yet.
+  const cardId = item?.projected ? item?.toAsset?.id : null;
+  const { currentData: cycle } = useGetProjectedCreditStatementQuery(
+    cardId ?? 0,
+    { skip: !cardId },
+  );
+  const [posting, setPosting] = useState<PendingPurchase | null>(null);
 
   const handleCancelPlan = async (planId: number, description: string) => {
     if (
@@ -224,6 +241,64 @@ const CreditStatementDetails = ({
           </div>
         </div>
       )}
+
+      {!!cycle?.pending?.length && (
+        <div className="p-4 pt-0">
+          <div className="mb-3 flex items-baseline justify-between gap-2">
+            <h2 className="text-sm font-bold">Pending charges</h2>
+            <span className="text-xs text-muted-foreground">
+              {formatCurrency(cycle.pendingTotal, currency)} not in the
+              estimate yet
+            </span>
+          </div>
+          <div className="space-y-2">
+            {cycle.pending.map((charge) => {
+              const tooLong =
+                charge.pendingBusinessDays >= PENDING_TOO_LONG_DAYS;
+              return (
+                <div
+                  key={charge.key}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-dashed p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {charge.description}
+                    </p>
+                    <p
+                      className={`text-xs ${tooLong ? "font-semibold text-destructive" : "text-muted-foreground"}`}
+                    >
+                      {moment(charge.date).format("MMM D")} ·{" "}
+                      {tooLong
+                        ? `Pending ${charge.pendingBusinessDays} business days. Check your bank`
+                        : `${charge.pendingBusinessDays} business day${charge.pendingBusinessDays === 1 ? "" : "s"}`}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <p className="text-sm font-medium tabular-nums">
+                      {formatCurrency(charge.amount, currency)}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPosting(charge)}
+                    >
+                      <LucideIcons.Check className="h-4 w-4" />
+                      Posted
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <MarkPostedDialog
+        open={!!posting}
+        setOpen={(open) => !open && setPosting(null)}
+        purchase={posting}
+      />
 
       {fees.length > 0 && (
         <div className="p-4 pt-0">
