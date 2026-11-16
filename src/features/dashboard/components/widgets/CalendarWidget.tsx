@@ -99,7 +99,6 @@ export default function CalendarWidget() {
 
   const active = useSelector((state: IRootState) => state.active.active);
   const currency = useSelector((state: IRootState) => state.settings.currency);
-
   // Everything that needs the user (bills, income to confirm, transfers,
   // credit card statements) up to the end of the active period, incl. overdue.
   const { data, isLoading } = useGetSchedulesQuery({
@@ -249,7 +248,7 @@ export default function CalendarWidget() {
           >
             <CarouselPrevious
               variant="ghost"
-              className="static translate-y-0 shrink-0 h-8 w-6"
+              className="static translate-y-0 shrink-0 h-8 w-6 hidden sm:inline-flex"
             >
               <Icons.ChevronLeft className="h-4 w-4" />
             </CarouselPrevious>
@@ -283,15 +282,22 @@ export default function CalendarWidget() {
                       >
                         <span
                           className={cn(
-                            "text-[10px] font-semibold uppercase tracking-wider leading-none",
+                            "text-[10px] font-semibold uppercase sm:tracking-wider leading-none",
                             isSelected
                               ? "text-background/80"
-                              : "text-muted-foreground",
+                              : isToday
+                                ? "text-primary"
+                                : "text-muted-foreground",
                           )}
                         >
-                          {isToday ? "Now" : day.format("ddd")}
+                          <span className="sm:hidden">
+                            {day.format("dd").charAt(0)}
+                          </span>
+                          <span className="hidden sm:inline">
+                            {day.format("ddd")}
+                          </span>
                         </span>
-                        <span className="text-lg font-bold leading-tight tabular-nums">
+                        <span className="text-base sm:text-lg font-bold leading-tight tabular-nums">
                           {day.format("D")}
                         </span>
                         <span className="flex h-1.5 items-center gap-0.5">
@@ -310,7 +316,7 @@ export default function CalendarWidget() {
             </div>
             <CarouselNext
               variant="ghost"
-              className="static translate-y-0 shrink-0 h-8 w-6"
+              className="static translate-y-0 shrink-0 h-8 w-6 hidden sm:inline-flex"
             >
               <Icons.ChevronRight className="h-4 w-4" />
             </CarouselNext>
