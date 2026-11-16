@@ -16,6 +16,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   Archive,
   ArrowUpDown,
+  Check,
   Eye,
   MoreHorizontal,
   Pencil,
@@ -32,6 +33,11 @@ import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransacti
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { useState } from "react";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
+import MarkPostedDialog from "../../dialogs/MarkPostedDialog";
+import {
+  isCardPurchase,
+  PostingStatusBadge,
+} from "../../PostingStatusBadge";
 
 export const expenseColumns: ColumnDef<TransactionRow>[] = [
   {
@@ -130,8 +136,13 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
     meta: {
       cellClassName: "border-b",
     },
-    cell: ({ getValue }) => {
+    cell: ({ getValue, row }) => {
       const status = getValue<string>();
+
+      // Card purchases show whether the bank has posted them.
+      if (isCardPurchase(row.original) && status === "Completed") {
+        return <PostingStatusBadge row={row.original} className="p-1 px-2" />;
+      }
 
       return (
         <Badge variant="outline" className="p-1 px-2">
@@ -156,6 +167,7 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
       const [confirmOpen, setConfirmOpen] = useState(false);
       const [mode, setMode] = useState<"edit" | "transact">("edit");
       const [viewOpen, setViewOpen] = useState(false);
+      const [markPostedOpen, setMarkPostedOpen] = useState(false);
       const expense = row.original;
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
@@ -210,6 +222,17 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
 
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              {/* --- Mark posted (pending card purchases) --- */}
+              {expense.isPending && (
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setDropdownOpen(false);
+                    setMarkPostedOpen(true);
+                  }}
+                >
+                  <Check /> Mark posted
+                </DropdownMenuItem>
+              )}
               {/* --- Edit --- */}
               <DropdownMenuItem
                 onSelect={(e) => {
@@ -254,6 +277,14 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
             setOpen={setViewOpen}
             transaction={expense}
           />
+
+          {expense.isPending && (
+            <MarkPostedDialog
+              open={markPostedOpen}
+              setOpen={setMarkPostedOpen}
+              purchase={expense}
+            />
+          )}
 
           <ConfirmDialog
             open={confirmOpen}

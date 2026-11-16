@@ -1,7 +1,16 @@
 import { api } from "@/shared/services/api";
 
 export const expensesApi = api
-  .enhanceEndpoints({ addTagTypes: ["Expenses", "Recurring", "Schedules"] })
+  .enhanceEndpoints({
+    addTagTypes: [
+      "Expenses",
+      "Recurring",
+      "Schedules",
+      "Assets",
+      "History",
+      "Stats",
+    ],
+  })
   .injectEndpoints({
     endpoints: (builder) => ({
       getExpenses: builder.query({
@@ -44,6 +53,20 @@ export const expensesApi = api
           body: data,
         }),
         invalidatesTags: ["Expenses", "Schedules"],
+      }),
+
+      // Confirms a pending card purchase with what the bank posted. It can
+      // move the purchase onto a statement, so balances and bills refresh too.
+      postPendingExpense: builder.mutation<
+        unknown,
+        { id: number; data: { postedDate: string; amount?: number } }
+      >({
+        query: ({ id, data }) => ({
+          url: `/transactions/expense/${id}/post`,
+          method: "PATCH",
+          body: data,
+        }),
+        invalidatesTags: ["Expenses", "Schedules", "Assets", "History", "Stats"],
       }),
 
       postRecurringExpense: builder.mutation({
@@ -104,6 +127,7 @@ export const {
   useLazyGetGraphExpenseQuery,
   useDeleteExpenseMutation,
   usePutExpenseMutation,
+  usePostPendingExpenseMutation,
   useGetRecurringExpensesQuery,
   usePostRecurringExpenseMutation,
   useUpdateRecurringExpenseMutation,

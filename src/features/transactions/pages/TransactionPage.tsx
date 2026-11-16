@@ -7,7 +7,6 @@ import TransactionToolbar from "@/features/transactions/components/toolbar/Trans
 import { navigationData } from "@/routing/navigationData";
 import PageHeader from "@/shared/components/PageHeader";
 import { DataTable } from "@/shared/components/Table/CommonTable";
-import CommonTracker from "@/shared/components/Tracker/TrackerWidget";
 import { formatMode } from "@/shared/utils/CustomFunctions";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -22,16 +21,16 @@ import { transactionConfig } from "../config/transactionConfig";
 
 import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
 import CommonToolbar from "@/shared/components/CommonToolbar";
+import MobileSummary from "../components/MobileSummary";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
-import ScheduledWidget from "@/shared/components/ScheduledWidget/ScheduledWidget";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import { setActionShow, setOpenDialog } from "@/shared/slices/activeSlice";
+import usePageTour from "@/shared/tour/usePageTour";
 import {
   filterProps,
   TransactionDetails,
   TransactionRow,
 } from "@/shared/types";
-import usePageTour from "@/shared/tour/usePageTour";
 
 const TransactionPage = () => {
   const { Tour } = usePageTour("transactions");
@@ -61,6 +60,8 @@ const TransactionPage = () => {
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const mode = formatMode();
   const width = useScreenWidth();
+  // Below Tailwind `sm`: card list instead of the table
+  const isMobile = width <= 639;
 
   const selectedCategories = filter?.selectedCategories ?? [];
   const selectedAssets = filter?.selectedAssets ?? [];
@@ -306,7 +307,11 @@ const TransactionPage = () => {
     <>
       {Tour}
       <CommonToolbar />
-      <div className="flex p-5 flex-col gap-5">
+      <div
+        className={`flex flex-col gap-4 p-4 sm:gap-5 sm:p-5 ${
+          isMobile ? "pb-24" : ""
+        }`}
+      >
         <PageHeader
           pageName={currentPageName?.name}
           description={`Overview of ${filter?.active === false ? "archived " : ""}${type.toLocaleLowerCase()} for this ${formatMode()}`}
@@ -323,6 +328,17 @@ const TransactionPage = () => {
           // setStatus={setStatus}
           // setSelectedCategories={setSelectedCategories}
         />
+
+        {/* Phones: total, category split, budget and upcoming above the list */}
+        {isMobile && (
+          <MobileSummary
+            type={type}
+            graphData={graphData}
+            graphLoading={graphFetching}
+            showBreakdown={showGraph}
+          />
+        )}
+
         <div className="flex w-full flex-col gap-5 lg:flex-row">
           {/* Table */}
           <div className="w-full overflow-hidden" data-tour="table">
@@ -337,12 +353,12 @@ const TransactionPage = () => {
               onLoadMore={handleLoadMore}
               resetKey={`${type}|${startDate?.getTime()}|${endDate?.getTime()}|${JSON.stringify(filter ?? {})}`}
               graphData={graphData}
-              data={width > 639 ? tableData?.data : transaction || []}
+              data={!isMobile ? tableData?.data : transaction || []}
             />
           </div>
 
           {/* Chart */}
-          {showGraph && (
+          {showGraph && !isMobile && (
             <div data-tour="graph">
               <CommonPieGraph
                 total={graphData?.total}
@@ -355,14 +371,14 @@ const TransactionPage = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div data-tour="budget" className="flex min-w-0">
             <CommonTracker />
           </div>
           <div data-tour="schedule" className="flex min-w-0">
             <ScheduledWidget type={type} />
           </div>
-        </div>
+        </div> */}
 
         <ViewDetailed
           open={viewOpen}

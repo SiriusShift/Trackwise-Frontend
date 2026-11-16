@@ -70,6 +70,7 @@ export const expenseSchema = {
     termMonths: null,
     monthlyAmount: null,
     installmentSkip: 0,
+    isPending: false,
     date: moment(),
     endDate: null,
     account: null,

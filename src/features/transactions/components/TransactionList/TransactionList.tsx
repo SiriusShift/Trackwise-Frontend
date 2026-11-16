@@ -1,14 +1,15 @@
 import { IRootState } from "@/app/store";
-import VirtualizedInfiniteList from "@/shared/components/VirtualizedInfiniteList";
-import { clearRemoving } from "@/shared/slices/activeSlice";
-import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
-import { useDispatch, useSelector } from "react-redux";
-import { Card } from "@/shared/components/ui/card";
 import NoData from "@/assets/images/noData.svg";
-import TransactionListSkeleton from "./TransactionListSkeleton";
-import TransactionItem from "./TransactionItem";
+import { Card } from "@/shared/components/ui/card";
+import { clearRemoving } from "@/shared/slices/activeSlice";
 import type { TransactionRow } from "@/shared/types";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
+import moment from "moment";
+import { motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import TransactionItem from "./TransactionItem";
+import TransactionListSkeleton from "./TransactionListSkeleton";
 
 interface TransactionListProps {
   transactions?: TransactionRow[];
@@ -16,11 +17,61 @@ interface TransactionListProps {
   onLoadMore?: () => void;
 }
 
-const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(function TransactionList(
-  { transactions, isFetching, onLoadMore },
-  ref
-) {
+interface DayGroup {
+  key: string;
+  label: string;
+  // Signed total for the day; null when it has no meaning (transfers)
+  total: number | null;
+  rows: TransactionRow[];
+}
+
+const dayLabel = (date: string | undefined) => {
+  const day = moment(date);
+  if (day.isSame(moment(), "day")) return `Today · ${day.format("ddd, MMM D")}`;
+  if (day.isSame(moment().subtract(1, "day"), "day")) {
+    return `Yesterday · ${day.format("ddd, MMM D")}`;
+  }
+  return day.format(
+    day.isSame(moment(), "year") ? "ddd, MMM D" : "ddd, MMM D, YYYY",
+  );
+};
+
+// Consecutive rows on the same day share a group, keeping the server's order
+const groupByDay = (rows: TransactionRow[]): DayGroup[] => {
+  const groups: DayGroup[] = [];
+  for (const row of rows) {
+    const key = moment(row.date).format("YYYY-MM-DD");
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.rows.push(row);
+    } else {
+      groups.push({ key, label: dayLabel(row.date), total: null, rows: [row] });
+    }
+  }
+  for (const group of groups) {
+    const sign = (row: TransactionRow) =>
+      row.type === "Expense" ? -1 : row.type === "Income" ? 1 : 0;
+    group.total = group.rows.some((row) => sign(row) !== 0)
+      ? group.rows.reduce(
+          (sum, row) =>
+            row.status === "Cancelled"
+              ? sum
+              : sum + sign(row) * Number(row.amount ?? 0),
+          0,
+        )
+      : null;
+  }
+  return groups;
+};
+
+const TransactionList = ({
+  transactions,
+  isFetching,
+  onLoadMore,
+}: TransactionListProps) => {
   const dispatch = useDispatch();
+  const reduceMotion = useReducedMotion();
+  const currency = useSelector((state: IRootState) => state.settings.currency);
   const removingIds = useSelector(
     (state: IRootState) => state.active.removingIds,
   );
@@ -54,62 +105,100 @@ const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(functio
     });
   }, [transactions, removingIds, dispatch]);
 
-  // const dispatch = useDispatch();
-  // const containerVariants = {
-  //   hidden: { opacity: 0 },
-  //   visible: {
-  //     opacity: 1,
-  //     transition: {
-  //       staggerChildren: 0.1,
-  //       delayChildren: 0.1,
-  //     },
-  //   },
-  // };
+  const groups = useMemo(
+    () => groupByDay(visibleTransactions ?? []),
+    [visibleTransactions],
+  );
 
-  // const itemVariants = {
-  //   hidden: { x: -40, opacity: 0 },
-  //   visible: {
-  //     x: 0,
-  //     opacity: 1,
-  //     transition: {
-  //       ease: [0.25, 0.1, 0.25, 1],
-  //       duration: 0.4,
-  //     },
-  //   },
-  // };
+  // Ask for the next page when the end of the list scrolls into view. The
+  // observer is recreated after each load, so a short page that leaves the end
+  // still on screen keeps loading until the screen is full.
+  const endRef = useRef<HTMLDivElement | null>(null);
+  const rowCount = visibleTransactions?.length ?? 0;
+  useEffect(() => {
+    const end = endRef.current;
+    if (!end || !onLoadMore || isFetching || rowCount === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
+      },
+      { rootMargin: "240px" },
+    );
+    observer.observe(end);
+    return () => observer.disconnect();
+  }, [onLoadMore, isFetching, rowCount]);
+
+  if (isFetching && rowCount === 0) {
+    return (
+      <div
+        className="divide-y overflow-hidden rounded-xl border bg-card"
+        aria-busy="true"
+        aria-label="Loading transactions"
+      >
+        {[...Array(5)].map((_, i) => (
+          <TransactionListSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (rowCount === 0) {
+    return (
+      <Card className="flex h-64 flex-col items-center justify-center">
+        <img src={NoData} width={250} alt="" />
+        <span className="block font-semibold">No transactions found</span>
+      </Card>
+    );
+  }
+
+  let runningIndex = 0;
 
   return (
-    <motion.div initial="hidden" animate="visible">
-      {isFetching && !visibleTransactions?.length ? (
-        <div className="space-y-6">
-          {[...Array(3)].map((_, i) => (
-            <TransactionListSkeleton key={i} />
-          ))}
-        </div>
-      ) : visibleTransactions && visibleTransactions.length > 0 ? (
-        <VirtualizedInfiniteList
-          items={visibleTransactions}
-          itemSize={130}
-          height={Math.min(visibleTransactions.length * 130, 520)}
-          ref={ref}
-          isFetching={isFetching}
-          onLoadMore={onLoadMore}
-          renderRow={(item, index) => (
-            <TransactionItem
-              item={item}
-              index={index}
-              onExited={handleExited}
-            />
-          )}
-        />
-      ) : (
-        <Card className="flex flex-col h-64 items-center justify-center">
-          <img src={NoData} width={250} alt="" />
-          <span className="block font-semibold">No transactions found</span>
-        </Card>
+    <div>
+      <div className="overflow-hidden rounded-xl border bg-card">
+        {groups.map((group) => (
+          <section key={group.key} aria-label={group.label}>
+            <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-2 text-xs not-first:border-t">
+              <h3 className="font-semibold text-foreground/80">
+                {group.label}
+              </h3>
+              {group.total !== null && (
+                <span className="tabular-nums text-muted-foreground">
+                  {group.total < 0 ? "−" : group.total > 0 ? "+" : ""}
+                  {formatCurrency(Math.abs(group.total), currency)}
+                </span>
+              )}
+            </div>
+            <ul className="divide-y">
+              {group.rows.map((row) => (
+                <motion.li
+                  key={row.id}
+                  layout={reduceMotion ? false : "position"}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <TransactionItem
+                    item={row}
+                    index={runningIndex++}
+                    onExited={handleExited}
+                  />
+                </motion.li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <div ref={endRef} aria-hidden className="h-px" />
+      {isFetching && (
+        <p
+          role="status"
+          className="py-3 text-center text-xs text-muted-foreground"
+        >
+          Loading more…
+        </p>
       )}
-    </motion.div>
+    </div>
   );
-});
+};
 
 export default TransactionList;

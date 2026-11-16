@@ -161,6 +161,8 @@ export interface payStatementForm {
 interface NamedRef {
   id?: number;
   name: string;
+  // Account category (CASH, BANK, CREDIT, ...) when the endpoint includes it
+  category?: string;
 }
 
 // A transaction (or recurring template) row as returned by the transaction list endpoints.
@@ -189,6 +191,38 @@ export interface TransactionRow {
     auto?: boolean;
     isActive?: boolean;
   } | null;
+  // Card purchase the bank hasn't posted yet (Expense only)
+  isPending?: boolean;
+  // When the bank posted it; null means it posted on `date`
+  postedDate?: string | null;
+}
+
+// A charge on a card's open cycle, from the upcoming statement endpoint.
+export interface CardCycleEntry {
+  key: string;
+  id: number;
+  type: "Expense" | "Income" | "Transfer";
+  description: string;
+  date: string;
+  postedDate: string | null;
+  amount: number;
+  category?: { name: string; icon?: string; color?: string } | null;
+}
+
+// The statement a card is building toward, before it closes.
+export interface ProjectedCreditStatement {
+  card: { id: number; name: string; color?: string };
+  periodStart: string;
+  statementDate: string;
+  dueDate: string;
+  estimate: number;
+  cycleTotal: number;
+  carriedOver: number;
+  unbilledInstallments: number;
+  transactions: CardCycleEntry[];
+  // Not in the estimate until they post
+  pending: (CardCycleEntry & { pendingBusinessDays: number })[];
+  pendingTotal: number;
 }
 
 // A single payment/occurrence belonging to a transaction or recurring template

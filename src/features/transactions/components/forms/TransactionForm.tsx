@@ -1,6 +1,6 @@
 import { ArrowUpDown, CalendarIcon, Repeat } from "lucide-react";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { Separator } from "@/shared/components/ui/separator";
+import { Switch } from "@/shared/components/ui/switch";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Toggle } from "@/shared/components/ui/toggle";
 import { scheduleDefaults } from "@/shared/schema/fields";
@@ -81,6 +82,23 @@ const TransactionForm = ({
     mode === "add" &&
     !isRecurring &&
     watch("account")?.category === "CREDIT";
+
+  // A new one-off card purchase can wait for the bank to post it. Installment
+  // plans are billed by the plan, so they're never pending.
+  const canMarkPending =
+    type === "Expense" &&
+    mode === "add" &&
+    !isRecurring &&
+    isCreditAccount &&
+    !watch("installment");
+
+  // Card purchases usually post a day or more later, so new ones start as
+  // pending; the user turns it off for a charge that already shows in the bank.
+  useEffect(() => {
+    if (mode === "add" && type === "Expense") {
+      setValue("isPending", isCreditAccount);
+    }
+  }, [isCreditAccount, mode, type]);
 
   // Show attachment for past transactions being added/edited
   const showAttachment =
@@ -275,6 +293,34 @@ const TransactionForm = ({
 
       {/* Category + Amount */}
       <CategoryAmountSection mode={mode} />
+
+      {/* Pending — new, one-off credit card purchases only */}
+      {canMarkPending && (
+        <FormField
+          control={control}
+          name="isPending"
+          render={({ field: { value, onChange } }) => (
+            <FormItem className="flex items-start justify-between gap-4 rounded-xl border border-dashed p-3">
+              <div className="space-y-1">
+                <FormLabel htmlFor="isPending">
+                  Not posted by the bank yet
+                </FormLabel>
+                <p className="text-xs text-muted-foreground">
+                  Stays off your statement until you mark it posted. It still
+                  counts against your available credit.
+                </p>
+              </div>
+              <FormControl>
+                <Switch
+                  id="isPending"
+                  checked={!!value}
+                  onCheckedChange={onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      )}
 
       {/* Installment conversion — new, non-recurring credit card expenses only */}
       {canConvertToInstallment && <InstallmentSection />}

@@ -1,4 +1,5 @@
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
+import FilterChip from "./FilterChip";
+import { STATUS_OPTIONS } from "./filterState";
 
 const Status = ({
   status,
@@ -8,29 +9,20 @@ const Status = ({
   setStatus: (status: string) => void;
 }) => {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="block text-sm font-semibold">Status</span>
-      <RadioGroup
-        value={status}
-        onValueChange={(value) => setStatus(value)} // Ensure value is updated
-        className="space-y-2"
-      >
-        {/* Option 2 */}
-        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-success">
-          <RadioGroupItem id="Paid" value="Paid" />
-          <label htmlFor="Paid" className="text-sm font-medium">
-            Completed
-          </label>
-        </div>
-        {/* Option 3 */}
-        <div className="flex items-center space-x-2 border px-4 h-10 rounded-md border-destructive">
-          <RadioGroupItem id="Overdue" value="Overdue" />
-          <label htmlFor="Overdue" className="text-sm font-medium">
-            Skipped
-          </label>
-        </div>
-      </RadioGroup>
-    </div>
+    <fieldset className="flex flex-col gap-2">
+      <legend className="mb-2 text-sm font-semibold">Status</legend>
+      <div className="flex flex-wrap gap-2">
+        {STATUS_OPTIONS.map((option) => (
+          <FilterChip
+            key={option.label}
+            selected={status === option.value}
+            onToggle={() => setStatus(option.value)}
+          >
+            {option.label}
+          </FilterChip>
+        ))}
+      </div>
+    </fieldset>
   );
 };
 

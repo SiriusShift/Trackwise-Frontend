@@ -1,6 +1,7 @@
 import { api } from "@/shared/services/api";
 import {
   CreditStatementDetail,
+  ProjectedCreditStatement,
   RecurringScheduleDetail,
   ScheduledItem,
   ScheduleHistoryEntry,
@@ -108,6 +109,17 @@ export const schedulesApi = api
         providesTags: ["Schedules"],
       }),
 
+      // `cardId` is the card's asset id: an open cycle has no statement yet.
+      getProjectedCreditStatement: builder.query<ProjectedCreditStatement, number>({
+        query: (cardId) => ({
+          url: `/transactions/schedules/credit/card/${cardId}/upcoming`,
+          method: "GET",
+        }),
+        transformResponse: (response: { data: ProjectedCreditStatement }) =>
+          response.data,
+        providesTags: ["Schedules", "Expenses"],
+      }),
+
       payCreditStatement: builder.mutation<
         unknown,
         { id: number; data: PaySchedulePayload }
@@ -138,6 +150,7 @@ export const {
   usePayRecurringScheduleMutation,
   useSkipRecurringScheduleMutation,
   useGetCreditStatementQuery,
+  useGetProjectedCreditStatementQuery,
   usePayCreditStatementMutation,
   useCancelInstallmentPlanMutation,
 } = schedulesApi;

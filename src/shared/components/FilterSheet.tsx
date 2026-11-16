@@ -18,6 +18,9 @@ export function FilterSheet({
   open,
   setOpen,
   icon,
+  side = "bottom",
+  applyLabel = "Apply",
+  clearLabel = "Clear all",
 }: {
   title: string;
   children: React.ReactNode;
@@ -26,19 +29,33 @@ export function FilterSheet({
   icon?: keyof typeof LucideIcon;
   open: boolean;
   setOpen: (open: boolean) => void;
+  // "bottom" for phones, "right" for a desktop side drawer
+  side?: "bottom" | "right";
+  applyLabel?: string;
+  clearLabel?: string;
 }) {
+  const isBottom = side === "bottom";
   const Icon = icon
     ? (LucideIcon[icon] as ComponentType<LucideProps>)
     : undefined;
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      {/* Mobile-friendly Sheet Content */}
       <SheetContent
-        side="right"
+        side={side}
         onOpenAutoFocus={(e) => e.preventDefault()}
-        className="w-full max-w-full sm:max-w-[18rem] p-5 h-screen flex flex-col"
+        className={
+          isBottom
+            ? "flex max-h-[85dvh] flex-col gap-3 rounded-t-2xl p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            : "flex h-full w-full flex-col gap-3 p-5 sm:max-w-sm"
+        }
       >
-        <SheetHeader>
+        {isBottom && (
+          <span
+            aria-hidden
+            className="mx-auto -mt-2 h-1.5 w-10 shrink-0 rounded-full bg-muted-foreground/30"
+          />
+        )}
+        <SheetHeader className="text-left">
           <div className="flex items-center gap-2">
             {Icon && <Icon className="w-4 h-4" />}
             <SheetTitle>{title}</SheetTitle>
@@ -47,15 +64,14 @@ export function FilterSheet({
         </SheetHeader>
 
         {/* Scrollable content area */}
-        <div className="flex-1 px-1 overflow-auto">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-1">{children}</div>
 
-        {/* Footer with fixed positioning */}
-        <SheetFooter className="mt-auto flex gap-2 justify-between w-full">
-          <Button type="submit" onClick={onSubmit}>
-            Apply
-          </Button>
+        <SheetFooter className="grid w-full grid-cols-2 gap-2 sm:space-x-0">
           <Button variant="outline" type="reset" onClick={setClear}>
-            Clear
+            {clearLabel}
+          </Button>
+          <Button type="submit" onClick={onSubmit}>
+            {applyLabel}
           </Button>
         </SheetFooter>
       </SheetContent>
