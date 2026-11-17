@@ -1,23 +1,22 @@
 import { ReceiptText } from "lucide-react";
-import { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { useSelector } from "react-redux";
 
 import { IRootState } from "@/app/store";
 import { useGetCategoryLimitQuery } from "@/shared/api/categoryApi";
-import { Button } from "@/shared/components/ui/button";
 import CommonDialog from "@/shared/components/dialog/CommonDialog";
+import { Button } from "@/shared/components/ui/button";
 import { DialogClose, DialogFooter } from "@/shared/components/ui/dialog";
 import { useTriggerFetch } from "@/shared/hooks/useLazyFetch";
 import { transactionConfig } from "../../config/transactionConfig";
 import TransactionForm from "../forms/TransactionForm";
 
 import { useGetAccountsQuery } from "@/shared/api/accountsApi";
+import { commonDialogProps } from "@/shared/types";
 import {
   usePostRecurringMutation,
   useUpdateRecurringMutation,
 } from "../../api/transaction/recurringApi";
-import { commonDialogProps } from "@/shared/types";
 import { useTransactionForm } from "../hooks/useTransactionForm";
 import {
   TransactionType,
@@ -26,6 +25,8 @@ import {
 
 interface TransactionDialogProps extends commonDialogProps {
   mode: "add" | "edit" | "transact";
+  /** Defaults to the transactions page's active type */
+  type?: TransactionType;
   rowData?: any;
 }
 
@@ -33,16 +34,16 @@ export function TransactionDialog({
   open,
   setOpen,
   mode,
+  type: typeProp,
   rowData,
 }: TransactionDialogProps) {
-  const [recurring, setRecurring] = useState(false);
-
-  const type = useSelector(
-    (state: IRootState) => state.active.type,
-  ) as TransactionType;
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
   );
+  const pageType = useSelector(
+    (state: IRootState) => state.active.type,
+  ) as TransactionType;
+  const type = typeProp ?? pageType;
   const endDate = useSelector((state: IRootState) => state.active.active.to);
 
   const { data: rawAssetData } = useGetAccountsQuery();
@@ -53,11 +54,7 @@ export function TransactionDialog({
 
   const assetData = rawAssetData?.data ?? [];
 
-  const {
-    postTrigger,
-    editTrigger,
-    schema,
-  } = transactionConfig[type] || {};
+  const { postTrigger, editTrigger, schema } = transactionConfig[type] || {};
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const form = useTransactionForm({
@@ -67,14 +64,13 @@ export function TransactionDialog({
     rowData,
     schema,
   });
-  
+
   const {
     handleSubmit,
     reset,
     watch,
     formState: { isDirty, isValid },
   } = form;
-
 
   // Schedules use the recurring endpoints; everything else uses the per-type ones.
   // Both hooks are always called (hook order must not change when "recurring" toggles).
@@ -105,7 +101,7 @@ export function TransactionDialog({
     setOpen,
   });
 
-  console.log(watch())
+  console.log(watch());
 
   // ── Helpers ───────────────────────────────────────────────────────────────────
   const isRecurring = watch("recurring");
@@ -140,11 +136,7 @@ export function TransactionDialog({
         contentClassName="sm:max-w-lg sm:max-h-[90vh]"
       >
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <TransactionForm
-            assetData={assetData}
-            mode={mode}
-            setRecurring={setRecurring}
-          />
+          <TransactionForm assetData={assetData} mode={mode} />
         </div>
 
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">

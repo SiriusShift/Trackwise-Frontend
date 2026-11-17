@@ -28,7 +28,6 @@ import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 import { InstallmentSection } from "./section/InstallmentSection";
 import { RepeatBySection } from "./section/RepeatBySection";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -47,15 +46,9 @@ interface Asset {
 interface TransactionFormProps {
   assetData: Asset[];
   mode: string;
-  setRecurring: (fn: (prev: boolean) => boolean) => void;
 }
 
-const TransactionForm = ({
-  assetData,
-  mode,
-  setRecurring,
-}: TransactionFormProps) => {
-  const { dateFormat, dateTimeFormat } = useDateFormat();
+const TransactionForm = ({ assetData, mode }: TransactionFormProps) => {
   const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
 
@@ -137,7 +130,6 @@ const TransactionForm = ({
       "date",
       pressed ? moment().startOf("day").toDate() : moment().toDate(),
     );
-    setRecurring((prev) => !prev);
   };
 
   // Swap the From / To accounts (Transfer only)
