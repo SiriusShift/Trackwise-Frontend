@@ -3,28 +3,20 @@ import { useGetAccountsQuery } from "@/shared/api/accountsApi";
 import { useGetCategoryQuery } from "@/shared/api/categoryApi";
 import { FilterSheet } from "@/shared/components/FilterSheet";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import useScreenWidth from "@/shared/hooks/useScreenWidth";
-import { AssetData, CategoryType } from "@/shared/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import {
-  Download,
-  Filter,
-  MoreHorizontal,
-  Plus,
-  Search,
-  X,
-} from "lucide-react";
+import { Input } from "@/shared/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import useScreenWidth from "@/shared/hooks/useScreenWidth";
+import { AssetData, CategoryType } from "@/shared/types";
+import { Download, Filter, MoreHorizontal, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ReportDialog from "../dialogs/ReportDialog";
-import { TransactionDialog } from "../dialogs/TransactionDialog";
 import Assets from "./filters/Assets";
 import Categories from "./filters/Categories";
 import FilterMenu, { ActiveFilterChips } from "./filters/FilterMenu";
@@ -186,7 +178,7 @@ const TransactionToolbar = ({
                 <Download />
                 <span className="hidden @4xl:inline">Export</span>
               </Button>
-              <Button
+              {/* <Button
                 size="icon"
                 className="@4xl:w-auto @4xl:px-4"
                 onClick={() => setDialogOpen(true)}
@@ -195,7 +187,7 @@ const TransactionToolbar = ({
               >
                 <Plus />
                 <span className="hidden @4xl:inline">Add</span>
-              </Button>
+              </Button> */}
             </div>
           )}
 
@@ -316,7 +308,7 @@ const TransactionToolbar = ({
       )}
 
       {/* Phones: Add floats within thumb reach */}
-      {isCompact && (
+      {/* {isCompact && (
         <Button
           size="icon"
           onClick={() => setDialogOpen(true)}
@@ -326,9 +318,9 @@ const TransactionToolbar = ({
         >
           <Plus />
         </Button>
-      )}
+      )} */}
 
-      <TransactionDialog open={dialogOpen} setOpen={setDialogOpen} mode="add" />
+      {/* <TransactionDialog open={dialogOpen} setOpen={setDialogOpen} mode="add" /> */}
       <ReportDialog setOpen={setReportOpen} open={reportOpen} />
     </>
   );

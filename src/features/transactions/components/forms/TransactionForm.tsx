@@ -46,14 +46,9 @@ interface Asset {
 interface TransactionFormProps {
   assetData: Asset[];
   mode: string;
-  setRecurring: (fn: (prev: boolean) => boolean) => void;
 }
 
-const TransactionForm = ({
-  assetData,
-  mode,
-  setRecurring,
-}: TransactionFormProps) => {
+const TransactionForm = ({ assetData, mode }: TransactionFormProps) => {
   const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
 
@@ -135,7 +130,6 @@ const TransactionForm = ({
       "date",
       pressed ? moment().startOf("day").toDate() : moment().toDate(),
     );
-    setRecurring((prev) => !prev);
   };
 
   // Swap the From / To accounts (Transfer only)
