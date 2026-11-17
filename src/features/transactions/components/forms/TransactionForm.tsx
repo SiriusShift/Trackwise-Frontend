@@ -28,6 +28,7 @@ import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 import { InstallmentSection } from "./section/InstallmentSection";
 import { RepeatBySection } from "./section/RepeatBySection";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -55,6 +56,7 @@ const TransactionForm = ({ assetData, mode }: TransactionFormProps) => {
   const type = useSelector((state: IRootState) => state.active.type);
 
   const { watch, control, setValue, getValues } = useFormContext();
+  const { dateFormat, dateTimeFormat } = useDateFormat();
 
   const isRecurring = watch("recurring");
   const isTransfer = type === "Transfer";
