@@ -5,6 +5,7 @@ import { signFormSlice } from '../shared/slices/userSlice';
 import { active } from '@/shared/slices/activeSlice';
 import { settingsSlice} from "@/shared/slices/settingsSlice"
 import { applyWeekStartDay } from "@/shared/utils/weekStart"
+import { applyTimezone } from "@/shared/utils/timezone"
 export const store = configureStore({
   reducer: {
     userDetails: signFormSlice.reducer,
@@ -21,16 +22,23 @@ export const store = configureStore({
     ]), // Add the RTK Query middleware
 });
 
-// Keep moment's startOf("week")/endOf("week") in sync with the user's
-// week start setting. Runs on dispatch, before React re-renders.
+// Keep moment in sync with the user's date settings: the default timezone
+// (every moment() call) and the week start day (startOf("week")/endOf("week")).
+// Runs on dispatch, before React re-renders.
+let lastTimezone: string | undefined;
 let lastWeekStartDay: number | undefined;
-const syncWeekStart = () => {
-  const day = store.getState().settings.weekStartDay;
-  if (day === lastWeekStartDay) return;
-  lastWeekStartDay = day;
-  applyWeekStartDay(day);
+const syncDateSettings = () => {
+  const { timezone, weekStartDay } = store.getState().settings;
+  if (timezone !== lastTimezone) {
+    lastTimezone = timezone;
+    applyTimezone(timezone);
+  }
+  if (weekStartDay !== lastWeekStartDay) {
+    lastWeekStartDay = weekStartDay;
+    applyWeekStartDay(weekStartDay);
+  }
 };
-syncWeekStart();
-store.subscribe(syncWeekStart);
+syncDateSettings();
+store.subscribe(syncDateSettings);
 
 export type IRootState = ReturnType<typeof store.getState>
