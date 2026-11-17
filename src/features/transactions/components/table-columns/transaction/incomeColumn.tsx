@@ -31,6 +31,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { StatusIcon } from "../../StatusIcon";
 import { accountsApi } from "@/shared/api/accountsApi";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 export const incomeColumns: ColumnDef<TransactionRow>[] = [
   // {
   //   accessorKey: "id",
@@ -47,10 +48,11 @@ export const incomeColumns: ColumnDef<TransactionRow>[] = [
       headerClassName: "inline-block w-32 flex items-center",
     },
     cell: ({ getValue }) => {
+      const { dateTimeFormat } = useDateFormat();
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
+          {dateValue ? moment(dateValue).format(dateTimeFormat) : "-"}
         </span>
       );
     },

@@ -2,6 +2,7 @@ import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import moment, { Moment } from "moment";
 import { styles } from "./TransactionStatement";
+import { DEFAULT_DATE_FORMAT, DEFAULT_TIME_FORMAT } from "@/shared/hooks/useDateFormat";
 
 // Narrower columns than the account statement to fit Source and Destination
 const cols = StyleSheet.create({
@@ -25,6 +26,8 @@ interface MoneyFlowTransaction {
 }
 
 interface MoneyFlowPDFProps {
+  dateFormat?: string;
+  dateTimeFormat?: string;
   from: Moment;
   to: Moment;
   openingBalance: number;
@@ -44,6 +47,8 @@ const MoneyFlowPDF = ({
   totalOut,
   transactions,
   currency,
+  dateFormat = DEFAULT_DATE_FORMAT,
+  dateTimeFormat = `${DEFAULT_DATE_FORMAT} ${DEFAULT_TIME_FORMAT}`,
 }: MoneyFlowPDFProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -53,7 +58,7 @@ const MoneyFlowPDF = ({
           <Text style={styles.subBrand}>Money flow report</Text>
         </View>
         <Text style={styles.generatedAt}>
-          Generated on {moment().format("MMM D, YYYY h:mm A")}
+          Generated on {moment().format(dateTimeFormat)}
         </Text>
       </View>
 
@@ -65,8 +70,8 @@ const MoneyFlowPDF = ({
         <View>
           <Text style={styles.metaLabel}>Report period</Text>
           <Text style={styles.metaValue}>
-            {moment(from).format("MMM D, YYYY")} –{" "}
-            {moment(to).format("MMM D, YYYY")}
+            {moment(from).format(dateFormat)} –{" "}
+            {moment(to).format(dateFormat)}
           </Text>
         </View>
       </View>
@@ -122,7 +127,7 @@ const MoneyFlowPDF = ({
             wrap={false}
           >
             <Text style={cols.date}>
-              {moment(tx.date).format("MMM D, YYYY")}
+              {moment(tx.date).format(dateFormat)}
             </Text>
             <View style={cols.desc}>
               <Text>{tx.description}</Text>

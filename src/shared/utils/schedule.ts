@@ -129,7 +129,11 @@ export const getFirstWeekdayDate = (
 };
 
 // The cycle after `dueDate`. Units come from the API as day|week|month|year.
-export const getNextDuePreview = (dueDate?: string, rule?: ScheduleRule) => {
+export const getNextDuePreview = (
+  dueDate?: string,
+  rule?: ScheduleRule,
+  format = "MMMM DD, YYYY",
+) => {
   if (!dueDate) return "—";
   const due = moment(dueDate).startOf("day");
 
@@ -137,10 +141,10 @@ export const getNextDuePreview = (dueDate?: string, rule?: ScheduleRule) => {
     return firstDayOfMonthOnOrAfter(
       due.clone().add(1, "day"),
       rule.daysOfMonth,
-    ).format("MMMM DD, YYYY");
+    ).format(format);
   }
 
-  if (!rule?.interval || !rule?.unit) return due.format("MMMM DD, YYYY");
+  if (!rule?.interval || !rule?.unit) return due.format(format);
   const step = rule.interval;
   const unit = rule.unit.toLowerCase() as moment.unitOfTime.DurationConstructor;
 
@@ -152,7 +156,7 @@ export const getNextDuePreview = (dueDate?: string, rule?: ScheduleRule) => {
     k++;
     next = anchor.clone().add(k * step, unit);
   }
-  return next.format("MMMM DD, YYYY");
+  return next.format(format);
 };
 
 // Turns the form's Repeat by fields into what the recurring API expects.

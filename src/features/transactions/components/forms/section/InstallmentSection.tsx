@@ -12,6 +12,7 @@ import {
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
 import { Switch } from "@/shared/components/ui/switch";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 const peso = (value: number) =>
   `₱${value.toLocaleString("en-PH", {
@@ -80,6 +81,7 @@ const firstBill = (
  * the user never picks a date.
  */
 export const InstallmentSection = () => {
+  const { dateFormat } = useDateFormat();
   const { control, watch, setValue } = useFormContext();
 
   const enabled = !!watch("installment");
@@ -322,7 +324,7 @@ export const InstallmentSection = () => {
                 </span>
                 , due{" "}
                 <span className="font-medium">
-                  {bill.due.format("MMM DD, YYYY")}
+                  {bill.due.format(dateFormat)}
                 </span>
               </p>
               <p className="mt-1 text-xs text-muted-foreground">

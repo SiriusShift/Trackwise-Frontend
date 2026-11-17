@@ -8,6 +8,7 @@ import { FileX } from "lucide-react";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 interface RecentTransaction {
   id: number;
   type: string;
@@ -58,6 +59,7 @@ function AmountLabel({ type, amount }: { type: string; amount: number }) {
 }
 
 const TransactionHistory = () => {
+  const { dateTimeFormat } = useDateFormat();
   const { data, isFetching } = useGetTransactionHistoryQuery({
     pageSize: 4,
     pageIndex: 0,
@@ -148,7 +150,7 @@ const TransactionHistory = () => {
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
                   <AmountLabel type={item?.type} amount={item?.amount} />
                   <p className="text-[11px] text-muted-foreground">
-                    {moment(item?.date).format("MMM DD, h:mm A")}
+                    {moment(item?.date).format(dateTimeFormat)}
                   </p>
                 </div>
               </div>

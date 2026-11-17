@@ -1,28 +1,45 @@
-import { generalSettings } from "@/schema/schema";
-import { Separator } from "@/shared/components/ui/separator";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-  FormMessage,
-} from "@/shared/components/ui/form";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { generalSettings, GeneralSettingsFormValues } from "@/schema/schema";
 import { Combobox } from "@/shared/components/Combobox";
 import { Button } from "@/shared/components/ui/button";
-import moment from "moment-timezone";
-import { useDispatch } from "react-redux";
-import currency from "currency-codes";
-import { toast } from "sonner";
-import { GeneralSettingsFormValues } from "@/schema/schema";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/shared/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { Separator } from "@/shared/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { setSettings } from "@/shared/slices/settingsSlice";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
+import { toWeekStartDay, WEEK_DAYS } from "@/shared/utils/weekStart";
+import { zodResolver } from "@hookform/resolvers/zod";
+import currency from "currency-codes";
+import moment from "moment-timezone";
+import { useEffect } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
 } from "../api/settingsApi";
+
+export const DATE_FORMAT_OPTIONS = [
+  { value: "MMM D, YYYY", label: "Nov 17, 2026" },
+  { value: "MMMM D, YYYY", label: "November 17, 2026" },
+  { value: "D MMM YYYY", label: "17 Nov 2026" },
+  { value: "MM/DD/YYYY", label: "11/17/2026" },
+  { value: "DD/MM/YYYY", label: "17/11/2026" },
+  { value: "YYYY-MM-DD", label: "2026-11-17" },
+] as const;
 
 const GeneralSettings = () => {
   const dispatch = useDispatch();
@@ -49,7 +66,11 @@ const GeneralSettings = () => {
     reset({
       timezone: settings.timezone,
       timeFormat: settings.timeFormat === "hh:mm A" ? "12" : "24",
-      currency: currency?.data?.find((item) => item?.code === settings.currency),
+      dateFormat: settings.dateFormat || "MMM D, YYYY",
+      weekStartDay: String(toWeekStartDay(settings.weekStartDay)),
+      currency: currency?.data?.find(
+        (item) => item?.code === settings.currency,
+      ),
     });
   }, [settings, reset]);
 
@@ -58,6 +79,8 @@ const GeneralSettings = () => {
       const updated = await updateSettings({
         timezone: values.timezone,
         timeFormat: values.timeFormat === "12" ? "hh:mm A" : "HH:mm",
+        dateFormat: values.dateFormat,
+        weekStartDay: toWeekStartDay(values.weekStartDay),
         currency: values.currency?.code,
       }).unwrap();
 
@@ -65,6 +88,8 @@ const GeneralSettings = () => {
         setSettings({
           timezone: updated.timezone,
           timeFormat: updated.timeFormat,
+          dateFormat: updated.dateFormat,
+          weekStartDay: updated.weekStartDay,
           currency: updated.currency,
         }),
       );
@@ -77,10 +102,7 @@ const GeneralSettings = () => {
 
   return (
     <FormProvider {...form}>
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Date & Time Header */}
         <div className="space-y-2">
           <span className="block text-lg font-semibold">Date & Time</span>
@@ -140,6 +162,76 @@ const GeneralSettings = () => {
                     </TabsList>
                   </Tabs>
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Date Format */}
+        <div className="flex flex-row items-center justify-between">
+          <div>
+            <h2 className="font-medium">Date Format</h2>
+            <p className="text-sm text-muted-foreground hidden sm:inline">
+              Choose how dates are displayed across the app.
+            </p>
+          </div>
+          <FormField
+            name="dateFormat"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <FormItem>
+                <Select value={value} onValueChange={onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Date format" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      {DATE_FORMAT_OPTIONS.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Week Start */}
+        <div className="flex flex-row items-center justify-between">
+          <div>
+            <h2 className="font-medium">Week Starts On</h2>
+            <p className="text-sm text-muted-foreground hidden sm:inline">
+              Choose the first day of the week for calendars and weekly reports.
+            </p>
+          </div>
+          <FormField
+            name="weekStartDay"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <FormItem>
+                <Select value={value} onValueChange={onChange}>
+                  <FormControl>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Week start day" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      {WEEK_DAYS.map((day) => (
+                        <SelectItem key={day.value} value={String(day.value)}>
+                          {day.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

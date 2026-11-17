@@ -1,11 +1,29 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { useEffect } from "react";
+import { configureStore } from "@reduxjs/toolkit";
+import {
+  cleanup,
+  fireEvent,
+  render as rtlRender,
+  screen,
+} from "@testing-library/react";
+import { ReactElement, ReactNode, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { Provider } from "react-redux";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { scheduleDefaults } from "@/shared/schema/fields";
+import { settingsSlice } from "@/shared/slices/settingsSlice";
 import { RepeatBySection } from "./RepeatBySection";
+
+// RepeatBySection reads the user's date format from the settings slice.
+const ReduxWrapper = ({ children }: { children: ReactNode }) => (
+  <Provider
+    store={configureStore({ reducer: { settings: settingsSlice.reducer } })}
+  >
+    {children}
+  </Provider>
+);
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: ReduxWrapper });
 
 const Harness = ({ mode = "add", values = {} }: { mode?: string; values?: object }) => {
   const form = useForm({
@@ -83,9 +101,10 @@ describe("RepeatBySection", () => {
     press("Specific days");
     press("Weekly");
     press("Sunday");
-    expect(screen.getByText("First due: Nov 08, 2026")).toBeTruthy();
+    // Default date format (settings slice) is "MMM D, YYYY".
+    expect(screen.getByText("First due: Nov 8, 2026")).toBeTruthy();
     press("Monday");
-    expect(screen.getByText("First due: Nov 02, 2026")).toBeTruthy();
+    expect(screen.getByText("First due: Nov 2, 2026")).toBeTruthy();
   });
 
   it("locks how a saved schedule repeats but keeps its days editable", () => {

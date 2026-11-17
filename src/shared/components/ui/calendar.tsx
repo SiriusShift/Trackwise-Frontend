@@ -1,6 +1,8 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
+import { useSelector } from "react-redux"
+import { IRootState } from "@/app/store"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/shared/components/ui/button"
@@ -16,10 +18,14 @@ function Calendar({
   onClear,
   ...props
 }: CalendarProps) {
+  const weekStartDay = useSelector(
+    (state: IRootState) => state.settings.weekStartDay
+  ) as CalendarProps["weekStartsOn"]
   return (
     <>
     <DayPicker
       showOutsideDays={showOutsideDays}
+      weekStartsOn={weekStartDay}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",

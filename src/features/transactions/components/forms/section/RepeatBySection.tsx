@@ -22,6 +22,7 @@ import {
   getFirstDueDate,
   getFirstWeekdayDate,
 } from "@/shared/utils/schedule";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 const REPEAT_OPTIONS = [
   { value: "frequency", label: "Frequency" },
@@ -70,6 +71,7 @@ const SegmentedChoice = ({
 );
 
 const RepeatBySection = ({ mode }: { mode: string }) => {
+  const { dateFormat } = useDateFormat();
   const { control, watch, setValue } = useFormContext();
 
   const isEdit = mode === "edit";
@@ -251,7 +253,7 @@ const RepeatBySection = ({ mode }: { mode: string }) => {
 
           {firstDue && (
             <p className="text-sm text-muted-foreground">
-              First due: {firstDue.format("MMM DD, YYYY")}
+              First due: {firstDue.format(dateFormat)}
             </p>
           )}
         </>

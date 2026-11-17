@@ -22,6 +22,7 @@ import { PayTarget } from "../PayDialog";
 import { InfoRow } from "../ViewDialog/InfoRow";
 import ButtonSkeleton from "./ButtonSkeleton";
 import InfoSkeleton from "./InfoSkeleton";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 interface RecurringScheduleDetailsProps {
   item: ScheduledItem;
@@ -34,6 +35,7 @@ const RecurringScheduleDetails = ({
   onPay,
   onSkip,
 }: RecurringScheduleDetailsProps) => {
+  const { dateFormat } = useDateFormat();
   const currency = useSelector((state: IRootState) => state.settings.currency);
   const id = item.sourceId ?? 0;
 
@@ -133,7 +135,7 @@ const RecurringScheduleDetails = ({
             <InfoRow
               icon={LucideIcons.Calendar1}
               label="Due Date"
-              value={dueDate?.format("MMMM DD, YYYY")}
+              value={dueDate?.format(dateFormat)}
             />
             <Separator />
             {item.type === "Transfer" ? (
@@ -186,8 +188,8 @@ const RecurringScheduleDetails = ({
               }
               value={
                 item.projected
-                  ? moment(schedule?.nextDueDate).format("MMMM DD, YYYY")
-                  : getNextDuePreview(schedule?.nextDueDate, schedule)
+                  ? moment(schedule?.nextDueDate).format(dateFormat)
+                  : getNextDuePreview(schedule?.nextDueDate, schedule, dateFormat)
               }
             />
             {schedule?.endDate && (
@@ -196,7 +198,7 @@ const RecurringScheduleDetails = ({
                 <InfoRow
                   icon={LucideIcons.CalendarOff}
                   label="Ends"
-                  value={moment(schedule.endDate).format("MMMM DD, YYYY")}
+                  value={moment(schedule.endDate).format(dateFormat)}
                 />
               </>
             )}

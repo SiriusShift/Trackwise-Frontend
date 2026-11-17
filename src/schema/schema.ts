@@ -54,12 +54,16 @@ export const generalSettings = {
     .object({
       timezone: requiredString("Timezone is required"),
       timeFormat: requiredString("Time format is required"),
+      dateFormat: requiredString("Date format is required"),
+      weekStartDay: requiredString("Week start day is required"),
       currency: requiredObject("Currency is required"),
     })
     .passthrough(),
   defaultValues: {
-    timezone: "MMM DD, YYYY",
+    timezone: "",
     timeFormat: "12",
+    dateFormat: "MMM D, YYYY",
+    weekStartDay: "0",
     currency: null,
   } as GeneralSettingsFormValues,
 };
@@ -67,6 +71,8 @@ export const generalSettings = {
 export interface GeneralSettingsFormValues {
   timezone: string;
   timeFormat: string;
+  dateFormat: string;
+  weekStartDay: string;
   currency: CurrencyCodeRecord | null | undefined;
 }
 

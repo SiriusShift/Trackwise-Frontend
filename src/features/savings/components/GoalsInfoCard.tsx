@@ -29,6 +29,7 @@ import { useSelector } from "react-redux";
 import { SavingsData } from "../types/savings.types";
 import { getStatus, statusStyles } from "./GoalCard";
 import GoalsInfoCardSkeleton from "./GoalsInfoCardSkeleton";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 type Tone = "positive" | "warning" | "negative" | "neutral";
 
@@ -110,6 +111,7 @@ const GoalsInfoCard = ({
   onDelete,
   className,
 }: GoalsInfoCardProps) => {
+  const { dateFormat } = useDateFormat();
   const currency = useSelector((state: IRootState) => state.settings.currency);
 
   if (isLoading) return <GoalsInfoCardSkeleton />;
@@ -279,9 +281,9 @@ const GoalsInfoCard = ({
               <span>
                 {isActive
                   ? due
-                    ? `Due ${due.format("MMM D, YYYY")}`
+                    ? `Due ${due.format(dateFormat)}`
                     : "No due date"
-                  : `Archived ${moment(data.archivedAt).format("MMM DD, YYYY")}`}
+                  : `Archived ${moment(data.archivedAt).format(dateFormat)}`}
               </span>
             </p>
           </div>

@@ -4,6 +4,7 @@ import { api } from '../shared/services/api'; // Import your API slice
 import { signFormSlice } from '../shared/slices/userSlice';
 import { active } from '@/shared/slices/activeSlice';
 import { settingsSlice} from "@/shared/slices/settingsSlice"
+import { applyWeekStartDay } from "@/shared/utils/weekStart"
 export const store = configureStore({
   reducer: {
     userDetails: signFormSlice.reducer,
@@ -19,5 +20,17 @@ export const store = configureStore({
       api.middleware,
     ]), // Add the RTK Query middleware
 });
+
+// Keep moment's startOf("week")/endOf("week") in sync with the user's
+// week start setting. Runs on dispatch, before React re-renders.
+let lastWeekStartDay: number | undefined;
+const syncWeekStart = () => {
+  const day = store.getState().settings.weekStartDay;
+  if (day === lastWeekStartDay) return;
+  lastWeekStartDay = day;
+  applyWeekStartDay(day);
+};
+syncWeekStart();
+store.subscribe(syncWeekStart);
 
 export type IRootState = ReturnType<typeof store.getState>

@@ -3,6 +3,7 @@ import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import moment from "moment";
 import { styles } from "./TransactionStatement";
+import { DEFAULT_DATE_FORMAT, DEFAULT_TIME_FORMAT } from "@/shared/hooks/useDateFormat";
 
 const STATUS_LABELS: Record<CreditCardStatementData["status"], string> = {
   PENDING: "Unpaid",
@@ -75,10 +76,16 @@ const cc = StyleSheet.create({
 });
 
 interface CreditCardStatementPDFProps {
+  dateFormat?: string;
+  dateTimeFormat?: string;
   statement: CreditCardStatementData;
 }
 
-const CreditCardStatementPDF = ({ statement }: CreditCardStatementPDFProps) => {
+const CreditCardStatementPDF = ({
+  statement,
+  dateFormat = DEFAULT_DATE_FORMAT,
+  dateTimeFormat = `${DEFAULT_DATE_FORMAT} ${DEFAULT_TIME_FORMAT}`,
+}: CreditCardStatementPDFProps) => {
   const { card, summary, transactions, installments, payments } = statement;
   const money = (value: number) => formatCurrency(value, card.currency, "code");
   const fees =
@@ -108,7 +115,7 @@ const CreditCardStatementPDF = ({ statement }: CreditCardStatementPDFProps) => {
             <Text style={styles.subBrand}>Credit card statement</Text>
           </View>
           <Text style={styles.generatedAt}>
-            Generated on {moment().format("MMM D, YYYY h:mm A")}
+            Generated on {moment().format(dateTimeFormat)}
           </Text>
         </View>
 
@@ -124,7 +131,7 @@ const CreditCardStatementPDF = ({ statement }: CreditCardStatementPDFProps) => {
             <Text style={styles.metaLabel}>Statement period</Text>
             <Text style={styles.metaValue}>
               {moment(statement.periodStart).format("MMM D")} –{" "}
-              {moment(statement.statementDate).format("MMM D, YYYY")}
+              {moment(statement.statementDate).format(dateFormat)}
             </Text>
           </View>
           <View>
@@ -196,7 +203,7 @@ const CreditCardStatementPDF = ({ statement }: CreditCardStatementPDFProps) => {
               <Text style={cc.dueLabel}>Total amount due</Text>
               <Text style={cc.dueValue}>{money(summary.totalAmountDue)}</Text>
               <Text style={cc.dueDate}>
-                Due {moment(statement.dueDate).format("MMM D, YYYY")}
+                Due {moment(statement.dueDate).format(dateFormat)}
               </Text>
             </View>
             <View style={cc.infoBox}>

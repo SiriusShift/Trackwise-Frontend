@@ -42,6 +42,8 @@ function ProtectedRoutes() {
             setSettings({
               timezone: response?.settings?.timezone,
               timeFormat: response?.settings?.timeFormat,
+              dateFormat: response?.settings?.dateFormat,
+              weekStartDay: response?.settings?.weekStartDay,
               currency: response?.settings?.currency
             })
           )

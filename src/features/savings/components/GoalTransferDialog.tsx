@@ -47,6 +47,7 @@ import {
   goalTransferSchema,
 } from "../schema/goalTransfer.schema";
 import { GoalTransferDirection, SavingsData } from "../types/savings.types";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 const copy: Record<
   GoalTransferDirection,
@@ -97,6 +98,7 @@ const GoalTransferDialog = ({
   goal,
   direction,
 }: GoalTransferDialogProps) => {
+  const { dateFormat } = useDateFormat();
   const [openDate, setOpenDate] = useState(false);
   const currency = useSelector((state: IRootState) => state.settings.currency);
   const { data: accountsData } = useGetAccountsQuery();
@@ -310,7 +312,7 @@ const GoalTransferDialog = ({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                       {field.value
-                        ? moment(field.value).format("MMM DD, YYYY")
+                        ? moment(field.value).format(dateFormat)
                         : "Pick a date"}
                     </Button>
                     <DatePicker

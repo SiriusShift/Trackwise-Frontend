@@ -25,6 +25,7 @@ import { PayTarget } from "../PayDialog";
 import { InfoRow } from "../ViewDialog/InfoRow";
 import ButtonSkeleton from "./ButtonSkeleton";
 import InfoSkeleton from "./InfoSkeleton";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 interface CreditStatementDetailsProps {
   item?: ScheduledItem | null;
@@ -47,6 +48,7 @@ const CreditStatementDetails = ({
   item,
   onPay,
 }: CreditStatementDetailsProps) => {
+  const { dateFormat } = useDateFormat();
   const currency = useSelector((state: IRootState) => state.settings.currency);
   // Projected statements haven't closed yet, so there's nothing to fetch/pay.
   const statementId = item?.projected ? null : item?.sourceId;
@@ -155,13 +157,13 @@ const CreditStatementDetails = ({
           <InfoRow
             icon={LucideIcons.Calendar1}
             label="Due Date"
-            value={moment(shown?.dueDate).format("MMMM DD, YYYY")}
+            value={moment(shown?.dueDate).format(dateFormat)}
           />
           <Separator />
           <InfoRow
             icon={LucideIcons.FileText}
             label="Statement Date"
-            value={moment(shown?.statementDate).format("MMMM DD, YYYY")}
+            value={moment(shown?.statementDate).format(dateFormat)}
           />
           <Separator />
           <InfoRow
@@ -335,7 +337,7 @@ const CreditStatementDetails = ({
                     </div>
                     <div>
                       <p className="text-sm">
-                        {moment(payment.date).format("MMMM DD, YYYY")}
+                        {moment(payment.date).format(dateFormat)}
                       </p>
                       <p className="font-medium text-xs text-muted-foreground">
                         From {payment.fromAsset?.name ?? "—"}

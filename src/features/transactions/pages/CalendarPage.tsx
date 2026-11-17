@@ -44,6 +44,9 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [filter, setFilter] = useState<ScheduleFilter>("All");
   const currency = useSelector((state: IRootState) => state.settings.currency);
+  const weekStartDay = useSelector(
+    (state: IRootState) => state.settings.weekStartDay,
+  );
 
   // Desktop renders event chips; mobile renders dots inside the day cells.
   // Events are not passed to FullCalendar on mobile, because its dayMaxEvents
@@ -261,6 +264,7 @@ const CalendarPage = () => {
             plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
             initialView={"dayGridMonth"}
             fixedWeekCount={false}
+            firstDay={weekStartDay}
             showNonCurrentDates
             headerToolbar={false}
             expandRows

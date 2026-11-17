@@ -12,12 +12,14 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import CommonDialog from "./CommonDialog";
 import { PayTarget } from "./PayDialog";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 interface SkipDialogProps extends commonDialogProps {
   data?: PayTarget | null;
 }
 
 const SkipDialog = ({ open, setOpen, data }: SkipDialogProps) => {
+  const { dateFormat } = useDateFormat();
   const Icon = getScheduleIcon(data);
   const color = getScheduleColor(data);
   const pastDue = moment().isAfter(moment(data?.dueDate), "day");
@@ -63,7 +65,7 @@ const SkipDialog = ({ open, setOpen, data }: SkipDialogProps) => {
                 </span>
                 <span>
                   {pastDue && "was "}
-                  due {moment(data?.dueDate).format("MMMM DD, YYYY")}
+                  due {moment(data?.dueDate).format(dateFormat)}
                 </span>
               </div>
             </div>
@@ -77,7 +79,7 @@ const SkipDialog = ({ open, setOpen, data }: SkipDialogProps) => {
           <LucideIcons.Calendar width={15} />
           <p>
             Next due date moves to{" "}
-            {getNextDuePreview(data?.dueDate, data ?? undefined)}
+            {getNextDuePreview(data?.dueDate, data ?? undefined, dateFormat)}
           </p>
         </div>
         <div className="flex text-sm text-muted-foreground items-center gap-1">

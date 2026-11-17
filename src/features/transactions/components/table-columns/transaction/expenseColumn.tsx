@@ -38,6 +38,7 @@ import {
   isCardPurchase,
   PostingStatusBadge,
 } from "../../PostingStatusBadge";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 export const expenseColumns: ColumnDef<TransactionRow>[] = [
   {
@@ -48,10 +49,11 @@ export const expenseColumns: ColumnDef<TransactionRow>[] = [
       headerClassName: "inline-block w-32 flex items-center",
     },
     cell: ({ getValue }) => {
+      const { dateTimeFormat } = useDateFormat();
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
+          {dateValue ? moment(dateValue).format(dateTimeFormat) : "-"}
         </span>
       );
     },

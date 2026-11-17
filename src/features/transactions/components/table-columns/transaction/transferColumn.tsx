@@ -37,6 +37,7 @@ import { Portal } from "@radix-ui/react-tooltip";
 import { useState } from "react";
 import { accountsApi } from "@/shared/api/accountsApi";
 import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const transferColumns: ColumnDef<TransactionRow>[] = [
@@ -55,10 +56,11 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
       headerClassName: "inline-block w-32 flex items-center",
     },
     cell: ({ getValue }) => {
+      const { dateTimeFormat } = useDateFormat();
       const dateValue = getValue();
       return (
         <span>
-          {dateValue ? moment(dateValue).format("MMM DD, h:mm a") : "-"}
+          {dateValue ? moment(dateValue).format(dateTimeFormat) : "-"}
         </span>
       );
     },

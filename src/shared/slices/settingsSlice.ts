@@ -4,21 +4,27 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface SettingsState {
   timezone: string;
   timeFormat: string;
+  dateFormat: string;
   currency: string;
+  weekStartDay: number;
 }
 
 // Define a type for the payload
 interface SettingsPayload {
   timezone: string;
   timeFormat: string;
+  dateFormat: string;
   currency: string;
+  weekStartDay?: number;
 }
 
 // Initial state
 const initialState: SettingsState = {
   timezone: "",
   timeFormat: "",
-  currency: ""
+  dateFormat: "",
+  currency: "",
+  weekStartDay: 0, // 0 = Sunday … 6 = Saturday
 };
 
 export const settingsSlice = createSlice({
@@ -28,7 +34,9 @@ export const settingsSlice = createSlice({
     setSettings: (state, action: PayloadAction<SettingsPayload>) => {
       state.timezone = action.payload.timezone;
       state.timeFormat = action.payload.timeFormat;
+      state.dateFormat = action.payload.dateFormat;
       state.currency = action.payload.currency;
+      state.weekStartDay = action.payload.weekStartDay ?? 0;
     },
   },
 });

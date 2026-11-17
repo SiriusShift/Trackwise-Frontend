@@ -67,7 +67,8 @@ export const getStatus = (date?: moment.MomentInput) => {
   };
 };
 
-// Week strip: the active period padded out to whole weeks (Sun–Sat).
+// Week strip: the active period padded out to whole weeks, starting on the
+// user's week start day (moment's locale is synced to it in the store).
 const buildStripDays = (from: string, to: string) => {
   const start = moment(from).startOf("week");
   const end = moment(to).endOf("week");
@@ -99,6 +100,9 @@ export default function CalendarWidget() {
 
   const active = useSelector((state: IRootState) => state.active.active);
   const currency = useSelector((state: IRootState) => state.settings.currency);
+  const weekStartDay = useSelector(
+    (state: IRootState) => state.settings.weekStartDay,
+  );
   // Everything that needs the user (bills, income to confirm, transfers,
   // credit card statements) up to the end of the active period, incl. overdue.
   const { data, isLoading } = useGetSchedulesQuery({
@@ -108,7 +112,8 @@ export default function CalendarWidget() {
 
   const stripDays = useMemo(
     () => buildStripDays(active.from, active.to),
-    [active.from, active.to],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [active.from, active.to, weekStartDay],
   );
 
   // Open on the week containing today, or the period's first week if today is outside it.

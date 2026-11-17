@@ -1,6 +1,7 @@
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import moment, { Moment } from "moment";
+import { DEFAULT_DATE_FORMAT, DEFAULT_TIME_FORMAT } from "@/shared/hooks/useDateFormat";
 
 // Matches --primary in index.css (react-pdf can't read CSS variables).
 const BRAND = "#3b82f6";
@@ -129,6 +130,8 @@ interface StatementTransaction {
 }
 
 interface StatementPDFProps {
+  dateFormat?: string;
+  dateTimeFormat?: string;
   accountName: string;
   from: Moment;
   to: Moment;
@@ -150,6 +153,8 @@ const StatementPDF = ({
   totalDebit,
   transactions,
   currency,
+  dateFormat = DEFAULT_DATE_FORMAT,
+  dateTimeFormat = `${DEFAULT_DATE_FORMAT} ${DEFAULT_TIME_FORMAT}`,
 }: StatementPDFProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -159,7 +164,7 @@ const StatementPDF = ({
           <Text style={styles.subBrand}>Transaction statement</Text>
         </View>
         <Text style={styles.generatedAt}>
-          Generated on {moment().format("MMM D, YYYY h:mm A")}
+          Generated on {moment().format(dateTimeFormat)}
         </Text>
       </View>
 
@@ -171,8 +176,8 @@ const StatementPDF = ({
         <View>
           <Text style={styles.metaLabel}>Statement period</Text>
           <Text style={styles.metaValue}>
-            {moment(from).format("MMM D, YYYY")} –{" "}
-            {moment(to).format("MMM D, YYYY")}
+            {moment(from).format(dateFormat)} –{" "}
+            {moment(to).format(dateFormat)}
           </Text>
         </View>
       </View>
@@ -228,7 +233,7 @@ const StatementPDF = ({
             wrap={false}
           >
             <Text style={styles.colDate}>
-              {moment(tx.date).format("MMM D, YYYY")}
+              {moment(tx.date).format(dateFormat)}
             </Text>
             <View style={styles.colDesc}>
               <Text>{tx.description}</Text>

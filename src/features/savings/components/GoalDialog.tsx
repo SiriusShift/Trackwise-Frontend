@@ -33,6 +33,7 @@ import {
 } from "../api/savingsApi";
 import { GoalForm, goalSchema } from "../schema/goal.schema";
 import { GoalPayload, SavingsData } from "../types/savings.types";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Liabilities can't back a goal (the backend rejects them)
 const GOAL_ACCOUNT_CATEGORIES = ["CASH", "BANK", "INVESTMENT"];
@@ -44,6 +45,7 @@ interface GoalDialogProps extends commonDialogProps {
 }
 
 const GoalDialog = ({ open, setOpen, goal, onSaved }: GoalDialogProps) => {
+  const { dateFormat } = useDateFormat();
   const [openDate, setOpenDate] = useState(false);
   const [openIconPicker, setOpenIconPicker] = useState(false);
   const { data: accountsData } = useGetAccountsQuery();
@@ -266,7 +268,7 @@ const GoalDialog = ({ open, setOpen, goal, onSaved }: GoalDialogProps) => {
                     >
                       <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                       {field.value
-                        ? moment(field.value).format("MMM DD, YYYY")
+                        ? moment(field.value).format(dateFormat)
                         : "No due date"}
                     </Button>
                     <DatePicker

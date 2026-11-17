@@ -2,6 +2,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import type { TransactionRow } from "@/shared/types";
 import { CircleCheck, Clock } from "lucide-react";
 import moment from "moment";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Card purchases are stored as Completed (they count against the card right
 // away), so their status is whether the bank has posted them.
@@ -17,6 +18,7 @@ export const PostingStatusBadge = ({
   row: TransactionRow;
   className?: string;
 }) => {
+  const { dateFormat } = useDateFormat();
   if (row.isPending) {
     return (
       <Badge
@@ -36,7 +38,7 @@ export const PostingStatusBadge = ({
       variant="outline"
       className={`gap-1 ${className}`}
       title={
-        posted ? `Posted ${moment(posted).format("MMM D, YYYY")}` : "Posted"
+        posted ? `Posted ${moment(posted).format(dateFormat)}` : "Posted"
       }
     >
       <CircleCheck className="h-3 w-3" />

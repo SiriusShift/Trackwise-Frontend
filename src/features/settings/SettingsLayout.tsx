@@ -4,7 +4,7 @@ import useLocationHook from "@/shared/hooks/useLocation";
 import useScreenWidth from "@/shared/hooks/useScreenWidth";
 import usePageTour from "@/shared/tour/usePageTour";
 import { ArrowLeft, ArrowRightIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 const SettingsLayout = () => {
@@ -14,10 +14,14 @@ const SettingsLayout = () => {
   const width = useScreenWidth();
   const [activeTab, setActiveTab] = useState("Settings");
 
-
   const subNavigation = navigationData?.find(
     (item) => item?.name === "Settings",
   )?.sub;
+
+  useEffect(() => {
+    if (location.location.pathname === "/settings")
+      navigate("/settings/general");
+  }, []);
 
   const renderTabs = () => {
     return (
@@ -76,16 +80,14 @@ const SettingsLayout = () => {
           </h1>
         </div>
         <div className="h-full">
-          {width < 640 ? (
-            location?.location?.pathname === "/settings" ? (
-              renderTabs()
-            ) : null
-          ) : (
-            renderTabs()
-          )}
+          {width < 640
+            ? location?.location?.pathname === "/settings"
+              ? renderTabs()
+              : null
+            : renderTabs()}
         </div>
       </div>
-        <Outlet />
+      <Outlet />
     </div>
   );
 };

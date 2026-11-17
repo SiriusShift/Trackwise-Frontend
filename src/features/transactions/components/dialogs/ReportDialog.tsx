@@ -44,6 +44,7 @@ import {
 import CreditCardStatementPDF from "../reports/CreditCardStatement";
 import MoneyFlowPDF from "../reports/MoneyFlowStatement";
 import StatementPDF from "../reports/TransactionStatement";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 type ExportFormat = "csv" | "json" | "excel";
 type ReportType = "statement" | "money-flow" | "credit-statement";
@@ -102,6 +103,7 @@ const downloadBlob = (blob: Blob, filename: string) => {
 };
 
 const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
+  const { dateFormat, dateTimeFormat } = useDateFormat();
   const [reportType, setReportType] = useState<ReportType>("statement");
   const [range, setRange] = useState<DateRange | undefined>(
     PRESETS[0].getRange(),
@@ -171,7 +173,11 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
 
     if (format === "json") {
       const blob = await pdf(
-        <CreditCardStatementPDF statement={data.data} />,
+        <CreditCardStatementPDF
+          statement={data.data}
+          dateFormat={dateFormat}
+          dateTimeFormat={dateTimeFormat}
+        />,
       ).toBlob();
       downloadBlob(blob, `${filename}.pdf`);
     } else {
@@ -224,6 +230,8 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
               totalOut={data.data.totalOut}
               transactions={data.data.transactions}
               currency={currency}
+              dateFormat={dateFormat}
+              dateTimeFormat={dateTimeFormat}
             />,
           ).toBlob();
           downloadBlob(blob, `Money-Flow_${from}_to_${to}.pdf`);
@@ -264,6 +272,8 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
             totalDebit={data.data.totalDebit}
             transactions={data.data.transactions}
             currency={currency}
+            dateFormat={dateFormat}
+            dateTimeFormat={dateTimeFormat}
           />,
         ).toBlob();
         const from = moment(range.from).format("MM-DD-YYYY");
@@ -378,8 +388,8 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {range?.from && range?.to ? (
                   <>
-                    {moment(range.from).format("MMM D, YYYY")} –{" "}
-                    {moment(range.to).format("MMM D, YYYY")}
+                    {moment(range.from).format(dateFormat)} –{" "}
+                    {moment(range.to).format(dateFormat)}
                   </>
                 ) : (
                   <span>Pick a custom date range</span>
@@ -467,7 +477,7 @@ const ReportDialog = ({ open, setOpen }: commonDialogProps) => {
                       key={statement.id}
                       value={statement.id.toString()}
                     >
-                      {moment(statement.statementDate).format("MMM D, YYYY")}
+                      {moment(statement.statementDate).format(dateFormat)}
                       <span className="text-muted-foreground">
                         {" "}
                         · {STATEMENT_STATUS_LABELS[statement.status]}

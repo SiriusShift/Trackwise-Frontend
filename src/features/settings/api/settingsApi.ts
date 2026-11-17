@@ -4,6 +4,7 @@ export interface UserSettings {
   id: number;
   timezone: string;
   timeFormat: string;
+  dateFormat: string;
   currency: string;
   weekStartDay: number;
   recurringBehaviour: "AUTO_LOG" | "REMIND";

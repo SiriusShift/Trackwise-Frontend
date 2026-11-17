@@ -28,6 +28,7 @@ import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 import { InstallmentSection } from "./section/InstallmentSection";
 import { RepeatBySection } from "./section/RepeatBySection";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -54,6 +55,7 @@ const TransactionForm = ({
   mode,
   setRecurring,
 }: TransactionFormProps) => {
+  const { dateFormat, dateTimeFormat } = useDateFormat();
   const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
 
@@ -206,8 +208,8 @@ const TransactionForm = ({
                 <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                 {field.value
                   ? isRecurring || moment(field.value).isAfter(moment())
-                    ? moment(field.value).format("MMM DD, YYYY")
-                    : moment(field.value).format("MMM DD, YYYY hh:mm A")
+                    ? moment(field.value).format(dateFormat)
+                    : moment(field.value).format(dateTimeFormat)
                   : "Pick a date"}
               </Button>
               <DatePicker
@@ -355,7 +357,7 @@ const TransactionForm = ({
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                   {field.value
-                    ? moment(field.value).format("MMM DD, YYYY")
+                    ? moment(field.value).format(dateFormat)
                     : "No end date"}
                 </Button>
                 <DatePicker

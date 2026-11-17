@@ -40,6 +40,7 @@ import { FormControl, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import CommonDialog from "./CommonDialog";
 import DatePicker from "./DatePicker";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // What is being paid: the current cycle of a recurring schedule, or a credit
 // card statement.
@@ -70,6 +71,7 @@ interface PayDialogType extends commonDialogProps {
 }
 
 function PayDialog({ data, open, setOpen }: PayDialogType) {
+  const { dateFormat } = useDateFormat();
   const [openDate, setOpenDate] = useState(false);
   const { data: accountsData } = useGetAccountsQuery();
   const assetData = accountsData?.data;
@@ -264,7 +266,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                     </span>
                     <span>
                       {pastDue && "was "}
-                      due {moment(data?.dueDate).format("MMMM DD, YYYY")}
+                      due {moment(data?.dueDate).format(dateFormat)}
                     </span>
                   </div>
                 </div>
@@ -324,7 +326,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                     >
                       <LucideIcons.CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                       {field.value
-                        ? moment(field.value).format("MMM DD, YYYY")
+                        ? moment(field.value).format(dateFormat)
                         : "Pick a date"}
                     </Button>
                     <DatePicker
@@ -457,6 +459,7 @@ function PayDialog({ data, open, setOpen }: PayDialogType) {
                     {getNextDuePreview(
                       data?.dueDate,
                       data ?? undefined,
+                      dateFormat,
                     )}
                   </p>
                 </div>
