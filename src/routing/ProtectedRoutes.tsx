@@ -8,6 +8,7 @@ import { setUserInfo } from "@/shared/slices/userSlice";
 import { setSettings } from "@/shared/slices/settingsSlice";
 import { IRootState } from "@/app/store";
 import LoadingScreen from "@/shared/components/LoadingScreen";
+import TimezoneMismatchNotice from "@/shared/components/TimezoneMismatchNotice";
 
 function ProtectedRoutes() {
   const navigate = useNavigate();
@@ -63,7 +64,16 @@ function ProtectedRoutes() {
     return <LoadingScreen />;
   }
 
-  return <>{data && <MainLayout />}</>;
+  return (
+    <>
+      {data && (
+        <>
+          <TimezoneMismatchNotice />
+          <MainLayout />
+        </>
+      )}
+    </>
+  );
   // return <MainLayout />;
 }
 
