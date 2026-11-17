@@ -83,12 +83,12 @@ export function QuickActionFab({ hidden }: { hidden: boolean }) {
           <DropdownMenuItem
             key={id}
             onSelect={() => run(actions)}
-            className="group gap-3 bg-transparent p-0 focus:bg-transparent"
+            className="group gap-3 bg-transparent p-0 pr-1 py-1 focus:bg-transparent"
           >
-            <span className="rounded-md bg-popover px-2.5 py-1 text-sm font-medium shadow">
+            <span className="rounded-md border border-border bg-popover px-2.5 py-1 text-sm font-semibold text-popover-foreground shadow-md">
               {label}
             </span>
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary shadow-md group-focus:ring-2 group-focus:ring-ring">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-popover text-popover-foreground shadow-lg transition-colors group-hover:bg-accent group-focus:bg-accent group-focus:ring-2 group-focus:ring-ring">
               <Icon className="h-5 w-5" />
             </span>
           </DropdownMenuItem>

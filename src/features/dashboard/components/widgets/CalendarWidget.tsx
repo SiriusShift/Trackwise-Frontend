@@ -400,7 +400,7 @@ export default function CalendarWidget() {
               <Skeleton key={i} className="h-10 w-full rounded-xl" />
             ))
           ) : dayItems?.length > 0 ? (
-            <div className="space-y-2 max-h-64 overflow-y-auto -mx-1 px-1">
+            <div className="space-y-2 max-h-34 overflow-y-auto -mx-1 px-1">
               {filteredItems.length === 0 ? (
                 <p className="text-xs text-muted-foreground text-center py-4">
                   No {filter} items for this day.
