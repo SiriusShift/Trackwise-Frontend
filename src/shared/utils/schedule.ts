@@ -1,7 +1,7 @@
 import { frequencies } from "@/shared/constants/dateConstants";
 import { ScheduleCategory, ScheduledItem, ScheduleType } from "@/shared/types";
-import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import * as Icons from "lucide-react";
 import moment from "moment";
 import { getLucideIcon } from "./icons";
 

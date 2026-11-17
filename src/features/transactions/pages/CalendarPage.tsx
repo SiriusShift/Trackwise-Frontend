@@ -1,6 +1,9 @@
+import { IRootState } from "@/app/store";
 import { Button } from "@/shared/components/ui/button";
+import { Card } from "@/shared/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ScheduledItem } from "@/shared/types";
+import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { getScheduleColor } from "@/shared/utils/schedule";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -10,11 +13,13 @@ import { type DateClickArg } from "@fullcalendar/interaction";
 import * as LucideIcon from "lucide-react";
 import moment from "moment";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLazyGetSchedulesQuery } from "../api/transaction/schedulesApi";
 import {
   ScheduleEvent,
   UpcomingSchedulesSidebar,
 } from "../components/SchedulesSidebar";
+import { summarizeSchedules } from "../utils/calendarSummary";
 
 type ScheduleFilter = "All" | "Expense" | "Income" | "Transfer" | "Credit";
 
@@ -35,8 +40,26 @@ const matchesFilter = (item: ScheduledItem, filter: ScheduleFilter) => {
 const CalendarPage = () => {
   const [monthRange, setMonthRange] = useState({ start: "", end: "" });
   const [title, setTitle] = useState("");
+  const [viewMonth, setViewMonth] = useState(() => moment().startOf("month"));
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [filter, setFilter] = useState<ScheduleFilter>("All");
+  const currency = useSelector((state: IRootState) => state.settings.currency);
+
+  // Desktop renders event chips; mobile renders dots inside the day cells.
+  // Events are not passed to FullCalendar on mobile, because its dayMaxEvents
+  // can hide them on short cells and leave only the "+N" link.
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window === "undefined"
+      ? true
+      : window.matchMedia("(min-width: 1024px)").matches,
+  );
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsDesktop(query.matches);
+    onChange();
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
 
   const calendarRef = useRef<FullCalendar>(null);
   const [trigger, { data, isFetching }] = useLazyGetSchedulesQuery();
@@ -49,19 +72,51 @@ const CalendarPage = () => {
     trigger({ dateFrom: monthRange.start, dateTo: monthRange.end }, true);
   }, [monthRange.start, monthRange.end, trigger]);
 
-  const events: ScheduleEvent[] = useMemo(
-    () =>
-      data
-        ?.filter((item) => matchesFilter(item, filter))
-        .map((item) => ({
-          id: item.key,
-          title: item.description,
-          start: item.dueDate,
-          allDay: true as const,
-          extendedProps: { item },
-        })) ?? [],
+  // Items for the current filter across the fetched range (grid padding included).
+  const filteredItems = useMemo(
+    () => data?.filter((item) => matchesFilter(item, filter)) ?? [],
     [data, filter],
   );
+
+  const events: ScheduleEvent[] = useMemo(
+    () =>
+      filteredItems.map((item) => ({
+        id: item.key,
+        title: item.description,
+        start: item.dueDate,
+        allDay: true as const,
+        extendedProps: { item },
+      })),
+    [filteredItems],
+  );
+
+  // Summary strip counts only the month being viewed, not the padding days.
+  const monthItems = useMemo(
+    () =>
+      filteredItems.filter((item) =>
+        moment(item.dueDate).isSame(viewMonth, "month"),
+      ),
+    [filteredItems, viewMonth],
+  );
+
+  const summary = useMemo(() => summarizeSchedules(monthItems), [monthItems]);
+
+  // Per-day count, total and items for the day cells.
+  const dayTotals = useMemo(() => {
+    const map = new Map<
+      string,
+      { count: number; total: number; items: ScheduledItem[] }
+    >();
+    for (const item of filteredItems) {
+      const key = moment(item.dueDate).format("YYYY-MM-DD");
+      const entry = map.get(key) ?? { count: 0, total: 0, items: [] };
+      entry.count += 1;
+      entry.total += item.amount ?? 0;
+      entry.items.push(item);
+      map.set(key, entry);
+    }
+    return map;
+  }, [filteredItems]);
 
   const today = moment();
 
@@ -80,10 +135,43 @@ const CalendarPage = () => {
     setSelectedDate((prevDate) => (prevDate === clicked ? null : clicked));
   };
 
+  const money = (value: number) => formatCurrency(value, currency, "symbol", 0);
+  const net = summary.net;
+
+  const stats = [
+    {
+      label: "Out this month",
+      value: money(summary.outgoing),
+      className: "",
+    },
+    {
+      label: "In this month",
+      value: money(summary.incoming),
+      className: "text-emerald-600",
+    },
+    {
+      label: "Net",
+      value: `${net >= 0 ? "+" : "−"}${money(Math.abs(net))}`,
+      className: net >= 0 ? "text-emerald-600" : "text-destructive",
+    },
+    {
+      label: "Card bills due",
+      value: money(summary.cardBills),
+      className: "",
+      sub: summary.projectedCount
+        ? `${summary.projectedCount} projected`
+        : undefined,
+    },
+  ];
+
+  const selectedLabel = selectedDate
+    ? moment(selectedDate).format("dddd, MMM D")
+    : undefined;
+
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-65px)]">
       {/* Calendar */}
-      <div className="flex flex-1 flex-col p-4 ">
+      <div className="flex flex-1 flex-col p-4 min-w-0">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h1 className="text-xl font-bold">{title}</h1>
           <div className="flex gap-2">
@@ -103,18 +191,59 @@ const CalendarPage = () => {
           </div>
         </div>
 
-        <div className="mb-3 flex flex-wrap gap-1.5">
-          {FILTERS.map((option) => (
-            <Button
-              key={option}
-              size="sm"
-              variant={filter === option ? "default" : "outline"}
-              className="h-7 rounded-full px-3 text-xs"
-              onClick={() => setFilter(option)}
-            >
-              {option}
-            </Button>
+        {/* Summary strip */}
+        <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <Card key={stat.label} className="p-3">
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <p
+                className={cn(
+                  "mt-1 text-lg font-bold tabular-nums",
+                  stat.className,
+                )}
+              >
+                {stat.value}
+              </p>
+              {stat.sub && (
+                <p className="text-[11px] text-muted-foreground">{stat.sub}</p>
+              )}
+            </Card>
           ))}
+        </div>
+
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1.5">
+            {FILTERS.map((option) => (
+              <Button
+                key={option}
+                size="sm"
+                variant={filter === option ? "default" : "outline"}
+                className="h-7 rounded-full px-3 text-xs"
+                onClick={() => setFilter(option)}
+              >
+                {option}
+              </Button>
+            ))}
+          </div>
+
+          <div className="hidden flex-wrap items-center gap-3 text-xs text-muted-foreground lg:flex">
+            <span className="inline-flex items-center gap-1.5">
+              <i className="h-2.5 w-4 rounded-sm border-l-[3px] border-solid border-primary bg-primary/10" />
+              Scheduled
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <i className="h-2.5 w-4 rounded-sm border-l-[3px] border-dashed border-primary bg-primary/10 opacity-60" />
+              Projected
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <i className="h-1.5 w-1.5 rounded-full bg-destructive" />
+              Overdue / failed
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <i className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
+              Due today
+            </span>
+          </div>
         </div>
 
         <div
@@ -138,6 +267,7 @@ const CalendarPage = () => {
             height="100%"
             datesSet={(info) => {
               setTitle(info.view.title);
+              setViewMonth(moment(info.view.currentStart).startOf("month"));
               setMonthRange({
                 start: moment(info.start).startOf("day").toISOString(),
                 end: moment(info.end)
@@ -148,11 +278,37 @@ const CalendarPage = () => {
               // Selection belonged to the previous month view.
               setSelectedDate(null);
             }}
-            events={events}
+            events={isDesktop ? events : []}
             dayCellClassNames={(arg) => {
               const isSelected =
                 selectedDate && moment(arg.date).isSame(selectedDate, "day");
               return isSelected ? ["bg-primary/10"] : [];
+            }}
+            dayCellContent={(arg) => {
+              const day = dayTotals.get(moment(arg.date).format("YYYY-MM-DD"));
+              return (
+                <div className="flex w-full flex-col gap-1">
+                  <div className="flex items-start justify-between gap-1">
+                    <span>{arg.dayNumberText}</span>
+                    {day && isDesktop && (
+                      <span className="mt-0.5 truncate text-[10px] font-semibold text-muted-foreground tabular-nums">
+                        {day.count} · {money(day.total)}
+                      </span>
+                    )}
+                  </div>
+                  {day && !isDesktop && (
+                    <div className="flex flex-wrap justify-center gap-0.5">
+                      {day.items.slice(0, 4).map((item) => (
+                        <i
+                          key={item.key}
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{ backgroundColor: getScheduleColor(item) }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
             }}
             eventContent={(arg) => {
               const item = arg.event.extendedProps.item as ScheduledItem;
@@ -164,50 +320,52 @@ const CalendarPage = () => {
               const isDueToday = dueDate.isSame(today, "day");
 
               return (
-                <div
-                  className={cn(
-                    "flex w-full items-center gap-1.5 truncate px-2 py-1 text-xs font-medium",
-                    item.projected && "opacity-60",
-                  )}
-                  style={{
-                    backgroundColor: `${color}26`,
-                    borderLeft: `3px ${item.projected ? "dashed" : "solid"} ${color}`,
-                    color,
-                  }}
-                >
-                  {(isOverdue || isDueToday || item.needsAttention) && (
-                    <span
-                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                        isOverdue || item.needsAttention
-                          ? "bg-destructive"
-                          : "bg-yellow-500"
-                      }`}
-                    />
-                  )}
-                  {item.source === "CREDIT_STATEMENT" && (
-                    <LucideIcon.CreditCard className="h-3 w-3 shrink-0" />
-                  )}
-                  {item.type === "Income" && (
-                    <LucideIcon.ArrowDownLeft className="h-3 w-3 shrink-0" />
-                  )}
-                  {item.source === "RECURRING" && item.type === "Transfer" && (
-                    <LucideIcon.ArrowLeftRight className="h-3 w-3 shrink-0" />
-                  )}
-                  <span className="truncate">{arg.event.title}</span>
-                  {!!item.installments?.length && (
-                    <span
-                      className="ml-auto shrink-0 rounded-full bg-background/60 px-1.5 text-[10px] leading-4"
-                      title={item.installments
-                        .map(
-                          (i) =>
-                            `${i.description} ${i.installmentNo}/${i.termMonths}`,
-                        )
-                        .join(", ")}
-                    >
-                      {item.installments.length} inst.
-                    </span>
-                  )}
-                </div>
+                <>
+                  <div
+                    className={cn(
+                      "flex w-full items-center gap-1.5 truncate px-2 py-1 text-xs font-medium",
+                      item.projected && "opacity-60",
+                    )}
+                    style={{
+                      backgroundColor: `${color}26`,
+                      borderLeft: `3px ${item.projected ? "dashed" : "solid"} ${color}`,
+                      color,
+                    }}
+                  >
+                    {(isOverdue || isDueToday || item.needsAttention) && (
+                      <span
+                        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                          isOverdue || item.needsAttention
+                            ? "bg-destructive"
+                            : "bg-yellow-500"
+                        }`}
+                      />
+                    )}
+                    {item.source === "CREDIT_STATEMENT" && (
+                      <LucideIcon.CreditCard className="h-3 w-3 shrink-0" />
+                    )}
+                    {item.type === "Income" && (
+                      <LucideIcon.ArrowDownLeft className="h-3 w-3 shrink-0" />
+                    )}
+                    {item.source === "RECURRING" && item.type === "Transfer" && (
+                      <LucideIcon.ArrowLeftRight className="h-3 w-3 shrink-0" />
+                    )}
+                    <span className="truncate">{arg.event.title}</span>
+                    {!!item.installments?.length && (
+                      <span
+                        className="ml-auto shrink-0 rounded-full bg-background/60 px-1.5 text-[10px] leading-4"
+                        title={item.installments
+                          .map(
+                            (i) =>
+                              `${i.description} ${i.installmentNo}/${i.termMonths}`,
+                          )
+                          .join(", ")}
+                      >
+                        {item.installments.length} inst.
+                      </span>
+                    )}
+                  </div>
+                </>
               );
             }}
             moreLinkContent={(arg) => (
@@ -226,6 +384,14 @@ const CalendarPage = () => {
       <UpcomingSchedulesSidebar
         events={displayedEvents}
         isFetching={isFetching}
+        heading={selectedLabel ?? "Scheduled"}
+        subtitle={
+          isFetching
+            ? undefined
+            : `${displayedEvents.length} item${displayedEvents.length === 1 ? "" : "s"}${selectedDate ? "" : ` in ${viewMonth.format("MMMM")}`}`
+        }
+        showDayHeaders={!selectedDate}
+        onShowAll={selectedDate ? () => setSelectedDate(null) : undefined}
       />
     </div>
   );
