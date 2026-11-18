@@ -14,15 +14,22 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { numberInput } from "@/shared/utils/CustomFunctions";
 import { useSelector } from "react-redux";
+import { TransactionType } from "../../hooks/UseTransactionSubmit";
 
 interface CategoryAmountSectionProps {
   mode: string;
+  type?: TransactionType;
 }
 
-export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
+export const CategoryAmountSection = ({
+  mode,
+  type: typeProp,
+}: CategoryAmountSectionProps) => {
   const { control, watch } = useFormContext();
   const type = useSelector((state: IRootState) => state.active.type);
-  const { data: categoryData } = useGetCategoryQuery({ type });
+  const { data: categoryData } = useGetCategoryQuery({
+    type: typeProp ?? type,
+  });
 
   // Amount is disabled until an account is chosen (for non-recurring past/present transactions)
   const isAmountDisabled =
@@ -49,7 +56,9 @@ export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
       !watch("recurring") &&
       value > accountBalance
     ) {
-      toast.error(isCredit ? "Exceeds available credit" : "Insufficient balance");
+      toast.error(
+        isCredit ? "Exceeds available credit" : "Insufficient balance",
+      );
       e.target.value = String(accountBalance);
       return;
     }

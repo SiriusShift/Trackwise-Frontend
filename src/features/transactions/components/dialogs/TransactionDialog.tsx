@@ -37,6 +37,7 @@ export function TransactionDialog({
   type: typeProp,
   rowData,
 }: TransactionDialogProps) {
+  console.log(typeProp);
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
   );
@@ -136,7 +137,7 @@ export function TransactionDialog({
         contentClassName="sm:max-w-lg sm:max-h-[90vh]"
       >
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <TransactionForm assetData={assetData} mode={mode} />
+          <TransactionForm assetData={assetData} mode={mode} type={typeProp} />
         </div>
 
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 border-t">

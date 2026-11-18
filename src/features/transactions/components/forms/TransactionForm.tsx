@@ -20,15 +20,14 @@ import { Toggle } from "@/shared/components/ui/toggle";
 import { scheduleDefaults } from "@/shared/schema/fields";
 import { Field } from "@/shared/types";
 
-import { IRootState } from "@/app/store";
-import { useSelector } from "react-redux";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
+import { TransactionType } from "../hooks/UseTransactionSubmit";
 import { AccountSelect } from "./section/AccountSelect";
 import { BehaviourSelector } from "./section/BehaviourSelector";
 import { CategoryAmountSection } from "./section/CategoryAmountSection";
 import { ImageAttachment } from "./section/ImageAttachment";
 import { InstallmentSection } from "./section/InstallmentSection";
 import { RepeatBySection } from "./section/RepeatBySection";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
@@ -47,13 +46,12 @@ interface Asset {
 interface TransactionFormProps {
   assetData: Asset[];
   mode: string;
+  type?: TransactionType;
 }
 
-const TransactionForm = ({ assetData, mode }: TransactionFormProps) => {
+const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
   const [openDate, setOpenDate] = useState(false);
   const [openEndDate, setOpenEndDate] = useState(false);
-
-  const type = useSelector((state: IRootState) => state.active.type);
 
   const { watch, control, setValue, getValues } = useFormContext();
   const { dateFormat, dateTimeFormat } = useDateFormat();
@@ -288,7 +286,7 @@ const TransactionForm = ({ assetData, mode }: TransactionFormProps) => {
       )}
 
       {/* Category + Amount */}
-      <CategoryAmountSection mode={mode} />
+      <CategoryAmountSection mode={mode} type={type} />
 
       {/* Pending — new, one-off credit card purchases only */}
       {canMarkPending && (
