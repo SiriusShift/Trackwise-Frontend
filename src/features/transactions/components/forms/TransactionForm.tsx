@@ -31,7 +31,7 @@ import { RepeatBySection } from "./section/RepeatBySection";
 
 // Account categories each transaction type can use (LOAN isn't supported yet).
 const EXPENSE_CATEGORIES = ["CASH", "BANK", "CREDIT"];
-const INCOME_CATEGORIES = ["CASH", "BANK"];
+const INCOME_CATEGORIES = ["CASH", "BANK", "CREDIT"];
 const TRANSFER_CATEGORIES = ["CASH", "BANK", "CREDIT", "INVESTMENT"];
 
 interface Asset {
