@@ -2,7 +2,7 @@ import { Card } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const GoalsInfoCardSkeleton = () => (
-  <Card className="flex flex-col gap-4 p-4">
+  <Card className="flex flex-1 flex-col gap-4 p-4">
     <div className="flex items-center gap-4">
       <Skeleton className="size-11 rounded-xl" />
       <div className="flex flex-col gap-2">
@@ -18,4 +18,4 @@ const GoalsInfoCardSkeleton = () => (
   </Card>
 );
 
-export default GoalsInfoCardSkeleton
+export default GoalsInfoCardSkeleton;

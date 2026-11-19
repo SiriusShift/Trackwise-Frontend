@@ -16,7 +16,7 @@ import {
 } from "@/shared/components/ui/tabs";
 import { ArrowUpDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SavingsData } from "../types/savings.types";
+import { SavingsCounts, SavingsData } from "../types/savings.types";
 import { GoalTab, isInTab } from "../utils/goalTabs";
 import GoalCard from "./GoalCard";
 import GoalCardSkeleton from "./GoalCardSkeleton";
@@ -56,6 +56,7 @@ const sortGoals = (goals: SavingsData[], sort: string) =>
 const GoalList = ({
   data,
   active,
+  counts,
   setActive,
   isLoading,
   tab,
@@ -63,6 +64,7 @@ const GoalList = ({
 }: {
   data: SavingsData[];
   active: number | null;
+  counts?: SavingsCounts;
   setActive: (active: number | null) => void;
   isLoading: boolean;
   // Owned by the page, which shows an empty state for an empty tab
@@ -173,14 +175,14 @@ const GoalList = ({
         className="flex flex-col flex-1 min-h-0"
       >
         <TabsList className="grid w-full grid-cols-3 shrink-0">
-          {tabs.map(({ value, label, goals }) => (
+          {tabs.map(({ value, label }) => (
             <TabsTrigger key={value} value={value}>
               {label}
               {isLoading ? (
                 <Skeleton className="ms-1.5 h-4 w-4" />
               ) : (
                 <span className="ms-1.5 rounded-full bg-muted-foreground/15 px-1.5 text-xs tabular-nums">
-                  {goals.length}
+                  {counts?.[value] ?? 0}
                 </span>
               )}
             </TabsTrigger>

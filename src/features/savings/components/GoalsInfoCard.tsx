@@ -281,7 +281,10 @@ const GoalsInfoCard = ({
                   ? due
                     ? `Due ${due.format("MMM D, YYYY")}`
                     : "No due date"
-                  : `Archived ${moment(data.archivedAt).format("MMM DD, YYYY")}`}
+                  : // Goals archived while the column was dropped have no date
+                    data.archivedAt
+                    ? `Archived ${moment(data.archivedAt).format(dateFormat)}`
+                    : "Archived"}
               </span>
             </p>
           </div>
