@@ -3,6 +3,14 @@ export interface SavingsTemplate {
   message: string;
   data: SavingsData[];
   summary: SavingsSummary;
+  counts: SavingsCounts;
+}
+
+export interface SavingsCounts {
+  all: number;
+  active: number;
+  completed: number;
+  archived: number;
 }
 
 export interface SavingsData {
@@ -24,7 +32,8 @@ export interface SavingsData {
   } | null;
   createdAt: string;
   updatedAt: string;
-  archivedAt: string;
+  // Null while the goal is active
+  archivedAt: string | null;
   savedAmount: number;
   remainingAmount: number;
   progress: number;
@@ -92,7 +101,7 @@ export interface GoalHealth {
 }
 
 export interface SavingsPayload {
-  isActive?: boolean;
+  status?: "all" | "active" | "completed" | "archived";
 }
 
 export interface SavingsGoalTemplate {

@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import {
   Archive,
@@ -29,7 +30,6 @@ import { useSelector } from "react-redux";
 import { SavingsData } from "../types/savings.types";
 import { getStatus, statusStyles } from "./GoalCard";
 import GoalsInfoCardSkeleton from "./GoalsInfoCardSkeleton";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 
 type Tone = "positive" | "warning" | "negative" | "neutral";
 
@@ -283,7 +283,10 @@ const GoalsInfoCard = ({
                   ? due
                     ? `Due ${due.format(dateFormat)}`
                     : "No due date"
-                  : `Archived ${moment(data.archivedAt).format(dateFormat)}`}
+                  : // Goals archived while the column was dropped have no date
+                    data.archivedAt
+                    ? `Archived ${moment(data.archivedAt).format(dateFormat)}`
+                    : "Archived"}
               </span>
             </p>
           </div>

@@ -24,10 +24,11 @@ import { GoalTab, isInTab } from "../utils/goalTabs";
 const SavingsPage = () => {
   const [activeGoal, setActiveGoal] = useState<number | null>(null);
   const [goalTab, setGoalTab] = useState<GoalTab>("active");
-  // Archived goals are included for the Archived tab; the summary still only
-  // counts active ones
+  // Every goal in one request: GoalList filters by tab on the client, so
+  // switching tabs doesn't refetch. The summary still only counts active ones
   const { data, isLoading } = useGetSavingsQuery({});
   const savings = data?.data || [];
+  const counts = data?.counts;
   // Only a goal in the open tab counts, so a stale selection (e.g. right after
   // archiving) never shows the details of a goal from another tab
   const activeSaving = savings.find(
@@ -191,6 +192,7 @@ const SavingsPage = () => {
           <GoalList
             data={savings}
             active={activeGoal}
+            counts={counts}
             setActive={setActiveGoal}
             isLoading={isLoading}
             tab={goalTab}
@@ -200,7 +202,7 @@ const SavingsPage = () => {
               charts row), so manual goals, empty tabs and loading all keep the
               same size. Below lg the charts stack and the panel is under the
               list, so the height is left to the content */}
-          <div className="flex-1 min-w-0 flex flex-col gap-3 lg:min-h-[34rem]">
+          <div className="flex-1 min-w-0 flex flex-col gap-3 lg:min-h-136">
             <GoalsInfoCard
               data={activeSaving}
               isLoading={isLoading}
