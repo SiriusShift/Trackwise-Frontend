@@ -180,3 +180,45 @@ export const buildScheduleFields = (data: any) => {
     daysOfMonth: [...daysOfMonth].sort((a: number, b: number) => a - b),
   };
 };
+
+// Average occurrences per month for each repeat unit.
+const PER_MONTH: Record<string, number> = {
+  day: 365.25 / 12,
+  week: 365.25 / 7 / 12,
+  month: 1,
+  year: 1 / 12,
+};
+
+// What a schedule costs (or brings in) in an average month, so schedules on
+// different frequencies can be added up. 0 when the rule can't be read.
+export const getMonthlyEquivalent = (
+  rule: { amount?: number | string; interval?: number | string; unit?: string; daysOfMonth?: number[] },
+) => {
+  const amount = Number(rule.amount);
+  if (!Number.isFinite(amount)) return 0;
+  if (rule.daysOfMonth?.length) return amount * rule.daysOfMonth.length;
+
+  const interval = Number(rule.interval);
+  const perMonth = PER_MONTH[rule.unit?.toLowerCase() ?? ""];
+  if (!perMonth || !(interval > 0)) return 0;
+  return (amount * perMonth) / interval;
+};
+
+// Days ahead at which an upcoming due date is highlighted
+export const DUE_SOON_DAYS = 3;
+
+// Short "when is it due" label and its text colour, relative to today.
+export const getDueInfo = (date?: string | Date | number | null) => {
+  if (!date) return { label: "No upcoming date", tone: "text-muted-foreground" };
+
+  const days = moment(date).startOf("day").diff(moment().startOf("day"), "days");
+
+  if (days < 0) return { label: `Overdue ${Math.abs(days)}d`, tone: "text-destructive" };
+  if (days === 0) return { label: "Due today", tone: "text-warning" };
+  if (days === 1) return { label: "Tomorrow", tone: "text-warning" };
+  if (days <= DUE_SOON_DAYS) return { label: `In ${days} days`, tone: "text-warning" };
+  return {
+    label: moment(date).format("MMM D"),
+    tone: "text-muted-foreground",
+  };
+};

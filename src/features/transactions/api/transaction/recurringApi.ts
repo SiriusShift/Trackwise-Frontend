@@ -1,5 +1,10 @@
 import { api } from "@/shared/services/api";
-import { Schedule } from "@/shared/types";
+import { RecurringStatus, Schedule, ScheduleType } from "@/shared/types";
+
+export interface GetRecurringParams {
+  type?: ScheduleType | string;
+  status?: RecurringStatus | "ALL";
+}
 
 export const expensesApi = api
   .enhanceEndpoints({ addTagTypes: ["Recurring", "Schedules"] })
@@ -26,19 +31,45 @@ export const expensesApi = api
         invalidatesTags: ["Recurring", "Schedules"],
       }),
 
-      getRecurring: builder.query<Schedule[], string | void>({
-        query: (type) => ({
-          url: "/transactions/recurring",
-          method: "GET",
-          ...(type && { params: { type } }),
-        }),
-        transformResponse: (response: { data: Schedule[] }) => response.data,
-        providesTags: ["Recurring"],
-      }),
+      // A bare string is the type (kept for the widgets). `status` defaults to
+      // ACTIVE on the server; pass "ALL" to get paused and ended ones too.
+      getRecurring: builder.query<Schedule[], string | GetRecurringParams | void>(
+        {
+          query: (arg) => {
+            const params: GetRecurringParams =
+              typeof arg === "string" ? { type: arg } : (arg ?? {});
+            return {
+              url: "/transactions/recurring",
+              method: "GET",
+              params: Object.fromEntries(
+                Object.entries(params).filter(([, value]) => value),
+              ),
+            };
+          },
+          transformResponse: (response: { data: Schedule[] }) => response.data,
+          providesTags: ["Recurring"],
+        },
+      ),
 
       cancelRecurring: builder.mutation({
         query: (id) => ({
           url: `/transactions/recurring/${id}`,
+          method: "PATCH",
+        }),
+        invalidatesTags: ["Recurring", "Schedules"],
+      }),
+
+      pauseRecurring: builder.mutation<unknown, number>({
+        query: (id) => ({
+          url: `/transactions/recurring/${id}/pause`,
+          method: "PATCH",
+        }),
+        invalidatesTags: ["Recurring", "Schedules"],
+      }),
+
+      resumeRecurring: builder.mutation<unknown, number>({
+        query: (id) => ({
+          url: `/transactions/recurring/${id}/resume`,
           method: "PATCH",
         }),
         invalidatesTags: ["Recurring", "Schedules"],
@@ -51,4 +82,6 @@ export const {
   usePostRecurringMutation,
   useUpdateRecurringMutation,
   useCancelRecurringMutation,
+  usePauseRecurringMutation,
+  useResumeRecurringMutation,
 } = expensesApi;

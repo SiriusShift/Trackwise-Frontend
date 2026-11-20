@@ -264,20 +264,27 @@ export interface TransactionDetails extends Omit<
 export type ScheduleType = "Expense" | "Income" | "Transfer";
 
 // A recurring transaction template from /transactions/recurring
+export type RecurringStatus = "ACTIVE" | "PAUSED" | "ENDED";
+
 export interface Schedule {
   id: number;
   type: ScheduleType;
   description: string;
   amount: number | string;
-  category: { icon?: string; name: string };
-  fromAsset?: { name: string };
-  behaviour?: string;
+  category: ScheduleCategory & { name: string };
+  fromAsset?: (ScheduleAccount & { currency?: string }) | null;
+  toAsset?: (ScheduleAccount & { currency?: string }) | null;
+  behaviour?: "AUTO_LOG" | "REMIND" | string;
   unit?: string;
   interval?: number | string;
   daysOfMonth?: number[];
+  startDate?: string;
   nextDueDate?: string | Date | number;
+  endDate?: string | null;
+  status?: RecurringStatus;
   isActive?: boolean;
   endedAt?: string | Date | null;
+  lastTriggeredAt?: string | null;
 }
 
 // An item from /transactions/schedules: a recurring transaction cycle or a

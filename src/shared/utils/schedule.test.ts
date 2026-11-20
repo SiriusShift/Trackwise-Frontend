@@ -7,6 +7,7 @@ import {
   getFirstDueDate,
   getFirstWeekdayDate,
   getFrequencyLabel,
+  getMonthlyEquivalent,
   getNextDuePreview,
 } from "./schedule";
 
@@ -193,5 +194,27 @@ describe("schedule validation", () => {
     expect(errors({ repeatBy: "frequency" })).toEqual(["frequency", "every"]);
     expect(errors({})).toEqual(["frequency", "every"]);
     expect(errors({ every: 2, frequency: "week" })).toEqual([]);
+  });
+});
+
+describe("getMonthlyEquivalent", () => {
+  it("scales interval schedules to an average month", () => {
+    expect(getMonthlyEquivalent({ amount: 1000, interval: 1, unit: "month" })).toBe(1000);
+    expect(getMonthlyEquivalent({ amount: 1200, interval: 1, unit: "year" })).toBe(100);
+    expect(getMonthlyEquivalent({ amount: 500, interval: 3, unit: "month" })).toBeCloseTo(166.67, 2);
+    expect(getMonthlyEquivalent({ amount: 100, interval: 1, unit: "week" })).toBeCloseTo(434.82, 2);
+    expect(getMonthlyEquivalent({ amount: 100, interval: 2, unit: "week" })).toBeCloseTo(217.41, 2);
+  });
+
+  it("counts each chosen day of the month", () => {
+    expect(
+      getMonthlyEquivalent({ amount: "7500", interval: 1, unit: "month", daysOfMonth: [15, 30] }),
+    ).toBe(15000);
+  });
+
+  it("returns 0 for rules it can't read", () => {
+    expect(getMonthlyEquivalent({ amount: 100 })).toBe(0);
+    expect(getMonthlyEquivalent({ amount: 100, interval: 0, unit: "month" })).toBe(0);
+    expect(getMonthlyEquivalent({ amount: "abc", interval: 1, unit: "month" })).toBe(0);
   });
 });

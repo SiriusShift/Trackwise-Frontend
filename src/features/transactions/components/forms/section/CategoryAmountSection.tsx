@@ -1,7 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
-import { IRootState } from "@/app/store";
 import { useGetCategoryQuery } from "@/shared/api/categoryApi";
 import { Combobox } from "@/shared/components/Combobox";
 import {
@@ -13,15 +12,15 @@ import {
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
 import { numberInput } from "@/shared/utils/CustomFunctions";
-import { useSelector } from "react-redux";
+import { TransactionType } from "../../hooks/UseTransactionSubmit";
 
 interface CategoryAmountSectionProps {
   mode: string;
+  type: TransactionType;
 }
 
-export const CategoryAmountSection = ({ mode }: CategoryAmountSectionProps) => {
+export const CategoryAmountSection = ({ mode, type }: CategoryAmountSectionProps) => {
   const { control, watch } = useFormContext();
-  const type = useSelector((state: IRootState) => state.active.type);
   const { data: categoryData } = useGetCategoryQuery({ type });
 
   // Amount is disabled until an account is chosen (for non-recurring past/present transactions)

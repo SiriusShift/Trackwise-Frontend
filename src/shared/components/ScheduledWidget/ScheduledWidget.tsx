@@ -105,7 +105,7 @@ function ScheduledWidget({ type }: ScheduledWidgetProps) {
             size="sm"
             variant="ghost"
             className="h-8 shrink-0 gap-1 px-2.5 text-xs"
-            onClick={() => navigate("/transactions/schedules")}
+            onClick={() => navigate("/transactions/recurring")}
           >
             View all
             <ChevronRight className="h-4 w-4" />
