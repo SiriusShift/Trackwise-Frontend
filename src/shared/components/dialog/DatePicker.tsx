@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "../ui/dialog";
 import moment from "moment";
 import { Calendar } from "../ui/calendar";
@@ -25,6 +26,18 @@ const DatePicker = ({
   clearable?: boolean;
 }) => {
   //   const [timeOpen, setTimeOpen] = useState(false);
+  const formatTime = (value: unknown) => {
+    if (!value) return "";
+    const m = moment(value as Date);
+    return m.isValid() ? m.format("HH:mm") : "";
+  };
+  const [timeValue, setTimeValue] = useState(formatTime(field.value));
+
+  // Keep local input in sync when the date changes from outside (calendar, clear, etc.)
+  useEffect(() => {
+    setTimeValue(formatTime(field.value));
+  }, [field.value]);
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -88,10 +101,15 @@ const DatePicker = ({
 <Input
   type="time"
   className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-  value={field.value ? moment(field.value).format("HH:mm") : ""}
+  value={timeValue}
   onChange={(e) => {
-    const [hours, minutes] = e.target.value.split(":").map(Number);
-    const updatedDate = field.value ? new Date(field.value) : new Date();
+    const value = e.target.value;
+    setTimeValue(value);
+    // Partial/cleared input emits "" — don't push an invalid date to the form
+    if (!/^\d{2}:\d{2}$/.test(value)) return;
+    const [hours, minutes] = value.split(":").map(Number);
+    const base = field.value ? new Date(field.value) : new Date();
+    const updatedDate = isNaN(base.getTime()) ? new Date() : base;
     updatedDate.setHours(hours, minutes, 0, 0);
     field.onChange(updatedDate);
   }}
