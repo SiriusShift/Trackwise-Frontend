@@ -1,10 +1,10 @@
 import { IRootState } from "@/app/store";
-import StatCard from "@/features/accounts/components/StatCard";
 import {
   useArchiveAccountMutation,
   useGetAccountsQuery,
 } from "@/shared/api/accountsApi";
 import PageHeader from "@/shared/components/PageHeader";
+import StatCard from "@/shared/components/StatCard";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
 import { Label } from "@/shared/components/ui/label";

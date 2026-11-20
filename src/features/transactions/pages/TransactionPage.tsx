@@ -11,7 +11,7 @@ import { formatMode } from "@/shared/utils/CustomFunctions";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   useGetGraphIncomeQuery,
   useGetIncomeQuery,
@@ -20,6 +20,8 @@ import { useGetTransferQuery } from "../api/transaction/transferApi";
 import { transactionConfig } from "../config/transactionConfig";
 
 import CommonPieGraph from "@/shared/components/charts/CommonPieGraph";
+import { Button } from "@/shared/components/ui/button";
+import { Repeat } from "lucide-react";
 import CommonToolbar from "@/shared/components/CommonToolbar";
 import MobileSummary from "../components/MobileSummary";
 import ViewDetailed from "@/shared/components/dialog/ViewDialog/ViewTransaction";
@@ -56,6 +58,7 @@ const TransactionPage = () => {
 
   console.log(filter);
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const mode = formatMode();
@@ -316,7 +319,17 @@ const TransactionPage = () => {
           pageName={currentPageName?.name}
           description={`Overview of ${filter?.active === false ? "archived " : ""}${type.toLocaleLowerCase()} for this ${formatMode()}`}
           monthPicker={true}
-        />
+        >
+          <Button
+            variant="outline"
+            onClick={() => navigate("/transactions/recurring")}
+            aria-label="Recurring transactions"
+            data-tour="recurring"
+          >
+            <Repeat />
+            <span className="hidden sm:inline">Recurring</span>
+          </Button>
+        </PageHeader>
         {/* Toolbar */}
         <TransactionToolbar
           onSubmit={handleFilter}

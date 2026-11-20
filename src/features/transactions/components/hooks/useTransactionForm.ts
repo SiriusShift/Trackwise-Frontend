@@ -13,6 +13,8 @@ interface UseTransactionFormProps {
   history?: boolean;
   rowData: any;
   schema: any;
+  /** New entry only: start with Repeat on */
+  startRecurring?: boolean;
 }
 
 function buildResetData(type: string, mode: string, rowData: any) {
@@ -91,6 +93,7 @@ export function useTransactionForm({
   mode,
   rowData,
   schema,
+  startRecurring = false,
 }: UseTransactionFormProps) {
   const form = useForm({
     resolver: zodResolver(schema?.schema),
@@ -102,13 +105,24 @@ export function useTransactionForm({
     if (!open) return;
 
     if (!rowData) {
-      form.reset({ ...schema?.defaultValues, mode, date: moment().toDate() });
+      form.reset({
+        ...schema?.defaultValues,
+        mode,
+        // "Add recurring": a schedule starting today, with default repeat settings
+        ...(startRecurring
+          ? {
+              recurring: true,
+              ...scheduleDefaults,
+              date: moment().startOf("day").toDate(),
+            }
+          : { date: moment().toDate() }),
+      });
       return;
     }
 
     const resetData = buildResetData(type, mode, rowData);
     form.reset({ ...resetData, mode });
-  }, [open, type, rowData, mode]);
+  }, [open, type, rowData, mode, startRecurring]);
 
   // New entries start from the last entry's account and category. Refetched on
   // every open so it reflects what was just saved.
@@ -122,9 +136,16 @@ export function useTransactionForm({
     if (!isNew || !lastEntry) return;
 
     const accountField = type === "Transfer" ? "from" : "account";
+    // Credit cards can't be scheduled, so don't carry one into a recurring form.
+    const canUseAccount =
+      lastEntry.account &&
+      !(
+        form.getValues("recurring") &&
+        lastEntry.account.category === "CREDIT"
+      );
     const prefill = {
       ...(lastEntry.category && { category: lastEntry.category }),
-      ...(lastEntry.account && { [accountField]: lastEntry.account }),
+      ...(canUseAccount && { [accountField]: lastEntry.account }),
     };
 
     // Becomes the form's baseline (so it doesn't count as a user edit), and

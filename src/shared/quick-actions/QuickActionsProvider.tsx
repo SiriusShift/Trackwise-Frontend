@@ -12,8 +12,13 @@ import {
 import { useSelector } from "react-redux";
 import { QuickActionFab } from "./QuickActionsFab";
 
+export type OpenAddOptions = {
+  /** Open the form with Repeat already on (schedule fields showing) */
+  recurring?: boolean;
+};
+
 export type QuickActions = {
-  openAdd: (type?: TransactionType) => void;
+  openAdd: (type?: TransactionType, options?: OpenAddOptions) => void;
   //   openChat: () => void;
 };
 
@@ -23,13 +28,23 @@ export function QuickActionsProvider({ children }: { children: ReactNode }) {
   const pageType = useSelector(
     (s: IRootState) => s.active.type,
   ) as TransactionType;
-  const [add, setAdd] = useState<{ open: boolean; type: TransactionType }>({
+  const [add, setAdd] = useState<{
+    open: boolean;
+    type: TransactionType;
+    recurring: boolean;
+  }>({
     open: false,
     type: "Expense",
+    recurring: false,
   });
 
   const openAdd = useCallback(
-    (type?: TransactionType) => setAdd({ open: true, type: type ?? pageType }),
+    (type?: TransactionType, options?: OpenAddOptions) =>
+      setAdd({
+        open: true,
+        type: type ?? pageType,
+        recurring: !!options?.recurring,
+      }),
     [pageType],
   );
 
@@ -40,9 +55,10 @@ export function QuickActionsProvider({ children }: { children: ReactNode }) {
       {children}
       <QuickActionFab hidden={add.open} />
       <TransactionDialog
-        key={add.type}
+        key={`${add.type}-${add.recurring}`}
         mode="add"
         type={add.type}
+        startRecurring={add.recurring}
         open={add.open}
         setOpen={(open) => setAdd((s) => ({ ...s, open }))}
       />

@@ -1,8 +1,8 @@
+import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import { ComponentProps, ReactNode } from "react";
-import { Card } from "../../../shared/components/ui/card";
-import { Skeleton } from "../../../shared/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { Card } from "./ui/card";
+import { Skeleton } from "./ui/skeleton";
 
 type StatCardProps = ComponentProps<typeof Card> & {
   title: string;

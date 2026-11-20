@@ -1,4 +1,4 @@
-import { ArrowUpDown, CalendarIcon, Repeat } from "lucide-react";
+import { ArrowUpDown, CalendarIcon } from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -16,8 +16,6 @@ import {
 import { Separator } from "@/shared/components/ui/separator";
 import { Switch } from "@/shared/components/ui/switch";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { Toggle } from "@/shared/components/ui/toggle";
-import { scheduleDefaults } from "@/shared/schema/fields";
 import { Field } from "@/shared/types";
 
 import { useDateFormat } from "@/shared/hooks/useDateFormat";
@@ -46,7 +44,8 @@ interface Asset {
 interface TransactionFormProps {
   assetData: Asset[];
   mode: string;
-  type?: TransactionType;
+  /** The dialog's type, which can differ from the transactions page's */
+  type: TransactionType;
 }
 
 const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
@@ -64,12 +63,10 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
       ? INCOME_CATEGORIES
       : EXPENSE_CATEGORIES;
 
-  // Recurring toggle is only available when adding. When editing, the
-  // record already is (or isn't) a schedule, and switching would hit the wrong endpoint.
-  // Credit card purchases can't be scheduled, so the toggle goes away once a
-  // credit account is picked (and credit accounts are hidden once recurring is on).
+  // "recurring" is fixed when the dialog opens: on for "Add recurring" and for
+  // editing a schedule, off otherwise. Credit cards can't be scheduled, so
+  // they're hidden from the account list while it's on.
   const isCreditAccount = watch("account")?.category === "CREDIT";
-  const canToggleRecurring = mode === "add" && !isCreditAccount;
 
   // Installments only apply to a new one-off purchase on a credit card.
   const canConvertToInstallment =
@@ -113,23 +110,6 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
     } else {
       setValue("date", moment().toDate());
     }
-  };
-
-  const handleRecurringToggle = (pressed: boolean) => {
-    setValue("frequency", null);
-    setValue("every", null);
-    setValue("repeatBy", scheduleDefaults.repeatBy);
-    setValue("dayPeriod", scheduleDefaults.dayPeriod);
-    setValue("weekday", scheduleDefaults.weekday);
-    setValue("daysOfMonth", scheduleDefaults.daysOfMonth);
-    setValue("endDate", null);
-    setValue("account", null);
-    setValue("image", null);
-    if (type !== "Expense") setValue("to", null);
-    setValue(
-      "date",
-      pressed ? moment().startOf("day").toDate() : moment().toDate(),
-    );
   };
 
   // Swap the From / To accounts (Transfer only)
@@ -176,7 +156,7 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
         )}
       />
 
-      {/* Date + Recurring toggle */}
+      {/* Date */}
       <div className="flex gap-3 items-end">
         <FormField
           control={control}
@@ -215,32 +195,6 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
             </FormItem>
           )}
         />
-
-        {/* Only render when the user is allowed to toggle recurring */}
-        {canToggleRecurring && (
-          <FormField
-            control={control}
-            name="recurring"
-            render={({ field: { onChange, value } }) => (
-              <FormItem className="flex items-end pb-0.5">
-                <FormControl>
-                  <Toggle
-                    pressed={!!value}
-                    onPressedChange={(pressed) => {
-                      onChange(pressed);
-                      handleRecurringToggle(pressed);
-                    }}
-                    aria-label="Toggle recurring"
-                    title={value ? "Make one-time" : "Make recurring"}
-                    className="h-10 min-w-10"
-                  >
-                    <Repeat className="h-4 w-4" />
-                  </Toggle>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        )}
       </div>
 
       {/* From / Account */}

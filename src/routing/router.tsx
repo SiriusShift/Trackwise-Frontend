@@ -8,6 +8,7 @@ import GeneralSettings from "@/features/settings/pages/GeneralSettings";
 import NotificationSettings from "@/features/settings/pages/NotificationSettings";
 import ThemeSettings from "@/features/settings/pages/ThemeSettings";
 import CalendarPage from "@/features/transactions/pages/CalendarPage";
+import RecurringPage from "@/features/transactions/pages/RecurringPage";
 import TransactionPage from "@/features/transactions/pages/TransactionPage";
 import { createBrowserRouter } from "react-router-dom";
 import PageNotFound from "../pages/PageNotFound";
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <TransactionPage />,
+          },
+          {
+            path: "recurring",
+            element: <RecurringPage />,
           },
         ],
       },

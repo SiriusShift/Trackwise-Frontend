@@ -18,8 +18,7 @@ import { cn } from "@/lib/utils";
 import { Schedule, ScheduleType } from "@/shared/types";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import { getLucideIcon } from "@/shared/utils/icons";
-import { getFrequencyLabel } from "@/shared/utils/schedule";
-import moment from "moment";
+import { getDueInfo, getFrequencyLabel } from "@/shared/utils/schedule";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -37,24 +36,6 @@ const TYPE_TONES: Record<ScheduleType, { text: string; prefix: string }> = {
   Income: { text: "text-success", prefix: "+" },
   Transfer: { text: "text-primary", prefix: "" },
 };
-
-// Days ahead at which an upcoming due date is highlighted
-const DUE_SOON_DAYS = 3;
-
-function getDueInfo(date?: string | Date | number) {
-  if (!date) return { label: "No upcoming date", tone: "text-muted-foreground" };
-
-  const days = moment(date).startOf("day").diff(moment().startOf("day"), "days");
-
-  if (days < 0) return { label: `Overdue ${Math.abs(days)}d`, tone: "text-destructive" };
-  if (days === 0) return { label: "Due today", tone: "text-warning" };
-  if (days === 1) return { label: "Tomorrow", tone: "text-warning" };
-  if (days <= DUE_SOON_DAYS) return { label: `In ${days} days`, tone: "text-warning" };
-  return {
-    label: moment(date).format("MMM D"),
-    tone: "text-muted-foreground",
-  };
-}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -177,6 +158,7 @@ const ScheduleCard = memo(({ schedule, onDelete, count }: ScheduleCardProps) => 
         open={open}
         setOpen={setOpen}
         mode="edit"
+        type={schedule.type}
         rowData={schedule}
       />
     </>
