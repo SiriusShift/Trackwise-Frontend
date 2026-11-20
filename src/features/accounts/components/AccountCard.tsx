@@ -7,6 +7,7 @@ import { formatCurrency, hexToRgba } from "@/shared/utils/CustomFunctions";
 import {
   Activity,
   Archive,
+  ArchiveRestore,
   ArrowDownRight,
   ArrowUpRight,
   Banknote,
@@ -61,10 +62,14 @@ const AccountCard = ({
   account,
   openDialog,
   onArchive,
+  archived = false,
+  onUnarchive,
 }: {
   account: Account;
-  openDialog: () => void;
-  onArchive: () => void;
+  openDialog?: () => void;
+  onArchive?: () => void;
+  archived?: boolean;
+  onUnarchive?: () => void;
 }) => {
   const dispatch = useDispatch();
   const { Icon, glowStyle, badgeStyle, ghostStyle } = getAccountConfig(
@@ -74,7 +79,7 @@ const AccountCard = ({
   );
 
   const handleEdit = () => {
-    openDialog();
+    openDialog?.();
     dispatch(setActiveRow(account));
   };
 
@@ -110,26 +115,41 @@ const AccountCard = ({
       <div
         className={`absolute right-2 top-2 z-20 flex items-center gap-0.5 sm:right-3 sm:top-3 ${actionVisibility}`}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 sm:h-8 sm:w-8"
-          onClick={onArchive}
-          aria-label={`Archive ${account.name}`}
-          title="Archive"
-        >
-          <Archive className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 sm:h-8 sm:w-8"
-          onClick={handleEdit}
-          aria-label={`Edit ${account.name}`}
-          title="Edit"
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
+        {archived ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 sm:h-8 sm:w-8"
+            onClick={onUnarchive}
+            aria-label={`Unarchive ${account.name}`}
+            title="Unarchive"
+          >
+            <ArchiveRestore className="h-4 w-4" />
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 sm:h-8 sm:w-8"
+              onClick={onArchive}
+              aria-label={`Archive ${account.name}`}
+              title="Archive"
+            >
+              <Archive className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 sm:h-8 sm:w-8"
+              onClick={handleEdit}
+              aria-label={`Edit ${account.name}`}
+              title="Edit"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -165,10 +185,16 @@ const AccountCard = ({
           >
             {balance}
           </span>
-          {!account.includeInNetWorth && (
+          {archived ? (
             <Badge variant="outline" className="w-fit text-[10px] font-normal">
-              Excluded from net worth
+              Archived · not in net worth
             </Badge>
+          ) : (
+            !account.includeInNetWorth && (
+              <Badge variant="outline" className="w-fit text-[10px] font-normal">
+                Excluded from net worth
+              </Badge>
+            )
           )}
         </div>
       </div>

@@ -1,11 +1,12 @@
 import {
   AccountPayload,
   AccountTemplate,
+  ArchiveAccountPayload,
 } from "@/features/accounts/types/account.types";
 import { api } from "../services/api";
 
 export const accountsApi = api
-  .enhanceEndpoints({ addTagTypes: ["Assets", "Schedules"] })
+  .enhanceEndpoints({ addTagTypes: ["Assets", "Schedules", "Recurring"] })
   .injectEndpoints({
     endpoints: (builder) => ({
       getAccounts: builder.query<AccountTemplate, AccountPayload | void>({
@@ -30,15 +31,18 @@ export const accountsApi = api
         }),
         invalidatesTags: ["Assets", "Schedules"],
       }),
-      archiveAccount: builder.mutation({
-        query: (id) => ({
+      // Archives by default; { archived: false } unarchives.
+      archiveAccount: builder.mutation<unknown, ArchiveAccountPayload>({
+        query: ({ id, ...body }) => ({
           url: `/assets/${id}`,
           method: "PATCH",
-                    headers: {
+          headers: {
             Accept: "application/json",
           },
+          body,
         }),
-        invalidatesTags: ["Assets", "Schedules"]
+        // Archiving pauses (and unarchiving resumes) its recurring items
+        invalidatesTags: ["Assets", "Schedules", "Recurring"],
       }),
       updateAccount: builder.mutation({
         query: ({ id, ...body }) => ({

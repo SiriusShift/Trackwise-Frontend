@@ -45,6 +45,34 @@ export interface Account {
   investmentPosition: InvestmentPosition | null;
   creditDetail: CreditDetail | null;
   loanDetail: LoanDetail | null;
+
+  // Archived accounts only (GET /assets?archived=true)
+  pausedRecurring?: PausedRecurring[];
+}
+
+// What unarchiving today does to a paused recurring item
+export type ResumeAction = "RESUMES" | "ENDS" | "STAYS_PAUSED";
+
+export interface PausedRecurring {
+  id: number;
+  type: "Expense" | "Income" | "Transfer";
+  description: string;
+  amount: string | number;
+  fromAsset: { id: number; name: string } | null;
+  toAsset: { id: number; name: string } | null;
+  resume: {
+    action: ResumeAction;
+    nextDueDate: string | null;
+    // Name of the other archived account holding a transfer back
+    blockedBy: string | null;
+  };
+}
+
+export interface ArchiveAccountPayload {
+  id: number;
+  archived?: boolean;
+  // Paused recurring items to end instead of resuming (unarchive only)
+  end?: number[];
 }
 
 export interface AccountTemplate {
@@ -59,6 +87,7 @@ export interface AccountTemplate {
 export interface AccountPayload {
   dateFrom?: string;
   dateTo?: string;
+  archived?: boolean;
 }
 
 export interface CreditDetail {

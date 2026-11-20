@@ -7,19 +7,29 @@ import {
 import PageHeader from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
+import { Label } from "@/shared/components/ui/label";
+import { Switch } from "@/shared/components/ui/switch";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import usePageTour from "@/shared/tour/usePageTour";
 import {
   formatCurrency,
   handleCatchErrorMessage,
 } from "@/shared/utils/CustomFunctions";
-import { ArrowUpDown, CreditCard, Landmark, Plus, Wallet } from "lucide-react";
+import {
+  Archive,
+  ArrowUpDown,
+  CreditCard,
+  Landmark,
+  Plus,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import AccountCard from "../components/AccountCard";
 import AccountCardSkeleton from "../components/AccountCardSkeleton";
 import AccountDialog from "../components/AccountDialog";
+import UnarchiveDialog from "../components/UnarchiveDialog";
 import { Account } from "../types/account.types";
 
 const stats = [
@@ -53,6 +63,8 @@ const AccountPage = () => {
   const { Tour } = usePageTour("accounts");
   const [open, setOpen] = useState<boolean>(false);
   const [mode, setMode] = useState<string>("add");
+  const [showArchived, setShowArchived] = useState<boolean>(false);
+  const [unarchiving, setUnarchiving] = useState<Account | null>(null);
 
   const startDate = useSelector(
     (state: IRootState) => state.active.active.from,
@@ -67,6 +79,10 @@ const AccountPage = () => {
       dateTo: endDate,
     });
 
+  // Fetched up front so the switch can show its count
+  const { data: archivedData, isLoading: archivedLoading } =
+    useGetAccountsQuery({ archived: true });
+
   const [archive] = useArchiveAccountMutation();
   const handleAdd = () => {
     setMode("Add");
@@ -78,17 +94,36 @@ const AccountPage = () => {
     setOpen(true);
   };
 
-  const handleArchive = (id: number) => {
+  const handleArchive = (account: Account) => {
+    const balance = Number(account.remainingBalance);
+    const hasBalance = Math.abs(balance) >= 0.005;
+
     confirm({
-      description: `Are you sure you want to archive this account?`,
-      title: `Archive account`,
-      variant: "info",
-      confirmText: "Confirm",
+      title: `Archive ${account.name}?`,
+      description: (
+        <span className="flex flex-col gap-2">
+          <span>
+            Its transactions stay in your history and reports, but its money
+            can't change until you unarchive it. Recurring items that use it
+            are paused.
+          </span>
+          {hasBalance && (
+            <span className="font-medium text-amber-600">
+              Its balance of{" "}
+              {formatCurrency(balance, account.currency, "symbol")} will no
+              longer count toward your net worth.
+            </span>
+          )}
+        </span>
+      ),
+      variant: hasBalance ? "warning" : "info",
+      confirmText: "Archive",
       showLoadingOnConfirm: true,
       cancelText: "Cancel",
       onConfirm: async () => {
         try {
-          await archive(id).unwrap();
+          await archive({ id: account.id }).unwrap();
+          toast.success(`${account.name} archived.`);
         } catch (err) {
           console.log(err);
           toast.error(handleCatchErrorMessage(err));
@@ -98,6 +133,9 @@ const AccountPage = () => {
   };
 
   const assetsLength = accountsData?.data?.length ?? 0;
+  const archivedLength = archivedData?.data?.length ?? 0;
+  const listLoading = showArchived ? archivedLoading : accountsLoading;
+  const listLength = showArchived ? archivedLength : assetsLength;
   const excludedAccountsLength =
     accountsData?.data?.filter((item) => !item.includeInNetWorth)?.length ?? 0;
 
@@ -138,6 +176,24 @@ const AccountPage = () => {
           description="Manage and track your accounts"
           monthPicker={true}
         >
+          <Label
+            htmlFor="show-archived"
+            className="flex cursor-pointer items-center gap-2 px-1 text-sm font-normal text-muted-foreground"
+          >
+            <Switch
+              id="show-archived"
+              checked={showArchived}
+              onCheckedChange={setShowArchived}
+            />
+            <span>
+              <span className="hidden sm:inline">Show </span>archived
+              {archivedLength > 0 && (
+                <span className="ms-1.5 rounded-full bg-muted-foreground/15 px-1.5 text-xs tabular-nums">
+                  {archivedLength}
+                </span>
+              )}
+            </span>
+          </Label>
           <Button
             data-tour="add-account"
             onClick={handleAdd}
@@ -172,14 +228,15 @@ const AccountPage = () => {
             />
           ))}
         </div>
-        {!accountsLoading && assetsLength > 0 && (
+        {!listLoading && listLength > 0 && (
           <div className="-mb-1 flex items-baseline justify-between gap-2 pt-1">
             <h2 className="text-base font-medium tracking-tight">
-              Your accounts
+              {showArchived ? "Archived accounts" : "Your accounts"}
             </h2>
             <span className="text-xs text-muted-foreground">
-              {assetsLength} total
-              {excludedAccountsLength > 0 &&
+              {listLength} total
+              {!showArchived &&
+                excludedAccountsLength > 0 &&
                 ` · ${excludedAccountsLength} excluded`}
             </span>
           </div>
@@ -188,11 +245,30 @@ const AccountPage = () => {
           data-tour="account-list"
           className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:gap-5 2xl:grid-cols-4"
         >
-          {accountsLoading ? (
+          {listLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <AccountCardSkeleton key={i} />
             ))
-          ) : assetsLength === 0 ? (
+          ) : showArchived && archivedLength === 0 ? (
+            <Card className="col-span-full flex flex-col items-center justify-center gap-3 border-dashed p-6 text-center sm:p-10">
+              <div className="rounded-full bg-muted p-3 text-muted-foreground">
+                <Archive className="h-6 w-6" />
+              </div>
+              <p className="mx-auto max-w-sm text-sm text-muted-foreground">
+                No archived accounts. Archive an account you no longer use to
+                hide it while keeping its history.
+              </p>
+            </Card>
+          ) : showArchived ? (
+            archivedData?.data?.map((account: Account) => (
+              <AccountCard
+                key={account.id}
+                account={account}
+                archived
+                onUnarchive={() => setUnarchiving(account)}
+              />
+            ))
+          ) : listLength === 0 ? (
             <Card className="col-span-full flex flex-col items-center justify-center gap-3 border-dashed p-6 text-center sm:p-10">
               <div className="rounded-full bg-primary/10 p-3 text-primary">
                 <Wallet className="h-6 w-6" />
@@ -214,13 +290,17 @@ const AccountPage = () => {
                 key={account.id}
                 account={account}
                 openDialog={handleEdit}
-                onArchive={() => handleArchive(account.id)}
+                onArchive={() => handleArchive(account)}
               />
             ))
           )}
         </div>
       </div>
       <AccountDialog open={open} setOpen={setOpen} mode={mode} />
+      <UnarchiveDialog
+        account={unarchiving}
+        onClose={() => setUnarchiving(null)}
+      />
     </>
   );
 };
