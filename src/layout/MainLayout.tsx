@@ -14,9 +14,9 @@ function MainLayout() {
             (absolutely positioned) instead of taking layout width.
             Radix wraps children in a display:table div, which stops them
             shrinking (breaks truncate/grids), so force it back to block. */}
-        <ScrollArea className="flex-1 min-w-0 h-svh [&>[data-radix-scroll-area-viewport]>div]:!block">
+        <ScrollArea className="flex-1 min-w-0 h-svh [&>[data-radix-scroll-area-viewport]>div]:block!">
           <Header />
-          <div className="pb-24">
+          <div>
             <Outlet />
           </div>
         </ScrollArea>
