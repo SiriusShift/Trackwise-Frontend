@@ -23,8 +23,10 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 // import PayDialog from "@/features/transactions/components/dialogs/PayDialog";
-import { useDeleteTransferMutation } from "@/features/transactions/api/transaction/transferApi";
+import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import { transferApi } from "@/features/transactions/api/transaction/transferApi";
 import { StatusIcon } from "@/features/transactions/components/StatusIcon";
+import { accountsApi } from "@/shared/api/accountsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import {
@@ -32,12 +34,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { Portal } from "@radix-ui/react-tooltip";
 import { useState } from "react";
-import { accountsApi } from "@/shared/api/accountsApi";
-import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 // import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 export const transferColumns: ColumnDef<TransactionRow>[] = [
@@ -213,6 +213,7 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               dispatch(accountsApi.util.invalidateTags(["Assets"]));
+              dispatch(transferApi.util.invalidateTags(["Transfer"]));
             } catch (err) {
               console.log(err);
               toast.error(handleCatchErrorMessage(err));
@@ -255,9 +256,7 @@ export const transferColumns: ColumnDef<TransactionRow>[] = [
                         setDialogOpen(true);
                         setDropdownOpen(false);
                       }}
-                      disabled={
-                        transfer?.status === "Completed"
-                      }
+                      disabled={transfer?.status === "Completed"}
                     >
                       <Pencil /> Edit
                     </DropdownMenuItem>

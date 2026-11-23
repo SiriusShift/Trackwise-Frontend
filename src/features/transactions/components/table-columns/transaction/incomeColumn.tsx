@@ -1,7 +1,7 @@
-import {
-  useDeleteIncomeMutation,
-} from "@/features/transactions/api/transaction/incomeApi";
+import { useArchiveTransactionMutation } from "@/features/transactions/api/transaction";
+import { incomeApi } from "@/features/transactions/api/transaction/incomeApi";
 import { TransactionDialog } from "@/features/transactions/components/dialogs/TransactionDialog";
+import { accountsApi } from "@/shared/api/accountsApi";
 import { categoryApi } from "@/shared/api/categoryApi";
 import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import { Badge } from "@/shared/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 import { useConfirm } from "@/shared/provider/ConfirmProvider";
 import { TransactionRow } from "@/shared/types";
 import { handleCatchErrorMessage } from "@/shared/utils/CustomFunctions";
@@ -30,8 +31,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { StatusIcon } from "../../StatusIcon";
-import { accountsApi } from "@/shared/api/accountsApi";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 export const incomeColumns: ColumnDef<TransactionRow>[] = [
   // {
   //   accessorKey: "id",
@@ -184,7 +183,7 @@ export const incomeColumns: ColumnDef<TransactionRow>[] = [
       const { confirm } = useConfirm();
       const dispatch = useDispatch();
 
-      const [deleteIncome] = useDeleteIncomeMutation();
+      const [deleteIncome] = useArchiveTransactionMutation();
 
       const onView = () => {
         setDropdownOpen(false);
@@ -203,12 +202,13 @@ export const incomeColumns: ColumnDef<TransactionRow>[] = [
             try {
               await deleteIncome({
                 data: {
-                  delete: true,
+                  type: "income",
                 },
                 id: income.id,
               }).unwrap();
               dispatch(categoryApi.util.invalidateTags(["CategoryLimit"]));
               dispatch(accountsApi.util.invalidateTags(["Assets"]));
+              dispatch(incomeApi.util.invalidateTags(["Income"]));
             } catch (err) {
               console.log(err);
               toast.error(handleCatchErrorMessage(err));

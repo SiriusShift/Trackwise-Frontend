@@ -115,5 +115,5 @@ export const {
   usePostRecurringIncomeMutation,
   useUpdateRecurringIncomeMutation,
   useDeleteRecurringIncomeMutation,
-  useCancelRecurringIncomeMutation
+  useCancelRecurringIncomeMutation,
 } = incomeApi;
