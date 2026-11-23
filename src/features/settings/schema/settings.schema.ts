@@ -1,23 +1,13 @@
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { requiredString } from "@/shared/schema/fields";
 import { z } from "zod";
 
 export const categorySchema = {
   schema: z.object({
-    name: z.string({
-      required_error: "Name is required",
-    }),
-
-    type: z.string({
-      required_error: "Type is required",
-    }),
-
-    icon: z.string({
-      required_error: "Icon is required",
-    }),
-
-    color: z.string({
-      required_error: "Color is required",
-    }),
+    name: requiredString("Name is required"),
+    type: requiredString("Type is required"),
+    icon: requiredString("Icon is required"),
+    color: requiredString("Color is required"),
   }),
   defaultValues: {
     name: "",
@@ -51,15 +41,9 @@ export const changePasswordSchema = z
 
 export const profileSchema =z.object({
   profile_image: z.instanceof(File).nullable(),
-  first_name: z.string({
-    required_error: "First Name is required",
-  }),
-  last_name: z.string({
-    required_error: "First Name is required",
-  }),
-  email: z.string({
-    required_error: "Email is required",
-  }),
+  first_name: requiredString("First name is required"),
+  last_name: requiredString("Last name is required"),
+  email: requiredString("Email is required").email("Invalid email address"),
   phone_number: z
     .string().optional()
     // .refine(isValidPhoneNumber, { message: "Invalid phone number" }),

@@ -1,5 +1,5 @@
 import { notificationSettings } from "@/schema/schema";
-import { FormField, FormItem } from "@/shared/components/ui/form";
+import { FormField, FormItem, FormMessage } from "@/shared/components/ui/form";
 import { Switch } from "@/shared/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -158,6 +158,7 @@ const NotificationSettings = () => {
                   className="w-36 text-start"
                   placeholder="Days"
                 />
+                <FormMessage />
               </FormItem>
             )}
           />

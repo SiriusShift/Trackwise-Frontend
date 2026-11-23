@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { Dialog, DialogContent } from "../ui/dialog";
-import moment from "moment";
-import { Calendar } from "../ui/calendar";
-import { Input } from "../ui/input";
 import { Field } from "@/shared/types";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Calendar } from "../ui/calendar";
+import { Dialog, DialogContent } from "../ui/dialog";
+import { Input } from "../ui/input";
 // import TimePicker from "./TimePicker";
 
 const DatePicker = ({
@@ -59,6 +60,9 @@ const DatePicker = ({
                     field.value ? new Date(field.value).getMinutes() : 0,
                   ),
                 );
+                if (disableFuture) {
+                  return toast.error("Can't set date to future");
+                }
                 if (setDate) {
                   setDate(field, newDate);
                 }
@@ -98,22 +102,26 @@ const DatePicker = ({
                 <Clock />
               </Button> */}
 
-<Input
-  type="time"
-  className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-  value={timeValue}
-  onChange={(e) => {
-    const value = e.target.value;
-    setTimeValue(value);
-    // Partial/cleared input emits "" — don't push an invalid date to the form
-    if (!/^\d{2}:\d{2}$/.test(value)) return;
-    const [hours, minutes] = value.split(":").map(Number);
-    const base = field.value ? new Date(field.value) : new Date();
-    const updatedDate = isNaN(base.getTime()) ? new Date() : base;
-    updatedDate.setHours(hours, minutes, 0, 0);
-    field.onChange(updatedDate);
-  }}
-/>
+                <Input
+                  type="time"
+                  className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  value={timeValue}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setTimeValue(value);
+                    // Partial/cleared input emits "" — don't push an invalid date to the form
+                    if (!/^\d{2}:\d{2}$/.test(value)) return;
+                    const [hours, minutes] = value.split(":").map(Number);
+                    const base = field.value
+                      ? new Date(field.value)
+                      : new Date();
+                    const updatedDate = isNaN(base.getTime())
+                      ? new Date()
+                      : base;
+                    updatedDate.setHours(hours, minutes, 0, 0);
+                    field.onChange(updatedDate);
+                  }}
+                />
               </div>
             )}
           </div>

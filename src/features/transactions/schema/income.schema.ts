@@ -1,7 +1,6 @@
 import {
   amountField,
   optionalDate,
-  optionalObject,
   optionalString,
   requiredDate,
   requiredObject,
@@ -31,6 +30,13 @@ export const incomeSchema = {
     // Keep form-only fields (id, recurring, repeat, balance...) in submitted values
     .passthrough()
     .superRefine((data, ctx) => {
+      if (data.date > new Date()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["date"],
+          message: "Date can't be in the future",
+        });
+      }
       if (data.recurring !== true) return;
       requireFields(data, ctx, {
         behaviour: "Mode is required",

@@ -55,7 +55,6 @@ const CategoryDialog = ({ open, setOpen, mode }: CategoryDialogProps) => {
     setOpen(false);
   });
 
-
   return (
     <CommonDialog
       open={open}
@@ -151,11 +150,13 @@ const CategoryDialog = ({ open, setOpen, mode }: CategoryDialogProps) => {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              disabled={formState.isSubmitting || !formState.isValid}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={formState.isSubmitting}>
+            <Button
+              type="submit"
+              disabled={formState.isSubmitting || !formState.isValid}
+            >
               {formState.isSubmitting
                 ? isEdit
                   ? "Saving..."

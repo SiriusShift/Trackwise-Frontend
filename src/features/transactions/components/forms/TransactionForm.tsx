@@ -94,10 +94,7 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
 
   // Show attachment for past transactions being added/edited
   const showAttachment =
-    !isRecurring &&
-    ((watch("date") < moment() && mode === "add") ||
-      mode === "transact" ||
-      mode === "edit");
+    !isRecurring && (mode === "add" || mode === "transact" || mode === "edit");
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
@@ -179,11 +176,13 @@ const TransactionForm = ({ assetData, mode, type }: TransactionFormProps) => {
               >
                 <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                 {field.value
-                  ? isRecurring || moment(field.value).isAfter(moment())
+                  ? isRecurring
                     ? moment(field.value).format(dateFormat)
                     : moment(field.value).format(dateTimeFormat)
                   : "Pick a date"}
               </Button>
+              <FormMessage />
+
               <DatePicker
                 setDate={handleDateChange}
                 disablePast={isRecurring}

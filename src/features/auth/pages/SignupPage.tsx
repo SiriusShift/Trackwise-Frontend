@@ -156,14 +156,44 @@ const signUp = () => {
         {!isVerifying ? (
           <>
             <div className="flex gap-5">
-              <Input placeholder="First Name" {...register("firstName")} />
-              <Input placeholder="Last name" {...register("lastName")} />
+              <div className="flex-1">
+                <Input
+                  placeholder="First Name"
+                  {...register("firstName")}
+                  aria-invalid={errors.firstName ? "true" : "false"}
+                />
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm">
+                    {errors.firstName.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="Last name"
+                  {...register("lastName")}
+                  aria-invalid={errors.lastName ? "true" : "false"}
+                />
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm">
+                    {errors.lastName.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <Input
-              placeholder="Username"
-              className={`w-full sm:w-96`}
-              {...register("username")}
-            />
+            <div>
+              <Input
+                placeholder="Username"
+                className={`w-full sm:w-96`}
+                {...register("username")}
+                aria-invalid={errors.username ? "true" : "false"}
+              />
+              {errors.username && (
+                <p className="text-red-500 text-sm">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
             <div>
               <Input
                 placeholder="Email"

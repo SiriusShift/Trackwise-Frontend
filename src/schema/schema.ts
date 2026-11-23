@@ -80,7 +80,9 @@ export const notificationSettings = {
   schema: z
     .object({
       notifyDays: numberField(
-        requiredNumber("Notify expense days is required"),
+        requiredNumber("Reminder days is required")
+          .int("Enter whole days")
+          .min(0, "Days can't be negative"),
       ),
       emailNotification: z.boolean({
         required_error: "Email Notification is required",

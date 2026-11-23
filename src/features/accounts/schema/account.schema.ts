@@ -1,5 +1,13 @@
 import z from "zod";
 
+const dayOfMonth = z
+  .number()
+  .int("Enter a day from 1 to 31")
+  .min(1, "Enter a day from 1 to 31")
+  .max(31, "Enter a day from 1 to 31")
+  .optional()
+  .nullable();
+
 export const accountSchema = z
   .object({
     name: z.string().min(1, "Account name is required"),
@@ -28,13 +36,26 @@ export const accountSchema = z
     icon: z.string().optional(),
 
     // Mirrors CreditDetail: only creditLimit is non-nullable there.
-    creditLimit: z.number().positive().optional(),
-    statementDate: z.number().int().min(1).max(31).optional().nullable(),
-    dueDate: z.number().int().min(1).max(31).optional().nullable(),
+    creditLimit: z
+      .number()
+      .positive("Credit limit must be greater than 0")
+      .optional(),
+    statementDate: dayOfMonth,
+    dueDate: dayOfMonth,
     // Alternative to dueDate: due this many days after the statement date
-    dueDaysAfterStatement: z.number().int().min(1).max(60).optional().nullable(),
+    dueDaysAfterStatement: z
+      .number()
+      .int("Enter whole days")
+      .min(1, "Enter 1 to 60 days")
+      .max(60, "Enter 1 to 60 days")
+      .optional()
+      .nullable(),
     includeNetWorth: z.boolean(),
-    targetAmount: z.number().positive().optional().nullable(),
+    targetAmount: z
+      .number()
+      .positive("Savings goal must be greater than 0")
+      .optional()
+      .nullable(),
     targetDate: z.date().optional().nullable(),
   })
   .superRefine((data, ctx) => {
@@ -90,7 +111,7 @@ export const accountSchema = z
     if (hasDate && !hasGoal) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["savingsGoal"],
+        path: ["targetAmount"],
         message: "Savings goal is required when a target date is set",
       });
     }

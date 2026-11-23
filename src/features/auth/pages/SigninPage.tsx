@@ -46,7 +46,8 @@ const SignInPage = () => {
     watch,
   } = useForm({
     resolver: zodResolver(loginSchema.schema),
-    mode: "onChange",
+    // Validate on blur first so errors don't flash while typing
+    mode: "onTouched",
     defaultValues: loginSchema.defaultValues,
   });
 
@@ -137,18 +138,34 @@ const SignInPage = () => {
               submit={onSubmit}
             >
               <div className="mt-5 w-full gap-5 sm:w-96 flex-col flex">
-                <Input
-                  placeholder="Email"
-                  className="w-full sm:w-96"
-                  {...register("email")}
-                  required
-                />
-                <PasswordInput
-                  placeholder="Password"
-                  className="w-full sm:w-96"
-                  {...register("password")}
-                  required
-                />
+                <div>
+                  <Input
+                    placeholder="Email"
+                    className="w-full sm:w-96"
+                    {...register("email")}
+                    aria-invalid={errors.email ? "true" : "false"}
+                    required
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <PasswordInput
+                    placeholder="Password"
+                    className="w-full sm:w-96"
+                    {...register("password")}
+                    aria-invalid={errors.password ? "true" : "false"}
+                    required
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
                 <div className="flex justify-end">
                   <p
                     className="text-sm text-right -mt-4 cursor-pointer"

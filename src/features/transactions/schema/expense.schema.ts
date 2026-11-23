@@ -55,6 +55,13 @@ export const expenseSchema = {
           });
         }
       }
+      if (data.date > new Date()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["date"],
+          message: "Date can't be in the future",
+        });
+      }
       if (data.recurring !== true) return;
       requireFields(data, ctx, {
         behaviour: "Mode is required",
