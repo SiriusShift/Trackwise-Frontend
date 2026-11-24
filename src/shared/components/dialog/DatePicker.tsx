@@ -2,6 +2,7 @@ import { Field } from "@/shared/types";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -39,6 +40,12 @@ const DatePicker = ({
     setTimeValue(formatTime(field.value));
   }, [field.value]);
 
+  const selected = moment(field.value);
+  const now = moment();
+
+  const dateChanged = !selected.isSame(now, "day");
+  const timeChanged =
+    selected.hour() !== now.hour() || selected.minute() !== now.minute();
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -60,7 +67,7 @@ const DatePicker = ({
                     field.value ? new Date(field.value).getMinutes() : 0,
                   ),
                 );
-                if (disableFuture) {
+                if (disableFuture && newDate > new Date()) {
                   return toast.error("Can't set date to future");
                 }
                 if (setDate) {
@@ -84,10 +91,18 @@ const DatePicker = ({
               }}
             />
             {/* Time Picker for Time Selection */}
-            {!removeTime && (
-              <div className="flex items-center px-4 justify-between">
-                <label className="text-sm font-lg">Time:</label>
-                {/* <Button
+            <div
+              className={`flex items-center px-4 ${(dateChanged || timeChanged) && !removeTime ? "justify-between" : "justify-end"}`}
+            >
+              {(dateChanged || timeChanged) && (
+                <Button
+                  variant="ghost"
+                  onClick={() => field.onChange(new Date())}
+                >
+                  Now
+                </Button>
+              )}
+              {/* <Button
                 variant="outline"
                 onClick={() => {
                   setOpen(false);
@@ -101,7 +116,7 @@ const DatePicker = ({
                   : "-- : -- --"}{" "}
                 <Clock />
               </Button> */}
-
+              {!removeTime && (
                 <Input
                   type="time"
                   className="w-32 px-2 h-7 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
@@ -122,8 +137,8 @@ const DatePicker = ({
                     field.onChange(updatedDate);
                   }}
                 />
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
