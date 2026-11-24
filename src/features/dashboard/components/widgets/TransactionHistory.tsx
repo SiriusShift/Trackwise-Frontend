@@ -1,14 +1,16 @@
 import { IRootState } from "@/app/store";
 import { useGetTransactionHistoryQuery } from "@/features/transactions/api/transaction";
+import ViewTransaction from "@/shared/components/dialog/ViewDialog/ViewTransaction";
 import { Card, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useDateFormat } from "@/shared/hooks/useDateFormat";
 import { formatCurrency } from "@/shared/utils/CustomFunctions";
 import * as Icons from "lucide-react";
 import { FileX } from "lucide-react";
 import moment from "moment";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useDateFormat } from "@/shared/hooks/useDateFormat";
 interface RecentTransaction {
   id: number;
   type: string;
@@ -59,6 +61,10 @@ function AmountLabel({ type, amount }: { type: string; amount: number }) {
 }
 
 const TransactionHistory = () => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [transaction, setTransaction] = useState<RecentTransaction | null>(
+    null,
+  );
   const { dateTimeFormat } = useDateFormat();
   const { data, isFetching } = useGetTransactionHistoryQuery({
     pageSize: 4,
@@ -69,96 +75,108 @@ const TransactionHistory = () => {
 
   const isEmpty = !isFetching && transactions.length === 0;
 
+  const handleView = (data: RecentTransaction) => {
+    setOpen(true);
+    setTransaction(data);
+  };
   return (
-    <Card
-      data-tour="recent-transactions"
-      className="relative border border-border/60 p-4 sm:p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
-    >
-      <CardHeader className="p-0">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground">
-            Recent Transactions
-          </CardTitle>
-          <Link
-            to="/transactions"
-            className="text-xs text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-70 shrink-0 -my-2 py-2 -mx-1 px-1"
-          >
-            See All →
-          </Link>
-        </div>
-      </CardHeader>
-
-      <div className="flex-1 min-h-0">
-        {isFetching ? (
-          <div className="space-y-3 py-1">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <Skeleton className="h-3.5 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-                <Skeleton className="h-3.5 w-16" />
-              </div>
-            ))}
-          </div>
-        ) : isEmpty ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/20 p-8 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-              <FileX className="text-muted-foreground" size={22} />
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-foreground">
-                No transactions yet
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Your latest income, expenses and transfers will show up here.
-              </p>
-            </div>
+    <>
+      <Card
+        data-tour="recent-transactions"
+        className="relative border border-border/60 p-4 sm:p-5 gap-4 bg-card flex flex-col rounded-2xl shadow-xs col-span-full md:col-span-4 xl:col-span-1 transition-shadow hover:shadow-md"
+      >
+        <CardHeader className="p-0">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-foreground">
+              Recent Transactions
+            </CardTitle>
             <Link
               to="/transactions"
-              className="text-xs font-medium text-primary hover:underline underline-offset-4 py-2 -my-2 px-1"
+              className="text-xs text-primary hover:underline underline-offset-4 transition-opacity hover:opacity-70 shrink-0 -my-2 py-2 -mx-1 px-1"
             >
-              Add a transaction →
+              See All →
             </Link>
           </div>
-        ) : (
-          <div className="space-y-2">
-            {transactions.map((item, index) => (
-              <div
-                key={`${item.id}-${index}`}
-                className="flex items-center p-2 gap-3 rounded-lg border border-border/50 bg-muted/30"
-              >
-                <TransactionIcon
-                  icon={item?.category?.icon}
-                  type={item?.type}
-                />
+        </CardHeader>
 
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-medium truncate text-foreground"
-                    title={item?.description}
-                  >
-                    {item?.description}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {item?.category?.name}
-                  </p>
+        <div className="flex-1 min-h-0">
+          {isFetching ? (
+            <div className="space-y-3 py-1">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                  <Skeleton className="h-3.5 w-16" />
                 </div>
-
-                <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  <AmountLabel type={item?.type} amount={item?.amount} />
-                  <p className="text-[11px] text-muted-foreground">
-                    {moment(item?.date).format(dateTimeFormat)}
-                  </p>
-                </div>
+              ))}
+            </div>
+          ) : isEmpty ? (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/20 p-8 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                <FileX className="text-muted-foreground" size={22} />
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </Card>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  No transactions yet
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your latest income, expenses and transfers will show up here.
+                </p>
+              </div>
+              <Link
+                to="/transactions"
+                className="text-xs font-medium text-primary hover:underline underline-offset-4 py-2 -my-2 px-1"
+              >
+                Add a transaction →
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {transactions.map((item, index) => (
+                <div
+                  key={`${item.id}-${index}`}
+                  className="flex items-center p-2 gap-3 rounded-lg border border-border/50 bg-muted/30 cursor-pointer hover:bg-muted/80"
+                  onClick={() => handleView(item)}
+                >
+                  <TransactionIcon
+                    icon={item?.category?.icon}
+                    type={item?.type}
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-medium truncate text-foreground"
+                      title={item?.description}
+                    >
+                      {item?.description}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {item?.category?.name}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-0.5 shrink-0">
+                    <AmountLabel type={item?.type} amount={item?.amount} />
+                    <p className="text-[11px] text-muted-foreground">
+                      {moment(item?.date).format(dateTimeFormat)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Card>
+      <ViewTransaction
+        open={open}
+        setOpen={setOpen}
+        transaction={transaction}
+      />
+    </>
   );
 };
 

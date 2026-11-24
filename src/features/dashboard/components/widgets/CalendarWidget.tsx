@@ -418,7 +418,7 @@ export default function CalendarWidget() {
                       type="button"
                       key={item.key}
                       onClick={() => handleOpenBill(item)}
-                      className="w-full flex items-center gap-3 p-2 rounded-lg border-b border-border/50 last:border-b-0 hover:bg-muted/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      className="w-full flex cursor-pointer items-center gap-3 p-2 rounded-lg border-b border-border/50 last:border-b-0 hover:bg-muted/40 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                     >
                       {/* <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-background border border-border/60">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />

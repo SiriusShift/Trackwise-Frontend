@@ -1,4 +1,5 @@
 import { IRootState } from "@/app/store";
+import { accountsApi } from "@/shared/api/accountsApi";
 import {
   Popover,
   PopoverContent,
@@ -13,7 +14,6 @@ import {
 import { months } from "@/shared/constants/dateConstants";
 import { setActive, setMode } from "@/shared/slices/activeSlice";
 import { formatDateDisplay } from "@/shared/utils/CustomFunctions";
-import { accountsApi } from "@/shared/api/accountsApi";
 import { CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
